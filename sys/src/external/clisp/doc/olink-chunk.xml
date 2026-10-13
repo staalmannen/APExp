@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE targetset SYSTEM "http://docbook.sourceforge.net/release/xsl/current/common/targetdatabase.dtd" [
+  <!ENTITY man-targets SYSTEM "man.tdb">
+  <!ENTITY clink-targets SYSTEM "clink.tdb">
+  <!ENTITY imp-targets SYSTEM "chunk.tdb">
+]>
+<targetset>
+ <targetsetinfo>
+  cross-references between CLISP man page and implementation notes
+  http://www.sagehill.net/docbookxsl/Olinking.html
+  multi-file version for web pages
+ </targetsetinfo>
+
+ <document targetdoc="impnotes">&imp-targets;</document>
+ <document targetdoc="man" baseuri="clisp.html">&man-targets;</document>
+ <document targetdoc="clink" baseuri="clisp-link.html">&clink-targets;</document>
+</targetset>

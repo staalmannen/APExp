@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- *** Entities for docbook/xml, related to UNIX *** -->
+<!--
+ Copyright (C) 2002-2005, 2007-2008 by Sam Steingold
+ This is Free Software, covered by the GNU GPL (v2 or later)
+ See http://www.gnu.org/copyleft/gpl.html
+ -->
+
+<!ENTITY unix '<ulink url="http://www.unix.org/online.html"><emphasis role="strong">UNIX</emphasis></ulink>'>
+
+<!ENTITY X '<ulink url="http://www.x.org/">X Window System</ulink>'>
+
+<!ENTITY env-var '<ulink role="unix" url="basedefs/xbd_chap08.html">environment variable</ulink>'>
+<!ENTITY file-des '<ulink role="unix" url="basedefs/xbd_chap03.html#tag_03_165">file descriptor</ulink>'>
+<!ENTITY locale '<replaceable><ulink role="unix" url="basedefs/xbd_chap07.html">LOCALE</ulink></replaceable>'>
+<!ENTITY reg-exp '<ulink role="unix" url="basedefs/xbd_chap09.html">regular expression</ulink>'>
+<!ENTITY sh-lang '<ulink role="unix" url="utilities/xcu_chap02.html">Shell Command Language</ulink>'>
+<!ENTITY path-match '<ulink role="unix" url="utilities/xcu_chap02.html#tag_02_13">Pathname Matching</ulink>'>
+<!ENTITY iconv '<function role="unix">iconv</function>'>
+<!ENTITY free '<function role="unix">free</function>'>
+<!ENTITY malloc '<function role="unix">malloc</function>'>
+<!ENTITY sh '<ulink role="unix" url="utilities/sh.html"><command>/bin/sh</command></ulink>'>
+<!ENTITY stdin '<varname role="unix">stdin</varname>'>
+<!ENTITY stdout '<varname role="unix">stdout</varname>'>
+<!ENTITY stderr '<varname role="unix">stderr</varname>'>
+<!ENTITY stdio '<filename role="unix">stdio.h</filename>'>
+<!ENTITY errno '<varname role="unix">errno</varname>'>
+<!ENTITY strerror '<function role="unix">strerror</function>'>
+<!ENTITY dlopen '<function role="unix">dlopen</function>'>
+<!ENTITY dlsym '<function role="unix">dlsym</function>'>
+<!ENTITY dup '<function role="unix">dup</function>'>
+<!ENTITY fstat '<function role="unix">fstat</function>'>
+<!ENTITY setsockopt '<function role="unix">setsockopt</function>'>
+<!ENTITY socket '<function role="unix">socket</function>'>
+<!ENTITY socketpair '<function role="unix">socketpair</function>'>
+<!ENTITY read-U '<function role="unix">read</function>'>
+<!ENTITY write-U '<function role="unix">write</function>'>
+<!ENTITY mkstemp '<function role="unix">mkstemp</function>'>
+<!ENTITY regex '<filename role="unix">regex.h</filename>'>

@@ -1,0 +1,146 @@
+dnl AUTOCONF configuration for dbus
+dnl Copyright (C) 2008-2009 Sam Steingold <sds@gnu.org>
+dnl GNU GPL2+
+
+AC_PREREQ(2.57)
+AC_INIT(dbus, 1.0, clisp-list)
+AC_CONFIG_SRCDIR(dbus.lisp)
+AC_CONFIG_HEADERS(config.h)
+
+RSE_BOLD
+BOLD_MSG([Dbus (Common)])
+CL_MODULE_COMMON_CHECKS([ffi])
+
+BOLD_MSG([Dbus (Headers and Libraries)])
+PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.0,,[AC_MSG_ERROR([cannot find D-Bus])])
+AC_SUBST(DBUS_CFLAGS)
+AC_SUBST(DBUS_LIBS)
+dbus_save_CFLAGS=$CFLAGS
+AC_LIB_APPENDTOVAR([CFLAGS], [$DBUS_CFLAGS])
+AC_CHECK_TYPES([dbus_int64_t, dbus_int32_t, dbus_uint32_t, dbus_int16_t,
+dbus_unichar_t, dbus_bool_t],,,[#include <dbus/dbus.h>])
+CFLAGS=$dbus_save_CFLAGS
+
+BOLD_MSG([Dbus (Functions)])
+dbus_save_LIB=$LIBS
+AC_LIB_APPENDTOVAR([LIBS], [$DBUS_LIBS])
+AC_CHECK_FUNCS(dnl ;; === dbus-types.h
+dbus_error_init dbus_error_free dbus_set_error dbus_set_error_const dnl
+dbus_move_error dbus_error_has_name dbus_error_is_set dnl
+dnl ;; === dbus-address.h
+dbus_parse_address dbus_address_entry_get_value dnl
+dbus_address_entry_get_method dbus_address_entries_free dnl
+dbus_address_escape_value dbus_address_unescape_value dnl
+dnl ;; === dbus-memory.h
+dbus_malloc dbus_malloc0 dbus_realloc dbus_free dnl
+dbus_free_string_array dbus_shutdown dnl
+dnl ;; === dbus-message.h
+dbus_message_new dbus_message_new_method_call dnl
+dbus_message_new_method_return dbus_message_new_signal dnl
+dbus_message_new_error dbus_message_copy dbus_message_ref dnl
+dbus_message_unref dbus_message_get_type dbus_message_set_path dnl
+dbus_message_get_path dbus_message_has_path dbus_message_set_interface dnl
+dbus_message_get_interface dbus_message_has_interface dnl
+dbus_message_set_member dbus_message_get_member dbus_message_has_member dnl
+dbus_message_set_error_name dbus_message_get_error_name dnl
+dbus_message_set_destination dbus_message_get_destination dnl
+dbus_message_set_sender dbus_message_get_sender dbus_message_get_signature dnl
+dbus_message_set_no_reply dbus_message_get_no_reply dnl
+dbus_message_is_method_call dbus_message_is_signal dbus_message_is_error dnl
+dbus_message_has_destination dbus_message_has_sender dnl
+dbus_message_has_signature dbus_message_get_serial dnl
+dbus_message_set_reply_serial dbus_message_get_reply_serial dnl
+dbus_message_set_auto_start dbus_message_get_auto_start dnl
+dbus_message_get_path_decomposed dbus_message_append_args dnl
+dbus_message_append_args_valist dbus_message_get_args dnl
+dbus_message_get_args_valist dbus_message_iter_init dnl
+dbus_message_iter_has_next dbus_message_iter_next dnl
+dbus_message_iter_get_signature dbus_message_iter_get_arg_type dnl
+dbus_message_iter_get_element_type dbus_message_iter_recurse dnl
+dbus_message_iter_get_basic dbus_message_iter_get_fixed_array dnl
+dbus_message_iter_init_append dbus_message_iter_append_basic dnl
+dbus_message_iter_append_fixed_array dbus_message_iter_open_container dnl
+dbus_message_iter_close_container dbus_set_error_from_message dnl
+dbus_message_allocate_data_slot dbus_message_free_data_slot dnl
+dbus_message_set_data dbus_message_get_data dbus_message_type_from_string dnl
+dbus_message_type_to_string dbus_message_marshal dbus_message_demarshal dnl
+dnl ;; === dbus-shared.h
+dnl ;; === dbus-connection.h
+dbus_connection_open dbus_connection_open_private dbus_connection_ref dnl
+dbus_connection_unref dbus_connection_close dnl
+dbus_connection_get_is_connected dbus_connection_get_is_authenticated dnl
+dbus_connection_get_is_anonymous dbus_connection_get_server_id dnl
+dbus_connection_set_exit_on_disconnect dbus_connection_flush dnl
+dbus_connection_read_write_dispatch dbus_connection_read_write dnl
+dbus_connection_borrow_message dbus_connection_return_message dnl
+dbus_connection_steal_borrowed_message dbus_connection_pop_message dnl
+dbus_connection_get_dispatch_status dbus_connection_dispatch dnl
+dbus_connection_has_messages_to_send dbus_connection_send dnl
+dbus_connection_send_with_reply dnl
+dbus_connection_send_with_reply_and_block dnl
+dbus_connection_set_watch_functions dnl
+dbus_connection_set_timeout_functions dnl
+dbus_connection_set_wakeup_main_function dnl
+dbus_connection_set_dispatch_status_function dnl
+dbus_connection_get_unix_user dbus_connection_get_unix_process_id dnl
+dbus_connection_set_unix_user_function dbus_connection_get_windows_user dnl
+dbus_connection_set_windows_user_function dnl
+dbus_connection_set_allow_anonymous dnl
+dbus_connection_set_route_peer_messages dbus_connection_add_filter dnl
+dbus_connection_remove_filter dbus_connection_allocate_data_slot dnl
+dbus_connection_free_data_slot dbus_connection_set_data dnl
+dbus_connection_get_data dbus_connection_set_change_sigpipe dnl
+dbus_connection_set_max_message_size dnl
+dbus_connection_get_max_message_size dnl
+dbus_connection_set_max_received_size dnl
+dbus_connection_get_max_received_size dbus_connection_get_outgoing_size dnl
+dbus_connection_preallocate_send dbus_connection_free_preallocated_send dnl
+dbus_connection_send_preallocated dnl
+dbus_connection_try_register_object_path dnl
+dbus_connection_register_object_path dnl
+dbus_connection_try_register_fallback dbus_connection_register_fallback dnl
+dbus_connection_unregister_object_path dnl
+dbus_connection_get_object_path_data dbus_connection_list_registered dnl
+dbus_connection_get_unix_fd dbus_connection_get_socket dnl
+dbus_get_local_machine_id dbus_watch_get_fd dbus_watch_get_unix_fd dnl
+dbus_watch_get_socket dbus_watch_get_flags dbus_watch_get_data dnl
+dbus_watch_set_data dbus_watch_handle dbus_watch_get_enabled dnl
+dbus_timeout_get_interval dbus_timeout_get_data dbus_timeout_set_data dnl
+dbus_timeout_handle dbus_timeout_get_enabled dnl
+dnl ;; === dbus-bus.h
+dbus_bus_get dbus_bus_get_private dbus_bus_register dnl
+dbus_bus_set_unique_name dbus_bus_get_unique_name dbus_bus_get_unix_user dnl
+dbus_bus_get_id dbus_bus_request_name dbus_bus_release_name dnl
+dbus_bus_name_has_owner dbus_bus_start_service_by_name dnl
+dbus_bus_add_match dbus_bus_remove_match dnl
+dnl ;; === dbus-pending-call.h
+dbus_pending_call_ref dbus_pending_call_unref dnl
+dbus_pending_call_set_notify dbus_pending_call_cancel dnl
+dbus_pending_call_get_completed dbus_pending_call_steal_reply dnl
+dbus_pending_call_block dbus_pending_call_allocate_data_slot dnl
+dbus_pending_call_free_data_slot dbus_pending_call_set_data dnl
+dbus_pending_call_get_data dnl
+dnl ;; === dbus-protocol.h
+dnl ;; === dbus-server.h
+dbus_server_listen dbus_server_ref dbus_server_unref dnl
+dbus_server_disconnect dbus_server_get_is_connected dnl
+dbus_server_get_address dbus_server_get_id dnl
+dbus_server_set_new_connection_function dbus_server_set_watch_functions dnl
+dbus_server_set_timeout_functions dbus_server_set_auth_mechanisms dnl
+dbus_server_allocate_data_slot dbus_server_free_data_slot dnl
+dbus_server_set_data dbus_server_get_data dnl
+dnl ;; === dbus-signature.h
+dbus_signature_iter_init dbus_signature_iter_get_current_type dnl
+dbus_signature_iter_get_signature dbus_signature_iter_get_element_type dnl
+dbus_signature_iter_next dbus_signature_iter_recurse dnl
+dbus_signature_validate dbus_signature_validate_single dnl
+dbus_type_is_basic dbus_type_is_container dbus_type_is_fixed dnl
+dnl ;; === dbus-threads.h
+dbus_threads_init dbus_threads_init_default)
+LIBS=$dbus_save_LIB
+
+BOLD_MSG([Dbus (Output)])
+AC_CONFIG_FILES(Makefile link.sh)
+AC_OUTPUT
+
+BOLD_MSG([Dbus (Done)])

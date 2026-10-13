@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section id="gdbm"><title>GDBM - The GNU database manager</title>
+
+<para>This is an interface to the &gdbm;, which extends the standard
+ &unix; <filename role="unix">ndbm.h</filename>.</para>
+<simpara>When this module is present, &features-my; contains the
+ symbol <constant>:GDBM</constant>.</simpara>
+
+<simpara>See <filename role="clisp-cvs">modules/gdbm/test.tst</filename>
+ for sample usage.</simpara>
+
+<variablelist id="gdbm-api"><title>GDBM module API</title>
+ <varlistentry id="gdbm-version"><term><code>(GDBM:GDBM-VERSION)</code></term>
+  <listitem><para>Return the version string.</para></listitem></varlistentry>
+ <varlistentry id="gdbm-open"><term><code>(GDBM:GDBM-OPEN &filename-r;
+    &key-amp; :BLOCKSIZE :READ-WRITE :OPTION :MODE :DEFAULT-KEY-TYPE
+    :DEFAULT-VALUE-TYPE)</code></term>
+  <listitem><para>Open &filename-r; database file.
+    The return value is a <type>GDBM</type> structure.
+    <constant>:READ-WRITE</constant> can have one of following values:
+    <simplelist><member>&reader-k;</member><member>&writer-k;</member>
+     <member><constant>:WRCREAT</constant></member>
+     <member><constant>:NEWDB</constant></member>
+    </simplelist>
+    and <constant>:OPTION</constant> is one of
+    <simplelist>
+     <member><constant>:SYNC</constant></member>
+     <member><constant>:NOLOCK</constant></member>
+     <member><constant>:FAST</constant></member>
+   </simplelist></para><para>&clisp; can store and retrieve values of the
+    following types:<simplelist><member>&string-t;</member>
+     <member>&vector-t; (meaning anything that can be &coerce;d to
+      &ubyte-vec;)</member>
+     <member><literal role="type">EXT:32BIT-VECTOR</literal> (meaning
+      <literal role="type">(&vector-t; &ubyte-32;)</literal>)</member>
+     <member>&integer-t;</member><member>&single-float-t;</member>
+     <member>&double-float-t;</member></simplelist>
+    and <constant>:DEFAULT-KEY-TYPE</constant>
+    and <constant>:DEFAULT-VALUE-TYPE-TYPE</constant> should be one of
+    those.  If not specified (or &nil;), the &type-k;
+    argument is required in the access functions below.</para>
+   <para>If &filename-r; is actually an existing <type>GDBM</type> structure,
+    then it is re-opened (if it has been closed), and returned as is.</para>
+   <para>The return value is &finalize;d with
+    <link linkend="gdbm-close"><function>GDBM-CLOSE</function></link>.</para>
+ </listitem></varlistentry>
+ <varlistentry id="gdbm-default-types">
+  <term><code>(GDBM:GDBM-DEFAULT-KEY-TYPE &db-r;)</code></term>
+  <term><code>(GDBM:GDBM-DEFAULT-VALUE-TYPE &db-r;)</code></term>
+  <listitem><para>Return the default data conversion types.</para>
+ </listitem></varlistentry>
+ <varlistentry id="gdbm-close">
+  <term><code>(GDBM:GDBM-CLOSE &db-r;)</code></term>
+  <listitem><simpara>Close the database.
+ </simpara></listitem></varlistentry>
+ <varlistentry id="gdbm-open-p">
+  <term><code>(GDBM:GDBM-OPEN-P &db-r;)</code></term>
+  <listitem><simpara>Check whether &db-r; has been already closed.</simpara>
+   <warning><simpara>Only the above functions accept closed databases,
+     the following functions &sig-err; when passed a closed database.
+ </simpara></warning></listitem></varlistentry>
+ <varlistentry id="gdbm-store">
+  <term><code>(GDBM:GDBM-STORE &db-r; &key-r; &cont-r; &key-amp;
+    :FLAG)</code></term>
+  <listitem><para>&db-r; is the <type>GDBM</type> structure returned by
+    <link linkend="gdbm-open"><function>GDBM-OPEN</function></link>.
+    &key-r; is the key datum.
+    &cont-r; is the data to be associated with the key.
+    <constant>:FLAG</constant> can have one of following values:
+    <simplelist><member><constant>:INSERT</constant></member>
+     <member><constant>:REPLACE</constant></member></simplelist>
+ </para></listitem></varlistentry>
+ <varlistentry id="gdbm-fetch">
+  <term><code>(GDBM:GDBM-FETCH &db-r; &key-r; &key-amp;
+    (TYPE (GDBM:GDBM-DEFAULT-VALUE-TYPE &db-r;)))</code></term>
+  <listitem><simpara>Search the database.
+    The &type-k; argument specifies the return type.
+ </simpara></listitem></varlistentry>
+ <varlistentry id="gdbm-delete">
+  <term><code>(GDBM:GDBM-DELETE &db-r; &key-r;)</code></term>
+  <listitem><simpara>Delete &key-r; and its contents.
+ </simpara></listitem></varlistentry>
+ <varlistentry id="gdbm-exists">
+  <term><code>(GDBM:GDBM-EXISTS &db-r; &key-r;)</code></term>
+  <listitem><simpara>Search data without retrieving it.
+ </simpara></listitem></varlistentry>
+ <varlistentry id="gdbm-firstkey">
+  <term><code>(GDBM:GDBM-FIRSTKEY &db-r; &key-amp;
+    (TYPE (GDBM:GDBM-DEFAULT-KEY-TYPE &db-r;)))</code></term>
+  <listitem><simpara>Return the key of the first entry, as &type-k;.
+    If the database has no entries, the return value is &nil;.
+ </simpara></listitem></varlistentry>
+ <varlistentry id="gdbm-nextkey">
+  <term><code>(GDBM:GDBM-NEXTKEY &db-r; &key-r; &key-amp;
+    (TYPE (GDBM:GDBM-DEFAULT-KEY-TYPE &db-r;)))</code></term>
+  <listitem><simpara>Return the key that follows &key-r;, as &type-k;,
+    or &nil; if there are no further entries.
+ </simpara></listitem></varlistentry>
+ <varlistentry id="gdbm-reorganize">
+  <term><code>(GDBM:GDBM-REORGANIZE &db-r;)</code></term>
+  <listitem><simpara>Reorganize the database.
+ </simpara></listitem></varlistentry>
+ <varlistentry id="gdbm-sync">
+  <term><code>(GDBM:GDBM-SYNC &db-r;)</code></term>
+  <listitem><simpara>Syncronize the in-memory state of the database to
+    the disk file.</simpara></listitem></varlistentry>
+ <varlistentry id="gdbm-setopt">
+  <term><code>(GDBM:GDBM-SETOPT &db-r; &option-r; &value-r;)</code></term>
+  <listitem><para>Set options on an already open database.
+    &option-r; is one of following:
+    <variablelist>
+     <varlistentry><term><constant>:CACHESIZE</constant></term>
+      <listitem><simpara>set the size of the internal bucket cache.
+        (default is 100)</simpara></listitem></varlistentry>
+     <varlistentry><term><constant>:FASTMODE</constant></term>
+      <listitem><simpara>&t; or &nil; (obsolete)
+     </simpara></listitem></varlistentry>
+     <varlistentry><term><constant>:SYNCMODE</constant></term>
+      <listitem><simpara>&t; or &nil;</simpara></listitem></varlistentry>
+     <varlistentry><term><constant>:CENTFREE</constant></term>
+      <listitem><simpara>&t; or &nil;</simpara></listitem></varlistentry>
+     <varlistentry><term><constant>:COALESCEBLKS</constant></term>
+      <listitem><simpara>&t; or &nil;</simpara></listitem></varlistentry>
+     <varlistentry><term><constant>:DEFAULT-VALUE-TYPE</constant></term>
+      <term><constant>:DEFAULT-KEY-TYPE</constant></term>
+      <listitem><simpara>see
+        <link linkend="gdbm-open"><function>GDBM-OPEN</function></link>
+     </simpara></listitem></varlistentry>
+ </variablelist></para></listitem></varlistentry>
+ <varlistentry id="gdbm-file-size">
+  <term><code>(GDBM:GDBM-FILE-SIZE &db-r;)</code></term>
+  <listitem><simpara>Return the underlying file size using
+    <function role="unix">lseek</function>.</simpara></listitem></varlistentry>
+ <varlistentry id="gdbm-do-db">
+  <term><code>(GDBM:DO-DB (&key-r; &db-r; &rest-amp; &options-r;)
+    &body-amp; &body-r;)</code></term>
+  <listitem><simpara>Iterate over the database keys, &options-r; are
+    passed to <function>GDBM-FIRSTKEY</function>
+    and <function>GDBM-NEXTKEY</function>.
+    &body-r; is passed to &loop;, so you can use all the standard loop
+    contructs, e.g., <code>(do-db (k db) :collect (list k (gdbm-fetch
+     k)))</code> will convert the database to an &alist;.
+ </simpara></listitem></varlistentry>
+ <varlistentry id="gdbm-with-open-db">
+  <term><code>(GDBM:WITH-OPEN-DB (&db-r; &filename-r; &rest-amp; &options-r;)
+    &body-amp; &body-r;)</code></term>
+  <listitem><simpara>Open the &filename-r;, execute the &body-r;, close
+    the database.</simpara></listitem></varlistentry>
+</variablelist>
+
+</section>

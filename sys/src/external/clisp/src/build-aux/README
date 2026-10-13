@@ -1,0 +1,3 @@
+These are auxiliary scripts used in building and installing CLISP.
+They are not maintained by us, but updated from an external source by
+$ make -f Makefile.devel build-aux-update

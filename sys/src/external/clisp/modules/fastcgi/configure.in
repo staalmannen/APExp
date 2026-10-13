@@ -1,0 +1,34 @@
+# configure.in for FastCGI module
+
+AC_INIT(clisp-fastcgi-interface, 0.1, hin@alma.com)
+AC_CONFIG_SRCDIR(fastcgi.lisp)
+AC_CONFIG_HEADERS(config.h)
+
+RSE_BOLD
+BOLD_MSG([FastCGI (Common)])
+CL_MODULE_COMMON_CHECKS([ffi])
+
+BOLD_MSG([FastCGI (Programs)])
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+dnl Search for libfcgi and define LIBFCGI, LTLIBFCGI and INCFCGI.
+AC_LIB_LINKFLAGS([fcgi])
+
+BOLD_MSG([FastCGI (Headers)])
+AC_CHECK_HEADERS([fcgi_stdio.h string.h unistd.h])
+if test "$ac_cv_header_fcgi_stdio_h" = "no"; then
+  AC_MSG_ERROR([cannot find FastCGI headers])
+fi
+
+BOLD_MSG([FastCGI (Types)])
+AC_TYPE_SIZE_T
+
+BOLD_MSG([FastCGI (Functions)])
+AC_LIB_APPENDTOVAR([LIBS], [$LIBFCGI])
+AC_CHECK_FUNCS([strchr])
+
+BOLD_MSG([FastCGI (Output)])
+AC_CONFIG_FILES([Makefile link.sh])
+AC_OUTPUT
+BOLD_MSG([FastCGI (Done)])

@@ -1,0 +1,20 @@
+dnl AUTOCONF configuration for wildcard
+dnl Bruno Haible 12.4.1997
+dnl Sam Steingold 2003-07-28, 2006-2009
+
+AC_PREREQ(2.57)
+AC_INIT(wildcard, 1.0, clisp-list)
+AC_CONFIG_SRCDIR(wildcard.lisp)
+AC_CONFIG_HEADERS(config.h)
+
+RSE_BOLD
+BOLD_MSG([Wildcard (Common)])
+CL_MODULE_COMMON_CHECKS([ffi])
+AM_INIT_AUTOMAKE([no-define])
+wc_gl_EARLY
+wc_gl_INIT
+BOLD_MSG([Wildcard (Output)])
+AC_CONFIG_FILES([Makefile link.sh gllib/Makefile])
+AC_OUTPUT
+
+BOLD_MSG([Wildcard (Done)])

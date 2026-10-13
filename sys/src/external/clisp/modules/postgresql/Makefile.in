@@ -1,0 +1,44 @@
+# Makefile for CLISP module set postgresql
+
+srcdir = @srcdir@
+CC = @CC@
+PQCPPFLAGS = @CPPFLAGS@
+CFLAGS = @CFLAGS@
+CLISP = @CLISP@ -norc -q
+CLISP_LINKKIT = @CLISP_LINKKIT@
+
+LN = @LN@
+
+MAKE = make
+
+SHELL = /bin/sh
+
+GENERATED = postgresql.o postgresql.fas sql.fas
+DISTRIBFILES = link.sh Makefile $(GENERATED) \
+	$(srcdir)/postgresql.lisp $(srcdir)/sql.lisp $(srcdir)/README
+distribdir =
+
+# default target: make the module
+clisp-module : $(GENERATED)
+
+postgresql.c postgresql.fas : $(srcdir)/postgresql.lisp
+	$(CLISP) -c $(srcdir)/postgresql.lisp -o ./
+
+postgresql.o : postgresql.c config.h
+	$(CC) $(CPPFLAGS) $(PQCPPFLAGS) $(CFLAGS) -I$(CLISP_LINKKIT) \
+		-c postgresql.c
+
+sql.fas: $(srcdir)/sql.lisp
+	$(CLISP) -c $(srcdir)/sql.lisp -o ./
+
+# Make a module distribution into $(distribdir)
+clisp-module-distrib : clisp-module force
+	$(LN) $(DISTRIBFILES) $(distribdir)
+
+clean : force
+	rm -f core *.o *.a *.fas *.lib
+
+distclean : clean
+
+force :
+

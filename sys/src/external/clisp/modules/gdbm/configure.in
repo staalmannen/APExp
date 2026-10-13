@@ -1,0 +1,38 @@
+dnl AUTOCONF configuration for Gdbm
+dnl Copyright (C) 2007  Masayuki Onjo <onjo@lispuser.net>
+dnl Copyright (C) 2007-2009  Sam Steingold <sds@gnu.org>
+dnl GNU GPL2
+
+AC_PREREQ(2.57)
+AC_INIT(gdbm, 1.0, clisp-list)
+AC_CONFIG_SRCDIR(gdbm.lisp)
+AC_CONFIG_HEADERS(config.h)
+
+RSE_BOLD
+BOLD_MSG([Gdbm (Common)])
+CL_MODULE_COMMON_CHECKS()
+
+dnl Search for libgdbm and define LIBGDBM, INCGDBM.
+AC_LIB_LINKFLAGS([gdbm])
+
+BOLD_MSG([Gdbm (Headers)])
+AC_CHECK_HEADERS(gdbm.h gdbm/gdbm.h, break)
+if test "$ac_cv_header_gdbm_h" = "no" -a "$ac_cv_header_gdbm_gdbm_h" = "no";
+then AC_MSG_ERROR([cannot find Gdbm headers])
+fi
+
+BOLD_MSG([Gdbm (Functions)])
+AC_LIB_APPENDTOVAR([LIBS], [$LIBGDBM])
+AC_SEARCH_LIBS(gdbm_open, gdbm)
+if test "$ac_cv_search_gdbm_open" = "no"; then
+  AC_MSG_ERROR([cannot find Gdbm library])
+fi
+AC_CHECK_FUNCS(gdbm_open gdbm_close gdbm_fdesc gdbm_store gdbm_fetch dnl
+gdbm_delete gdbm_firstkey gdbm_nextkey gdbm_reorganize gdbm_sync dnl
+gdbm_exists gdbm_setopt)
+
+BOLD_MSG([Gdbm (Output)])
+AC_CONFIG_FILES(Makefile link.sh)
+AC_OUTPUT
+
+BOLD_MSG([Gdbm (Done)])

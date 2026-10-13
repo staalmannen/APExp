@@ -1,0 +1,2507 @@
+# -*- Makefile -*- for the CLISP binaries
+# DO NOT EDIT! GENERATED AUTOMATICALLY!
+# This file was created on host loiso as the output of the command:
+# ./makemake --with-dynamic-ffi --without-dynamic-modules win32msvc msvc7
+
+# -------------- Start of configurable section --------------------
+
+# Flags that can be set on the nmake command line:
+#   MFLAGS={-ML|-MT|-MD} for defining the compilation model
+#     MFLAGS=-ML (the default)  Single-threaded, statically linked - libc.lib
+#     MFLAGS=-MT                Multi-threaded, statically linked  - libcmt.lib
+#     MFLAGS=-MD                Multi-threaded, dynamically linked - msvcrt.lib
+!if !defined(MFLAGS)
+MFLAGS=
+!endif
+
+# The official version number
+PACKAGE_VERSION=2.49
+VERSION=2.49
+# The official package name
+PACKAGE_NAME=@PACKAGE_NAME@
+# If you want to distribute a modified version of CLISP,
+# use this to distinguish your distribution from the official one.
+# This can also be used for pre-test and post-release distributions:
+#   make distrib VERSION_SUFFIX=pre
+VERSION_SUFFIX=
+# The distribution's top directory
+TOPDIR=clisp-$(VERSION)$(VERSION_SUFFIX)
+
+# Directories used by "make install":
+prefix = 
+exec_prefix = $(prefix)
+bindir  = $(exec_prefix)\bin
+datarootdir = $(prefix)\share
+mandir  = $(datarootdir)\man
+docdir  = $(datarootdir)\doc\clisp
+htmldir = $(docdir)
+psdir   = $(docdir)
+pdfdir  = $(docdir)
+libdir  = $(exec_prefix)\lib
+lisplibdir = $(libdir)\$(TOPDIR)
+elispdir = $(datarootdir)/emacs/site-lisp
+vimdir = $(datarootdir)/vim/vimfiles/after/syntax
+aclocaldir = $(datarootdir)/aclocal
+# The value of following variable is prepended to all the paths for
+# installation. This is useful when preparing a binary distribution.
+DESTDIR =
+
+# (partial) list of available add-on modules
+# (see directory modules/ for the full list
+#  or pass --help-modules to top-level configure):
+# queens               the queens function (a toy example)
+# dirkey               the directory access (LDAP, win32 registry)
+# berkeley-db          the Berkeley DB access
+# gdbm                 the GNU DataBase manager
+# rawsock              raw socket access
+# pcre                 Perl-compatible regular expressions
+# libsvm               build Support Vector Machine models
+# wildcard             wildcard matching
+# postgresql           interface to PostgreSQL ODBMS
+# fastcgi              FastCGI (http://www.fastcgi.com/) interface
+# oracle               Oracle (http://www.oracle.com/) interface
+# netica               Netica (http://norsys.com/netica_c_api.htm)
+# pari                 PARI/gp (http://pari.math.u-bordeaux.fr/)
+# zlib                 ZLIB (http://www.zlib.org)
+# gtk2                 GTK2 interface
+# clx/mit-clx          classical X11 interface
+MODULES = 
+
+# Command line options passed to the configure files of add-on modules
+MODULE_CONFIGURE_FLAGS = --disable-option-checking --build=win32msvc
+
+# Programs used by "make":
+CC = cl
+CPPFLAGS = @CPPFLAGS@ -I/gllib
+CFLAGS = $(MFLAGS) -G5 -Os -Oy -Ob1 -Gs -Gf -Gy -U__GNUC__ -DANSI -D_M_IX86=500 -D_WIN32 -I$(MSVCDIR)/include -DENABLE_UNICODE @INCTERMCAP@ -DDYNAMIC_FFI -DNO_GETTEXT -I.
+CPP = cl -E -D_MSC_VER=1300 -D_INTEGRAL_MAX_BITS=64 -I$(MSVCDIR)/PlatformSDK/include
+CLFLAGS = 
+LIBS = @LIBS@ user32.lib ws2_32.lib advapi32.lib @LTLIBSIGSEGV@ ole32.lib shell32.lib libgnu_cl.a
+X_LIBS = @X_LIBS@
+#MSVCDIR = d:/msdev
+#MSVCDIR = d:/devstudio/vc
+#MSVCDIR = c:/msvs/vc98
+#MSVCDIR = "C:/Program Files/Microsoft Visual Studio/VC98"
+#MSVCDIR = "C:\Programme\Microsoft Visual Studio\VC98"
+
+MAKE = nmake
+RM = -del /q
+RMRF = -del /q /s
+TOUCH = -touch
+CP = copy
+LN_S = copy
+MV = ren
+CAT = type
+GREP = grep
+AR = ar
+RANLIB = @RANLIB@
+
+# Programs used by "make install":
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_DATA = @INSTALL_DATA@
+
+# Programs used by "make distrib":
+
+# formatter for manual page
+ROFF_MAN = @GROFF@ -Tascii -mandoc # try "groff -Tascii -mandoc" or "nroff -man"
+ROFF_PS  = @GROFF@ -Tps -mandoc # try "groff -Tps -mandoc"
+PS2PDF = @PS2PDF@
+
+# -------------- End of configurable section --------------------
+
+#
+#                       Requirements for add-on modules
+#                       -------------------------------
+#
+# The general layout of add-on modules is described in
+#  <http://clisp.cons.org/impnotes/modules.html>.
+# The requirements made there (i.e. the existence of a "link.sh" file
+# which defines certain variables) make sure that such an add-on module
+# can be distributed with CLISP.
+#
+# If you want an add-on module to be _built_ automatically with CLISP,
+# the following additional requirements have to be obeyed.
+#
+# 1. The module must be located in a subdirectory of clisp's build
+#    directory.
+#    Examples: clisp/build/wildcard/
+#              clisp/build/bindings/glibc/
+#
+# 2. If the module contains a file called "configure", it is assumed
+#    to be a GNU autoconf generated configuration file, and is called
+#    with a "--cache-file=..." argument. It should generate platform
+#    dependent header files, Makefiles and the like.
+#
+# 3. The module should contain a Makefile (maybe generated by requirement 2),
+#    which defines the following targets:
+#
+#     clisp-module
+#
+#      This target builds the file(s) mentioned by the link.sh file.
+#      The following makefile variables can be used:
+#        CC        the C compiler used to compile the CLISP source
+#        CPPFLAGS  the C compiler flags when compiling some source
+#        CFLAGS    the C compiler flags
+#        CLFLAGS   the C compiler flags when linking an executable
+#        LIBS      the libraries used when linking an executable
+#        RANLIB    the name of the "ranlib" command
+#        CLISP     a command which calls the already built "boot" clisp.
+#        CLISP_LINKKIT  the directory containing the CLISP header file clisp.h
+#                       (defaults to $$($(CLISP) -b)/linkkit)
+#        SHREXT    the shared object extension (.so or .dll)
+#      Typically, you will have rules like this in your Makefile:
+#        foo.o : foo.c
+#                $(CC) $(CPPFLAGS) $(CFLAGS) -I$(CLISP_LINKKIT) -c foo.c
+#        foo.fas : foo.lisp
+#                $(CLISP) -c foo.lisp
+#
+#     clisp-module-distrib
+#
+#      This target copies the module into a temporary distribution
+#      directory, on the same disk.
+#      The following makefile variables can be used:
+#        distribdir  the name of temporary distribution directory
+#        LN          command to make hard links (works also for symbolic links)
+#      Typically, this target will look like this:
+#        DISTRIBFILES = <the NEW_FILES mentioned in link.sh> <doc files>
+#        clisp-module-distrib : clisp-module force
+#               $(LN) $(DISTRIBFILES) $(distribdir)
+#
+# If these requirements are obeyed, this Makefile will automatically build
+# the add-on module and make it part of the "full" distribution -- all you
+# need to do is to add its name to the MODULES definition line above.
+#
+
+# Add-on modules that are present in all linking sets (including base)
+# syscalls             export some POSIX (and other) system calls
+# regexp               POSIX regular expressions
+# i18n                 Lisp program internationalization
+# readline             extra fine REPL controls
+BASE_MODULES = i18n syscalls regexp readline
+
+COMMENT5 = ./comment5
+GCTRIGGER = ./gctrigger
+VARBRACE = ./varbrace
+DEEMA = deema
+TXT2C = ./txt2c -I../
+
+CFILES = \
+spvw.c \
+spvwtabf.c \
+spvwtabs.c \
+spvwtabo.c \
+eval.c \
+control.c \
+encoding.c \
+pathname.c \
+stream.c \
+socket.c \
+io.c \
+funarg.c \
+array.c \
+hashtabl.c \
+list.c \
+package.c \
+record.c \
+weak.c \
+sequence.c \
+charstrg.c \
+debug.c \
+error.c \
+misc.c \
+time.c \
+predtype.c \
+symbol.c \
+lisparit.c \
+i18n.c \
+foreign.c \
+win32aux.c \
+built.c \
+lispbibl.c \
+fsubr.c \
+subr.c \
+pseudofun.c \
+constsym.c \
+constobj.c \
+constobj_tl.c \
+win32.c \
+xthread.c \
+constpack.c \
+avl.c \
+sort.c \
+subrkw.c \
+bytecode.c \
+spvw_module.c \
+spvw_debug.c \
+spvw_alloca.c \
+spvw_mmap.c \
+spvw_singlemap.c \
+spvw_page.c \
+spvw_heap.c \
+spvw_global.c \
+spvw_gcstat.c \
+spvw_space.c \
+spvw_mark.c \
+spvw_objsize.c \
+spvw_update.c \
+spvw_fault.c \
+spvw_sigsegv.c \
+spvw_sigcld.c \
+spvw_sigpipe.c \
+spvw_sigint.c \
+spvw_sigwinch.c \
+spvw_sigterm.c \
+spvw_garcol.c \
+spvw_garcol_old.c \
+spvw_genera1.c \
+spvw_gcmark.c \
+spvw_genera2.c \
+spvw_weak.c \
+spvw_genera3.c \
+spvw_allocate.c \
+spvw_typealloc.c \
+spvw_circ.c \
+spvw_walk.c \
+spvw_ctype.c \
+spvw_language.c \
+spvw_memfile.c \
+errunix.c \
+errwin32.c \
+aridecl.c \
+arilev0.c \
+arilev1.c \
+intelem.c \
+intlog.c \
+intplus.c \
+intcomp.c \
+intbyte.c \
+intmal.c \
+intdiv.c \
+intgcd.c \
+int2adic.c \
+intsqrt.c \
+intprint.c \
+intread.c \
+intserial.c \
+rational.c \
+sfloat.c \
+ffloat.c \
+dfloat.c \
+lfloat.c \
+flo_konv.c \
+flo_rest.c \
+realelem.c \
+realrand.c \
+realtran.c \
+compelem.c \
+comptran.c \
+arilev1c.c \
+arilev1e.c \
+arilev1i.c \
+genclisph.c \
+noreadline.c \
+ari80386.c \
+sp80386.c \
+gen.lispbibl.c
+
+OBJECTS = \
+spvw.obj \
+spvwtabf.obj \
+spvwtabs.obj \
+spvwtabo.obj \
+eval.obj \
+control.obj \
+encoding.obj \
+pathname.obj \
+stream.obj \
+socket.obj \
+io.obj \
+funarg.obj \
+array.obj \
+hashtabl.obj \
+list.obj \
+package.obj \
+record.obj \
+weak.obj \
+sequence.obj \
+charstrg.obj \
+debug.obj \
+error.obj \
+misc.obj \
+time.obj \
+predtype.obj \
+symbol.obj \
+lisparit.obj \
+i18n.obj \
+foreign.obj \
+win32aux.obj \
+built.obj \
+ari80386.obj \
+sp80386.obj
+
+LISPFILES = \
+init.lisp \
+defseq.lisp \
+backquote.lisp \
+defmacro.lisp \
+macros1.lisp \
+macros2.lisp \
+defs1.lisp \
+lambdalist.lisp \
+places.lisp \
+floatprint.lisp \
+defpackage.lisp \
+type.lisp \
+subtypep.lisp \
+clos-package.lisp \
+clos-macros.lisp \
+clos-class0.lisp \
+clos-metaobject1.lisp \
+clos-slotdef1.lisp \
+clos-stablehash1.lisp \
+clos-specializer1.lisp \
+clos-class1.lisp \
+clos-class2.lisp \
+clos-class3.lisp \
+defstruct.lisp \
+format.lisp \
+international.lisp \
+savemem.lisp \
+functions.lisp \
+trace.lisp \
+cmacros.lisp \
+compiler.lisp \
+defs2.lisp \
+loop.lisp \
+clos.lisp \
+clos-stablehash2.lisp \
+clos-specializer2.lisp \
+clos-specializer3.lisp \
+clos-class4.lisp \
+clos-class5.lisp \
+clos-class6.lisp \
+clos-slotdef2.lisp \
+clos-slotdef3.lisp \
+clos-slots1.lisp \
+clos-slots2.lisp \
+clos-method1.lisp \
+clos-method2.lisp \
+clos-method3.lisp \
+clos-method4.lisp \
+clos-methcomb1.lisp \
+clos-methcomb2.lisp \
+clos-methcomb3.lisp \
+clos-methcomb4.lisp \
+clos-genfun1.lisp \
+clos-genfun2a.lisp \
+clos-genfun2b.lisp \
+clos-genfun3.lisp \
+clos-genfun4.lisp \
+clos-genfun5.lisp \
+clos-dependent.lisp \
+clos-print.lisp \
+clos-custom.lisp \
+documentation.lisp \
+fill-out.lisp \
+disassem.lisp \
+condition.lisp \
+loadform.lisp \
+gstream.lisp \
+xcharin.lisp \
+keyboard.lisp \
+screen.lisp \
+runprog.lisp \
+query.lisp \
+reploop.lisp \
+dribble.lisp \
+complete.lisp \
+pprint.lisp \
+describe.lisp \
+room.lisp \
+edit.lisp \
+macros3.lisp \
+clhs.lisp \
+inspect.lisp \
+gray.lisp \
+case-sensitive.lisp \
+foreign1.lisp \
+exporting.lisp \
+german.lisp \
+french.lisp \
+spanish.lisp \
+russian.lisp \
+danish.lisp \
+dutch.lisp \
+deprecated.lisp
+
+FASFILES = \
+init.fas \
+defseq.fas \
+backquote.fas \
+defmacro.fas \
+macros1.fas \
+macros2.fas \
+defs1.fas \
+lambdalist.fas \
+places.fas \
+floatprint.fas \
+defpackage.fas \
+type.fas \
+subtypep.fas \
+clos-package.fas \
+clos-macros.fas \
+clos-class0.fas \
+clos-metaobject1.fas \
+clos-slotdef1.fas \
+clos-stablehash1.fas \
+clos-specializer1.fas \
+clos-class1.fas \
+clos-class2.fas \
+clos-class3.fas \
+defstruct.fas \
+format.fas \
+international.fas \
+savemem.fas \
+functions.fas \
+trace.fas \
+cmacros.fas \
+compiler.fas \
+defs2.fas \
+loop.fas \
+clos.fas \
+clos-stablehash2.fas \
+clos-specializer2.fas \
+clos-specializer3.fas \
+clos-class4.fas \
+clos-class5.fas \
+clos-class6.fas \
+clos-slotdef2.fas \
+clos-slotdef3.fas \
+clos-slots1.fas \
+clos-slots2.fas \
+clos-method1.fas \
+clos-method2.fas \
+clos-method3.fas \
+clos-method4.fas \
+clos-methcomb1.fas \
+clos-methcomb2.fas \
+clos-methcomb3.fas \
+clos-methcomb4.fas \
+clos-genfun1.fas \
+clos-genfun2a.fas \
+clos-genfun2b.fas \
+clos-genfun3.fas \
+clos-genfun4.fas \
+clos-genfun5.fas \
+clos-dependent.fas \
+clos-print.fas \
+clos-custom.fas \
+documentation.fas \
+fill-out.fas \
+disassem.fas \
+condition.fas \
+loadform.fas \
+gstream.fas \
+xcharin.fas \
+keyboard.fas \
+screen.fas \
+runprog.fas \
+query.fas \
+reploop.fas \
+dribble.fas \
+complete.fas \
+pprint.fas \
+describe.fas \
+room.fas \
+edit.fas \
+macros3.fas \
+clhs.fas \
+inspect.fas \
+gray.fas \
+case-sensitive.fas \
+foreign1.fas \
+exporting.fas \
+german.fas \
+french.fas \
+spanish.fas \
+russian.fas \
+danish.fas \
+dutch.fas \
+deprecated.fas \
+config.fas
+
+TXTFILES = \
+LISP-tutorial.txt \
+CLOS-guide.txt
+
+TESTFASFILES = \
+stage\init.fas \
+stage\defseq.fas \
+stage\backquote.fas \
+stage\defmacro.fas \
+stage\macros1.fas \
+stage\macros2.fas \
+stage\defs1.fas \
+stage\lambdalist.fas \
+stage\places.fas \
+stage\floatprint.fas \
+stage\defpackage.fas \
+stage\type.fas \
+stage\subtypep.fas \
+stage\clos-package.fas \
+stage\clos-macros.fas \
+stage\clos-class0.fas \
+stage\clos-metaobject1.fas \
+stage\clos-slotdef1.fas \
+stage\clos-stablehash1.fas \
+stage\clos-specializer1.fas \
+stage\clos-class1.fas \
+stage\clos-class2.fas \
+stage\clos-class3.fas \
+stage\defstruct.fas \
+stage\format.fas \
+stage\international.fas \
+stage\savemem.fas \
+stage\functions.fas \
+stage\trace.fas \
+stage\cmacros.fas \
+stage\compiler.fas \
+stage\defs2.fas \
+stage\loop.fas \
+stage\clos.fas \
+stage\clos-stablehash2.fas \
+stage\clos-specializer2.fas \
+stage\clos-specializer3.fas \
+stage\clos-class4.fas \
+stage\clos-class5.fas \
+stage\clos-class6.fas \
+stage\clos-slotdef2.fas \
+stage\clos-slotdef3.fas \
+stage\clos-slots1.fas \
+stage\clos-slots2.fas \
+stage\clos-method1.fas \
+stage\clos-method2.fas \
+stage\clos-method3.fas \
+stage\clos-method4.fas \
+stage\clos-methcomb1.fas \
+stage\clos-methcomb2.fas \
+stage\clos-methcomb3.fas \
+stage\clos-methcomb4.fas \
+stage\clos-genfun1.fas \
+stage\clos-genfun2a.fas \
+stage\clos-genfun2b.fas \
+stage\clos-genfun3.fas \
+stage\clos-genfun4.fas \
+stage\clos-genfun5.fas \
+stage\clos-dependent.fas \
+stage\clos-print.fas \
+stage\clos-custom.fas \
+stage\documentation.fas \
+stage\fill-out.fas \
+stage\disassem.fas \
+stage\condition.fas \
+stage\loadform.fas \
+stage\gstream.fas \
+stage\xcharin.fas \
+stage\keyboard.fas \
+stage\screen.fas \
+stage\runprog.fas \
+stage\query.fas \
+stage\reploop.fas \
+stage\dribble.fas \
+stage\complete.fas \
+stage\pprint.fas \
+stage\describe.fas \
+stage\room.fas \
+stage\edit.fas \
+stage\macros3.fas \
+stage\clhs.fas \
+stage\inspect.fas \
+stage\gray.fas \
+stage\case-sensitive.fas \
+stage\foreign1.fas \
+stage\exporting.fas \
+stage\german.fas \
+stage\french.fas \
+stage\spanish.fas \
+stage\russian.fas \
+stage\danish.fas \
+stage\dutch.fas \
+stage\deprecated.fas \
+stage\config.fas
+
+
+all : gllib init allc allo lisp.exe interpreted.mem halfcompiled.mem lispinit.mem manual
+
+SUBDIRS = gllib
+.PHONY: subdirs $(SUBDIRS) clean0 clean1 clean2 clean3 clean4 clean5 clean6 clean7 clean8 mostlyclean distclean clean maintainer-clean clean-modules am--refresh
+
+subdirs: $(SUBDIRS)
+
+SUBDIR_CFLAGS = $(CFLAGS) 
+$(SUBDIRS): build-aux
+	mkdir -p $@
+	test -f $@/Makefile || sh config.status $@/Makefile depfiles
+	cd $@ && $(MAKE) CFLAGS="$(SUBDIR_CFLAGS)" CLISP_LIBDIR=
+
+libgnu_cl.a: gllib
+	test -r $@ || $(LN_S) gllib/libgnu.a $@
+
+makemake : makemake.in config.status
+	sh config.status --file=makemake
+
+config.h : config.h.in config.status
+	sh config.status --header=config.h
+	touch config.h
+
+Makefile : makemake
+	./makemake --with-dynamic-ffi --without-dynamic-modules win32msvc msvc7 > Makefile.tmp
+	$(MV) Makefile Makefile~
+	$(MV) Makefile.tmp Makefile
+
+config.status : configure
+	$(RMRF) config.cache $(SUBDIRS)
+	sh config.status --recheck
+
+libtool : @LIBTOOL_DEPS@
+	sh config.status --recheck
+
+am--refresh : config.status Makefile config.h
+
+cflags.h : cflags.h.stamp
+
+cflags.h.stamp : Makefile
+	echo /* generated from Makefile */ > cflags.h.new
+	echo #define CC "$(CC)" >> cflags.h.new
+	echo #define CFLAGS "$(CFLAGS)" >> cflags.h.new
+	echo #define LDFLAGS "$(LDFLAGS)" >> cflags.h.new
+	echo #define CLFLAGS "$(CLFLAGS)" >> cflags.h.new
+	echo #define LIBS "$(LIBS)" >> cflags.h.new
+	echo #define CPPFLAGS "$(CPPFLAGS)" >> cflags.h.new
+	echo #define CPP "$(CPP)" >> cflags.h.new
+	echo #define CXX "$(CXX)" >> cflags.h.new
+	echo #define CXXFLAGS "$(CXXFLAGS)" >> cflags.h.new
+	echo #define X_LIBS "$(X_LIBS)" >> cflags.h.new
+	$(RM) cflags.h
+	$(MV) cflags.h.new cflags.h
+	$(TOUCH) cflags.h.stamp
+
+init : comment5.exe gctrigger.exe varbrace.exe deema.exe txt2c.exe ccmp2c.exe modules.h
+
+intparam.h : intparam.c config.h
+	echo '#include "config.h"' > tmp.c
+	cat 'intparam.c' >> tmp.c
+	$(CC) tmp.c /Feintparam.exe
+	./intparam.exe intparam.h
+	$(RM) intparam.exe tmp.c
+
+floatparam.h : floatparam.c config.h
+	echo '#include "config.h"' > tmp.c
+	cat 'floatparam.c' >> tmp.c
+	$(CC) tmp.c /Fefloatparam.exe
+	./floatparam.exe floatparam.h
+	$(RM) floatparam.exe tmp.c
+
+UTILCC=$(CC)
+comment5.exe : ..\utils\comment5.c
+	$(UTILCC) $(CPPFLAGS) $(CFLAGS) $(CLFLAGS)  ..\utils\comment5.c /Fecomment5.exe
+
+gctrigger.exe : ..\utils\gctrigger.c
+	$(UTILCC) $(CPPFLAGS) $(CFLAGS) $(CLFLAGS)  ..\utils\gctrigger.c /Fegctrigger.exe
+
+varbrace.exe : ..\utils\varbrace.c
+	$(UTILCC) $(CPPFLAGS) $(CFLAGS) $(CLFLAGS)  ..\utils\varbrace.c /Fevarbrace.exe
+
+deema.exe : ..\utils\deema.c
+	$(UTILCC) $(CPPFLAGS) $(CFLAGS) $(CLFLAGS)  ..\utils\deema.c /Fedeema.exe
+
+txt2c.exe : ..\utils\txt2c.c
+	$(UTILCC) $(CPPFLAGS) $(CFLAGS) $(CLFLAGS)  ..\utils\txt2c.c /Fetxt2c.exe
+
+ccmp2c.exe : ..\utils\ccmp2c.c
+	$(UTILCC) $(CPPFLAGS) $(CFLAGS) $(CLFLAGS)  ..\utils\ccmp2c.c /Feccmp2c.exe
+
+
+add_to_path.nsh : ..\win32msvc/nsis/add_to_path.nsh
+	-$(RM) add_to_path.nsh
+	-$(LN_S) ..\win32msvc/nsis/add_to_path.nsh add_to_path.nsh
+
+is_user_admin.nsh : ..\win32msvc/nsis/is_user_admin.nsh
+	-$(RM) is_user_admin.nsh
+	-$(LN_S) ..\win32msvc/nsis/is_user_admin.nsh is_user_admin.nsh
+
+install.nsi : ..\win32msvc/nsis/install.nsi config.status
+	sed -e 's/\@NAME\@/$(PACKAGE_NAME)/g' -e 's/\@VERSION\@/$(VERSION)/g' -e 's,\@BASE_MODULES\@,$(BASE_MODULES),g' -e 's,\@MODULES\@,$(MODULES),g' ..\win32msvc/nsis/install.nsi > install.nsi
+
+COPYRIGHT.rtf : COPYRIGHT ..\win32msvc/nsis/text_to_rtf.lisp config.status
+	$(RUN) -M lispinit.mem -q ..\win32msvc/nsis/text_to_rtf.lisp COPYRIGHT COPYRIGHT.tmp
+	sed -e 's/\@NAME\@/$(PACKAGE_NAME)/g' -e 's/\@VERSION\@/$(VERSION)/g' COPYRIGHT.tmp > COPYRIGHT.rtf
+	$(RM) COPYRIGHT.tmp
+
+allc : init $(CFILES)
+
+spvw.c : spvw.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw.c
+
+spvwtabf.c : spvwtabf.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvwtabf.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvwtabf.c
+
+spvwtabs.c : spvwtabs.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvwtabs.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvwtabs.c
+
+spvwtabo.c : spvwtabo.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvwtabo.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvwtabo.c
+
+eval.c : eval.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) eval.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > eval.c
+
+control.c : control.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) control.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > control.c
+
+encoding.c : encoding.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) encoding.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > encoding.c
+
+pathname.c : pathname.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) pathname.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > pathname.c
+
+stream.c : stream.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) stream.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > stream.c
+
+socket.c : socket.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) socket.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > socket.c
+
+io.c : io.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) io.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > io.c
+
+funarg.c : funarg.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) funarg.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > funarg.c
+
+array.c : array.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) array.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > array.c
+
+hashtabl.c : hashtabl.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) hashtabl.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > hashtabl.c
+
+list.c : list.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) list.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > list.c
+
+package.c : package.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) package.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > package.c
+
+record.c : record.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) record.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > record.c
+
+weak.c : weak.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) weak.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > weak.c
+
+sequence.c : sequence.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) sequence.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > sequence.c
+
+charstrg.c : charstrg.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) charstrg.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > charstrg.c
+
+debug.c : debug.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) debug.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > debug.c
+
+error.c : error.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) error.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > error.c
+
+misc.c : misc.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) misc.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > misc.c
+
+time.c : time.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) time.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > time.c
+
+predtype.c : predtype.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) predtype.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > predtype.c
+
+symbol.c : symbol.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) symbol.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > symbol.c
+
+lisparit.c : lisparit.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) lisparit.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > lisparit.c
+
+i18n.c : i18n.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) i18n.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > i18n.c
+
+foreign.c : foreign.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) foreign.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > foreign.c
+
+win32aux.c : win32aux.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) win32aux.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > win32aux.c
+
+built.c : built.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) built.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > built.c
+
+lispbibl.c : lispbibl.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) lispbibl.d | sed -e 's/^\(%%%% .*\)//' | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > lispbibl.c
+
+fsubr.c : fsubr.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) fsubr.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > fsubr.c
+
+subr.c : subr.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) subr.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > subr.c
+
+pseudofun.c : pseudofun.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) pseudofun.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > pseudofun.c
+
+constsym.c : constsym.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) constsym.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > constsym.c
+
+constobj.c : constobj.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) constobj.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > constobj.c
+
+constobj_tl.c : constobj_tl.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) constobj_tl.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > constobj_tl.c
+
+win32.c : win32.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) win32.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > win32.c
+
+xthread.c : xthread.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) xthread.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > xthread.c
+
+constpack.c : constpack.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) constpack.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > constpack.c
+
+avl.c : avl.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) avl.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > avl.c
+
+sort.c : sort.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) sort.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > sort.c
+
+subrkw.c : subrkw.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) subrkw.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > subrkw.c
+
+bytecode.c : bytecode.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) bytecode.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > bytecode.c
+
+spvw_module.c : spvw_module.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_module.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_module.c
+
+spvw_debug.c : spvw_debug.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_debug.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_debug.c
+
+spvw_alloca.c : spvw_alloca.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_alloca.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_alloca.c
+
+spvw_mmap.c : spvw_mmap.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_mmap.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_mmap.c
+
+spvw_singlemap.c : spvw_singlemap.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_singlemap.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_singlemap.c
+
+spvw_page.c : spvw_page.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_page.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_page.c
+
+spvw_heap.c : spvw_heap.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_heap.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_heap.c
+
+spvw_global.c : spvw_global.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_global.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_global.c
+
+spvw_gcstat.c : spvw_gcstat.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_gcstat.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_gcstat.c
+
+spvw_space.c : spvw_space.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_space.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_space.c
+
+spvw_mark.c : spvw_mark.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_mark.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_mark.c
+
+spvw_objsize.c : spvw_objsize.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_objsize.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_objsize.c
+
+spvw_update.c : spvw_update.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_update.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_update.c
+
+spvw_fault.c : spvw_fault.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_fault.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_fault.c
+
+spvw_sigsegv.c : spvw_sigsegv.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_sigsegv.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_sigsegv.c
+
+spvw_sigcld.c : spvw_sigcld.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_sigcld.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_sigcld.c
+
+spvw_sigpipe.c : spvw_sigpipe.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_sigpipe.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_sigpipe.c
+
+spvw_sigint.c : spvw_sigint.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_sigint.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_sigint.c
+
+spvw_sigwinch.c : spvw_sigwinch.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_sigwinch.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_sigwinch.c
+
+spvw_sigterm.c : spvw_sigterm.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_sigterm.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_sigterm.c
+
+spvw_garcol.c : spvw_garcol.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_garcol.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_garcol.c
+
+spvw_garcol_old.c : spvw_garcol_old.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_garcol_old.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_garcol_old.c
+
+spvw_genera1.c : spvw_genera1.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_genera1.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_genera1.c
+
+spvw_gcmark.c : spvw_gcmark.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_gcmark.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_gcmark.c
+
+spvw_genera2.c : spvw_genera2.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_genera2.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_genera2.c
+
+spvw_weak.c : spvw_weak.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_weak.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_weak.c
+
+spvw_genera3.c : spvw_genera3.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_genera3.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_genera3.c
+
+spvw_allocate.c : spvw_allocate.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_allocate.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_allocate.c
+
+spvw_typealloc.c : spvw_typealloc.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_typealloc.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_typealloc.c
+
+spvw_circ.c : spvw_circ.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_circ.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_circ.c
+
+spvw_walk.c : spvw_walk.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_walk.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_walk.c
+
+spvw_ctype.c : spvw_ctype.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_ctype.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_ctype.c
+
+spvw_language.c : spvw_language.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_language.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_language.c
+
+spvw_memfile.c : spvw_memfile.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) spvw_memfile.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > spvw_memfile.c
+
+errunix.c : errunix.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) errunix.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > errunix.c
+
+errwin32.c : errwin32.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) errwin32.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > errwin32.c
+
+aridecl.c : aridecl.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) aridecl.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > aridecl.c
+
+arilev0.c : arilev0.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) arilev0.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > arilev0.c
+
+arilev1.c : arilev1.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) arilev1.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > arilev1.c
+
+intelem.c : intelem.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intelem.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intelem.c
+
+intlog.c : intlog.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intlog.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intlog.c
+
+intplus.c : intplus.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intplus.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intplus.c
+
+intcomp.c : intcomp.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intcomp.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intcomp.c
+
+intbyte.c : intbyte.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intbyte.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intbyte.c
+
+intmal.c : intmal.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intmal.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intmal.c
+
+intdiv.c : intdiv.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intdiv.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intdiv.c
+
+intgcd.c : intgcd.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intgcd.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intgcd.c
+
+int2adic.c : int2adic.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) int2adic.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > int2adic.c
+
+intsqrt.c : intsqrt.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intsqrt.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intsqrt.c
+
+intprint.c : intprint.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intprint.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intprint.c
+
+intread.c : intread.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intread.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intread.c
+
+intserial.c : intserial.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) intserial.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > intserial.c
+
+rational.c : rational.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) rational.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > rational.c
+
+sfloat.c : sfloat.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) sfloat.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > sfloat.c
+
+ffloat.c : ffloat.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) ffloat.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > ffloat.c
+
+dfloat.c : dfloat.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) dfloat.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > dfloat.c
+
+lfloat.c : lfloat.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) lfloat.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > lfloat.c
+
+flo_konv.c : flo_konv.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) flo_konv.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > flo_konv.c
+
+flo_rest.c : flo_rest.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) flo_rest.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > flo_rest.c
+
+realelem.c : realelem.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) realelem.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > realelem.c
+
+realrand.c : realrand.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) realrand.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > realrand.c
+
+realtran.c : realtran.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) realtran.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > realtran.c
+
+compelem.c : compelem.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) compelem.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > compelem.c
+
+comptran.c : comptran.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) comptran.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > comptran.c
+
+arilev1c.c : arilev1c.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) arilev1c.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > arilev1c.c
+
+arilev1e.c : arilev1e.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) arilev1e.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > arilev1e.c
+
+arilev1i.c : arilev1i.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) arilev1i.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > arilev1i.c
+
+genclisph.c : genclisph.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) genclisph.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > genclisph.c
+
+noreadline.c : noreadline.d comment5.exe gctrigger.exe varbrace.exe deema.exe
+	$(COMMENT5) noreadline.d | $(GCTRIGGER) | $(VARBRACE) | $(DEEMA) > noreadline.c
+
+ari80386.c : ari80386.d comment5.exe 
+	$(COMMENT5) ari80386.d > ari80386.c
+
+sp80386.c : sp80386.d comment5.exe 
+	$(COMMENT5) sp80386.d > sp80386.c
+
+gen.lispbibl.c : lispbibl.d comment5.exe
+	$(COMMENT5) lispbibl.d | sed -e '/^%%%% /{s///p;d;}' -e '/^#line /!s/.*//' > gen.lispbibl.c
+
+allo : allc spvw.obj spvwtabf.obj spvwtabs.obj spvwtabo.obj eval.obj control.obj encoding.obj pathname.obj stream.obj socket.obj io.obj funarg.obj array.obj hashtabl.obj list.obj package.obj record.obj weak.obj sequence.obj charstrg.obj debug.obj error.obj misc.obj time.obj predtype.obj symbol.obj lisparit.obj i18n.obj foreign.obj win32aux.obj built.obj
+
+alls : allc spvw.s spvwtabf.s spvwtabs.s spvwtabo.s eval.s control.s encoding.s pathname.s stream.s socket.s io.s funarg.s array.s hashtabl.s list.s package.s record.s weak.s sequence.s charstrg.s debug.s error.s misc.s time.s predtype.s symbol.s lisparit.s i18n.s foreign.s win32aux.s built.s
+
+# Normally not used (just for debugging).
+alli : allc spvw.i spvwtabf.i spvwtabs.i spvwtabo.i eval.i control.i encoding.i pathname.i stream.i socket.i io.i funarg.i array.i hashtabl.i list.i package.i record.i weak.i sequence.i charstrg.i debug.i error.i misc.i time.i predtype.i symbol.i lisparit.i i18n.i foreign.i win32aux.i built.i
+
+spvw.i : spvw.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c constpack.c avl.c spvw_module.c spvw_debug.c spvw_alloca.c spvw_mmap.c spvw_singlemap.c spvw_page.c spvw_heap.c spvw_global.c spvw_gcstat.c spvw_space.c spvw_mark.c spvw_objsize.c spvw_update.c spvw_fault.c spvw_sigsegv.c spvw_sigcld.c spvw_sigpipe.c spvw_sigint.c spvw_sigwinch.c spvw_sigterm.c spvw_garcol.c spvw_garcol_old.c spvw_genera1.c spvw_gcmark.c spvw_genera2.c spvw_weak.c spvw_genera3.c spvw_allocate.c spvw_typealloc.c spvw_circ.c spvw_walk.c spvw_ctype.c spvw_language.c spvw_memfile.c sort.c subrkw.c spvw_calendar.c arilev0.c aridecl.c gllib/stdbool.h gllib/stdint.h localcharset.h version.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) spvw.c > spvw.i
+
+spvw.s : spvw.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c constpack.c avl.c spvw_module.c spvw_debug.c spvw_alloca.c spvw_mmap.c spvw_singlemap.c spvw_page.c spvw_heap.c spvw_global.c spvw_gcstat.c spvw_space.c spvw_mark.c spvw_objsize.c spvw_update.c spvw_fault.c spvw_sigsegv.c spvw_sigcld.c spvw_sigpipe.c spvw_sigint.c spvw_sigwinch.c spvw_sigterm.c spvw_garcol.c spvw_garcol_old.c spvw_genera1.c spvw_gcmark.c spvw_genera2.c spvw_weak.c spvw_genera3.c spvw_allocate.c spvw_typealloc.c spvw_circ.c spvw_walk.c spvw_ctype.c spvw_language.c spvw_memfile.c sort.c subrkw.c spvw_calendar.c arilev0.c aridecl.c gllib/stdbool.h gllib/stdint.h localcharset.h version.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S spvw.c
+
+spvw.obj : spvw.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c constpack.c avl.c spvw_module.c spvw_debug.c spvw_alloca.c spvw_mmap.c spvw_singlemap.c spvw_page.c spvw_heap.c spvw_global.c spvw_gcstat.c spvw_space.c spvw_mark.c spvw_objsize.c spvw_update.c spvw_fault.c spvw_sigsegv.c spvw_sigcld.c spvw_sigpipe.c spvw_sigint.c spvw_sigwinch.c spvw_sigterm.c spvw_garcol.c spvw_garcol_old.c spvw_genera1.c spvw_gcmark.c spvw_genera2.c spvw_weak.c spvw_genera3.c spvw_allocate.c spvw_typealloc.c spvw_circ.c spvw_walk.c spvw_ctype.c spvw_language.c spvw_memfile.c sort.c subrkw.c spvw_calendar.c arilev0.c aridecl.c gllib/stdbool.h gllib/stdint.h localcharset.h version.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c spvw.c
+
+spvwtabf.i : spvwtabf.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) spvwtabf.c > spvwtabf.i
+
+spvwtabf.s : spvwtabf.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S spvwtabf.c
+
+spvwtabf.obj : spvwtabf.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c spvwtabf.c
+
+spvwtabs.i : spvwtabs.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) spvwtabs.c > spvwtabs.i
+
+spvwtabs.s : spvwtabs.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S spvwtabs.c
+
+spvwtabs.obj : spvwtabs.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c spvwtabs.c
+
+spvwtabo.i : spvwtabo.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) spvwtabo.c > spvwtabo.i
+
+spvwtabo.s : spvwtabo.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S spvwtabo.c
+
+spvwtabo.obj : spvwtabo.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c spvwtabo.c
+
+eval.i : eval.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c bytecode.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) eval.c > eval.i
+
+eval.s : eval.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c bytecode.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S eval.c
+
+eval.obj : eval.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c bytecode.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c eval.c
+
+control.i : control.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) control.c > control.i
+
+control.s : control.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S control.c
+
+control.obj : control.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c control.c
+
+encoding.i : encoding.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c nls_ascii.c nls_iso8859_1.c nls_iso8859_2.c nls_iso8859_3.c nls_iso8859_4.c nls_iso8859_5.c nls_iso8859_6.c nls_iso8859_7.c nls_iso8859_8.c nls_iso8859_9.c nls_iso8859_10.c nls_iso8859_13.c nls_iso8859_14.c nls_iso8859_15.c nls_iso8859_16.c nls_koi8_r.c nls_koi8_u.c nls_mac_arabic.c nls_mac_centraleurope.c nls_mac_croatian.c nls_mac_cyrillic.c nls_mac_dingbat.c nls_mac_greek.c nls_mac_hebrew.c nls_mac_iceland.c nls_mac_roman.c nls_mac_romania.c nls_mac_symbol.c nls_mac_thai.c nls_mac_turkish.c nls_mac_ukraine.c nls_cp437_ms.c nls_cp437_ibm.c nls_cp737.c nls_cp775.c nls_cp850.c nls_cp852_ms.c nls_cp852_ibm.c nls_cp855.c nls_cp857.c nls_cp860_ms.c nls_cp860_ibm.c nls_cp861_ms.c nls_cp861_ibm.c nls_cp862_ms.c nls_cp862_ibm.c nls_cp863_ms.c nls_cp863_ibm.c nls_cp864_ms.c nls_cp864_ibm.c nls_cp865_ms.c nls_cp865_ibm.c nls_cp866.c nls_cp869_ms.c nls_cp869_ibm.c nls_cp874_ms.c nls_cp874_ibm.c nls_cp1250.c nls_cp1251.c nls_cp1252.c nls_cp1253.c nls_cp1254.c nls_cp1256.c nls_cp1257.c nls_hp_roman8.c nls_jisx0201.c gllib/stdbool.h gllib/stdint.h localcharset.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) encoding.c > encoding.i
+
+encoding.s : encoding.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c nls_ascii.c nls_iso8859_1.c nls_iso8859_2.c nls_iso8859_3.c nls_iso8859_4.c nls_iso8859_5.c nls_iso8859_6.c nls_iso8859_7.c nls_iso8859_8.c nls_iso8859_9.c nls_iso8859_10.c nls_iso8859_13.c nls_iso8859_14.c nls_iso8859_15.c nls_iso8859_16.c nls_koi8_r.c nls_koi8_u.c nls_mac_arabic.c nls_mac_centraleurope.c nls_mac_croatian.c nls_mac_cyrillic.c nls_mac_dingbat.c nls_mac_greek.c nls_mac_hebrew.c nls_mac_iceland.c nls_mac_roman.c nls_mac_romania.c nls_mac_symbol.c nls_mac_thai.c nls_mac_turkish.c nls_mac_ukraine.c nls_cp437_ms.c nls_cp437_ibm.c nls_cp737.c nls_cp775.c nls_cp850.c nls_cp852_ms.c nls_cp852_ibm.c nls_cp855.c nls_cp857.c nls_cp860_ms.c nls_cp860_ibm.c nls_cp861_ms.c nls_cp861_ibm.c nls_cp862_ms.c nls_cp862_ibm.c nls_cp863_ms.c nls_cp863_ibm.c nls_cp864_ms.c nls_cp864_ibm.c nls_cp865_ms.c nls_cp865_ibm.c nls_cp866.c nls_cp869_ms.c nls_cp869_ibm.c nls_cp874_ms.c nls_cp874_ibm.c nls_cp1250.c nls_cp1251.c nls_cp1252.c nls_cp1253.c nls_cp1254.c nls_cp1256.c nls_cp1257.c nls_hp_roman8.c nls_jisx0201.c gllib/stdbool.h gllib/stdint.h localcharset.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S encoding.c
+
+encoding.obj : encoding.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c nls_ascii.c nls_iso8859_1.c nls_iso8859_2.c nls_iso8859_3.c nls_iso8859_4.c nls_iso8859_5.c nls_iso8859_6.c nls_iso8859_7.c nls_iso8859_8.c nls_iso8859_9.c nls_iso8859_10.c nls_iso8859_13.c nls_iso8859_14.c nls_iso8859_15.c nls_iso8859_16.c nls_koi8_r.c nls_koi8_u.c nls_mac_arabic.c nls_mac_centraleurope.c nls_mac_croatian.c nls_mac_cyrillic.c nls_mac_dingbat.c nls_mac_greek.c nls_mac_hebrew.c nls_mac_iceland.c nls_mac_roman.c nls_mac_romania.c nls_mac_symbol.c nls_mac_thai.c nls_mac_turkish.c nls_mac_ukraine.c nls_cp437_ms.c nls_cp437_ibm.c nls_cp737.c nls_cp775.c nls_cp850.c nls_cp852_ms.c nls_cp852_ibm.c nls_cp855.c nls_cp857.c nls_cp860_ms.c nls_cp860_ibm.c nls_cp861_ms.c nls_cp861_ibm.c nls_cp862_ms.c nls_cp862_ibm.c nls_cp863_ms.c nls_cp863_ibm.c nls_cp864_ms.c nls_cp864_ibm.c nls_cp865_ms.c nls_cp865_ibm.c nls_cp866.c nls_cp869_ms.c nls_cp869_ibm.c nls_cp874_ms.c nls_cp874_ibm.c nls_cp1250.c nls_cp1251.c nls_cp1252.c nls_cp1253.c nls_cp1254.c nls_cp1256.c nls_cp1257.c nls_hp_roman8.c nls_jisx0201.c gllib/stdbool.h gllib/stdint.h localcharset.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c encoding.c
+
+pathname.i : pathname.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h execname.c w32shell.c
+	$(CPP) $(CPPFLAGS) $(CFLAGS) pathname.c > pathname.i
+
+pathname.s : pathname.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h execname.c w32shell.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S pathname.c
+
+pathname.obj : pathname.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h execname.c w32shell.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c pathname.c
+
+stream.i : stream.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) stream.c > stream.i
+
+stream.s : stream.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S stream.c
+
+stream.obj : stream.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c stream.c
+
+socket.i : socket.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) socket.c > socket.i
+
+socket.s : socket.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S socket.c
+
+socket.obj : socket.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c socket.c
+
+io.i : io.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) io.c > io.i
+
+io.s : io.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S io.c
+
+io.obj : io.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c io.c
+
+funarg.i : funarg.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) funarg.c > funarg.i
+
+funarg.s : funarg.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S funarg.c
+
+funarg.obj : funarg.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c funarg.c
+
+array.i : array.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) array.c > array.i
+
+array.s : array.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S array.c
+
+array.obj : array.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c array.c
+
+hashtabl.i : hashtabl.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c aridecl.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) hashtabl.c > hashtabl.i
+
+hashtabl.s : hashtabl.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c aridecl.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S hashtabl.c
+
+hashtabl.obj : hashtabl.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c aridecl.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c hashtabl.c
+
+list.i : list.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) list.c > list.i
+
+list.s : list.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S list.c
+
+list.obj : list.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c list.c
+
+package.i : package.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c constpack.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) package.c > package.i
+
+package.s : package.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c constpack.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S package.c
+
+package.obj : package.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c constpack.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c package.c
+
+record.i : record.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) record.c > record.i
+
+record.s : record.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S record.c
+
+record.obj : record.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c record.c
+
+weak.i : weak.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) weak.c > weak.i
+
+weak.s : weak.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S weak.c
+
+weak.obj : weak.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c weak.c
+
+sequence.i : sequence.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) sequence.c > sequence.i
+
+sequence.s : sequence.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S sequence.c
+
+sequence.obj : sequence.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c sequence.c
+
+charstrg.i : charstrg.c streq.h cjk.h uninames.h lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c uni_upcase.c uni_downcase.c uni_attribute.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) charstrg.c > charstrg.i
+
+charstrg.s : charstrg.c streq.h cjk.h uninames.h lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c uni_upcase.c uni_downcase.c uni_attribute.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S charstrg.c
+
+charstrg.obj : charstrg.c streq.h cjk.h uninames.h lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c uni_upcase.c uni_downcase.c uni_attribute.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c charstrg.c
+
+debug.i : debug.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) debug.c > debug.i
+
+debug.s : debug.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S debug.c
+
+debug.obj : debug.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c debug.c
+
+error.i : error.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c errunix.c errwin32.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) error.c > error.i
+
+error.s : error.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c errunix.c errwin32.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S error.c
+
+error.obj : error.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c errunix.c errwin32.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c error.c
+
+misc.i : misc.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) misc.c > misc.i
+
+misc.s : misc.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S misc.c
+
+misc.obj : misc.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c misc.c
+
+time.i : time.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) time.c > time.i
+
+time.s : time.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S time.c
+
+time.obj : time.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c time.c
+
+predtype.i : predtype.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c avl.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) predtype.c > predtype.i
+
+predtype.s : predtype.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c avl.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S predtype.c
+
+predtype.obj : predtype.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c avl.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c predtype.c
+
+symbol.i : symbol.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) symbol.c > symbol.i
+
+symbol.s : symbol.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S symbol.c
+
+symbol.obj : symbol.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c symbol.c
+
+lisparit.i : lisparit.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c aridecl.c arilev0.c arilev1.c intelem.c intlog.c intplus.c intcomp.c intbyte.c intmal.c intdiv.c intgcd.c int2adic.c intsqrt.c intprint.c intread.c intserial.c rational.c sfloat.c ffloat.c dfloat.c lfloat.c flo_konv.c flo_rest.c realelem.c realrand.c realtran.c compelem.c comptran.c arilev1c.c arilev1e.c arilev1i.c ari80386.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) lisparit.c > lisparit.i
+
+lisparit.s : lisparit.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c aridecl.c arilev0.c arilev1.c intelem.c intlog.c intplus.c intcomp.c intbyte.c intmal.c intdiv.c intgcd.c int2adic.c intsqrt.c intprint.c intread.c intserial.c rational.c sfloat.c ffloat.c dfloat.c lfloat.c flo_konv.c flo_rest.c realelem.c realrand.c realtran.c compelem.c comptran.c arilev1c.c arilev1e.c arilev1i.c ari80386.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S lisparit.c
+
+lisparit.obj : lisparit.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c aridecl.c arilev0.c arilev1.c intelem.c intlog.c intplus.c intcomp.c intbyte.c intmal.c intdiv.c intgcd.c int2adic.c intsqrt.c intprint.c intread.c intserial.c rational.c sfloat.c ffloat.c dfloat.c lfloat.c flo_konv.c flo_rest.c realelem.c realrand.c realtran.c compelem.c comptran.c arilev1c.c arilev1e.c arilev1i.c ari80386.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c lisparit.c
+
+i18n.i : i18n.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) i18n.c > i18n.i
+
+i18n.s : i18n.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S i18n.c
+
+i18n.obj : i18n.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c i18n.c
+
+foreign.i : foreign.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) -I../ffcall foreign.c > foreign.i
+
+foreign.s : foreign.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -I../ffcall -S foreign.c
+
+foreign.obj : foreign.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c arilev0.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -I../ffcall -c foreign.c
+
+win32aux.i : win32aux.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) win32aux.c > win32aux.i
+
+win32aux.s : win32aux.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S win32aux.c
+
+win32aux.obj : win32aux.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c win32aux.c
+
+built.i : built.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h cflags.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) built.c > built.i
+
+built.s : built.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h cflags.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S built.c
+
+built.obj : built.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h cflags.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c built.c
+
+genclisph.i : genclisph.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gen.lispbibl.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE genclisph.c > genclisph.i
+
+genclisph.s : genclisph.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gen.lispbibl.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE -S genclisph.c
+
+genclisph.obj : genclisph.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gen.lispbibl.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE -c genclisph.c
+
+modules.i : modules.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h modules.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) -DNO_CLISP_H modules.c > modules.i
+
+modules.s : modules.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h modules.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DNO_CLISP_H -S modules.c
+
+modules.obj : modules.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h modules.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DNO_CLISP_H -c modules.c
+
+noreadline.i : noreadline.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CPP) $(CPPFLAGS) $(CFLAGS) noreadline.c > noreadline.i
+
+noreadline.s : noreadline.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S noreadline.c
+
+noreadline.obj : noreadline.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c noreadline.c
+
+ari80386.i : ari80386.msvc.c
+	$(CPP) $(CPPFLAGS) $(CFLAGS) ari80386.msvc.c > ari80386.i
+
+ari80386.s : ari80386.msvc.c
+	$(CPP) $(CPPFLAGS) $(CFLAGS) ari80386.msvc.c > ari80386.i.c
+	$(CC) $(CFLAGS) -c ari80386.i.c /FAs /Faari80386.s
+	$(RM) ari80386.i.obj
+	$(RM) ari80386.i.c
+
+ari80386.obj : ari80386.msvc.c
+	$(CPP) $(CPPFLAGS) $(CFLAGS) ari80386.msvc.c > ari80386.i.c
+	$(CC) $(CFLAGS) -c ari80386.i.c
+	$(RM) ari80386.obj
+	$(MV) ari80386.i.obj ari80386.obj
+	$(RM) ari80386.i.c
+
+sp80386.i : sp80386.msvc.c
+	$(CPP) $(CPPFLAGS) $(CFLAGS) sp80386.msvc.c > sp80386.i
+
+sp80386.s : sp80386.msvc.c
+	$(CPP) $(CPPFLAGS) $(CFLAGS) sp80386.msvc.c > sp80386.i.c
+	$(CC) $(CFLAGS) -c sp80386.i.c /FAs /Fasp80386.s
+	$(RM) sp80386.i.obj
+	$(RM) sp80386.i.c
+
+sp80386.obj : sp80386.msvc.c
+	$(CPP) $(CPPFLAGS) $(CFLAGS) sp80386.msvc.c > sp80386.i.c
+	$(CC) $(CFLAGS) -c sp80386.i.c
+	$(RM) sp80386.obj
+	$(MV) sp80386.i.obj sp80386.obj
+	$(RM) sp80386.i.c
+
+localcharset.h : gllib/localcharset.h
+	-$(RM) localcharset.h
+	-$(LN_S) gllib/localcharset.h localcharset.h
+
+streq.h : gllib/streq.h
+	-$(RM) streq.h
+	-$(LN_S) gllib/streq.h streq.h
+
+cjk.h : gllib/uniwidth/cjk.h
+	-$(RM) cjk.h
+	-$(LN_S) gllib/uniwidth/cjk.h cjk.h
+
+uninames.h : gllib/uniname/uninames.h
+	-$(RM) uninames.h
+	-$(LN_S) gllib/uniname/uninames.h uninames.h
+
+data : ..\utils\unicode\UnicodeDataFull.txt ..\doc\Symbol-Table.text
+	$(RMRF) data
+	mkdir data
+	cd data && $(LN_S) ..\..\utils\unicode\UnicodeDataFull.txt .
+	cd data && $(LN_S) ..\..\doc\Symbol-Table.text .
+
+lisp.exe : $(OBJECTS) libgnu_cl.a modules.obj  data
+	$(RM) lisp.ilk
+	$(CC) $(CFLAGS) $(CLFLAGS) $(OBJECTS) modules.obj $(LIBS) /link /out:lisp.exe
+
+config.lisp : cfgwin32.lisp
+	$(CP) cfgwin32.lisp config.lisp
+
+RUN= ./lisp.exe -B . -E UTF-8 -Epathname 1:1 -Emisc 1:1 -norc
+
+modprep.fas : ..\utils\modprep.lisp lisp.exe lispinit.mem
+	$(RUN) -M lispinit.mem -q -c ../utils/modprep.lisp -o ./
+
+modprep.lisp : ..\utils\modprep.lisp
+	-$(RM) modprep.lisp
+	-$(LN_S) ..\utils\modprep.lisp modprep.lisp
+
+
+interpreted.mem : lisp.exe $(LISPFILES) config.lisp
+	-$(RM) interpreted.mem
+	$(RUN) -m 2MW -lp  -x '(and (load "init.lisp") (sys::%%saveinitmem) (ext::exit)) (ext::exit t)'
+	$(MV) lispimag.mem interpreted.mem
+
+init.fas : init.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c init.lisp -o ./
+
+defseq.fas : defseq.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c defseq.lisp -o ./
+
+backquote.fas : backquote.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c backquote.lisp -o ./
+
+defmacro.fas : defmacro.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c defmacro.lisp -o ./
+
+macros1.fas : macros1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c macros1.lisp -o ./
+
+macros2.fas : macros2.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c macros2.lisp -o ./
+
+defs1.fas : defs1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c defs1.lisp -o ./
+
+lambdalist.fas : lambdalist.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c lambdalist.lisp -o ./
+
+places.fas : places.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c places.lisp -o ./
+
+floatprint.fas : floatprint.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c floatprint.lisp -o ./
+
+defpackage.fas : defpackage.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c defpackage.lisp -o ./
+
+type.fas : type.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c type.lisp -o ./
+
+subtypep.fas : subtypep.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c subtypep.lisp -o ./
+
+clos-package.fas : clos-package.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-package.lisp -o ./
+
+clos-macros.fas : clos-macros.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-macros.lisp -o ./
+
+clos-class0.fas : clos-class0.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-class0.lisp -o ./
+
+clos-metaobject1.fas : clos-metaobject1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-metaobject1.lisp -o ./
+
+clos-slotdef1.fas : clos-slotdef1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-slotdef1.lisp -o ./
+
+clos-stablehash1.fas : clos-stablehash1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-stablehash1.lisp -o ./
+
+clos-specializer1.fas : clos-specializer1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-specializer1.lisp -o ./
+
+clos-class1.fas : clos-class1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-class1.lisp -o ./
+
+clos-class2.fas : clos-class2.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-class2.lisp -o ./
+
+clos-class3.fas : clos-class3.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-class3.lisp -o ./
+
+defstruct.fas : defstruct.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c defstruct.lisp -o ./
+
+format.fas : format.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c format.lisp -o ./
+
+international.fas : international.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c international.lisp -o ./
+
+savemem.fas : savemem.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c savemem.lisp -o ./
+
+functions.fas : functions.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c functions.lisp -o ./
+
+trace.fas : trace.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c trace.lisp -o ./
+
+cmacros.fas : cmacros.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c cmacros.lisp -o ./
+
+compiler.fas : compiler.lisp lisp.exe interpreted.mem
+	$(RUN) -m 2MW -M interpreted.mem -q -c compiler.lisp -o ./
+
+defs2.fas : defs2.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c defs2.lisp -o ./
+
+loop.fas : loop.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c loop.lisp -o ./
+
+clos.fas : clos.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos.lisp -o ./
+
+clos-stablehash2.fas : clos-stablehash2.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-stablehash2.lisp -o ./
+
+clos-specializer2.fas : clos-specializer2.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-specializer2.lisp -o ./
+
+clos-specializer3.fas : clos-specializer3.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-specializer3.lisp -o ./
+
+clos-class4.fas : clos-class4.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-class4.lisp -o ./
+
+clos-class5.fas : clos-class5.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-class5.lisp -o ./
+
+clos-class6.fas : clos-class6.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-class6.lisp -o ./
+
+clos-slotdef2.fas : clos-slotdef2.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-slotdef2.lisp -o ./
+
+clos-slotdef3.fas : clos-slotdef3.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-slotdef3.lisp -o ./
+
+clos-slots1.fas : clos-slots1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-slots1.lisp -o ./
+
+clos-slots2.fas : clos-slots2.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-slots2.lisp -o ./
+
+clos-method1.fas : clos-method1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-method1.lisp -o ./
+
+clos-method2.fas : clos-method2.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-method2.lisp -o ./
+
+clos-method3.fas : clos-method3.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-method3.lisp -o ./
+
+clos-method4.fas : clos-method4.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-method4.lisp -o ./
+
+clos-methcomb1.fas : clos-methcomb1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-methcomb1.lisp -o ./
+
+clos-methcomb2.fas : clos-methcomb2.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-methcomb2.lisp -o ./
+
+clos-methcomb3.fas : clos-methcomb3.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-methcomb3.lisp -o ./
+
+clos-methcomb4.fas : clos-methcomb4.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-methcomb4.lisp -o ./
+
+clos-genfun1.fas : clos-genfun1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-genfun1.lisp -o ./
+
+clos-genfun2a.fas : clos-genfun2a.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-genfun2a.lisp -o ./
+
+clos-genfun2b.fas : clos-genfun2b.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-genfun2b.lisp -o ./
+
+clos-genfun3.fas : clos-genfun3.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-genfun3.lisp -o ./
+
+clos-genfun4.fas : clos-genfun4.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-genfun4.lisp -o ./
+
+clos-genfun5.fas : clos-genfun5.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-genfun5.lisp -o ./
+
+clos-dependent.fas : clos-dependent.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-dependent.lisp -o ./
+
+clos-print.fas : clos-print.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-print.lisp -o ./
+
+clos-custom.fas : clos-custom.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clos-custom.lisp -o ./
+
+documentation.fas : documentation.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c documentation.lisp -o ./
+
+fill-out.fas : fill-out.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c fill-out.lisp -o ./
+
+disassem.fas : disassem.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c disassem.lisp -o ./
+
+condition.fas : condition.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c condition.lisp -o ./
+
+loadform.fas : loadform.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c loadform.lisp -o ./
+
+gstream.fas : gstream.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c gstream.lisp -o ./
+
+xcharin.fas : xcharin.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c xcharin.lisp -o ./
+
+keyboard.fas : keyboard.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c keyboard.lisp -o ./
+
+screen.fas : screen.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c screen.lisp -o ./
+
+runprog.fas : runprog.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c runprog.lisp -o ./
+
+query.fas : query.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c query.lisp -o ./
+
+reploop.fas : reploop.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c reploop.lisp -o ./
+
+dribble.fas : dribble.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c dribble.lisp -o ./
+
+complete.fas : complete.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c complete.lisp -o ./
+
+pprint.fas : pprint.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c pprint.lisp -o ./
+
+describe.fas : describe.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c describe.lisp -o ./
+
+room.fas : room.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c room.lisp -o ./
+
+edit.fas : edit.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c edit.lisp -o ./
+
+macros3.fas : macros3.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c macros3.lisp -o ./
+
+clhs.fas : clhs.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c clhs.lisp -o ./
+
+inspect.fas : inspect.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c inspect.lisp -o ./
+
+gray.fas : gray.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c gray.lisp -o ./
+
+case-sensitive.fas : case-sensitive.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c case-sensitive.lisp -o ./
+
+foreign1.fas : foreign1.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c foreign1.lisp -o ./
+
+exporting.fas : exporting.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c exporting.lisp -o ./
+
+german.fas : german.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c german.lisp -o ./
+
+french.fas : french.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c french.lisp -o ./
+
+spanish.fas : spanish.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c spanish.lisp -o ./
+
+russian.fas : russian.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c russian.lisp -o ./
+
+danish.fas : danish.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c danish.lisp -o ./
+
+dutch.fas : dutch.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c dutch.lisp -o ./
+
+deprecated.fas : deprecated.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c deprecated.lisp -o ./
+
+config.fas : config.lisp lisp.exe halfcompiled.mem
+	$(RUN) -m 2MW -M halfcompiled.mem -q -c config.lisp
+
+halfcompiled.mem : lisp.exe $(LISPFILES) config.lisp compiler.fas
+	-$(RM) halfcompiled.mem
+	$(RUN) -m 2MW -lp  -x '(and (load "init.lisp") (sys::%%saveinitmem) (ext::exit)) (ext::exit t)'
+	$(MV) lispimag.mem halfcompiled.mem
+
+lispinit.mem : lisp.exe $(FASFILES)
+	-$(RM) lispinit.mem
+	$(RUN) -x "(and (load \"init.fas\") (ext::saveinitmem) (ext::exit)) (ext::exit t)"
+
+
+# check the sources:
+# 1. subr.d, fsubr.d, subrkw.d and all the LISPFUNs must add up
+# 2. no variables of type gcv_object_t - only pointers to it
+check-sources : # lisp.exe lispinit.mem
+	$(RUN) -M lispinit.mem -C -i check-lispfun.lisp -x "(check-lisp-defs \"\")"
+	if egrep ' var gcv_object_t *[^* ]' *.d; then false; else true; fi
+
+# Test: recompile $(LISPFILES) and compare their contents.
+check-recompile : lispinit.mem stage $(TESTFASFILES)
+	comp *.fas stage
+	echo The test passed if only GENSYM differences were found.
+
+stage :
+	-mkdir stage
+
+stage\init.fas : init.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c init.lisp -o stage\
+
+stage\defseq.fas : defseq.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c defseq.lisp -o stage\
+
+stage\backquote.fas : backquote.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c backquote.lisp -o stage\
+
+stage\defmacro.fas : defmacro.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c defmacro.lisp -o stage\
+
+stage\macros1.fas : macros1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c macros1.lisp -o stage\
+
+stage\macros2.fas : macros2.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c macros2.lisp -o stage\
+
+stage\defs1.fas : defs1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c defs1.lisp -o stage\
+
+stage\lambdalist.fas : lambdalist.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c lambdalist.lisp -o stage\
+
+stage\places.fas : places.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c places.lisp -o stage\
+
+stage\floatprint.fas : floatprint.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c floatprint.lisp -o stage\
+
+stage\defpackage.fas : defpackage.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c defpackage.lisp -o stage\
+
+stage\type.fas : type.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c type.lisp -o stage\
+
+stage\subtypep.fas : subtypep.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c subtypep.lisp -o stage\
+
+stage\clos-package.fas : clos-package.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-package.lisp -o stage\
+
+stage\clos-macros.fas : clos-macros.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-macros.lisp -o stage\
+
+stage\clos-class0.fas : clos-class0.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-class0.lisp -o stage\
+
+stage\clos-metaobject1.fas : clos-metaobject1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-metaobject1.lisp -o stage\
+
+stage\clos-slotdef1.fas : clos-slotdef1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-slotdef1.lisp -o stage\
+
+stage\clos-stablehash1.fas : clos-stablehash1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-stablehash1.lisp -o stage\
+
+stage\clos-specializer1.fas : clos-specializer1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-specializer1.lisp -o stage\
+
+stage\clos-class1.fas : clos-class1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-class1.lisp -o stage\
+
+stage\clos-class2.fas : clos-class2.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-class2.lisp -o stage\
+
+stage\clos-class3.fas : clos-class3.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-class3.lisp -o stage\
+
+stage\defstruct.fas : defstruct.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c defstruct.lisp -o stage\
+
+stage\format.fas : format.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c format.lisp -o stage\
+
+stage\international.fas : international.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c international.lisp -o stage\
+
+stage\savemem.fas : savemem.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c savemem.lisp -o stage\
+
+stage\functions.fas : functions.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c functions.lisp -o stage\
+
+stage\trace.fas : trace.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c trace.lisp -o stage\
+
+stage\cmacros.fas : cmacros.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c cmacros.lisp -o stage\
+
+stage\compiler.fas : compiler.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c compiler.lisp -o stage\
+
+stage\defs2.fas : defs2.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c defs2.lisp -o stage\
+
+stage\loop.fas : loop.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c loop.lisp -o stage\
+
+stage\clos.fas : clos.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos.lisp -o stage\
+
+stage\clos-stablehash2.fas : clos-stablehash2.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-stablehash2.lisp -o stage\
+
+stage\clos-specializer2.fas : clos-specializer2.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-specializer2.lisp -o stage\
+
+stage\clos-specializer3.fas : clos-specializer3.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-specializer3.lisp -o stage\
+
+stage\clos-class4.fas : clos-class4.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-class4.lisp -o stage\
+
+stage\clos-class5.fas : clos-class5.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-class5.lisp -o stage\
+
+stage\clos-class6.fas : clos-class6.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-class6.lisp -o stage\
+
+stage\clos-slotdef2.fas : clos-slotdef2.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-slotdef2.lisp -o stage\
+
+stage\clos-slotdef3.fas : clos-slotdef3.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-slotdef3.lisp -o stage\
+
+stage\clos-slots1.fas : clos-slots1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-slots1.lisp -o stage\
+
+stage\clos-slots2.fas : clos-slots2.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-slots2.lisp -o stage\
+
+stage\clos-method1.fas : clos-method1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-method1.lisp -o stage\
+
+stage\clos-method2.fas : clos-method2.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-method2.lisp -o stage\
+
+stage\clos-method3.fas : clos-method3.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-method3.lisp -o stage\
+
+stage\clos-method4.fas : clos-method4.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-method4.lisp -o stage\
+
+stage\clos-methcomb1.fas : clos-methcomb1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-methcomb1.lisp -o stage\
+
+stage\clos-methcomb2.fas : clos-methcomb2.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-methcomb2.lisp -o stage\
+
+stage\clos-methcomb3.fas : clos-methcomb3.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-methcomb3.lisp -o stage\
+
+stage\clos-methcomb4.fas : clos-methcomb4.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-methcomb4.lisp -o stage\
+
+stage\clos-genfun1.fas : clos-genfun1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-genfun1.lisp -o stage\
+
+stage\clos-genfun2a.fas : clos-genfun2a.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-genfun2a.lisp -o stage\
+
+stage\clos-genfun2b.fas : clos-genfun2b.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-genfun2b.lisp -o stage\
+
+stage\clos-genfun3.fas : clos-genfun3.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-genfun3.lisp -o stage\
+
+stage\clos-genfun4.fas : clos-genfun4.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-genfun4.lisp -o stage\
+
+stage\clos-genfun5.fas : clos-genfun5.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-genfun5.lisp -o stage\
+
+stage\clos-dependent.fas : clos-dependent.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-dependent.lisp -o stage\
+
+stage\clos-print.fas : clos-print.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-print.lisp -o stage\
+
+stage\clos-custom.fas : clos-custom.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clos-custom.lisp -o stage\
+
+stage\documentation.fas : documentation.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c documentation.lisp -o stage\
+
+stage\fill-out.fas : fill-out.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c fill-out.lisp -o stage\
+
+stage\disassem.fas : disassem.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c disassem.lisp -o stage\
+
+stage\condition.fas : condition.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c condition.lisp -o stage\
+
+stage\loadform.fas : loadform.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c loadform.lisp -o stage\
+
+stage\gstream.fas : gstream.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c gstream.lisp -o stage\
+
+stage\xcharin.fas : xcharin.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c xcharin.lisp -o stage\
+
+stage\keyboard.fas : keyboard.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c keyboard.lisp -o stage\
+
+stage\screen.fas : screen.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c screen.lisp -o stage\
+
+stage\runprog.fas : runprog.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c runprog.lisp -o stage\
+
+stage\query.fas : query.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c query.lisp -o stage\
+
+stage\reploop.fas : reploop.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c reploop.lisp -o stage\
+
+stage\dribble.fas : dribble.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c dribble.lisp -o stage\
+
+stage\complete.fas : complete.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c complete.lisp -o stage\
+
+stage\pprint.fas : pprint.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c pprint.lisp -o stage\
+
+stage\describe.fas : describe.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c describe.lisp -o stage\
+
+stage\room.fas : room.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c room.lisp -o stage\
+
+stage\edit.fas : edit.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c edit.lisp -o stage\
+
+stage\macros3.fas : macros3.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c macros3.lisp -o stage\
+
+stage\clhs.fas : clhs.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c clhs.lisp -o stage\
+
+stage\inspect.fas : inspect.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c inspect.lisp -o stage\
+
+stage\gray.fas : gray.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c gray.lisp -o stage\
+
+stage\case-sensitive.fas : case-sensitive.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c case-sensitive.lisp -o stage\
+
+stage\foreign1.fas : foreign1.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c foreign1.lisp -o stage\
+
+stage\exporting.fas : exporting.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c exporting.lisp -o stage\
+
+stage\german.fas : german.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c german.lisp -o stage\
+
+stage\french.fas : french.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c french.lisp -o stage\
+
+stage\spanish.fas : spanish.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c spanish.lisp -o stage\
+
+stage\russian.fas : russian.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c russian.lisp -o stage\
+
+stage\danish.fas : danish.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c danish.lisp -o stage\
+
+stage\dutch.fas : dutch.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c dutch.lisp -o stage\
+
+stage\deprecated.fas : deprecated.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c deprecated.lisp -o stage\
+
+stage\config.fas : config.lisp lisp.exe lispinit.mem
+	$(RUN) -m 1MW -M lispinit.mem -q -d -c config.lisp -o stage\
+
+lispinit2.mem : lisp.exe $(TESTFASFILES)
+	$(RUN) -x "(and (cd \"stage/\") (load \"init.fas\") (cd \"../\") (sys::%%saveinitmem) (ext::exit)) (ext::exit t)"
+	-$(RM) lispinit2.mem
+	$(MV) lispimag.mem lispinit2.mem
+
+
+check-fresh-line : lisp.exe lispinit.mem
+	-$(RM) fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (dolist (s (quote (*terminal-io* *standard-output* *error-output* *query-io* *debug-io* *trace-output*))) (format t "~S = ~S~%%" s (symbol-value s))) (values))' 2>&1 > fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *terminal-io* "~&Line1 to *terminal-io*") (format *terminal-io* "~&Line2 to *terminal-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *terminal-io* "~&Line1 to *terminal-io*") (format *standard-output* "~&Line2 to *standard-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *terminal-io* "~&Line1 to *terminal-io*") (format *error-output* "~&Line2 to *error-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *terminal-io* "~&Line1 to *terminal-io*") (format *query-io* "~&Line2 to *query-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *terminal-io* "~&Line1 to *terminal-io*") (format *debug-io* "~&Line2 to *debug-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *terminal-io* "~&Line1 to *terminal-io*") (format *trace-output* "~&Line2 to *trace-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *standard-output* "~&Line1 to *standard-output*") (format *terminal-io* "~&Line2 to *terminal-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *standard-output* "~&Line1 to *standard-output*") (format *standard-output* "~&Line2 to *standard-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *standard-output* "~&Line1 to *standard-output*") (format *error-output* "~&Line2 to *error-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *standard-output* "~&Line1 to *standard-output*") (format *query-io* "~&Line2 to *query-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *standard-output* "~&Line1 to *standard-output*") (format *debug-io* "~&Line2 to *debug-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *standard-output* "~&Line1 to *standard-output*") (format *trace-output* "~&Line2 to *trace-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *error-output* "~&Line1 to *error-output*") (format *terminal-io* "~&Line2 to *terminal-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *error-output* "~&Line1 to *error-output*") (format *standard-output* "~&Line2 to *standard-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *error-output* "~&Line1 to *error-output*") (format *error-output* "~&Line2 to *error-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *error-output* "~&Line1 to *error-output*") (format *query-io* "~&Line2 to *query-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *error-output* "~&Line1 to *error-output*") (format *debug-io* "~&Line2 to *debug-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *error-output* "~&Line1 to *error-output*") (format *trace-output* "~&Line2 to *trace-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *query-io* "~&Line1 to *query-io*") (format *terminal-io* "~&Line2 to *terminal-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *query-io* "~&Line1 to *query-io*") (format *standard-output* "~&Line2 to *standard-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *query-io* "~&Line1 to *query-io*") (format *error-output* "~&Line2 to *error-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *query-io* "~&Line1 to *query-io*") (format *query-io* "~&Line2 to *query-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *query-io* "~&Line1 to *query-io*") (format *debug-io* "~&Line2 to *debug-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *query-io* "~&Line1 to *query-io*") (format *trace-output* "~&Line2 to *trace-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *debug-io* "~&Line1 to *debug-io*") (format *terminal-io* "~&Line2 to *terminal-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *debug-io* "~&Line1 to *debug-io*") (format *standard-output* "~&Line2 to *standard-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *debug-io* "~&Line1 to *debug-io*") (format *error-output* "~&Line2 to *error-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *debug-io* "~&Line1 to *debug-io*") (format *query-io* "~&Line2 to *query-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *debug-io* "~&Line1 to *debug-io*") (format *debug-io* "~&Line2 to *debug-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *debug-io* "~&Line1 to *debug-io*") (format *trace-output* "~&Line2 to *trace-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *trace-output* "~&Line1 to *trace-output*") (format *terminal-io* "~&Line2 to *terminal-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *trace-output* "~&Line1 to *trace-output*") (format *standard-output* "~&Line2 to *standard-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *trace-output* "~&Line1 to *trace-output*") (format *error-output* "~&Line2 to *error-output*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *trace-output* "~&Line1 to *trace-output*") (format *query-io* "~&Line2 to *query-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *trace-output* "~&Line1 to *trace-output*") (format *debug-io* "~&Line2 to *debug-io*") (values))' 2>&1 >> fresh-line.out
+	$(RUN) -q -M lispinit.mem -x '(progn (format *trace-output* "~&Line1 to *trace-output*") (format *trace-output* "~&Line2 to *trace-output*") (values))' 2>&1 >> fresh-line.out
+	if grep 'Line1.*Line2' fresh-line.out > /dev/null; then exit 1; fi
+	$(RM) fresh-line.out
+
+check-script : lisp.exe lispinit.mem
+	$(RUN) -q -M lispinit.mem 0>/dev/null
+	test `echo '(princ (+ 11 99))' | $(RUN) -q -M lispinit.mem - | tr -d '\r'` = 110 || exit 1
+	test "`echo '(+ foo bar)' | $(RUN) -q -M lispinit.mem -x '(setq foo 11 bar 99)' -repl | tr -d '\r'| tr '\n' '_'`" = '99_[1]> _110_' || exit 1
+	$(RM) script.lisp; echo '(error "loading script.lisp")' > script.lisp
+	if $(RUN) -q -M lispinit.mem -x '(load "script.lisp")' -repl < /dev/null; then exit 1; else :; fi
+	test `echo '(setf (stream-element-type *standard-output*) (quote (unsigned-byte 8))) (write-sequence (convert-string-to-bytes "42" charset:ascii) *standard-output*) (setf (stream-element-type *standard-output*) (quote character)) (terpri)' | $(RUN) -q -M lispinit.mem - | tr -d '\r'` = 42 || exit 1
+	$(RM) script.lisp; echo '(+ 11 99)' > script.lisp
+	test `$(RUN) -q -M lispinit.mem < script.lisp | tr -d '\r'` = 110 || exit 1
+	$(RM) script.lisp; echo '(princ (+ 11 99))' > script.lisp
+	test `$(RUN) -q -M lispinit.mem script.lisp | tr -d '\r'` = 110 || exit 1
+	$(RM) script.lisp; echo '(+ foo bar)' > script.lisp
+	test `$(RUN) -q -M lispinit.mem -x '(setq foo 11 bar 99)' -repl < script.lisp | tr -d '\r'| tr '\n' '_'` = 99_110_ || exit 1
+	$(RM) script.lisp; echo '(setf (stream-element-type *standard-output*) (quote (unsigned-byte 8))) (write-sequence (convert-string-to-bytes "42" charset:ascii) *standard-output*) (setf (stream-element-type *standard-output*) (quote character)) (terpri)' > script.lisp
+	test `$(RUN) -q -M lispinit.mem script.lisp | tr -d '\r'` = 42 || exit 1
+	$(RM) script.lisp; echo '(with-open-stream (s (make-stream :output :element-type (quote (unsigned-byte 8)))) (write-sequence (convert-string-to-bytes "42" charset:ascii) s) (values))' > script.lisp
+	test `$(RUN) -q -M lispinit.mem < script.lisp | tr -d '\r'` = 42 || exit 1
+	test `$(RUN) -q -M lispinit.mem script.lisp | tr -d '\r'` = 42 || exit 1
+	$(RM) script.lisp; nohup $(RUN) -q -M lispinit.mem -x 42 2>&1 > script.lisp; test `tail -n 1 script.lisp | tr -d '\r'` = 42 || exit 1 
+	$(RM) script.lisp
+
+check-exec-image: lisp.exe lispinit.mem
+	$(RUN) -M lispinit.mem -x "(saveinitmem \"foo\" :executable t :norc t)"
+	./foo.exe -x "(setq zz 10) (saveinitmem \"foo\")"
+	./foo.exe -norc -M foo.mem -x zz
+	$(RUN) -M lispinit.mem -x "(saveinitmem \"foo\" :executable t :norc t :quiet t :init-function (lambda () (prin1 *args*) (exit)))" -- a 1
+	test "`./foo.exe b | tr -d '\r'`" = '("b")' || exit 1
+	test "`./foo.exe b 2 | tr -d '\r'`" = '("b" "2")' || exit 1
+	-ls -l lisp.exe lispinit.mem foo.exe foo.mem
+	$(RM) foo.exe foo.mem
+
+check-tests : tests lisp.exe lispinit.mem
+	cd tests && $(MAKE) SHELL='$(SHELL)' LEXE=.exe
+
+check-tests-all : tests lisp.exe lispinit.mem
+	cd tests && $(MAKE) SHELL='$(SHELL)' LEXE=.exe clean complete compare
+
+tests :
+	-mkdir tests
+	cd tests && $(LN_S) ..\..\tests\Makefile .
+	cd tests && $(LN_S) ..\..\tests\*.lisp .
+	cd tests && $(LN_S) ..\..\tests\*.tst .
+
+# Perform self-tests.
+check : check-recompile check-fresh-line check-script check-exec-image check-tests
+
+
+clisp.h clisp-test.c : genclisph.o config.h  intparam.h floatparam.h
+	$(CC) $(CFLAGS) $(CLFLAGS) genclisph.o /Fegenclisph.exe
+	(echo '#ifndef _CLISP_H' ; echo '#define _CLISP_H' ; echo; echo '/* config.h */' ; grep '^#' config.h ) > clisp.h
+	(echo; echo '/* 'intparam.h' */' ; grep '^#' intparam.h ) >> clisp.h
+	(echo; echo '/* 'floatparam.h' */' ; grep '^#' floatparam.h ) >> clisp.h
+	(echo; echo '/* genclisph */' ; ./genclisph clisp-test.c ; echo ; echo '#endif /* _CLISP_H */') >> clisp.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(CLFLAGS) -DUSE_CLISP_H=1 -DCOMPILE_STANDALONE clisp-test.c /Feclisp-test-clisp.exe
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(CLFLAGS) -DUSE_CLISP_H=0 -DCOMPILE_STANDALONE clisp-test.c /Feclisp-test-lispbibl.exe
+	./clisp-test-clisp > clisp-test-clisp.out
+	./clisp-test-lispbibl > clisp-test-lispbibl.out
+	comp clisp-test-clisp.out clisp-test-lispbibl.out
+	if grep lispbibl.d clisp.h; then false; else true; fi
+	$(RM) genclisph.exe clisp-test-clisp.exe clisp-test-lispbibl.exe clisp-test-clisp.out clisp-test-lispbibl.out
+
+linkkit : modules.c clisp.h modprep.lisp
+	-$(RMRF) linkkit
+	mkdir linkkit
+	cd linkkit && $(LN_S) ..\modules.c modules.c
+	cd linkkit && $(LN_S) ..\clisp.h clisp.h
+	cd linkkit && $(LN_S) ..\modprep.lisp modprep.lisp
+
+modular : lisp.a libnoreadline.a libgnu_cl.a  clisp-link linkkit modules.h modules.o makevars build-aux
+
+makevars : Makefile
+	(echo 'CC='"'"'$(CC)'"'" ;\
+	 echo 'CPPFLAGS='"'"'$(CPPFLAGS)'"'" ;\
+	 echo 'CFLAGS='"'"'$(CFLAGS)'"'" ;\
+	 echo 'CLFLAGS='"'"'$(CLFLAGS)'"'" ;\
+	 echo 'LIBS='"'"'lisp.a $(LIBS)'"'" ;\
+	 echo 'X_LIBS='"'"'$(X_LIBS)'"'" ;\
+	 echo 'RANLIB='"'"'$(RANLIB)'"'" ;\
+	 echo 'FILES='"'"'lisp.a libnoreadline.a libgnu_cl.a '"'") > makevars
+
+clisp-link : clisp-link.in
+	sed -e 's%%@with_dynamic_modules@%%no%%' \
+	    -e 's%%@createsharedlib@%%%%' \
+	    -e 's%%@LEXE@%%.exe%%' -e 's%%@SHREXT@%%.dll%%' \
+	    -e 's%%@CLISP_DEF@%%%%' \
+	  < clisp-link.in > clisp-link
+	chmod a+x clisp-link
+
+boot : modular lispinit.mem
+	test -d boot || (mkdir boot && cd boot && for f in lisp.a libnoreadline.a libgnu_cl.a  modules.h modules.o lisp.exe lispinit.mem; do $(LN_S) ..\$$f .; done && ($(GREP) -v '^FILES=' ..\makevars; fl=''; for f in lisp.a libnoreadline.a libgnu_cl.a ; do fl=$$fl' '`basename $$f`; done; echo 'FILES='"'"$$fl"'") > makevars) || ($(RMRF) boot ; exit 1)
+
+anymodule $(BASE_MODULES) $(MODULES) : boot clisp.exe linkkit force
+	mkdir -p $@
+	m=`cd ..\modules\$@; pwd`; \
+	if test -f $$m/configure -a $$m/configure -nt $@/config.status ; then ( cd $@ ; $(RMRF) gllib;\
+	    cache=`echo $@/ | sed -e 's,[^/][^/]*//*,../,g'`config.cache; \
+	    if test -f $${cache} ; then \
+	      . $${cache}; \
+	      if test "$${ac_cv_env_CC_set}" = set; then CC="$${ac_cv_env_CC_value}"; export CC; fi; \
+	      if test "$${ac_cv_env_CFLAGS_set}" = set; then CFLAGS="$${ac_cv_env_CFLAGS_value}"; export CFLAGS; fi; \
+	      if test "$${ac_cv_env_LDFLAGS_set}" = set; then LDFLAGS="$${ac_cv_env_LDFLAGS_value}"; export LDFLAGS; fi; \
+	      if test "$${ac_cv_env_CLFLAGS_set}" = set; then CLFLAGS="$${ac_cv_env_CLFLAGS_value}"; export CLFLAGS; fi; \
+	      if test "$${ac_cv_env_LIBS_set}" = set; then LIBS="$${ac_cv_env_LIBS_value}"; export LIBS; fi; \
+	      if test "$${ac_cv_env_CPPFLAGS_set}" = set; then CPPFLAGS="$${ac_cv_env_CPPFLAGS_value}"; export CPPFLAGS; fi; \
+	      if test "$${ac_cv_env_CPP_set}" = set; then CPP="$${ac_cv_env_CPP_value}"; export CPP; fi; \
+	      if test "$${ac_cv_env_CXX_set}" = set; then CXX="$${ac_cv_env_CXX_value}"; export CXX; fi; \
+	      if test "$${ac_cv_env_CXXFLAGS_set}" = set; then CXXFLAGS="$${ac_cv_env_CXXFLAGS_value}"; export CXXFLAGS; fi; \
+	      if test "$${ac_cv_env_X_LIBS_set}" = set; then X_LIBS="$${ac_cv_env_X_LIBS_value}"; export X_LIBS; fi; \
+	      $(SHELL) $$m/configure --with-clisp="/home/sds/src/clisp/current/src/clisp -K boot  -E UTF-8 -Epathname 1:1 -Emisc 1:1 -norc" --cache-file=$${cache} --srcdir=$$m $(MODULE_CONFIGURE_FLAGS);\
+	    else \
+	      $(SHELL) $$m/configure --srcdir=$$m $(MODULE_CONFIGURE_FLAGS); \
+	    fi ) ;\
+	fi; \
+	test -f $$m/Makefile -a $$m/Makefile -nt $@/Makefile && sed "s,srcdir = .,srcdir = $$m," "$$m/Makefile" > $@/Makefile ; \
+	CLISP="/home/sds/src/clisp/current/src/clisp -K boot  -E UTF-8 -Epathname 1:1 -Emisc 1:1 -norc" ; \
+	cd $@ ; $(MAKE) clisp-module CC="$(CC)" CPPFLAGS="$(CPPFLAGS) -I" CFLAGS="$(CFLAGS)" CLFLAGS="$(CLFLAGS)" LIBS="$(LIBS)" RANLIB="$(RANLIB)" CLISP="$$CLISP -q" SHREXT=.dll
+
+base : modular boot $(BASE_MODULES)
+	$(RMRF) base
+	MAKE=$(MAKE) CLISP="/home/sds/src/clisp/current/src/clisp -K boot  -E UTF-8 -Epathname 1:1 -Emisc 1:1 -norc" with_dynamic_modules=no ./clisp-link add boot base $(BASE_MODULES) || ($(RMRF) base ; exit 1)
+
+full : modular base $(MODULES)
+	$(RMRF) full
+	MAKE=$(MAKE) CLISP="/home/sds/src/clisp/current/src/clisp  -E UTF-8 -Epathname 1:1 -Emisc 1:1 -norc" ./clisp-link add base full $(MODULES) || ($(RMRF) full ; exit 1)
+
+mod-check : base-mod-check full-mod-check
+
+base-mod-check : clisp.exe tests # base
+	for m in "" $(BASE_MODULES); do test -n "$$m" && $(RM) $$m/*.erg; done
+	z=""; for m in "" $(BASE_MODULES); do test -n "$$m" && z=$$z" \""$$m/\"; done; ./clisp -E UTF-8 -Epathname 1:1 -Emisc 1:1 -norc -C -i tests/tests -x "(ext:exit (plusp (or (run-some-tests :dirlist '($$z) :srcdir \"..\modules\\" :outdir \"./\") 0)))"
+
+full-mod-check : clisp.exe tests # full
+	for m in "" $(MODULES); do test -n "$$m" && $(RM) $$m/*.erg; done
+	z=""; for m in "" $(MODULES); do test -n "$$m" && z=$$z" \""$$m/\"; done; ./clisp -K full -E UTF-8 -Epathname 1:1 -Emisc 1:1 -norc -C -i tests/tests -x "(ext:exit (plusp (or (run-some-tests :dirlist '($$z) :srcdir \"..\modules\\" :outdir \"./\") 0)))"
+
+READMES = ANNOUNCE COPYRIGHT GNU-GPL SUMMARY NEWS README README.de README.es
+IMPNOTES_FILES = impnotes.html impnotes.css clisp.png clisp.ico
+MANUALS = clisp.1 clisp.html clisp-link.1 clisp-link.html $(TXTFILES) $(IMPNOTES_FILES)
+
+impnotes.html : ..\doc\impnotes.html
+	$(LN_S) ..\doc\impnotes.html impnotes.html
+
+impnotes.css : ..\doc\impnotes.css
+	$(LN_S) ..\doc\impnotes.css impnotes.css
+
+clisp.png : ..\doc\clisp.png
+	$(LN_S) ..\doc\clisp.png clisp.png
+
+clisp.ico : ..\doc\clisp.ico
+	$(LN_S) ..\doc\clisp.ico clisp.ico
+
+manual : $(READMES) $(MANUALS)
+
+manualx : manual clisp.man clisp-link.man  clisp.ps clisp.pdf clisp-link.ps clisp-link.pdf
+
+ANNOUNCE : ..\ANNOUNCE
+	-$(LN_S) ..\ANNOUNCE ANNOUNCE
+
+COPYRIGHT : ..\COPYRIGHT
+	-$(LN_S) ..\COPYRIGHT COPYRIGHT
+
+GNU-GPL : ..\GNU-GPL
+	-$(LN_S) ..\GNU-GPL GNU-GPL
+
+SUMMARY : ..\SUMMARY
+	-$(LN_S) ..\SUMMARY SUMMARY
+
+README : _README lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h _README.de _README.en txt2c.exe
+	$(TXT2C) < _README > txt.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE $(CLFLAGS) txt.c /Fetxt.exe
+	./txt > README
+	$(RM) txt.c
+	$(RM) txt.exe
+
+README.de : _README.de lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h txt2c.exe
+	$(TXT2C) < _README.de > txt.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE $(CLFLAGS) txt.c /Fetxt.exe
+	./txt > README.de
+	$(RM) txt.c
+	$(RM) txt.exe
+
+README.es : _README.es lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h txt2c.exe
+	$(TXT2C) < _README.es > txt.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE $(CLFLAGS) txt.c /Fetxt.exe
+	./txt > README.es
+	$(RM) txt.c
+	$(RM) txt.exe
+
+clisp.c : _clisp.c lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h txt2c.exe
+	$(TXT2C) < _clisp.c > txt.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE $(CLFLAGS) txt.c /Fetxt.exe
+	./txt > clisp.c
+	$(RM) txt.c
+	$(RM) txt.exe
+
+clisp.1 : ../doc/_clisp.1 lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h txt2c.exe
+	$(TXT2C) < ../doc/_clisp.1 > txt.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE $(CLFLAGS) txt.c /Fetxt.exe
+	./txt | $(GREP) -v "^ *$$" | sed -e "s,@PLATFORM@,win32msvc,g" > clisp.1
+	$(RM) txt.c
+	$(RM) txt.exe
+
+clisp.html : ../doc/_clisp.html lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h txt2c.exe
+	$(TXT2C) < ../doc/_clisp.html > txt.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE $(CLFLAGS) txt.c /Fetxt.exe
+	./txt | sed -e "s,@PLATFORM@,win32msvc,g" > clisp.html
+	$(RM) txt.c
+	$(RM) txt.exe
+
+clisp-1.html : ../doc/_clisp-1.html lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h txt2c.exe
+	$(TXT2C) < ../doc/_clisp-1.html > txt.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE $(CLFLAGS) txt.c /Fetxt.exe
+	./txt | sed -e "s,@PLATFORM@,win32msvc,g" > clisp-1.html
+	$(RM) txt.c
+	$(RM) txt.exe
+
+clisp-link.1 : ../doc/_clisp-link.1 lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h txt2c.exe
+	$(TXT2C) < ../doc/_clisp-link.1 > txt.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE $(CLFLAGS) txt.c /Fetxt.exe
+	./txt | $(GREP) -v "^ *$$" | sed -e "s,@PLATFORM@,win32msvc,g" > clisp-link.1
+	$(RM) txt.c
+	$(RM) txt.exe
+
+clisp-link.html : ../doc/_clisp-link.html lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h txt2c.exe
+	$(TXT2C) < ../doc/_clisp-link.html > txt.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE $(CLFLAGS) txt.c /Fetxt.exe
+	./txt | sed -e "s,@PLATFORM@,win32msvc,g" > clisp-link.html
+	$(RM) txt.c
+	$(RM) txt.exe
+
+clisp-link-1.html : ../doc/_clisp-link-1.html lispbibl.c fsubr.c subr.c pseudofun.c constsym.c constobj.c constobj_tl.c win32.c xthread.c gllib/stdbool.h gllib/stdint.h localcharset.h txt2c.exe
+	$(TXT2C) < ../doc/_clisp-link-1.html > txt.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DCOMPILE_STANDALONE $(CLFLAGS) txt.c /Fetxt.exe
+	./txt | sed -e "s,@PLATFORM@,win32msvc,g" > clisp-link-1.html
+	$(RM) txt.c
+	$(RM) txt.exe
+
+clisp.ps : clisp.1
+	-$(ROFF_PS) clisp.1 > clisp.ps
+
+clisp.pdf : clisp.ps
+	-$(PS2PDF) clisp.ps clisp.pdf
+
+clisp.man : clisp.1
+	$(ROFF_MAN) clisp.1 > clisp.man
+
+clisp-link.ps : clisp-link.1
+	-$(ROFF_PS) clisp-link.1 > clisp-link.ps
+
+clisp-link.pdf : clisp-link.ps
+	-$(PS2PDF) clisp-link.ps clisp-link.pdf
+
+clisp-link.man : clisp-link.1
+	$(ROFF_MAN) clisp-link.1 > clisp-link.man
+
+LISP-tutorial.txt : ..\doc\LISP-tutorial.txt
+	-$(LN_S) ..\doc\LISP-tutorial.txt LISP-tutorial.txt
+
+CLOS-guide.txt : ..\doc\CLOS-guide.txt
+	-$(LN_S) ..\doc\CLOS-guide.txt CLOS-guide.txt
+
+
+clispres.obj : clisp.rc clisp.ico
+	rc /v /foclisp.res clisp.rc
+	cvtres /verbose /out:clispres.obj clisp.res
+	-$(RM) clisp.res
+
+clisp.rc :
+	echo "MAINICON ICON \"clisp.ico\"" > clisp.rc
+
+clisp.exe : clisp.c clispres.obj w32shell.c execname.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(CLFLAGS) -DENABLE_RELOCATABLE clisp.c clispres.obj $(LIBS)  /link /out:clisp.exe
+
+# Distribution, to be executed on a Unix host or using Cygwin.
+distrib : install.lisp install.bat config.lisp  clisp.man clisp-link.man clisp.html COPYRIGHT.rtf add_to_path.nsh install.nsi is_user_admin.nsh force
+	version=$(VERSION) ; \
+	distdir=clisp-$$version ; \
+	rm -rf $$distdir; \
+	mkdir $$distdir ; \
+	for f in ANNOUNCE COPYRIGHT GNU-GPL SUMMARY NEWS README README.de README.es install.bat ; do \
+	  if test -f $$f ; then cp -p $$f $$distdir/$$f ; else cp -p `echo $$f | tr '[A-Z]' '[a-z]'` $$distdir/$$f ; fi ; \
+	done ; \
+	distfile=clisp-$$version-msvc-win32.zip ; \
+	for f in lisp.exe lispinit.mem install.bat clisp.exe ; do \
+	  cp -p $$f $$distdir/$$f ; \
+	done ; \
+	mkdir $$distdir/data ; \
+	cp -p data/UnicodeDataFull.txt $$distdir/data/UnicodeDataFull.txt ; \
+	cp -p data/Symbol-Table.text $$distdir/data/Symbol-Table.text ; \
+	mkdir $$distdir/doc ; \
+	for f in  clisp.1 clisp.html clisp-link.1 clisp-link.html  clisp.man clisp-link.man $(TXTFILES) $(IMPNOTES_FILES) ; do \
+	  if test -f $$f ; then cp -p $$f $$distdir/doc/$$f ; else cp -p `echo $$f | tr '[A-Z]' '[a-z]'` $$distdir/doc/$$f ; fi ; \
+	done ; \
+	mkdir $$distdir/emacs; \
+	cp -p ../emacs/clhs.el $$distdir/emacs/clhs.el ; \
+	cp -p ../emacs/clisp-coding.el $$distdir/emacs/clisp-coding.el ; \
+	cp -p ../emacs/clisp-indent.el $$distdir/emacs/clisp-indent.el ; \
+	cp -p ../emacs/clisp-indent.lisp $$distdir/emacs/clisp-indent.lisp ; \
+	cp -p ../emacs/clisp-ffi.el $$distdir/emacs/clisp-ffi.el ; \
+	cp -p ../emacs/lisp.vim $$distdir/emacs/lisp.vim ; \
+	mkdir $$distdir/misc; \
+	cp -p m4/clisp.m4 $$distdir/misc/clisp.m4 ; \
+	mkdir $$distdir/src ; \
+	cp -p $(LISPFILES) config.lisp install.lisp install.bat $$distdir/src/ ; \
+	chmod 755 $$distdir/. $$distdir/*/. ; \
+	find $$distdir -type f -exec chmod 664 {} ';' ; \
+	rm -f $$distfile $$installfile ; \
+	(echo "$(PACKAGE_NAME) version $(PACKAGE_VERSION) for Win32."; echo ".") | zip -r -9 -z $$distfile $$distdir ; \
+	cd $$distdir; cp ../*.ns[hi] ../COPYRIGHT.rtf .; makensis install.nsi; mv $$installfile .. ; cd ..; \
+	rm -rf $$distdir
+
+# clean0 is harmless: removes only superfluous things: temporary files.
+clean0 : force
+	-$(RM) core *.core *.stackdump Makefile~ fresh-line.out foo.exe foo.mem clisp-test.c genclisph.exe txt.c txt.exe
+
+# clean1 removes everything that becomes obsolete once lisp.exe is recompiled
+# without changing the bytecode format and the tables in
+# constobj.d, constpack.d, constsym.d, subr.d, fsubr.d, pseudofun.d.
+clean1 : clean0
+	-$(RM) lispbibl.h clisp.h *.i *.s *.obj *.a lisp.exe clisp-link makevars ansi-tests-log build-aux
+	-$(RMRF) stage
+	-$(RMRF) tests
+	-$(RMRF) ansi-tests
+	-$(RMRF) sacla-tests
+	-$(RMRF) boot base full linkkit
+	-$(RM) README README.de README.es clisp.c clisp.1 clisp.html clisp-1.html clisp-link.1 clisp-link.html clisp-link-1.html  clisp.man clisp-link.man  clisp.ps clisp.pdf clisp-link.ps clisp-link.pdf $(IMPNOTES_FILES) $(TXTFILES) COPYRIGHT.rtf install.nsi
+
+# clean2 removes everything that becomes obsolete once lisp.exe
+# is recompiled without changing the bytecode format.
+clean2 : clean1
+	-$(RM) interpreted.mem halfcompiled.mem lispinit.mem lispinit2.mem
+
+# clean3 removes everything that becomes obsolete once lisp.exe
+# is recompiled. It leaves everything generated by "make allc".
+clean3 : clean2
+	-$(RM) $(FASFILES) *.lib
+	-$(RM) modprep.fas
+	for m in "" $(BASE_MODULES) $(MODULES); do test -n "$$m" && $(RM) $$m/*.fas $$m/*.lib $$m/*.erg; done
+
+# clean4 removes everything that becomes obsolete
+# when switching to a new version of the C compiler.
+# It leaves everything generated by "make init".
+clean4 : clean3
+	-$(RM) cflags.h cflags.h.stamp
+	-$(RM) $(CFILES)
+	test ! -d gllib || (cd gllib && $(MAKE) clean CFLAGS="$(SUBDIR_CFLAGS)")
+
+# clean5 even undoes "make init".
+clean5 : clean4
+	-$(RM) ANNOUNCE COPYRIGHT GNU-GPL SUMMARY
+	-$(RMRF) data
+	-$(RM) clisp.exe clisp.rc comment5.exe gctrigger.exe varbrace.exe deema.exe txt2c.exe ccmp2c.exe
+
+# clean6 lets us go back to "makemake > Makefile".
+clean6 : clean5
+	-$(RM) config.lisp
+	-$(RM) Makefile
+
+# clean-modules remove the copies of modules, do it if you change modprep and such
+clean-modules :
+	-$(RMRF) `ls -d ../modules/*/. | sed -e 's,/\.$$,,' -e 's,^.*/,,' | grep -v '^CVS$$'`
+
+# clean7 lets us go back to the main "configure".
+clean7 : clean6 clean-modules
+	-$(RM) config.status config.log config.cache  intparam.h floatparam.h config.h makemake
+
+# clean8 moreover cleans up the SRCDIR.
+clean8 : clean7
+
+# The normal "start over" command:
+mostlyclean : clean4
+
+# Clear all files that are built by "make ...":
+clean : clean5
+
+# Make "clear for distribution":
+distclean : clean7
+
+# Remove everything that can be generated otherwise:
+maintainer-clean : clean8
+
+
+.SUFFIXES:
+
+force:
+

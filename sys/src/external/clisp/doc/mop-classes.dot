@@ -1,0 +1,47 @@
+strict digraph all {
+  rankdir=LR;
+
+  so [label="standard-\n-object"];
+
+  es [label="eql-\n-specializer", shape="box"];
+
+  bic [label="built-\n-in-\n-class", shape="box"];
+  sc [label="standard-\n-class", shape="box"];
+  fsc [label="funcallable-\n-standard-\n-class", shape="box"];
+  frc [label="forward-\n-referenced-\n-class", shape="box"];
+
+  sd [label="slot-\n-definition"];
+  ssd [label="standard-\n-slot-\n-definition"];
+  dsd [label="direct-\n-slot-\n-definition"];
+  sdsd [label="standard-\n-direct-\n-slot-\n-definition", shape="box"];
+  esd [label="effective-\n-slot-\n-definition"];
+  sesd [label="standard-\n-effective-\n-slot-\n-definition", shape="box"];
+
+  mc [label="method-\n-combination"];
+
+  sm [label="standard-\n-method", shape="box"];
+  sam [label="standard-\n-accessor-\n-method"];
+  srm [label="standard-\n-reader-\n-method", shape="box"];
+  swm [label="standard-\n-writer-\n-method", shape="box"];
+
+  fso [label="funcallable-\n-standard-\n-object"];
+  gf [label="generic-\n-function"];
+  sgf [label="standard-\n-generic-\n-function", shape="box"];
+
+  so -> metaobject -> specializer -> class -> bic;
+    class -> sc; class -> fsc; class -> frc;
+    specializer -> es;
+
+  metaobject -> sd -> ssd;
+    sd -> dsd -> sdsd; sd -> esd -> sesd;
+    ssd -> sdsd; ssd -> sesd;
+
+  metaobject -> mc
+
+  metaobject -> method -> sm -> sam -> srm; sam -> swm;
+
+  function [shape="box"];
+  function -> fso;
+    metaobject -> gf;
+    so -> fso -> gf -> sgf;
+}

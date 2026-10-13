@@ -1,0 +1,776 @@
+/* config.h.in.  Generated from configure.in by autoheader.  */
+
+/* Define to 1 if you have the `dbus_address_entries_free' function. */
+#undef HAVE_DBUS_ADDRESS_ENTRIES_FREE
+
+/* Define to 1 if you have the `dbus_address_entry_get_method' function. */
+#undef HAVE_DBUS_ADDRESS_ENTRY_GET_METHOD
+
+/* Define to 1 if you have the `dbus_address_entry_get_value' function. */
+#undef HAVE_DBUS_ADDRESS_ENTRY_GET_VALUE
+
+/* Define to 1 if you have the `dbus_address_escape_value' function. */
+#undef HAVE_DBUS_ADDRESS_ESCAPE_VALUE
+
+/* Define to 1 if you have the `dbus_address_unescape_value' function. */
+#undef HAVE_DBUS_ADDRESS_UNESCAPE_VALUE
+
+/* Define to 1 if the system has the type `dbus_bool_t'. */
+#undef HAVE_DBUS_BOOL_T
+
+/* Define to 1 if you have the `dbus_bus_add_match' function. */
+#undef HAVE_DBUS_BUS_ADD_MATCH
+
+/* Define to 1 if you have the `dbus_bus_get' function. */
+#undef HAVE_DBUS_BUS_GET
+
+/* Define to 1 if you have the `dbus_bus_get_id' function. */
+#undef HAVE_DBUS_BUS_GET_ID
+
+/* Define to 1 if you have the `dbus_bus_get_private' function. */
+#undef HAVE_DBUS_BUS_GET_PRIVATE
+
+/* Define to 1 if you have the `dbus_bus_get_unique_name' function. */
+#undef HAVE_DBUS_BUS_GET_UNIQUE_NAME
+
+/* Define to 1 if you have the `dbus_bus_get_unix_user' function. */
+#undef HAVE_DBUS_BUS_GET_UNIX_USER
+
+/* Define to 1 if you have the `dbus_bus_name_has_owner' function. */
+#undef HAVE_DBUS_BUS_NAME_HAS_OWNER
+
+/* Define to 1 if you have the `dbus_bus_register' function. */
+#undef HAVE_DBUS_BUS_REGISTER
+
+/* Define to 1 if you have the `dbus_bus_release_name' function. */
+#undef HAVE_DBUS_BUS_RELEASE_NAME
+
+/* Define to 1 if you have the `dbus_bus_remove_match' function. */
+#undef HAVE_DBUS_BUS_REMOVE_MATCH
+
+/* Define to 1 if you have the `dbus_bus_request_name' function. */
+#undef HAVE_DBUS_BUS_REQUEST_NAME
+
+/* Define to 1 if you have the `dbus_bus_set_unique_name' function. */
+#undef HAVE_DBUS_BUS_SET_UNIQUE_NAME
+
+/* Define to 1 if you have the `dbus_bus_start_service_by_name' function. */
+#undef HAVE_DBUS_BUS_START_SERVICE_BY_NAME
+
+/* Define to 1 if you have the `dbus_connection_add_filter' function. */
+#undef HAVE_DBUS_CONNECTION_ADD_FILTER
+
+/* Define to 1 if you have the `dbus_connection_allocate_data_slot' function.
+   */
+#undef HAVE_DBUS_CONNECTION_ALLOCATE_DATA_SLOT
+
+/* Define to 1 if you have the `dbus_connection_borrow_message' function. */
+#undef HAVE_DBUS_CONNECTION_BORROW_MESSAGE
+
+/* Define to 1 if you have the `dbus_connection_close' function. */
+#undef HAVE_DBUS_CONNECTION_CLOSE
+
+/* Define to 1 if you have the `dbus_connection_dispatch' function. */
+#undef HAVE_DBUS_CONNECTION_DISPATCH
+
+/* Define to 1 if you have the `dbus_connection_flush' function. */
+#undef HAVE_DBUS_CONNECTION_FLUSH
+
+/* Define to 1 if you have the `dbus_connection_free_data_slot' function. */
+#undef HAVE_DBUS_CONNECTION_FREE_DATA_SLOT
+
+/* Define to 1 if you have the `dbus_connection_free_preallocated_send'
+   function. */
+#undef HAVE_DBUS_CONNECTION_FREE_PREALLOCATED_SEND
+
+/* Define to 1 if you have the `dbus_connection_get_data' function. */
+#undef HAVE_DBUS_CONNECTION_GET_DATA
+
+/* Define to 1 if you have the `dbus_connection_get_dispatch_status' function.
+   */
+#undef HAVE_DBUS_CONNECTION_GET_DISPATCH_STATUS
+
+/* Define to 1 if you have the `dbus_connection_get_is_anonymous' function. */
+#undef HAVE_DBUS_CONNECTION_GET_IS_ANONYMOUS
+
+/* Define to 1 if you have the `dbus_connection_get_is_authenticated'
+   function. */
+#undef HAVE_DBUS_CONNECTION_GET_IS_AUTHENTICATED
+
+/* Define to 1 if you have the `dbus_connection_get_is_connected' function. */
+#undef HAVE_DBUS_CONNECTION_GET_IS_CONNECTED
+
+/* Define to 1 if you have the `dbus_connection_get_max_message_size'
+   function. */
+#undef HAVE_DBUS_CONNECTION_GET_MAX_MESSAGE_SIZE
+
+/* Define to 1 if you have the `dbus_connection_get_max_received_size'
+   function. */
+#undef HAVE_DBUS_CONNECTION_GET_MAX_RECEIVED_SIZE
+
+/* Define to 1 if you have the `dbus_connection_get_object_path_data'
+   function. */
+#undef HAVE_DBUS_CONNECTION_GET_OBJECT_PATH_DATA
+
+/* Define to 1 if you have the `dbus_connection_get_outgoing_size' function.
+   */
+#undef HAVE_DBUS_CONNECTION_GET_OUTGOING_SIZE
+
+/* Define to 1 if you have the `dbus_connection_get_server_id' function. */
+#undef HAVE_DBUS_CONNECTION_GET_SERVER_ID
+
+/* Define to 1 if you have the `dbus_connection_get_socket' function. */
+#undef HAVE_DBUS_CONNECTION_GET_SOCKET
+
+/* Define to 1 if you have the `dbus_connection_get_unix_fd' function. */
+#undef HAVE_DBUS_CONNECTION_GET_UNIX_FD
+
+/* Define to 1 if you have the `dbus_connection_get_unix_process_id' function.
+   */
+#undef HAVE_DBUS_CONNECTION_GET_UNIX_PROCESS_ID
+
+/* Define to 1 if you have the `dbus_connection_get_unix_user' function. */
+#undef HAVE_DBUS_CONNECTION_GET_UNIX_USER
+
+/* Define to 1 if you have the `dbus_connection_get_windows_user' function. */
+#undef HAVE_DBUS_CONNECTION_GET_WINDOWS_USER
+
+/* Define to 1 if you have the `dbus_connection_has_messages_to_send'
+   function. */
+#undef HAVE_DBUS_CONNECTION_HAS_MESSAGES_TO_SEND
+
+/* Define to 1 if you have the `dbus_connection_list_registered' function. */
+#undef HAVE_DBUS_CONNECTION_LIST_REGISTERED
+
+/* Define to 1 if you have the `dbus_connection_open' function. */
+#undef HAVE_DBUS_CONNECTION_OPEN
+
+/* Define to 1 if you have the `dbus_connection_open_private' function. */
+#undef HAVE_DBUS_CONNECTION_OPEN_PRIVATE
+
+/* Define to 1 if you have the `dbus_connection_pop_message' function. */
+#undef HAVE_DBUS_CONNECTION_POP_MESSAGE
+
+/* Define to 1 if you have the `dbus_connection_preallocate_send' function. */
+#undef HAVE_DBUS_CONNECTION_PREALLOCATE_SEND
+
+/* Define to 1 if you have the `dbus_connection_read_write' function. */
+#undef HAVE_DBUS_CONNECTION_READ_WRITE
+
+/* Define to 1 if you have the `dbus_connection_read_write_dispatch' function.
+   */
+#undef HAVE_DBUS_CONNECTION_READ_WRITE_DISPATCH
+
+/* Define to 1 if you have the `dbus_connection_ref' function. */
+#undef HAVE_DBUS_CONNECTION_REF
+
+/* Define to 1 if you have the `dbus_connection_register_fallback' function.
+   */
+#undef HAVE_DBUS_CONNECTION_REGISTER_FALLBACK
+
+/* Define to 1 if you have the `dbus_connection_register_object_path'
+   function. */
+#undef HAVE_DBUS_CONNECTION_REGISTER_OBJECT_PATH
+
+/* Define to 1 if you have the `dbus_connection_remove_filter' function. */
+#undef HAVE_DBUS_CONNECTION_REMOVE_FILTER
+
+/* Define to 1 if you have the `dbus_connection_return_message' function. */
+#undef HAVE_DBUS_CONNECTION_RETURN_MESSAGE
+
+/* Define to 1 if you have the `dbus_connection_send' function. */
+#undef HAVE_DBUS_CONNECTION_SEND
+
+/* Define to 1 if you have the `dbus_connection_send_preallocated' function.
+   */
+#undef HAVE_DBUS_CONNECTION_SEND_PREALLOCATED
+
+/* Define to 1 if you have the `dbus_connection_send_with_reply' function. */
+#undef HAVE_DBUS_CONNECTION_SEND_WITH_REPLY
+
+/* Define to 1 if you have the `dbus_connection_send_with_reply_and_block'
+   function. */
+#undef HAVE_DBUS_CONNECTION_SEND_WITH_REPLY_AND_BLOCK
+
+/* Define to 1 if you have the `dbus_connection_set_allow_anonymous' function.
+   */
+#undef HAVE_DBUS_CONNECTION_SET_ALLOW_ANONYMOUS
+
+/* Define to 1 if you have the `dbus_connection_set_change_sigpipe' function.
+   */
+#undef HAVE_DBUS_CONNECTION_SET_CHANGE_SIGPIPE
+
+/* Define to 1 if you have the `dbus_connection_set_data' function. */
+#undef HAVE_DBUS_CONNECTION_SET_DATA
+
+/* Define to 1 if you have the `dbus_connection_set_dispatch_status_function'
+   function. */
+#undef HAVE_DBUS_CONNECTION_SET_DISPATCH_STATUS_FUNCTION
+
+/* Define to 1 if you have the `dbus_connection_set_exit_on_disconnect'
+   function. */
+#undef HAVE_DBUS_CONNECTION_SET_EXIT_ON_DISCONNECT
+
+/* Define to 1 if you have the `dbus_connection_set_max_message_size'
+   function. */
+#undef HAVE_DBUS_CONNECTION_SET_MAX_MESSAGE_SIZE
+
+/* Define to 1 if you have the `dbus_connection_set_max_received_size'
+   function. */
+#undef HAVE_DBUS_CONNECTION_SET_MAX_RECEIVED_SIZE
+
+/* Define to 1 if you have the `dbus_connection_set_route_peer_messages'
+   function. */
+#undef HAVE_DBUS_CONNECTION_SET_ROUTE_PEER_MESSAGES
+
+/* Define to 1 if you have the `dbus_connection_set_timeout_functions'
+   function. */
+#undef HAVE_DBUS_CONNECTION_SET_TIMEOUT_FUNCTIONS
+
+/* Define to 1 if you have the `dbus_connection_set_unix_user_function'
+   function. */
+#undef HAVE_DBUS_CONNECTION_SET_UNIX_USER_FUNCTION
+
+/* Define to 1 if you have the `dbus_connection_set_wakeup_main_function'
+   function. */
+#undef HAVE_DBUS_CONNECTION_SET_WAKEUP_MAIN_FUNCTION
+
+/* Define to 1 if you have the `dbus_connection_set_watch_functions' function.
+   */
+#undef HAVE_DBUS_CONNECTION_SET_WATCH_FUNCTIONS
+
+/* Define to 1 if you have the `dbus_connection_set_windows_user_function'
+   function. */
+#undef HAVE_DBUS_CONNECTION_SET_WINDOWS_USER_FUNCTION
+
+/* Define to 1 if you have the `dbus_connection_steal_borrowed_message'
+   function. */
+#undef HAVE_DBUS_CONNECTION_STEAL_BORROWED_MESSAGE
+
+/* Define to 1 if you have the `dbus_connection_try_register_fallback'
+   function. */
+#undef HAVE_DBUS_CONNECTION_TRY_REGISTER_FALLBACK
+
+/* Define to 1 if you have the `dbus_connection_try_register_object_path'
+   function. */
+#undef HAVE_DBUS_CONNECTION_TRY_REGISTER_OBJECT_PATH
+
+/* Define to 1 if you have the `dbus_connection_unref' function. */
+#undef HAVE_DBUS_CONNECTION_UNREF
+
+/* Define to 1 if you have the `dbus_connection_unregister_object_path'
+   function. */
+#undef HAVE_DBUS_CONNECTION_UNREGISTER_OBJECT_PATH
+
+/* Define to 1 if you have the `dbus_error_free' function. */
+#undef HAVE_DBUS_ERROR_FREE
+
+/* Define to 1 if you have the `dbus_error_has_name' function. */
+#undef HAVE_DBUS_ERROR_HAS_NAME
+
+/* Define to 1 if you have the `dbus_error_init' function. */
+#undef HAVE_DBUS_ERROR_INIT
+
+/* Define to 1 if you have the `dbus_error_is_set' function. */
+#undef HAVE_DBUS_ERROR_IS_SET
+
+/* Define to 1 if you have the `dbus_free' function. */
+#undef HAVE_DBUS_FREE
+
+/* Define to 1 if you have the `dbus_free_string_array' function. */
+#undef HAVE_DBUS_FREE_STRING_ARRAY
+
+/* Define to 1 if you have the `dbus_get_local_machine_id' function. */
+#undef HAVE_DBUS_GET_LOCAL_MACHINE_ID
+
+/* Define to 1 if the system has the type `dbus_int16_t'. */
+#undef HAVE_DBUS_INT16_T
+
+/* Define to 1 if the system has the type `dbus_int32_t'. */
+#undef HAVE_DBUS_INT32_T
+
+/* Define to 1 if the system has the type `dbus_int64_t'. */
+#undef HAVE_DBUS_INT64_T
+
+/* Define to 1 if you have the `dbus_malloc' function. */
+#undef HAVE_DBUS_MALLOC
+
+/* Define to 1 if you have the `dbus_malloc0' function. */
+#undef HAVE_DBUS_MALLOC0
+
+/* Define to 1 if you have the `dbus_message_allocate_data_slot' function. */
+#undef HAVE_DBUS_MESSAGE_ALLOCATE_DATA_SLOT
+
+/* Define to 1 if you have the `dbus_message_append_args' function. */
+#undef HAVE_DBUS_MESSAGE_APPEND_ARGS
+
+/* Define to 1 if you have the `dbus_message_append_args_valist' function. */
+#undef HAVE_DBUS_MESSAGE_APPEND_ARGS_VALIST
+
+/* Define to 1 if you have the `dbus_message_copy' function. */
+#undef HAVE_DBUS_MESSAGE_COPY
+
+/* Define to 1 if you have the `dbus_message_demarshal' function. */
+#undef HAVE_DBUS_MESSAGE_DEMARSHAL
+
+/* Define to 1 if you have the `dbus_message_free_data_slot' function. */
+#undef HAVE_DBUS_MESSAGE_FREE_DATA_SLOT
+
+/* Define to 1 if you have the `dbus_message_get_args' function. */
+#undef HAVE_DBUS_MESSAGE_GET_ARGS
+
+/* Define to 1 if you have the `dbus_message_get_args_valist' function. */
+#undef HAVE_DBUS_MESSAGE_GET_ARGS_VALIST
+
+/* Define to 1 if you have the `dbus_message_get_auto_start' function. */
+#undef HAVE_DBUS_MESSAGE_GET_AUTO_START
+
+/* Define to 1 if you have the `dbus_message_get_data' function. */
+#undef HAVE_DBUS_MESSAGE_GET_DATA
+
+/* Define to 1 if you have the `dbus_message_get_destination' function. */
+#undef HAVE_DBUS_MESSAGE_GET_DESTINATION
+
+/* Define to 1 if you have the `dbus_message_get_error_name' function. */
+#undef HAVE_DBUS_MESSAGE_GET_ERROR_NAME
+
+/* Define to 1 if you have the `dbus_message_get_interface' function. */
+#undef HAVE_DBUS_MESSAGE_GET_INTERFACE
+
+/* Define to 1 if you have the `dbus_message_get_member' function. */
+#undef HAVE_DBUS_MESSAGE_GET_MEMBER
+
+/* Define to 1 if you have the `dbus_message_get_no_reply' function. */
+#undef HAVE_DBUS_MESSAGE_GET_NO_REPLY
+
+/* Define to 1 if you have the `dbus_message_get_path' function. */
+#undef HAVE_DBUS_MESSAGE_GET_PATH
+
+/* Define to 1 if you have the `dbus_message_get_path_decomposed' function. */
+#undef HAVE_DBUS_MESSAGE_GET_PATH_DECOMPOSED
+
+/* Define to 1 if you have the `dbus_message_get_reply_serial' function. */
+#undef HAVE_DBUS_MESSAGE_GET_REPLY_SERIAL
+
+/* Define to 1 if you have the `dbus_message_get_sender' function. */
+#undef HAVE_DBUS_MESSAGE_GET_SENDER
+
+/* Define to 1 if you have the `dbus_message_get_serial' function. */
+#undef HAVE_DBUS_MESSAGE_GET_SERIAL
+
+/* Define to 1 if you have the `dbus_message_get_signature' function. */
+#undef HAVE_DBUS_MESSAGE_GET_SIGNATURE
+
+/* Define to 1 if you have the `dbus_message_get_type' function. */
+#undef HAVE_DBUS_MESSAGE_GET_TYPE
+
+/* Define to 1 if you have the `dbus_message_has_destination' function. */
+#undef HAVE_DBUS_MESSAGE_HAS_DESTINATION
+
+/* Define to 1 if you have the `dbus_message_has_interface' function. */
+#undef HAVE_DBUS_MESSAGE_HAS_INTERFACE
+
+/* Define to 1 if you have the `dbus_message_has_member' function. */
+#undef HAVE_DBUS_MESSAGE_HAS_MEMBER
+
+/* Define to 1 if you have the `dbus_message_has_path' function. */
+#undef HAVE_DBUS_MESSAGE_HAS_PATH
+
+/* Define to 1 if you have the `dbus_message_has_sender' function. */
+#undef HAVE_DBUS_MESSAGE_HAS_SENDER
+
+/* Define to 1 if you have the `dbus_message_has_signature' function. */
+#undef HAVE_DBUS_MESSAGE_HAS_SIGNATURE
+
+/* Define to 1 if you have the `dbus_message_is_error' function. */
+#undef HAVE_DBUS_MESSAGE_IS_ERROR
+
+/* Define to 1 if you have the `dbus_message_is_method_call' function. */
+#undef HAVE_DBUS_MESSAGE_IS_METHOD_CALL
+
+/* Define to 1 if you have the `dbus_message_is_signal' function. */
+#undef HAVE_DBUS_MESSAGE_IS_SIGNAL
+
+/* Define to 1 if you have the `dbus_message_iter_append_basic' function. */
+#undef HAVE_DBUS_MESSAGE_ITER_APPEND_BASIC
+
+/* Define to 1 if you have the `dbus_message_iter_append_fixed_array'
+   function. */
+#undef HAVE_DBUS_MESSAGE_ITER_APPEND_FIXED_ARRAY
+
+/* Define to 1 if you have the `dbus_message_iter_close_container' function.
+   */
+#undef HAVE_DBUS_MESSAGE_ITER_CLOSE_CONTAINER
+
+/* Define to 1 if you have the `dbus_message_iter_get_arg_type' function. */
+#undef HAVE_DBUS_MESSAGE_ITER_GET_ARG_TYPE
+
+/* Define to 1 if you have the `dbus_message_iter_get_basic' function. */
+#undef HAVE_DBUS_MESSAGE_ITER_GET_BASIC
+
+/* Define to 1 if you have the `dbus_message_iter_get_element_type' function.
+   */
+#undef HAVE_DBUS_MESSAGE_ITER_GET_ELEMENT_TYPE
+
+/* Define to 1 if you have the `dbus_message_iter_get_fixed_array' function.
+   */
+#undef HAVE_DBUS_MESSAGE_ITER_GET_FIXED_ARRAY
+
+/* Define to 1 if you have the `dbus_message_iter_get_signature' function. */
+#undef HAVE_DBUS_MESSAGE_ITER_GET_SIGNATURE
+
+/* Define to 1 if you have the `dbus_message_iter_has_next' function. */
+#undef HAVE_DBUS_MESSAGE_ITER_HAS_NEXT
+
+/* Define to 1 if you have the `dbus_message_iter_init' function. */
+#undef HAVE_DBUS_MESSAGE_ITER_INIT
+
+/* Define to 1 if you have the `dbus_message_iter_init_append' function. */
+#undef HAVE_DBUS_MESSAGE_ITER_INIT_APPEND
+
+/* Define to 1 if you have the `dbus_message_iter_next' function. */
+#undef HAVE_DBUS_MESSAGE_ITER_NEXT
+
+/* Define to 1 if you have the `dbus_message_iter_open_container' function. */
+#undef HAVE_DBUS_MESSAGE_ITER_OPEN_CONTAINER
+
+/* Define to 1 if you have the `dbus_message_iter_recurse' function. */
+#undef HAVE_DBUS_MESSAGE_ITER_RECURSE
+
+/* Define to 1 if you have the `dbus_message_marshal' function. */
+#undef HAVE_DBUS_MESSAGE_MARSHAL
+
+/* Define to 1 if you have the `dbus_message_new' function. */
+#undef HAVE_DBUS_MESSAGE_NEW
+
+/* Define to 1 if you have the `dbus_message_new_error' function. */
+#undef HAVE_DBUS_MESSAGE_NEW_ERROR
+
+/* Define to 1 if you have the `dbus_message_new_method_call' function. */
+#undef HAVE_DBUS_MESSAGE_NEW_METHOD_CALL
+
+/* Define to 1 if you have the `dbus_message_new_method_return' function. */
+#undef HAVE_DBUS_MESSAGE_NEW_METHOD_RETURN
+
+/* Define to 1 if you have the `dbus_message_new_signal' function. */
+#undef HAVE_DBUS_MESSAGE_NEW_SIGNAL
+
+/* Define to 1 if you have the `dbus_message_ref' function. */
+#undef HAVE_DBUS_MESSAGE_REF
+
+/* Define to 1 if you have the `dbus_message_set_auto_start' function. */
+#undef HAVE_DBUS_MESSAGE_SET_AUTO_START
+
+/* Define to 1 if you have the `dbus_message_set_data' function. */
+#undef HAVE_DBUS_MESSAGE_SET_DATA
+
+/* Define to 1 if you have the `dbus_message_set_destination' function. */
+#undef HAVE_DBUS_MESSAGE_SET_DESTINATION
+
+/* Define to 1 if you have the `dbus_message_set_error_name' function. */
+#undef HAVE_DBUS_MESSAGE_SET_ERROR_NAME
+
+/* Define to 1 if you have the `dbus_message_set_interface' function. */
+#undef HAVE_DBUS_MESSAGE_SET_INTERFACE
+
+/* Define to 1 if you have the `dbus_message_set_member' function. */
+#undef HAVE_DBUS_MESSAGE_SET_MEMBER
+
+/* Define to 1 if you have the `dbus_message_set_no_reply' function. */
+#undef HAVE_DBUS_MESSAGE_SET_NO_REPLY
+
+/* Define to 1 if you have the `dbus_message_set_path' function. */
+#undef HAVE_DBUS_MESSAGE_SET_PATH
+
+/* Define to 1 if you have the `dbus_message_set_reply_serial' function. */
+#undef HAVE_DBUS_MESSAGE_SET_REPLY_SERIAL
+
+/* Define to 1 if you have the `dbus_message_set_sender' function. */
+#undef HAVE_DBUS_MESSAGE_SET_SENDER
+
+/* Define to 1 if you have the `dbus_message_type_from_string' function. */
+#undef HAVE_DBUS_MESSAGE_TYPE_FROM_STRING
+
+/* Define to 1 if you have the `dbus_message_type_to_string' function. */
+#undef HAVE_DBUS_MESSAGE_TYPE_TO_STRING
+
+/* Define to 1 if you have the `dbus_message_unref' function. */
+#undef HAVE_DBUS_MESSAGE_UNREF
+
+/* Define to 1 if you have the `dbus_move_error' function. */
+#undef HAVE_DBUS_MOVE_ERROR
+
+/* Define to 1 if you have the `dbus_parse_address' function. */
+#undef HAVE_DBUS_PARSE_ADDRESS
+
+/* Define to 1 if you have the `dbus_pending_call_allocate_data_slot'
+   function. */
+#undef HAVE_DBUS_PENDING_CALL_ALLOCATE_DATA_SLOT
+
+/* Define to 1 if you have the `dbus_pending_call_block' function. */
+#undef HAVE_DBUS_PENDING_CALL_BLOCK
+
+/* Define to 1 if you have the `dbus_pending_call_cancel' function. */
+#undef HAVE_DBUS_PENDING_CALL_CANCEL
+
+/* Define to 1 if you have the `dbus_pending_call_free_data_slot' function. */
+#undef HAVE_DBUS_PENDING_CALL_FREE_DATA_SLOT
+
+/* Define to 1 if you have the `dbus_pending_call_get_completed' function. */
+#undef HAVE_DBUS_PENDING_CALL_GET_COMPLETED
+
+/* Define to 1 if you have the `dbus_pending_call_get_data' function. */
+#undef HAVE_DBUS_PENDING_CALL_GET_DATA
+
+/* Define to 1 if you have the `dbus_pending_call_ref' function. */
+#undef HAVE_DBUS_PENDING_CALL_REF
+
+/* Define to 1 if you have the `dbus_pending_call_set_data' function. */
+#undef HAVE_DBUS_PENDING_CALL_SET_DATA
+
+/* Define to 1 if you have the `dbus_pending_call_set_notify' function. */
+#undef HAVE_DBUS_PENDING_CALL_SET_NOTIFY
+
+/* Define to 1 if you have the `dbus_pending_call_steal_reply' function. */
+#undef HAVE_DBUS_PENDING_CALL_STEAL_REPLY
+
+/* Define to 1 if you have the `dbus_pending_call_unref' function. */
+#undef HAVE_DBUS_PENDING_CALL_UNREF
+
+/* Define to 1 if you have the `dbus_realloc' function. */
+#undef HAVE_DBUS_REALLOC
+
+/* Define to 1 if you have the `dbus_server_allocate_data_slot' function. */
+#undef HAVE_DBUS_SERVER_ALLOCATE_DATA_SLOT
+
+/* Define to 1 if you have the `dbus_server_disconnect' function. */
+#undef HAVE_DBUS_SERVER_DISCONNECT
+
+/* Define to 1 if you have the `dbus_server_free_data_slot' function. */
+#undef HAVE_DBUS_SERVER_FREE_DATA_SLOT
+
+/* Define to 1 if you have the `dbus_server_get_address' function. */
+#undef HAVE_DBUS_SERVER_GET_ADDRESS
+
+/* Define to 1 if you have the `dbus_server_get_data' function. */
+#undef HAVE_DBUS_SERVER_GET_DATA
+
+/* Define to 1 if you have the `dbus_server_get_id' function. */
+#undef HAVE_DBUS_SERVER_GET_ID
+
+/* Define to 1 if you have the `dbus_server_get_is_connected' function. */
+#undef HAVE_DBUS_SERVER_GET_IS_CONNECTED
+
+/* Define to 1 if you have the `dbus_server_listen' function. */
+#undef HAVE_DBUS_SERVER_LISTEN
+
+/* Define to 1 if you have the `dbus_server_ref' function. */
+#undef HAVE_DBUS_SERVER_REF
+
+/* Define to 1 if you have the `dbus_server_set_auth_mechanisms' function. */
+#undef HAVE_DBUS_SERVER_SET_AUTH_MECHANISMS
+
+/* Define to 1 if you have the `dbus_server_set_data' function. */
+#undef HAVE_DBUS_SERVER_SET_DATA
+
+/* Define to 1 if you have the `dbus_server_set_new_connection_function'
+   function. */
+#undef HAVE_DBUS_SERVER_SET_NEW_CONNECTION_FUNCTION
+
+/* Define to 1 if you have the `dbus_server_set_timeout_functions' function.
+   */
+#undef HAVE_DBUS_SERVER_SET_TIMEOUT_FUNCTIONS
+
+/* Define to 1 if you have the `dbus_server_set_watch_functions' function. */
+#undef HAVE_DBUS_SERVER_SET_WATCH_FUNCTIONS
+
+/* Define to 1 if you have the `dbus_server_unref' function. */
+#undef HAVE_DBUS_SERVER_UNREF
+
+/* Define to 1 if you have the `dbus_set_error' function. */
+#undef HAVE_DBUS_SET_ERROR
+
+/* Define to 1 if you have the `dbus_set_error_const' function. */
+#undef HAVE_DBUS_SET_ERROR_CONST
+
+/* Define to 1 if you have the `dbus_set_error_from_message' function. */
+#undef HAVE_DBUS_SET_ERROR_FROM_MESSAGE
+
+/* Define to 1 if you have the `dbus_shutdown' function. */
+#undef HAVE_DBUS_SHUTDOWN
+
+/* Define to 1 if you have the `dbus_signature_iter_get_current_type'
+   function. */
+#undef HAVE_DBUS_SIGNATURE_ITER_GET_CURRENT_TYPE
+
+/* Define to 1 if you have the `dbus_signature_iter_get_element_type'
+   function. */
+#undef HAVE_DBUS_SIGNATURE_ITER_GET_ELEMENT_TYPE
+
+/* Define to 1 if you have the `dbus_signature_iter_get_signature' function.
+   */
+#undef HAVE_DBUS_SIGNATURE_ITER_GET_SIGNATURE
+
+/* Define to 1 if you have the `dbus_signature_iter_init' function. */
+#undef HAVE_DBUS_SIGNATURE_ITER_INIT
+
+/* Define to 1 if you have the `dbus_signature_iter_next' function. */
+#undef HAVE_DBUS_SIGNATURE_ITER_NEXT
+
+/* Define to 1 if you have the `dbus_signature_iter_recurse' function. */
+#undef HAVE_DBUS_SIGNATURE_ITER_RECURSE
+
+/* Define to 1 if you have the `dbus_signature_validate' function. */
+#undef HAVE_DBUS_SIGNATURE_VALIDATE
+
+/* Define to 1 if you have the `dbus_signature_validate_single' function. */
+#undef HAVE_DBUS_SIGNATURE_VALIDATE_SINGLE
+
+/* Define to 1 if you have the `dbus_threads_init' function. */
+#undef HAVE_DBUS_THREADS_INIT
+
+/* Define to 1 if you have the `dbus_threads_init_default' function. */
+#undef HAVE_DBUS_THREADS_INIT_DEFAULT
+
+/* Define to 1 if you have the `dbus_timeout_get_data' function. */
+#undef HAVE_DBUS_TIMEOUT_GET_DATA
+
+/* Define to 1 if you have the `dbus_timeout_get_enabled' function. */
+#undef HAVE_DBUS_TIMEOUT_GET_ENABLED
+
+/* Define to 1 if you have the `dbus_timeout_get_interval' function. */
+#undef HAVE_DBUS_TIMEOUT_GET_INTERVAL
+
+/* Define to 1 if you have the `dbus_timeout_handle' function. */
+#undef HAVE_DBUS_TIMEOUT_HANDLE
+
+/* Define to 1 if you have the `dbus_timeout_set_data' function. */
+#undef HAVE_DBUS_TIMEOUT_SET_DATA
+
+/* Define to 1 if you have the `dbus_type_is_basic' function. */
+#undef HAVE_DBUS_TYPE_IS_BASIC
+
+/* Define to 1 if you have the `dbus_type_is_container' function. */
+#undef HAVE_DBUS_TYPE_IS_CONTAINER
+
+/* Define to 1 if you have the `dbus_type_is_fixed' function. */
+#undef HAVE_DBUS_TYPE_IS_FIXED
+
+/* Define to 1 if the system has the type `dbus_uint32_t'. */
+#undef HAVE_DBUS_UINT32_T
+
+/* Define to 1 if the system has the type `dbus_unichar_t'. */
+#undef HAVE_DBUS_UNICHAR_T
+
+/* Define to 1 if you have the `dbus_watch_get_data' function. */
+#undef HAVE_DBUS_WATCH_GET_DATA
+
+/* Define to 1 if you have the `dbus_watch_get_enabled' function. */
+#undef HAVE_DBUS_WATCH_GET_ENABLED
+
+/* Define to 1 if you have the `dbus_watch_get_fd' function. */
+#undef HAVE_DBUS_WATCH_GET_FD
+
+/* Define to 1 if you have the `dbus_watch_get_flags' function. */
+#undef HAVE_DBUS_WATCH_GET_FLAGS
+
+/* Define to 1 if you have the `dbus_watch_get_socket' function. */
+#undef HAVE_DBUS_WATCH_GET_SOCKET
+
+/* Define to 1 if you have the `dbus_watch_get_unix_fd' function. */
+#undef HAVE_DBUS_WATCH_GET_UNIX_FD
+
+/* Define to 1 if you have the `dbus_watch_handle' function. */
+#undef HAVE_DBUS_WATCH_HANDLE
+
+/* Define to 1 if you have the `dbus_watch_set_data' function. */
+#undef HAVE_DBUS_WATCH_SET_DATA
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <time.h> header file. */
+#undef HAVE_TIME_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if on MINIX. */
+#undef _MINIX
+
+/* Define to 2 if the system does not provide POSIX.1 features except with
+   this defined. */
+#undef _POSIX_1_SOURCE
+
+/* Define to 1 if you need to in order for `stat' and other things to work. */
+#undef _POSIX_SOURCE
+
+/* Define to 500 only on HP-UX. */
+#undef _XOPEN_SOURCE
+
+/* Enable extensions on AIX 3, Interix.  */
+#ifndef _ALL_SOURCE
+# undef _ALL_SOURCE
+#endif
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+# undef _GNU_SOURCE
+#endif
+/* Enable threading extensions on Solaris.  */
+#ifndef _POSIX_PTHREAD_SEMANTICS
+# undef _POSIX_PTHREAD_SEMANTICS
+#endif
+/* Enable extensions on HP NonStop.  */
+#ifndef _TANDEM_SOURCE
+# undef _TANDEM_SOURCE
+#endif
+/* Enable general extensions on Solaris.  */
+#ifndef __EXTENSIONS__
+# undef __EXTENSIONS__
+#endif
+

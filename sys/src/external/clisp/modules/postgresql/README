@@ -1,0 +1,14 @@
+This directory contains a CLISP add-on module to interface with PostgreSQL
+databases, see <http://www.PostgreSQL.org/>.
+
+To install the PostgreSQL bindings, do the following:
+
+$ ./configure --with-module=postgresql --with-libpq-prefix=/usr/local/ --cbc build-pq
+
+Use dos (8.3) names on win32:
+
+$ ./configure --with-module=postgresql --with-libpq-prefix=C:/Progra~1/PostgreSQL/8.0/ --cbc build-pq
+
+If you have built clisp already,
+
+$ cd build-dir && make MODULES=postgresql MODULE_CONFIGURE_FLAGS=--with-libpq-prefix=/usr/local/

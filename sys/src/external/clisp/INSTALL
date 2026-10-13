@@ -1,0 +1,91 @@
+This is the source distribution of CLISP, an ANSI Common Lisp implementation.
+Available from <ftp://ftp.gnu.org/pub/gnu/clisp/latest/>.
+More information at <http://clisp.cons.org/>, <http://www.clisp.org/>,
+<http://clisp.sf.net/> and <http://www.gnu.org/software/clisp/>.
+
+Contents:
+---------
+
+It consists of the following directories and files:
+
+Documentation:
+
+      INSTALL            this text
+      SUMMARY            description, summary
+      ANNOUNCE           announcement
+      COPYRIGHT          copyright notice
+      GNU-GPL            free software license
+
+Source:
+
+      src/FILES.1        source documentation
+      src/_README        README master
+      src/_clisp.1       manual page master
+      src/*.c            C source files
+      src/*.d            C source files
+      src/*.lisp         Lisp source files
+      doc/*              documentation
+
+Installation:
+
+      configure          main configuration script
+      src/configure      auxiliary configuration script
+      src/*.in           auxiliary files
+      utils/*            auxiliary programs
+      unix/              installing on Unix (including Mac OS/X & mingw)
+      win32msvc/         installing on Win32, using MSVC
+
+Other:
+
+      src/malloc/        a GNU malloc library routine
+      ffcall/            a foreign function call library
+
+  modules:           add-on sofware
+      modules/queens/    sample external module for CLISP for you to explore
+
+    base:              normally included in all linking sets
+      syscalls           portable OS call interface
+      i18n               user program internationalization
+      regexp             POSIX regular expressions
+      readline           advances command line editing and history
+    optional:          will be available in "clisp -K full"
+      database
+        gdbm             interface to GNU DBM
+        berkeley-db      interface to Berkeley DB from Sleepycat Software
+        dirkey           windows registry
+        postgresql       PostGreSQL RDMBS interface
+        oracle           Oracle RDMBS interface
+      math
+        libsvm           Support Vector Machine predictive analytics
+        pari             PARI Computer Algebra System
+        matlab           matrix calculations using Matlab
+        netica           Bayesian belief networks and influence diagrams
+      matching, file processing
+        pcre             Perl-compatible regular expressions
+        wildcard         wildcard matching (shell globbing)
+        zlib             compress vectors
+      networking
+        rawsock          low level socket interface
+        fastcgi          FastCGI interface for web development
+
+
+Installation:
+-------------
+
+For instruction on how to install CLISP
+* on Unix (including cygwin): see file unix/INSTALL.
+* on Win32 using mingw: see unix/INSTALL and pass --with-mingw to configure.
+* on Win32 using MSVC++: see file win32msvc/INSTALL.
+
+
+Authors:
+--------
+
+        Bruno Haible
+        Michael Stoll
+        Marcus Daniels
+        Pierpaolo Bernardi
+        Sam Steingold
+
+Email: <clisp-list@lists.sourceforge.net>
+

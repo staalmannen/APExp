@@ -1,0 +1,47 @@
+# Makefile for CLISP module set Berkeley-DB
+
+srcdir = @srcdir@
+CC = @CC@
+DBCPPFLAGS = @CPPFLAGS@
+CFLAGS = @CFLAGS@
+CLISP = @CLISP@ -norc -q
+CLISP_LINKKIT = @CLISP_LINKKIT@
+
+LN = @LN@
+LN_S = @LN_S@
+
+MAKE = make
+
+SHELL = /bin/sh
+
+GENERATED = bdb.o dbi.fas preload.lisp
+DISTRIBFILES = link.sh Makefile $(GENERATED) $(srcdir)/dbi.lisp
+distribdir =
+
+# default target: make the module
+clisp-module : $(GENERATED)
+
+dbi.fas: $(srcdir)/dbi.lisp
+	$(CLISP) -c $(srcdir)/dbi.lisp -o ./
+
+bdb.m.c: $(srcdir)/bdb.c
+	$(CLISP) -C $(CLISP_LINKKIT)/modprep $(srcdir)/bdb.c ./
+
+bdb.o : bdb.m.c config.h
+	$(CC) $(CPPFLAGS) $(DBCPPFLAGS) $(CFLAGS) -I$(CLISP_LINKKIT) \
+		-c bdb.m.c -o bdb.o
+
+preload.lisp : $(srcdir)/preload.lisp
+	$(LN_S) $(srcdir)/preload.lisp .
+
+# Make a module distribution into $(distribdir)
+clisp-module-distrib : clisp-module force
+	$(LN) $(DISTRIBFILES) $(distribdir)
+
+clean : force
+	rm -f core *.o *.a *.m.c *.fas *.lib
+
+distclean : clean
+
+force :
+

@@ -1,0 +1,11 @@
+These are various Rawsock demos.
+Most have to be run as a superuser, so beware!
+We assume no responsibility for your use of this software.
+
+It is best to test all such things on a system that you can easily
+reboot and that is not critical to anything, e.g., use bootable CDs and
+floppy-based configuration files (write locked except during down-time).
+Thus one can push reset and try again on a moment's notice.
+
+Improper use may disrupt not only the local machine, but also
+surrounding networks, and who knows what else.

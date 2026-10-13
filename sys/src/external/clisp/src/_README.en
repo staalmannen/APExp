@@ -1,0 +1,217 @@
+This is GNU CLISP, an ANSI Common Lisp implementation.
+
+
+What is LISP?
+-------------
+
+LISP is a general purpose programming language.
+It was invented by J. McCarthy in 1959.
+There have been many dialects of it, but nowadays LISP has been standardized
+and wide-spread due to the industrial standard ANSI COMMON LISP. There are
+applications in the domains of symbolic knowledge processing (AI), numerical
+mathematics (MACLISP yielded numerical code as good as FORTRAN), and
+widely used programs like editors (EMACS) and CAD (AUTOCAD).
+There are introductions to the language:
+
+  Sheila Hughes: Lisp. Pitman Publishing Limited, London 1986.
+  Paul Graham: "ANSI Common Lisp", Prentice Hall, 1995, ISBN 0133708756.
+  <http://paulgraham.com/acl.html>
+  and "On Lisp", Prentice Hall, 1993. ISBN 0130305529.
+  <http://paulgraham.com/onlisp.html>
+
+After a while wou will need the standard text containing the language
+definition:
+
+  Guy L. Steele Jr.: Common Lisp - The Language. Digital Press.
+  1st edition, 1984, 465 pages.
+  2nd edition, 1990, 1032 pages.
+
+This book is available in HTML form via FTP from
+  ftp://ftp.cs.cmu.edu/user/ai/lang/lisp/doc/cltl/cltl_ht.tgz
+and can be viewed through WWW under
+  http://www-2.cs.cmu.edu/Groups/AI/html/cltl/cltl2.html or
+  http://www-2.cs.cmu.edu/afs/cs/project/ai-repository/ai/html/cltl/cltl2.html .
+
+For experts: This standard text has emerged into an ANSI standard, which
+you can get free of charge from
+
+  http://www.lisp.org/HyperSpec/FrontMatter/
+
+LISP is run in an interactive environment. You input forms, and they will be
+evaluated at once. Thus you can inspect variables, call functions with given
+arguments or define your own functions.
+
+
+Contents:
+---------
+
+This distribution contains the following files of interest:
+
+   doc/clisp.1            manual page in Unix man format
+   doc/clisp.man          pre-formatted manual page
+   doc/clisp.html         manual page in HTML format
+   doc/impnotes.html,
+   doc/impnotes.css,
+   doc/clisp.png          implementation notes (user manual)
+   doc/LISP-tutorial.txt  LISP tutorial for beginners
+   doc/CLOS-guide.txt     brief guide to CLOS
+   doc/editors.txt        survey of editors with Lisp support
+   README                 this text
+   SUMMARY                a short description of CLISP
+   ANNOUNCE               announcement
+   NEWS                   list of modifications since the last version
+   COPYRIGHT              copyright notice
+   GNU-GPL                free software license
+   emacs/*.el             Emacs customization, see doc/editors.txt
+#ifndef UNIX_BINARY_DISTRIB
+   src/clisp.c            source of the driver program
+#endif
+   src/config.lisp        site-dependent configuration
+#ifdef WIN32_NATIVE
+   clisp.exe              the driver which starts runtime and memory image
+   install.bat,
+   src/install.lisp       user-friendly installer
+#endif
+
+
+and - for your convenience, if you like reading sources -
+
+   src/*.lisp             the source of lispinit.mem
+   src/*.fas              the same files, already compiled
+
+
+Installation:
+-------------
+
+#if defined(UNIX) || defined(WIN32)
+#if defined(UNIX) && !defined(UNIX_BINARY_DISTRIB)
+Type
+
+         make
+
+#endif
+Optionally, change the strings in src/config.lisp, using a text editor.
+#else
+Optionally, edit the contents of config.lisp appropriately for your site,
+especially the definitions of short-site-name and long-site-name.
+You may also want to edit the time zone definition at the end of
+timezone.lisp.
+#endif
+If you did, you need to save these changes in the memory image: start
+
+#ifdef WIN32_NATIVE
+         clisp.exe
+#endif
+#ifdef UNIX
+         base/lisp.run -M base/lispinit.mem
+#endif
+
+When the LISP prompt
+
+      [1]> _
+
+appears, type
+
+#if defined(UNIX) || defined(WIN32)
+      (without-package-lock ()
+        (load (compile-file "src/config.lisp")))
+#else
+      (without-package-lock ()
+        (load (compile-file "config.lisp")))
+
+and - in case you modified timezone.lisp -
+
+      (without-package-lock ()
+        (load (compile-file "timezone.lisp")))
+#endif
+
+and then
+
+#ifdef UNIX
+        (cd "base/")
+#endif
+        (saveinitmem)
+
+to overwrite the file lispinit.mem with your configuration. Then
+
+        (exit)
+
+The rest is done by
+
+#ifdef UNIX
+        make install
+#endif
+#ifdef WIN32_NATIVE
+        install.bat
+
+(not necessary if you use an installation executable).
+#endif
+
+
+When you encounter problems:
+----------------------------
+
+After errors, you are in the debugger:
+
+     Break 1 [2]> _
+
+You can evaluate forms, as usual. Furthermore:
+
+     Help
+               prints context-sensitive help
+     Abort     or
+     Unwind
+               climbs up to the next higher input loop
+     Backtrace
+               shows the contents of the stack, helpful for debugging
+
+And you can look at the values of the variables of the functions where the
+error occurred.
+See <http://clisp.cons.org/impnotes/debugger.html> for more information.
+
+If you think you found a bug in CLISP, please see
+<http://clisp.cons.org/clisp.html#bugs> on how to report it.
+
+
+Sources:
+--------
+
+The sources of CLISP are available from
+     ftp://ftp.gnu.org/pub/gnu/clisp/
+     http://clisp.cons.org/
+     http://www.gnu.org/software/clisp/
+     http://www.clisp.org/
+     http://clisp.sf.net/
+
+
+Mailing Lists:
+--------------
+
+There are three mailing lists for users of CLISP. You can find subscription
+information and archives on the homepage http://clisp.cons.org/.
+
+
+Acknowledgement:
+----------------
+
+We are indebted to
+  * Guy L. Steele and many others for the Common Lisp specification.
+#ifdef UNIX
+  * Richard Stallman's GNU project for GCC, Autoconf and the readline library.
+#else
+#ifdef GNU
+  * Richard Stallman's GNU project for GCC.
+#endif
+#endif
+
+
+Authors:
+--------
+
+        Bruno Haible
+        Michael Stoll
+
+Maintainer:
+-----------
+
+        Sam Steingold

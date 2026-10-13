@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section id="pari"><title>Computer Algebra System PARI</title>
+
+<para>This package offers an &ffi-pac;-based interface to &pari-link;.</para>
+<para>The package <quote role="package">PARI</quote>
+ is &case-sensitive-k;.</para>
+
+<simpara>When this module is present, &features-my; contains the
+ symbol <constant>:PARI</constant>.</simpara>
+
+<para>PARI objects are printed and read using a special
+ <literal role="data">#Z""</literal> syntax.</para>
+
+<para>Most functions accept lisp objects as well as PARI objects and
+return PARI objects, which can be converted to lisp using the
+<function>pari:pari-to-lisp</function> function.</para>
+
+<para>See <filename role="clisp-cvs">modules/pari/test.tst</filename>
+ for sample usage.</para>
+
+<simplesect id="pari-ext"><title>Extending the module</title>
+<para>Not all PARI functions have a corresponding lisp function yet, but one
+remedy that with just a few lines: <programlisting language="lisp">
+(&default-foreign-library; "libpari.so") ; or pari.dll on &win32;
+(pari:pari-call-out (matrix-rank ffi:long) "rank" (x))<lineannotation>long rank(GEN x);</lineannotation>
+(pari:pari-call-out fibonacci "fibo" ((n ffi:long)))<lineannotation>GEN fibo(long n);</lineannotation>
+(pari:pari-call-out-prec pari-arctan "gatan" (x))<lineannotation>GEN gatan(GEN x, long prec);</lineannotation>
+(pari:pari-call-out (equal? boolean) "gequal" (x y))<lineannotation>GEN gequal(GEN x, GEN y);</lineannotation>
+</programlisting>
+(Actually, these four functions are already present in the module.)
+Please feel free to submit additions for
+ <filename role="clisp-cvs">modules/pari/pari.lisp</filename>
+ and <filename role="clisp-cvs">modules/pari/test.tst</filename>.</para>
+</simplesect>
+
+<simplesect id="pari-prec"><title>Real precision</title>
+<para>The real precision defaults to <varname>pari:pari-real-precision</varname>
+which specifies the default precision in decimal digits:
+<programlisting language="lisp">
+pari:pari-real-precision
+<computeroutput>19</computeroutput>
+(&length; (&prin1-to-string; (pari:pari-to-lisp (pari:pari-pi))))
+<computeroutput>23</computeroutput>
+</programlisting>
+One can also pass the precision parameter explicitly:
+<programlisting language="lisp">
+(&length; (&prin1-to-string; (pari:pari-to-lisp (pari:pari-pi :prec 38))))
+<computeroutput>41</computeroutput>
+</programlisting>
+Note that the <emphasis>actual</emphasis> precision is determined by the
+size of the mantissa which can be incremented only in steps of
+<code>(&bitsizeof; 'ffi:ulong)</code> (64 bits or 32 bits).</para>
+</simplesect>
+</section>

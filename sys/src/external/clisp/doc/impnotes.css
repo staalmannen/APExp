@@ -1,0 +1,80 @@
+/*
+ * CLISP implementation notes stylesheets
+ * Copyright (C) 2001-2008 by Sam Steingold <sds@gnu.org>
+ * Covered by the GNU GPL <http://www.gnu.org/copyleft/gpl.html>
+ */
+
+body { background-color: white; color: black; }
+
+/* reduce the whitespace (see also clisp.css) */
+li, td, dd p { margin: 0pt; }
+
+/* mark code with color */
+.code, .programlisting, .screen
+{ background-color: lightgray; color: darkblue; }
+
+/* mark methods with color - same background as type! */
+.method { background-color: lightcyan; color: darkblue; }
+
+/* literal data */
+.computeroutput, .returnvalue, .data
+{ background-color: lightblue; color: darkred; }
+
+/* bytecode instructions */
+.byte { background-color: lightgray; color: darkred; }
+
+/* mark types with color - same background as method! */
+.type, .classname, .superclass
+{ background-color: lightcyan; color: darkgreen; }
+
+/* mark packages with color */
+.package { background-color: lightgreen; color: navy; }
+
+/* mark format strings with color */
+.format { background-color: lightgray; color: navy; }
+
+/* no border for images */
+img { border-width: 0; }
+
+/* epigraph: flush right, large left margin */
+.epigraph { text-align: right; margin-left: 50%; }
+
+/* cmdsynopsis: indent first line */
+.cmdsynopsis { text-indent: -40px; margin-left: 40px; }
+
+/* userinput: highlight */
+.userinput { background-color: lightgreen; color: darkred; font-weight: bold; }
+
+/* larger headings:
+ (loop :for i :from 1 :to 6 :do
+   (format t "h~d { font-size: ~d%; }~%"
+           i (round (expt 1.1 (- 7 i)) 1d-2))) */
+h1 { font-size: 177%; }
+h2 { font-size: 161%; }
+h3 { font-size: 146%; }
+h4 { font-size: 133%; }
+h5 { font-size: 121%; }
+h6 { font-size: 110%; }
+
+/* necessary when <programlisting> or <screen> is in a centered table cell */
+.programlisting, .screen { text-align: left; }
+
+/* platform dependencies */
+.plat-dep { background-color: lightcyan; color: darkred; }
+.platform { font-weight: bold; }
+
+/* highlight the FAQ questions */
+.question { background-color: lightyellow; }
+
+/* term in table */
+td span.term, dt span.term { font-weight: bold; }
+
+/* revhistory */
+.revnumber { background-color: lightblue; color: darkred; font-weight: bold; }
+.revdate { background-color: lightgreen; color: darkred; font-weight: bold; }
+
+/* modules */
+.module { background-color: lightyellow; color: darkblue; font-weight: bold; }
+
+/* full width horizontal rulers */
+hr { width: 100%; }

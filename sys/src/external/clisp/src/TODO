@@ -1,0 +1,394 @@
+This file contains suggestions for further work.
+See also <https://sourceforge.net/tracker/?group_id=1355&atid=351355>
+
+URGENT PROBLEMS
+===============
+Should handle these soon.
+
+
+Inefficiency of class redefinition when old or new class is unfinalizable
+
+
+support perseverances also on write side
+change wr_by_array_iau8_buffered to use persev instead of persev_full
+
+
+Changes to Unicode standard
+(Bruno and Jörg discussing issues Nov. 2006)
+Eliminate surrogates D800-DFFF from characters
+"Surrogates do not represent characters"
+"there are not and will never be *surrogate characters* (i.e. encoded
+characters represented with a single surrogate code point)"
+Change: (code-char #xD800) -> NIL, and #\uD800 becomes illegal
+This is to be consistent and avoid problems with embedded string constants
+ in .fas files, e.g. (defvar foo #.(string (code-char #xD800))) ; error
+Goal: CLISP shall never generate an illegal UTF sequence (unlike
+ versions <= 2.41). Similarly, CLISP shall not construct a
+ weird string e.g. by reading an illegal sequence.
+Conversion to and from binary signals error.
+Affects: UTF-8, UTF-7, UCS2, UCS4 and likely others.
+Unpaired surrogates shall signal error when reading (like iconv does).
+CODE-CHAR-LIMIT is preserved, but CODE-CHAR yields NIL for all
+surrogates because they don't stand on their own (they are considered
+an artefact of the days when 16 bit where hoped sufficient).
+Of course, valid sequences are not affected.  Code #x10400 is represented as
+F0 90 90 80 in UTF-8 and as 01 D8 00 DC or D8 01 DC 00 in UTF-16.
+
+Not adressed here: "The two values FFFE and FFFF as well as the 32
+values from FDD0 to FDEF represent noncharacters."
+
+
+Reading illegal UTF byte sequences
+Markus Kuhn has some recommendations
+http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
+CLISP currently differs from these, c.f. bug#1575569
+Should we follow these more closely?
+(ext:convert-string-from-bytes #(65 #xB5 66)
+ (ext:make-encoding :charset "utf-8" :input-error-action #\Z))
+"AB" (clisp src/encoding.d)
+(ext:convert-string-from-bytes #(65 #xB5 66)
+ (ext:make-encoding :charset "\\utf-8" :input-error-action #\Z))
+"AZB" (iconv)
+
+
+Embeddability: additional API in spvw.d; example. RFE#423264
+
+
+nested REQUIRE is broken
+<http://article.gmane.org/gmane.lisp.clisp.devel:13691>:
+suppose I have a library which consists of 10 files - which create
+packages, define macros &c.
+I create a special file foo.lisp:
+--- foo ---
+(load "foo0")
+(load "foo1")
+....
+(load "foo9")
+(provide "foo")
+--- foo ---
+then (require "foo") will load the whole library,
+but since foo.lib is _empty_, this won't work:
+--- bar ---
+(require "foo")
+(defun bar () (foo:with-foo (...) ...))
+--- bar ---
+when bar.lisp is compiled, the empty foo.lib is loaded and there is no
+package FOO, no macro WITH-FOO &c.
+to fix this we need to, first, replace LOAD with REQUIRE in foo.lisp,
+and, second, change c-REQUIRE to write the REQUIRE form into *.lib.
+unfortunately, this means that each foo?.lisp must PROVIDE "foo?" which
+is quite ugly.
+Alternatively, c-LOAD could write (LOAD "*.lib") into the LIB file.
+
+
+Review all macros and tighten the runtime interface of the macros.
+  check-redefinition
+
+
+contagion warnings: engineering vs portability
+<http://sourceforge.net/mailarchive/message.php?msg_id=10935288>
+<http://article.gmane.org/gmane.lisp.clisp.devel:13758>
+*warn-on-floating-point-contagion*              engineering warning
+      the user is doing something mathematically unsound
+*warn-on-floating-point-rational-contagion*     "portability" warning
+      we don't like the standard requirement
+since our ANSI mode makes these portability concerns non-existent,
+logically, either this variable should be removed,
+or every *...-ansi* variable should have a corresponding *warn-...* variable
+   (e.g., warn on (pathname "foo:bar") and (print #\space))
+or there should be a single variable *enable-portability-warnings*
+the last option is best: simple and inobtrusive.
+(setq *ansi* t) should also disable *enable-portability-warnings*.
+initially, *warn-on-floating-point-contagion* and *enable-portability-warnings*
+should be T.
+
+
+libopen should DWIM -- include libltdl and use lt_dlopenext().
+Note: including libltdl is non-trivial and libtoolize requires configure.ac
+
+
+Better error checking in get-setf-expansion for long defsetf
+
+
+FFI: passing structs by value:
+http://clisp.cons.org/impnotes/dffi.html#ffi-struct-arg
+foreign.d should signal an error when a struct is passed by value
+foreign1.lisp should emit C code for a wrapper function
+ that passes the struct by pointer
+http://article.gmane.org/gmane.lisp.clisp.general:11075
+RFE#1486583
+
+
+for Emacs: GC root macro, YETANOTHER macro
+           [sds: what does this mean?]
+
+
+print-readably for interpreted closures and #<specdecl> ?
+
+
+Should reject invalid format string:
+> (format t "abc~,'*Sdef" '(a b c))
+abc(A B C)def
+> (format t (formatter "abc~,'*Sdef") '(a b c))
+abc*(A B C)def
+Similarly "abc~3W"
+how about a compile-time format string check to warn about
+ (format t "~A" a b) and (format t "~A ~B ~C" a b)
+
+
+If you (TRACE generic-function) and then reload the file defining that
+function, you got an error saying that #<CLOSURE TRACED-xxx> is not a generic
+function. Now the function is silently untraced, which is just as bad. For
+non-generic functions, DEFUN untraces the function, but at least gives a
+warning. The desired behaviour is:
+  1. no difference between non-generic and generic functions,
+  2. a custom:*untrace-upon-redefinition* variable, default value nil,
+  3. if custom:*untrace-upon-redefinition* is true, redefining a function
+     removes the trace wrapper but gives a warning,
+  4. if custom:*untrace-upon-redefinition* is false, redefining a function
+     keeps the trace wrapper and replaces the "inner" function inside the
+     wrapper.
+A documented API should be provided for the trace wrapper, so that profilers
+etc. can do the same as TRACE without needing to hack clisp's TRACE, COMPILE,
+DISASSEMBLE, DEFUN, DEFGENERIC.
+<http://article.gmane.org/gmane.lisp.clisp.devel:12837>
+Such a def-fwrapper is what we need, so that profilers
+etc. that are ported to ACL can be ported to clisp with minimal effort.
+<http://www.franz.com/support/documentation/6.2/doc/fwrappers-and-advice.htm>
+
+
+clean up and modularize spvw.d (hasn't this been done already in 1998-07?)
+
+
+Add fast unicode attribute accessors (like CHAR-NUMERIC-P and CHAR-DECOMPOSE)
+[bruno] Agreed, this is a binding it my libunistring
+and augment the reader to return 168 from
+ (let ((*read-base* 16))
+   (read-from-string
+     (concatenate 'string
+       (string #\MATHEMATICAL_BOLD_CAPITAL_A)
+       (string #\MATHEMATICAL_BOLD_DIGIT_EIGHT))))
+[bruno] better not. It was argued in comp.lang.lisp that the behaviour of
+        the Lisp reader should remain based on the traditional notion of
+        "digit". (ANSI CL is ambiguous in its definition of "digit". Unexpected
+        behaviour in this area can lead to security issues.)
+
+
+error recovery RFE#946463
+The ability not to lose the computation on error is
+crucial for any serious task.
+Therefore, we need to be able to recover from ALL errors.
+There are two independent issues here:
+1. "retry" restart on i/o, see
+<https://sourceforge.net/mailarchive/message.php?msg_id=7607066>
+2. "return-from" restart that will return the specified
+values from the given function on the stack. we
+already have that in interpreted functions, but we must
+also have it in compiled functions.
+<http://thread.gmane.org/gmane.lisp.clisp.devel/11448>
+
+
+GENERATIONAL_GC on Cygwin bug#1104677
+the mmap() autoconf test fails but maybe one can work around it?
+
+
+GC/Memory Management:
+1. Better post-mortem on segfault RFE#1565790
+   <http://article.gmane.org/gmane.lisp.clisp.devel:13211>
+2. More GC generations as a build-time option RFE#1565794
+3. Better TIME/ROOM GC statistics reporting (per generation stats) RFE#1565795
+   <http://article.gmane.org/gmane.lisp.clisp.devel:13207>
+   <http://article.gmane.org/gmane.lisp.clisp.devel:13209>
+   <http://article.gmane.org/gmane.lisp.clisp.devel:13212>
+4. Ability to "tenure" a specific object (with all its references!) RFE#1565801
+   or the whole current heap (also untenure the object).
+
+
+local function (LABEL/FLET) calls waste heap (COPY-CLOSURE).
+ use STACK instead?
+
+
+LAUNCH/RUN-PROGRAM:
+CLISP has now 6 built-ins for launching external executables:
+SHELL, EXECUTE, MAKE-PIPE-*-STREAM, LAUNCH.
+We need to have just _one_ such built-in, with many more options,
+like CMUCL's RUN-PROGRAM
+<http://common-lisp.net/project/cmucl/doc/cmu-user/extensions.html#toc46>
+We now have LAUNCH which is a good start.  More work is needed.
+[bruno]:
+A possible outcome is just two facilities:
+  1) A type PROCESS, which describes the result of an asynchronous launch,
+     and a function which returns a process. (Similar to the Java API. The
+     .NET API, where you set the input parameters through an object, is
+     more confusing.) This is powerful but difficult to use.
+  2) A simple to use facility which doesn't produce a PROCESS object, but
+     rather returns stream(s) directly. Like RUN-PROGRAM with fewer options.
+SHELL, EXECUTE, MAKE-PIPE-*-STREAM can then become shorthands for facility #2.
+Of course, facility #2 should be based on facility #1, otherwise porting and
+testing becomes twice as time consuming.
+[sds]: (1) is an overkill, (2) is not needed if (1) is simplified:
+ when :WAIT is T (synchronous launch), the return value is the exit code.
+ when :WAIT is NIL (asynchronous), the return values are streams, and
+      the number and type of the return values is determined by the
+      :INPUT and :OUTPUT arguments.
+   This is Lisp, not C or Java, and the return type can depend on arguments!
+ (this, of course, can be implemented via several internal functions
+ which even use a _C_ struct clisp_process, but the user does not need that)
+
+
+Debugger:
+- Think about the function call traces on the STACK and SP. Which stack
+  should be used for which purpose?
+- Turn the <n> entries of show-stack into normal entries, with equal rights
+  as the other entries. Remove the <n>, as it's no information.
+  * actually, these entries specify control flow (function calls)
+    rather than local data (the other entries), they are "headers",
+    so they should be printed differently and counted separately
+- Devise a better variety of stack traces, maybe one without args and one with
+  args?
+
+
+MAYBE
+=====
+
+Still have to think about these, whether they are good ideas or not.
+
+
+Try to increase the string size limit, to get rid of
+"*** - string too long: desired length 6553600 exceeds the supported maximum
+       length" errors
+instead, the string size limit just went down! bug#1308440
+
+
+Add highlight/underline/etc. capability to the output side of *terminal-io*.
+
+
+Optimize REPLACE so that (replace v v :start1 10 :end1 30 :start2 0 :end2 20)
+doesn't cons. (vectors only, not lists)
+
+
+CLOSE :ABORT T maybe do something on file streams.
+
+
+Having two different handlings of Ctrl-C (once as a serious-condition, once
+directly through tast_break(), bypassing ERROR and SIGNAL) is horrible.
+Introduce a class of SERIOUS-CONDITION and then remove BATCHMODE-BREAK-DRIVER.
+
+
+FFI: Actually support :language :cc/:gcc by passing appropriate flags
+to the avcall/vacall macros. The default should be the same compiler
+as the one used to compile clisp.
+
+
+Looks at GCL CLCS (debugger.lsp top-patches.lsp condition-definitions.lsp)
+whether it contains something clisp could profit from.
+
+
+More CLtL2 compliance:
+; List of X3J13 votes that may be implemented in CLISP
+;
+; Number: from CLtL2, Index of X3J13 Votes.
+; Status: indicates whether CLISP currently supports code that makes use of
+; this vote.
+;
+; Number Title                               Status          Files affected
+;
+;  <85>  FORMAT & pretty print               yes             format.lisp
+;                                            no: ~E, ~F, ~G, ~$ also bind *PRINT-BASE* to 10 and *PRINT-RADIX* to NIL
+; <110>  LOAD & objects                      no              loadform.lisp
+; <127>  package function consistency        no              package.d
+; <129>  pathname: component value           no              pathname.d
+; <133>  pathname: subdirectory list         no              pathname.d
+; <134>  pathname: symbol                    no              pathname.d, stream.d
+; <136>  pathname: unspecific component      no              pathname.d
+; <139>  pretty-print interface              no              xp.lisp
+; <153>  REMF & destruction: unspecified     no for NRECONC  list.d
+;                                            yes for anything else
+
+
+The completion in user2.lisp does bad things with respect to upper case and
+lower case of symbols. Assume the symbols |TMP|, |TMP structure class|
+are interned. Then type a tab in the following situations:
+> (symbol-plist '\Tmp
+> 'tm
+> '|
+
+
+Optimize the compiler or the LOOP expander so that
+  (macroexpand '(loop for (a b c) = (multiple-value-list (foo))))
+contains
+  (MULTIPLE-VALUE-SETQ (A B C) (FOO))
+
+
+NOT TO DO
+=========
+
+These have been in my mind, but are probably bad ideas.
+
+
+upgrade to newest CLN, but still big-endian and without gmp
+
+intgcd
+
+* Speed up the functions `cl_I gcd (const cl_I&, const cl_I&)' and
+  `cl_I xgcd (const cl_I&, const cl_I&, cl_I*, cl_I*)' by a factor
+  of 1.5. Simple trick.
+Why is there no cl_gcd_double_threshold in xgcd, only in gcd??
+
+lfloat
+
+* Speed up multiplication and division of large long-floats by small integers.
+
+realtran
+
+* Speed up the internal computation of ln(2) and ln(10) by about 20%.
+
+* Speed up the computation of exp (for 1000 digits or more) by about 10%.
+
+* Speed up the computation of the elementary transcendental functions:
+  exp, sinh, cosh, asinh, atanh (for 100 digits) by about 30%,
+  log (for 100 digits) by about 25%,
+  sin, cos (for 1000 or 10000 digits) by about 20%,
+  asin, acos, atan (for 1000 digits) by about 25%.
+
+* Speed up the computation of pi, e, exp, log, sin, cos, tan, sinh, cosh, tanh,
+  asin, acos, atan, asinh, acosh, atanh.
+  All of them are now computed with asymptotically fast algorithms, of
+  bit complexity O(log(N)^2*M(N)) = O(N^(1+epsilon)) for N digits.
+
+It's not worth the effort: Most people really interested in fast numerics are
+already using CLN, NTL, or a similar library. CLISP is already the champion
+among the Common Lisp implementations regarding bignum performance.
+
+
+Block the signals SIGHUP SIGPIPE SIGTERM SIGXCPU SIGXFSZ during GC, and
+when they occur outside of GC, do a quit(1); .
+
+Programs that deal too much with signals tend to be unfriendly. I hate
+programs which stay alive when I try to kill them.
+
+
+CLtL2 issue
+; <162>  sharp-comma confusion               no              io.d
+
+Backward compatibility to CLtL2. Doesn't cost much.
+
+
+CLtL2 issue
+; <174>  syntactic environment access        no
+
+It never made it into ANSI CL.
+
+
+CLtL2 issue
+; <176>  :TEST-NOT, -IF-NOT                  no              sequence.d, list.d
+
+It's a bad idea because REMOVE-IF-NOT is a kind of "positive filter", which
+is more confusing when expressed as REMOVE of COMPLEMENT. Also, COMPLEMENT
+is harder to understand than XXX-IF-NOT because COMPLEMENT is a function
+returning a function.
+
+;; Local Variables:
+;; mode: bug-reference
+;; bug-reference-url-format: clisp-bug-reference-url-format
+;; End:

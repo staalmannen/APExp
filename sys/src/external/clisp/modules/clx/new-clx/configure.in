@@ -1,0 +1,115 @@
+dnl -*- Autoconf -*- script for new-clx
+dnl Gilbert Baumann, 1999-10-11
+dnl Sam Steingold 2002-2009
+
+AC_PREREQ(2.57)
+AC_INIT(clx/new-clx, 1.0, clisp-list)
+AC_CONFIG_SRCDIR(clx.f)
+AC_CONFIG_HEADERS(config.h)
+
+RSE_BOLD
+BOLD_MSG([NEW CLX])
+CL_MODULE_COMMON_CHECKS()
+AC_HEADER_TIME
+AC_CHECK_HEADERS([sys/socket.h netdb.h netinet/in.h])
+dnl find a path to X11 - set X_LIBS and X_CFLAGS
+AC_PATH_XTRA
+
+if test "$have_x" != "yes"; then
+  AC_MSG_FAILURE([cannot find X Window System])
+fi
+
+AC_CHECK_SIZEOF(KeySym,,[#include <stdio.h>
+#include <X11/X.h>])
+
+AC_CACHE_CHECK([for XGetAtomNames], [cl_cv_have_XGetAtomNames],
+  [ cl_LIBS_save=$LIBS
+    cl_CFLAGS_save=$CFLAGS
+    LIBS="$X_LIBS $X_PRE_LIBS -lX11 $LIBS"
+    CFLAGS="$CFLAGS $X_CFLAGS"
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <X11/Xlib.h>],
+     [XGetAtomNames(0,0,0,0)])],
+      [cl_cv_have_XGetAtomNames=yes], [cl_cv_have_XGetAtomNames=no])
+    LIBS=$cl_LIBS_save
+    CFLAGS=$cl_CFLAGS_save])
+if test $cl_cv_have_XGetAtomNames = yes; then
+  AC_DEFINE([HAVE_XGETATOMNAMES], 1, [Define if XGetAtomNames() works])
+fi
+
+dnl Look for Xpm
+AC_CACHE_CHECK([for Xpm library], [cl_cv_have_xpm],
+  [ cl_LIBS_save=$LIBS
+    cl_CFLAGS_save=$CFLAGS
+    LIBS="$X_LIBS -lXpm $X_PRE_LIBS -lX11 $LIBS"
+    CFLAGS="$CFLAGS $X_CFLAGS"
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <X11/xpm.h>],
+     [XpmReadFileToPixmap(0,0,0,0,0,0)])],
+      [cl_cv_have_xpm=yes], [cl_cv_have_xpm=no])
+    LIBS=$cl_LIBS_save
+    CFLAGS=$cl_CFLAGS_save])
+
+dnl Same thing with XShape
+AC_CACHE_CHECK([for X shape extension], [cl_cv_have_xshape],
+  [ cl_LIBS_save=$LIBS
+    cl_CFLAGS_save=$CFLAGS
+    LIBS="$X_LIBS -lXext $X_PRE_LIBS -lX11 $LIBS"
+    CFLAGS="$CFLAGS $X_CFLAGS"
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/extensions/shape.h>],[XShapeQueryExtension(0,0,0)])],
+      [cl_cv_have_xshape=yes], [cl_cv_have_xshape=no])
+    LIBS=$cl_LIBS_save
+    CFLAGS=$cl_CFLAGS_save])
+
+m4_define([CL_PROGRAM_XauGetAuthByAddr],
+[AC_LANG_PROGRAM([#include <sys/socket.h>
+#include <X11/Xlib.h>
+#include <X11/Xauth.h>],
+[XauGetAuthByAddr(AF_INET,0,"",13,"localhost:0.0",13,"localhost:0.0")])])
+
+AC_CACHE_CHECK([if XauGetAuthByAddr needs -lXau], [cl_cv_need_lXau],
+  [ cl_LIBS_save=$LIBS
+    cl_CFLAGS_save=$CFLAGS
+    LIBS="$X_LIBS $X_PRE_LIBS -lX11 $LIBS"
+    CFLAGS="$CFLAGS $X_CFLAGS"
+    AC_LINK_IFELSE([CL_PROGRAM_XauGetAuthByAddr],
+      [cl_cv_need_lXau=no], [cl_cv_need_lXau=maybe])
+    if test $cl_cv_need_lXau = maybe; then
+      LIBS="$X_LIBS -lXau $X_PRE_LIBS $LIBS"
+      CFLAGS="$CFLAGS $X_CFLAGS"
+      AC_LINK_IFELSE([CL_PROGRAM_XauGetAuthByAddr],[cl_cv_need_lXau=yes],
+        AC_MSG_FAILURE([XauGetAuthByAddr was not found]))
+    fi
+    LIBS=$cl_LIBS_save
+    CFLAGS=$cl_CFLAGS_save])
+
+dnl Now define some output variables
+
+AC_SUBST(WANTS)         dnl defines WANTS as output variable
+
+dnl Setup X_LIBS as well as WANTS
+
+if test $cl_cv_have_xpm = "yes"; then
+    X_LIBS="$X_LIBS -lXpm";
+    WANTS="$WANTS -DWANT_XPM=1"
+else
+    WANTS="$WANTS -DWANT_XPM=0"
+fi
+
+if test $cl_cv_have_xshape = "yes"; then
+    X_LIBS="$X_LIBS -lXext";
+    WANTS="$WANTS -DWANT_XSHAPE=1"
+else
+    WANTS="$WANTS -DWANT_XSHAPE=0"
+fi
+
+if test $cl_cv_need_lXau = "yes"; then
+    X_LIBS="$X_LIBS -lXau";
+fi
+
+dnl And dump what we found:
+BOLD_MSG([NEW CLX (output)])
+AC_CONFIG_FILES(Makefile link.sh)
+AC_OUTPUT
+
+BOLD_MSG([NEW CLX (done)])

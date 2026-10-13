@@ -1,0 +1,47 @@
+# Makefile for CLISP module set gdbm
+
+srcdir = @srcdir@
+CC = @CC@
+GDBMCPPFLAGS = @CPPFLAGS@
+CFLAGS = @CFLAGS@
+CLISP = @CLISP@ -norc -q
+CLISP_LINKKIT = @CLISP_LINKKIT@
+
+LN = @LN@
+LN_S = @LN_S@
+
+MAKE = make
+
+SHELL = /bin/sh
+
+GENERATED = gdbm.fas gdbm.o preload.lisp
+DISTRIBFILES = link.sh Makefile $(GENERATED) $(srcdir)/gdbm.lisp
+distribdir =
+
+# default target: make the module
+clisp-module : $(GENERATED)
+
+gdbm.fas: $(srcdir)/gdbm.lisp
+	$(CLISP) -c $(srcdir)/gdbm.lisp -o ./
+
+gdbm.o : gdbm.m.c config.h
+	$(CC) $(CPPFLAGS) $(GDBMCPPFLAGS) $(CFLAGS) -I$(CLISP_LINKKIT) \
+		-c gdbm.m.c -o gdbm.o
+
+gdbm.m.c : $(srcdir)/gdbm.c
+	$(CLISP) -C $(CLISP_LINKKIT)/modprep $(srcdir)/gdbm.c ./
+
+preload.lisp : $(srcdir)/preload.lisp
+	$(LN_S) $(srcdir)/preload.lisp .
+
+# Make a module distribution into $(distribdir)
+clisp-module-distrib : clisp-module force
+	$(LN) $(DISTRIBFILES) $(distribdir)
+
+clean : force
+	rm -f core *.o *.a *.m.c *.fas *.lib
+
+distclean : clean
+
+force :
+

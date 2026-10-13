@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section id="dbus"><title>Interface to D-Bus</title>
+
+<para>This is an &ffi-pac;-based interface to the &d-bus-link; message bus
+ system, a simple way for applications to talk to one another.</para>
+
+<para>The package <quote role="package">DBUS</quote> is &case-sensitive-k;,
+ e.g., you would write <code>(dbus:dbus_error_init ...)</code>
+ when you need to call the &c-lang; function
+ <function>dbus_error_init</function>.</para>
+
+<simpara>When this module is present, &features-my;
+ contains the symbol <constant>:D-BUS</constant>.</simpara>
+
+<para>All public &c-lang; functions are available as &foreign-function-t;s,
+ defined in <filename role="clisp-cvs">modules/dbus/dbus.lisp</filename>.</para>
+<para>See <filename role="clisp-cvs">modules/dbus/test.tst</filename>
+ for sample usage.</para>
+
+</section>
