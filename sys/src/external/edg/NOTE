@@ -1577,6 +1577,7 @@ WHAT REMAINS BEFORE THE PATCH, in order:
   5. Then cpfe on the VM: the `0x68' fault is what all of this is for.
 
 
+
 sualign() IS PATCHED -- SIX LINES, AND A MODEL CAUGHT ITS COMMENT
 ------------------------------------------------------------------
 
@@ -1677,3 +1678,4 @@ ORDER FROM HERE, and the first step is not the tree:
      against the committed before.
   4. `mk distclean` then `mk install`.
   5. cpfe: the `0x68` fault is what all of this is for.
+
