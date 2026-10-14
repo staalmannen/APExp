@@ -27,7 +27,21 @@ UPDATE=\
 
 <$APEXPROOT/sys/src/cmd/mkone
 
-CC=pcc
+# `pcc -c', NOT bare `pcc'.  Without -c the driver COMPILES AND THEN
+# LINKS (pcc.c's `if(!cflag)' arm), so the very first file answered
+#
+#	_apemain: undefined: main in _apemain
+#
+# -- a LINK error on `arm.c', which has no `main' and was never meant to
+# have one.  *The message is about the second half of a command whose
+# first half worked*, which is why it reads like a missing symbol in
+# libap rather than a missing flag here.
+# `CC=pcc -c' is what every other APE package in this tree says
+# (`cmd/tar/mkfile:79', `cmd/core/mkfile:206'); `mkone's own `%.$O: %.c'
+# rule is `$CC $CFLAGS $stem.c' with no -c of its own, so the -c has to
+# arrive through CC or through CFLAGS and this file had it in neither.
+# LD stays bare: the link is the one place pcc should link.
+CC=pcc -c
 LD=pcc
 # -DHAVE_C_BOOL: kencc's `bool' is a keyword, so dist's own
 # `typedef int bool;' in a.h is a syntax error and the build stopped on

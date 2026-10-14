@@ -1,0 +1,69 @@
+# mkrecipe-probe -- WHICH construct in a tab-indented recipe does rc
+# refuse?  One command:
+#
+#	cd sys/lib/tests/mkrecipe-probe && mk -k all
+#
+# `-k' is not optional: mk stops at the first failing recipe, and the
+# whole point here is to get every answer in one run rather than one
+# round each.  Every case that works prints `ok N'; a case that does
+# not prints an rc syntax error instead, and the number names the
+# construct.  Nothing is compiled and nothing is installed.
+#
+# WHY IT EXISTS.  `cmd/clisp/mkfile.rebuild' answered
+#
+#	/rc/lib/rcmain:24 *eval*:13: token '=': syntax error
+#
+# and the ONLY `=' characters anywhere in that recipe were two inside
+# COMMENT lines plus one leading assignment, which rc allows.  So
+# either rc is lexing recipe comments after all, or mk is doing
+# something to them on the way, or the line rc names is not the line
+# that failed.  **Three different causes, three different fixes, and
+# reading cannot separate them**: there is no rc on the build host, so
+# every statement about rc's lexer in this tree is a recollection until
+# a VM run says otherwise -- which is exactly how the `=' rule itself
+# sat unmeasured for rounds.
+#
+# Case 1 is the CONTROL.  A recipe comment with nothing special in it
+# must work, and the tree says it already does -- `external/perl/plan9/
+# mkfile:88' is a whole-line recipe comment and perl builds.  If case 1
+# fails, the answer is "rc sees recipe comments at all" and every
+# comment in every recipe in this tree is a hazard.  If case 1 passes
+# and case 2 or 3 fails, it is the CONTENT, and the rule is narrower.
+#
+# Case 5 has a precedent that already works and is here to be excluded
+# rather than to be learnt: `cmd/tar/mkfile:126' is
+# `echo '#ifndef DEFAULT_RMT_COMMAND' >rmt-command.h' and tar's header
+# comes out right, so mk does not strip `#' from inside quotes.  *A
+# case whose answer is known is what makes the others readable* -- if
+# 5 fails, the probe itself is measuring something other than rc.
+
+all:V: t1 t2 t3 t4 t5 t6
+
+t1:V:
+	# a plain comment, nothing special in it
+	echo ok 1 plain recipe comment
+
+t2:V:
+	# this comment contains a bare = sign
+	echo ok 2 comment containing a bare equals
+
+t3:V:
+	# `~' rather than `test $name = x': `=' is a SYNTAX CHARACTER
+	echo ok 3 comment with backquotes apostrophes and equals
+
+t4:V:
+	if (~ x x) {
+		echo ok 4a
+	} if not {
+		echo not reached
+	}
+	echo ok 4 brace-if-not on one line
+
+t5:V:
+	echo abc | sed -e '/^#line /!s/.*//' -e 's/^/ok 5 /'
+
+t6:V:
+	@{
+		v=hello
+		echo ok 6 leading assignment inside a block $v
+	}
