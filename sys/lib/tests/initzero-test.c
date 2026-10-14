@@ -61,6 +61,30 @@
  * the assertion that `len' is 0 before the memset length is taken from it.
  * It is the one section whose failure names a program rather than a rule.
  *
+ * MEASURED ON THE VM: **6 failures under `pcc', 0 under gcc**, so muon's
+ * crash is kencc's and the fix is in the compiler.  `sizeof(struct tstr)'
+ * printed 24 rather than the host's 32, which is the 32-bit `long'
+ * invariant and not a finding.
+ *
+ * AND THE PATTERN IS THE DIAGNOSIS, not the count.  `.len' was garbage
+ * and `.s' was zero through a POINTER (1a/1b), and the other way round
+ * into a LOCAL (2a/2b) -- the same two gaps of the same struct, in one
+ * program, differing only in what the frame last held.  Section 6b, an
+ * array literal with three holes, passed outright.  *A compiler that
+ * simply never zeroed would have failed all of them uniformly; this is
+ * what an UNINITIALISED SLOT looks like*, and `compoundlit()' in
+ * `cc/dcl.c' allocates exactly that -- a hidden auto, `adecl(CAUTO,...)',
+ * written only where the initialiser list says.
+ *
+ * **SECTION 5 IS THE CONTROL AND IT PASSED FOR A REAL REASON.** A
+ * DECLARATION goes through `cc.y's `adlist', which is `doinit(); contig()'
+ * -- and `contig()' is precisely "zero every byte the list did not
+ * cover".  `compoundlit()' was the one caller of `doinit()' that never
+ * had the second half.  So section 5 passing beside 1a/3a/4a/6a/7 failing
+ * is not noise: *it is the asymmetry between the two productions, which
+ * is the whole bug*, and it is why no ordinary C in this tree ever
+ * tripped over it.
+ *
  * 0 failures on gcc.  Exit status is the failure count.
  */
 

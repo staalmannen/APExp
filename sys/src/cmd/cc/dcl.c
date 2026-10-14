@@ -1,6 +1,8 @@
 #include "cc.h"
 
 static Node*	mkvlasym(Node*);
+/* defined beside contig(), ~2200 lines down, and used by clitzero() here */
+static Node*	initz(Node*, Type*, long, Node*);
 
 /*
  * compoundlit(t, initnode) -- lower a C99 compound literal to a hidden auto.
@@ -26,6 +28,71 @@ static Node*	mkvlasym(Node*);
  *               postfix operators ([], ., ->, &, ...) compose normally.
  *   init == Z:  bare ONAME  (trivially-zero or empty literal)
  */
+/*
+ * clitzero -- zero every byte of a compound literal's hidden auto that the
+ * initialiser list does not write.  C99 6.7.8p21 (and 6.5.2.5p1, which
+ * defers to it): a member with no initialiser is initialised as an object
+ * with static storage duration would be, i.e. to zero.
+ *
+ * WHY THIS IS NOT JUST A CALL TO contig().  `contig()' is exactly this
+ * function for an ordinary declaration -- `adlist' in cc.y does
+ * `doinit(); contig()' -- and compoundlit() is the ONE caller of doinit()
+ * that never had the second half.  But contig()'s bulk arm emits an
+ * **ODWHILE**, a STATEMENT, and everything compoundlit builds has to
+ * survive cgen() in EXPRESSION context: the literal's value is an operand.
+ * So the front and back trims are reused verbatim and the loop is spelled
+ * out as straight-line stores instead.
+ *
+ * ORDER IS WHAT MAKES CLOBBERING SAFE, and it is the same reasoning
+ * contig() relies on.  `initz()' skips a word only when it is ENTIRELY
+ * covered, so a word holding both an initialised member and a gap is
+ * zeroed whole -- and that is correct because every store this builds is
+ * prepended, so all of them run BEFORE the member assignments in `n'.
+ *
+ * THE COST IS LINEAR AND IS THE REASON contig() HAS A LOOP: one store per
+ * uncovered pointer-sized word, so `(char[4096]){0}' emits 512 of them
+ * where a declaration emits a four-node loop.  Compound literals in this
+ * tree are small (muon's `struct tstr' is 24 bytes); recorded rather than
+ * capped, because a cap would have to reject legal C or fall back to a
+ * statement this expression cannot hold.
+ */
+static Node*
+clitzero(Node *q, Type *t, long v, Node *n)
+{
+	long w;
+	Type *zt;
+
+	w = t->width;
+	if(w <= 0)
+		return n;
+
+	/* unaligned front -- contig()'s own arm, character for character */
+	while(w > 0 && (v % ewidth[TIND]) != 0) {
+		zt = types[TCHAR];
+		if(w >= ewidth[TLONG] && (v % ewidth[TLONG]) == 0)
+			zt = types[TLONG];
+		n = initz(q, zt, v, n);
+		v += zt->width;
+		w -= zt->width;
+	}
+
+	/* the body, in the width contig() uses for its loop pointer */
+	zt = ewidth[TIND] > ewidth[TLONG]? types[TVLONG]: types[TLONG];
+	while(w >= zt->width) {
+		n = initz(q, zt, v, n);
+		v += zt->width;
+		w -= zt->width;
+	}
+
+	/* and whatever tail is left over */
+	while(w > 0) {
+		n = initz(q, types[TCHAR], v, n);
+		v++;
+		w--;
+	}
+	return n;
+}
+
 Node*
 compoundlit(Type *t, Node *initnode)
 {
@@ -72,6 +139,43 @@ compoundlit(Type *t, Node *initnode)
 
 	/* Generate assignment tree from the already-parsed ilist. */
 	init = doinit(s, t, 0L, initnode);
+
+	/*
+	 * ZERO THE GAPS.  MEASURED: without this, `initzero-test' under pcc
+	 * reports 6 failures where gcc reports 0 -- muon faulted in
+	 * `memset(sb->buf, 0, sb->len)' with `sb->len' holding 2,731,952,
+	 * because `tstr_init' ends
+	 *     *sb = (struct tstr){.flags = .., .buf = .., .cap = ..};
+	 * and `.len' is omitted.  The hidden auto is a stack slot like any
+	 * other, so an omitted member kept whatever the frame last held.
+	 *
+	 * THE SYMPTOM LOOKED INTERMITTENT, AND THAT IS THE EVIDENCE FOR AN
+	 * UNINITIALISED SLOT RATHER THAN A RULE.  In that run `.len' was
+	 * garbage and `.s' was zero through a pointer, and the other way
+	 * round into a local -- the same two gaps of the same struct, in
+	 * the same program, differing only in what the frame last held.
+	 * Section 6b, an array literal with three holes, passed outright.
+	 * *A blanket "omitted members are never zeroed" would have been
+	 * uniform; this is what a dirty slot looks like.*
+	 *
+	 * AND THE ONE DECLARATION CASE PASSED FOR A REAL REASON, not for
+	 * that one: `adlist' in cc.y is `doinit(); contig()', so an
+	 * ordinary `T x = {.c = 9};' has always had its gaps cleared.  That
+	 * is what makes this the only site -- the asymmetry between the two
+	 * productions is the whole bug, and it is why no amount of ordinary
+	 * C in this tree ever tripped over it.
+	 *
+	 * MUST COME BEFORE THE OLIST->OCOMMA FLATTENING BELOW.  `covered1()'
+	 * descends OLIST and OASI and nothing else, so once the tree is
+	 * OCOMMA it reads as entirely uncovered and every member would be
+	 * zeroed on top of its own initialiser.
+	 *
+	 * CAUTO only: a file-scope literal is CSTATIC, doinit() writes DATA
+	 * records for it and BSS is already zero, so stores here would be
+	 * both wrong and unreachable.
+	 */
+	if(class == CAUTO)
+		init = clitzero(var, t, s->offset, init);
 
 	/*
 	 * doinit() builds the init tree with newlist(), which left-folds:

@@ -304,7 +304,16 @@ a `memset` length. **Its storage is dirtied with 0xAA first and section
 0 checks that the poison arrived**, because against a zero destination
 every check passes for the wrong reason. Section 7 is muon's own
 reduction and is the one whose failure names a program rather than a
-rule.
+rule. **Section 5 is the CONTROL**: a declaration rather than a
+literal, so it exercises `contig()` and must pass under both compilers.
+**`clitzero-model.py` is a host MODEL rather than a test**, beside
+`sualign-model.py` and for the same reason -- kencc's sources need
+Plan 9's `<u.h>`, so the first build of any `cc/` change is the VM's.
+It extracts `clitzero()` from `cc/dcl.c` verbatim and asks which BYTES
+it stores zero into, over six layouts by seven negative FRAME OFFSETS.
+**It has no external oracle**, so its control is a deliberate break: a
+copy with the tail loop removed must report a gap. Re-run it after any
+edit to that function.
 **`strerror-xcheck.py` is the second host SWEEP**, and it is a
 script for a reason the other xchecks do not have: **APE's errno
 NUMBERS are its own**, so libap's table and glibc's cannot be lined
@@ -2614,7 +2623,49 @@ live either way.
   fresh frame usually is one. 0 failures on gcc; the broken behaviour
   replicated beside it gives **3, naming exactly 1a, 1b and 7** and
   printing a length of `0xAAAAAAAA`, the same shape as the VM's
-  `0x29afb0`. **NOT YET RUN UNDER pcc** -- that run is the measurement.
+  `0x29afb0`.
+  **MEASURED: 6 FAILURES UNDER pcc, 0 UNDER gcc -- muon's crash is
+  kencc's, and it is ONE MISSING CALL IN `cc/dcl.c`.**
+  `compoundlit()` lowers a literal to a hidden auto (`adecl(CAUTO,...)`)
+  and calls `doinit()`, which assigns only the members the list names.
+  **`cc.y`'s `adlist` -- an ordinary `T x = {...}` -- is `doinit()`
+  FOLLOWED BY `contig()`**, and `contig()` is exactly "zero every byte
+  the initialiser did not cover". *`compoundlit()` was the one caller of
+  `doinit()` in the compiler that never had the second half*, which is
+  why no ordinary C in this tree ever tripped over it.
+  **THE PATTERN WAS THE DIAGNOSIS, NOT THE COUNT.** `.len` was garbage
+  and `.s` zero through a POINTER, and the other way round into a LOCAL
+  -- the same two gaps of the same struct, in one program -- and section
+  6b's array literal passed outright. *A compiler that simply never
+  zeroed would have failed uniformly; this is an uninitialised slot.*
+  And **section 5, a DECLARATION, passed for a real reason** rather than
+  by luck: it goes through `adlist`, so it has always had `contig()`.
+  *The asymmetry between the two productions is the whole bug.*
+  **`contig()` COULD NOT SIMPLY BE CALLED, which is the one subtlety.**
+  Its bulk arm emits an **`ODWHILE`** -- a STATEMENT -- and everything
+  `compoundlit()` builds has to survive `cgen()` in EXPRESSION context,
+  since the literal's value is an operand. `clitzero()` reuses contig's
+  front and back trims verbatim and spells the loop out as straight-line
+  stores; the cost is one store per uncovered pointer-sized word, which
+  is linear and is recorded rather than capped. **It must run BEFORE the
+  existing `OLIST`->`OCOMMA` flattening**: `covered1()` descends OLIST
+  and OASI and nothing else, so against an OCOMMA tree every member
+  would read as uncovered and be zeroed on top of its own initialiser.
+  **Zeroing a partially-covered word is correct and deliberate** --
+  `initz()` prepends, so every zero store runs before the member stores,
+  which is the same ordering `contig()` already relies on.
+  **`clitzero-model.py` is the instrument** and extracts the real
+  function from `dcl.c` rather than restating it, because the first
+  build of any `cc/` change is the VM's. Six layouts by seven FRAME
+  OFFSETS -- *`v` is negative, so every `%` in that function is a
+  negative modulo and one sign error writes zeros over a neighbouring
+  local*. **It has no external oracle** the way `sualign-model` has the
+  acid dump, so **its control is a deliberate break**: a copy with the
+  tail loop removed must report a gap, and it does. All cases ok, and a
+  fully-covered literal costs no stores at all, so `(int){i}` and
+  `&(T){...}` keep their `addable` path.
+  **NOT COMPILED ANYWHERE: the first build is the VM's**, the same
+  weaker position `-J`, the `auto` grammar fix and `-C` shipped from.
   *The gcc sweep over the files muon builds was 0 errors in the classes
   6c treats as fatal, and it has no 32-bit-`long` assumptions, so both
   cheap classes were clean and this needed the crash.*
