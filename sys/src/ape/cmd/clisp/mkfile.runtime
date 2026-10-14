@@ -1,0 +1,49 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+CLISPSRC=$APEXPROOT/sys/src/external/clisp
+BIN=$APEXPROOT/$objtype/bin/ape
+LIBDIR=$APEXPROOT/$objtype/lib/ape
+BUILD=build-$objtype
+
+# Upstream's configure and GNU make rules build lisp.run, compile the Lisp
+# sources into *.fas, construct the base linking set and memory image, and
+# build the clisp launcher. Run them natively in the 9front APE environment.
+
+configure:V:
+	@{
+		root=`{cd $APEXPROOT; pwd}
+		srcroot=`{cd $CLISPSRC; pwd}
+		if (test $objtype = arm64 || test $objtype = spim) {
+			echo 'CLISP upstream does not support the 9front '$objtype' target yet'
+			exit 1
+		}
+		mkdir -p $BUILD
+		cd $BUILD
+		if (! test -f config.status) {
+			env CC=pcc CPPFLAGS='-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION' CFLAGS='-Fw -D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION' sh $srcroot/configure . --srcdir=$srcroot --prefix=$root/$objtype --exec-prefix=$root/$objtype --bindir=$root/$objtype/bin/ape --libdir=$root/$objtype/lib/ape --localedir=$root/sys/lib/ape/locale --ignore-absence-of-libsigsegv --without-ffcall --without-readline --without-dynamic-modules --disable-nls
+		}
+	}
+
+build:V: configure
+	$BIN/make -C $BUILD clisp base
+
+install:V: build
+	$BIN/make -C $BUILD install-bin
+
+installall:V:
+	for (objtype in $CPUS) @{
+		if (test $objtype = arm64 || test $objtype = spim) {
+			echo '---- clisp skipped for '$objtype' ----'
+		} if not {
+			mk $MKFLAGS install
+		}
+	}
+
+clean:V:
+	if (test -f $BUILD/Makefile) $BIN/make -C $BUILD clean
+
+nuke:V:
+	if (test -f $BUILD/Makefile) $BIN/make -C $BUILD distclean
+

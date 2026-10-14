@@ -3,6 +3,7 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 CLISPSRC=$APEXPROOT/sys/src/external/clisp/src
 BIN=$APEXPROOT/$objtype/bin/ape
+BUILD=build-$objtype
 
 # CLISP's non-assembly C inputs for the Unix configuration, adapted from
 # makemake.in. This port disables dynamic FFI, threads, and optional modules.
@@ -31,30 +32,31 @@ DFILES=$CPARTS $EVERY_INCLUDES $OTHER_INCLUDES $SPVW_INCLUDES\
 	errunix $LISPARIT_INCLUDES genclisph noreadline
 
 # Stage two: turn CLISP's comment-annotated C in *.d into ordinary C.
-# This intentionally keeps generated files in this directory, where the
-# 9front-specific C adjustments can be made and reviewed before stage 3.
+# Keep generated files in the per-architecture build directory so the
+# configure and GNU-make build use the same sources on 9front.
 CLEANFILES=*.c *.tmp
 
 all:V: sources
 
 sources:V:
+	mkdir -p $BUILD
 	for (name in $DFILES) @{
 		src=$CLISPSRC/$name.d
 		if (test $name = lispbibl) {
-			$BIN/comment5 $src | sed -e 's/^%% .*//' | $BIN/gctrigger | $BIN/varbrace > $name.c.tmp
+			$BIN/comment5 $src | sed -e 's/^%% .*//' | $BIN/gctrigger | $BIN/varbrace > $BUILD/$name.c.tmp
 		} if not {
-			$BIN/comment5 $src | $BIN/gctrigger | $BIN/varbrace > $name.c.tmp
+			$BIN/comment5 $src | $BIN/gctrigger | $BIN/varbrace > $BUILD/$name.c.tmp
 		}
-		if (test -s $name.c.tmp) mv $name.c.tmp $name.c
-		if not { rm -f $name.c.tmp; exit 1 }
+		if (test -s $BUILD/$name.c.tmp) mv $BUILD/$name.c.tmp $BUILD/$name.c
+		if not { rm -f $BUILD/$name.c.tmp; exit 1 }
 	}
-	$BIN/comment5 $CLISPSRC/lispbibl.d | sed -e '/^%% /{s///p;d;}' -e '/^#line /!s/.*//' > gen.lispbibl.c.tmp
-	if (test -s gen.lispbibl.c.tmp) mv gen.lispbibl.c.tmp gen.lispbibl.c
-	if not { rm -f gen.lispbibl.c.tmp; exit 1 }
+	$BIN/comment5 $CLISPSRC/lispbibl.d | sed -e '/^%% /{s///p;d;}' -e '/^#line /!s/.*//' > $BUILD/gen.lispbibl.c.tmp
+	if (test -s $BUILD/gen.lispbibl.c.tmp) mv $BUILD/gen.lispbibl.c.tmp $BUILD/gen.lispbibl.c
+	if not { rm -f $BUILD/gen.lispbibl.c.tmp; exit 1 }
 
 clean:V:
-	rm -f *.c *.tmp
+	rm -f $BUILD/*.c $BUILD/*.tmp
 
 nuke:V:
-	rm -f *.c *.tmp
+	rm -f $BUILD/*.c $BUILD/*.tmp
 

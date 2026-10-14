@@ -121,7 +121,7 @@
   #define PC386 /* IBMPC-compatible with 80386/80486-processor */
 #endif
 #ifdef GENERIC_UNIX
-  #if (defined(unix) && (defined(linux) || defined(__CYGWIN32__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)) && (defined(i386) || defined(__i386__) || defined(__x86_64__) || defined(__amd64__)))
+  #if (defined(unix) && (defined(linux) || defined(__CYGWIN32__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(_PLAN9_SOURCE)) && (defined(i386) || defined(__i386__) || defined(__x86_64__) || defined(__amd64__)))
     #define PC386
   #endif
   #if (defined(sun) && defined(unix) && defined(sparc))
