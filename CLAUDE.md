@@ -2729,6 +2729,32 @@ item -- *a port that builds and has never run is not a port*:
   under pcc.
   **The exit status is NOT the failure count** (BaCon's `END` takes no
   value, its `EXIT` leaves a SUB), so read the `N failures` line.
+  **AND THE VM RUN'S TWO FAILURES ARE 1b AND 2a, WHICH ARE THE
+  INVARIANT THE FILE EXISTS TO MEASURE RATHER THAN A REGRESSION.**
+  BaCon's NUMBER is a C `long` and kencc's is 32 bits, so a value past
+  2^31 wraps -- *and NUMBER is the only integer type a BaCon program
+  has*, so that is every arithmetic result in every program, not a
+  curiosity. They stay as FAILURES rather than becoming a probe:
+  demoting the loudest true thing the file measures would hide it.
+  The test now PRINTS the diagnosis beside the count.
+  **MY FIRST SIZING OF THE FIX WAS WRONG BY TWO ORDERS, and the
+  generated output settled it in one second where a grep had not.** I
+  counted `"long"` in the GENERATOR -- 232 sites, 175 distinct
+  literals -- and called the change large. The generated C contains
+  none of them: every NUMBER goes through **one** line,
+  `#define NUMBER long`, and the 232 are the generator's own
+  bookkeeping. *Counting the thing that emits is not counting the
+  thing emitted.*
+  **BUT IT IS NOT ONE LINE EITHER, AND THAT IS WHAT `6c` IS FOR.** A
+  FUNCTION's return type is written as the bare word `long`
+  (`bacon.bac:2322`), not as NUMBER, so widening the define alone is a
+  MIXED build -- **chicken's `C_LLP` without `C_SIXTY_FOUR`, exactly**.
+  Measured on the host in all three configurations: as generated **0**
+  failures; NUMBER and returns both `int` (kencc's shape) **3** --
+  1b, 2a, 6c; and the HALF-FIX, NUMBER widened with returns left
+  alone, **1 -- 6c alone**. *Without 6c a half-fix and a whole one
+  print the same thing.* **So the VM count becomes 3, and the third is
+  newly MEASURED rather than newly broken.**
   **AND THE RECIPE THIS FILE RECORDED WAS WRONG IN BOTH HALVES, which
   the first VM run said in one screen.**
   - **`-c cc`, not `-c pcc`.** bacon writes a `Makefile.bacon` naming

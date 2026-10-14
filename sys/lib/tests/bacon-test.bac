@@ -216,7 +216,92 @@ END FUNCTION
 
 check("6b FUNCTION returns STRING", namestr$("x"), "<x>")
 
+' --- 6c: A FUNCTION RETURNING A VALUE WIDER THAN 32 BITS, and it is
+' --- here to catch a HALF-FIX rather than the platform.
+'
+' BaCon's generated C declares a NUMBER variable through one
+' `#define NUMBER long' in the generic header -- but it writes the
+' RETURN TYPE of a function as the bare word `long':
+'
+'     long twice( NUMBER n);        <- parameter NUMBER, return long
+'
+' So widening the `#define' alone gives a MIXED build: variables hold
+' 64 bits and every value above 2^31 is truncated as it comes back out
+' of a FUNCTION.  **6a cannot see that** -- `twice(21)' is 42, which
+' fits either way -- and a half-fix would therefore look exactly like
+' a whole one.
+'
+' *That is chicken's `C_LLP' without `C_SIXTY_FOUR' precisely: half
+' the configuration takes and half does not.*  This check is the
+' discriminator, and it fails on a host build with the define widened
+' and the return type left alone, which is how it was verified rather
+' than argued.
+FUNCTION bignum(NUMBER n)
+    RETURN n * 1000000
+END FUNCTION
+
+check("6c FUNCTION returns > 2^31", STR$(bignum(1000000)), "1000000000000")
+
 PRINT fail, " failures"
+
+' --- WHAT 1b AND 2a MEAN, printed rather than left to be re-derived.
+'
+' They are the two checks that turn on the width of BaCon's NUMBER,
+' and they are EXPECTED TO FAIL here until BaCon's own code generator
+' changes.  They stay as FAILURES rather than becoming a probe, and
+' the reason is that this is not a platform curiosity: NUMBER is the
+' only integer type a BaCon program has, so a 32-bit one makes every
+' arithmetic result in every program on this platform wrap silently
+' at 2^31.  *Demoting the loudest true thing this file measures would
+' be hiding it.*
+'
+' THE CAUSE, AND MY FIRST SIZING OF IT WAS WRONG BY TWO ORDERS.
+'
+' I counted `"long"' in the GENERATOR -- 232 sites, 175 distinct
+' string literals -- and reported the change as large.  **The
+' generated C does not contain those**: it declares every NUMBER
+' through ONE line of the generic header,
+'
+'     #define NUMBER long
+'
+' and the 232 are mostly the generator's own bookkeeping variables.
+' *Counting the thing that emits is not counting the thing emitted*,
+' and one look at the generated output settles in a second what the
+' grep got wrong.
+'
+' **BUT IT IS NOT ONE LINE EITHER, AND 6c IS WHY.**  The return type
+' of a FUNCTION is written as the bare word `long'
+' (`bacon.bac:2322', `g_FUNCTYPE$ = "long"'), not as NUMBER -- so
+' widening the define alone gives a MIXED build.  Measured on the
+' host, all three configurations:
+'
+'     NUMBER long,      returns long   ->  0 failures (the host)
+'     NUMBER int,       returns int    ->  3: 1b, 2a, 6c  (kencc)
+'     NUMBER long long, returns int    ->  1: 6c alone (the HALF-FIX)
+'
+' *The third line is the whole reason 6c exists*: without it a
+' half-fix and a whole one print the same thing.
+'
+' Upstream has no knob -- searched, because this tree has found "the
+' capability was already there" six times -- and no `long long' or
+' `int64_t' path for NUMBER anywhere.  **It is chicken's `C_word' a
+' second time**, and the parallel is exact down to the failure mode:
+' there `-DC_LLP' without `C_SIXTY_FOUR' gave a mixed build where
+' half the configuration took, and here the define without the return
+' type does the same.  The real change is that define plus the
+' function-type sites, and a sweep for anything else NUMBER-typed
+' that the generator spells `long' -- its own round, with a
+' regeneration and this file as its before-and-after.
+IF fail > 0 THEN
+    PRINT ""
+    PRINT "NOTE: 1b, 2a and 6c are EXPECTED to fail on APExp -- BaCon's"
+    PRINT "      NUMBER is a C `long' and kencc's `long' is 32 bits."
+    PRINT "      That is upstream's LP64 assumption, not a regression."
+    PRINT "      6c is the one that tells a HALF-fix from a whole one:"
+    PRINT "      widening the NUMBER define alone leaves FUNCTION return"
+    PRINT "      types at `long' and 6c alone still fails.  See the end"
+    PRINT "      of this file.  ANY OTHER failure above is real."
+END IF
 
 ' READ THE COUNT, NOT THE EXIT STATUS.  This directory's convention is
 ' to exit with the number of failures, and this file CANNOT: BaCon's
