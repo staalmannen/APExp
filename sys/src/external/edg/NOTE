@@ -1153,3 +1153,81 @@ cpfe whose target says so.  **And the second `offsetof' is the better
 evidence for that**: `module_id_ptr' is shifted by the same 8, so a
 hand-edit would have to find both, and the next one added would be
 wrong again.
+
+
+CONFIRMED ON THE VM, TO THE DIGIT, AND THE KNOB IS NAMED
+----------------------------------------------------------------
+
+	sizeof(long)                   = 4
+	sizeof(a_scope_pointers_block) = 168   (host 160)
+	sizeof(an_il_header)           = 184   (host 208)
+	orphaned_file_scope_il_entries: compiler 408  baked 400  MISMATCH
+	module_id_ptr:                  compiler 424  baked 416  MISMATCH
+	2 mismatch(es)
+
+**Every number in that output was written down before the run** --
+408, 424, 184, 168 and the uniform 8-byte shift -- and every one
+matched.  The two halves of the prediction were independent and both
+held: `an_il_header' 208 -> 184 is five `unsigned long' at 4 bytes
+instead of 8, exactly the 24 of 424-400, *so the fold did use kencc's
+`long' and the corpus is right about scalar widths*; and
+`a_scope_pointers_block' 160 -> 168 is the bit-field container.
+So the fault is located, it is one rule, and it is not the target
+configuration.
+
+AND IT IS NOT A LAYOUT PROBLEM THE REGISTRATION COULD HAVE SURVIVED:
+408 is where the orphan array was filed and 400 is `exported_template_file`,
+so the registration wrote the pointer over a DIFFERENT live member and
+left its own null.  The fault at `0x68` is the second of those two
+consequences; the first has not been looked for.
+
+**THE KNOB IS `TARG_MICROSOFT_BIT_FIELD_ALLOCATION`, and finding it
+reversed what this NOTE said one section ago.**  That section ended
+"the fix is a re-translation, not a patch", which is right, and then
+left the re-translation unspecified -- *a plan with no mechanism named
+is a plan that cannot be refuted*.  The mechanism:
+- `kencc_targ.h` sets **no bit-field variable at all**, so the
+  translation took EDG's defaults.
+- `targ_bit_field_container_size` is NOT it: upstream's own comment
+  says -1 means "use the base type given in the declaration", which
+  for `unsigned int x:1` is already a four-byte container -- and EDG
+  still started the following `char` at the next BYTE.  *The container
+  governs alignment and overflow, not whether the tail is shared*, so
+  reading that variable's name and stopping there would have been a
+  wasted round.
+- `targ_microsoft_bit_field_allocation` is the one that governs
+  sharing, **one of the eight shipped configurations already sets it**
+  (so it is a supported path rather than a dead switch), and it is a
+  `TARG_` macro rather than a command-line flag -- which is exactly
+  what a pre-included `kencc_targ.h` can set.
+
+**AND THE SCOPE IS THE WHOLE CORPUS RATHER THAN THIS STRUCT, which is
+the completeness half and was asked separately**: EDG emits explicit
+padding after EVERY bit-field group -- 33 of 33 in `src/il.c` with no
+exceptions, and 958 `__dummy[N]` members across 74 files.  So one rule
+decides all of them, and a regeneration under the right rule fixes the
+class rather than the two constants.  *Correctness and completeness
+are different properties, and the 47-of-97 probe is why that is now
+asked every time.*
+
+**SECTION 2 OF THE PROBE IS WHAT DECIDES IT, AND IT IS NOT YET RUN.**
+The identification "kencc's rule is MSVC's" is RECALLED, not measured,
+and a one-line change plus a 2.9M-line regeneration is too much to
+rest on a recollection.  So the probe asks pcc directly, in a form
+needing no rebuilt cpfe:
+
+	struct{unsigned x:1; char c;}       c at ?, sizeof ?
+	struct{unsigned a:3,b:5; char c;}   c at ?, sizeof ?
+
+	gcc / EDG today : 1, 4   (container shared)   <- host control, fires
+	MSVC            : 4, 8   (container closed)
+
+**4 and 8 means the knob is the fix.** Anything else means it is not,
+and the remaining option is kencc's own allocation under `-J` -- the
+non-conformance this tree records and deliberately left alone, whose
+cost `apeabi-probe` already exists to measure and which touches only
+five public APE headers.
+*Deliberately NOT written into the probe: what cpfe would emit under
+the knob.* Only a rebuilt cpfe can say, so a section asserting it
+would measure a guess; the probe asks the compiler in front of it
+about the rule instead.

@@ -196,10 +196,54 @@ struct a_translation_unit {
 	char **module_id_ptr;				/* baked 416 */
 };
 
+/*
+ * SECTION 2 -- WHICH published bit-field rule is kencc's?
+ *
+ * Section 1 says only THAT the two disagree.  This asks the question
+ * that decides what to do about it, and it is answerable by pcc alone.
+ *
+ * `a_scope_pointers_block' ends `unsigned x:1; char __dummy[7];' --
+ * EDG's own explicit tail padding, and EDG emits one after EVERY
+ * bit-field group in the corpus (33 of 33 in `src/il.c', no
+ * exceptions), so whatever rule governs this governs all of them.
+ * EDG lets the `char' share the unused tail of the bit field's
+ * container, which is what gcc does; kencc closes the container
+ * first.  **That second behaviour is MSVC's**, and EDG has a target
+ * variable for it -- `TARG_MICROSOFT_BIT_FIELD_ALLOCATION', which
+ * `kencc_targ.h' sets nowhere and which one of the eight shipped
+ * configurations already uses.  *It is a `TARG_' macro rather than a
+ * command-line flag*, so a pre-include can set it and a regeneration
+ * would then emit padding kencc agrees with.
+ *
+ * So the whole plan turns on one identification, and it is recalled
+ * rather than measured -- which is why it is asked here instead of
+ * assumed. **Do not write the expected emission into this probe**: a
+ * section that assumes what cpfe WOULD emit measures nothing, since
+ * only a rebuilt cpfe can say. Ask kencc what it does, and compare
+ * with the two published rules:
+ *
+ *   gcc / EDG today : c at 1, sizeof 4   (the container is shared)
+ *   MSVC            : c at 4, sizeof 8   (the container is closed)
+ *
+ * If pcc answers 4 and 8, kencc's rule IS the MSVC one, the knob is
+ * the right knob, and a one-line `kencc_targ.h' plus a regeneration
+ * fixes the class rather than the two constants.  **If it answers
+ * anything else the knob is NOT the fix** -- it would trade one
+ * mismatch for a different one -- and the remaining option is to
+ * change kencc's own allocation under `-J', which is the
+ * non-conformance this tree already records and deliberately left.
+ *
+ * The gcc control is the first column: the host must print 1 and 4,
+ * or this section is measuring something other than the rule.
+ */
+struct bf1 { unsigned x: 1; char c; };
+struct bf2 { unsigned a: 3; unsigned b: 5; char c; };
+
 extern int printf(const char *, ...);
 
 #define OFF(f) ((unsigned long)(unsigned long long) \
 	&((struct a_translation_unit *)0)->f)
+#define BOFF(t, f) ((unsigned long)(unsigned long long) &((struct t *)0)->f)
 
 int
 main(void)
@@ -236,5 +280,20 @@ main(void)
 	if (b != 416)
 		bad++;
 	printf("%d mismatch(es)\n", bad);
+
+	printf("\n-- section 2: which published bit-field rule is this? --\n");
+	printf("struct{unsigned x:1; char c;}        c at %lu, sizeof %lu\n",
+	    BOFF(bf1, c), (unsigned long)sizeof(struct bf1));
+	printf("struct{unsigned a:3,b:5; char c;}    c at %lu, sizeof %lu\n",
+	    BOFF(bf2, c), (unsigned long)sizeof(struct bf2));
+	printf("   gcc/EDG-today says 1,4 and 1,4    (container shared)\n");
+	printf("   MSVC says           4,8 and 4,8   (container closed)\n");
+	printf("   -> this compiler follows: %s\n",
+	    (BOFF(bf1, c) == 4 && BOFF(bf2, c) == 4) ? "MSVC -- "
+	    "TARG_MICROSOFT_BIT_FIELD_ALLOCATION is the knob"
+	    : (BOFF(bf1, c) == 1 && BOFF(bf2, c) == 1) ? "gcc/EDG -- "
+	    "then section 1 cannot have mismatched; re-read it"
+	    : "NEITHER -- the knob is not the fix, see the header");
+
 	return bad;
 }
