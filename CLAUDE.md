@@ -304,9 +304,14 @@ header -- it renames the SOURCE with `sed` into a temporary instead.
 `strtol`/`strtoul` cannot be swept at all here, because kencc's
 `long` is 32-bit and the host's is 64.
 `apeabi-probe.c` is a PROBE and is never run: it is compiled TWICE,
-`pcc -a` and `pcc -J -a`, and the DIFF of the two acid dumps names
-every APE struct whose layout `-J` moves. Take it before any
-tree-wide rebuild.
+`pcc -c -a` and `pcc -9 -c -a`, and the DIFF of the two acid dumps
+names every APE struct whose layout `-J` moves. Take it before any
+tree-wide rebuild. **Running it prints NOTHING and that is correct** --
+the output is the acid dump on stdout, not the program. **It now
+carries a BIT-FIELD section too**, for the second axis: there the two
+sides are two COMPILERS (HEAD's `pcc` against a patched one) with the
+same flags, and the `before` dump must be taken and kept first,
+because no flag asks for the old allocation afterwards.
 `structalign-test.c` measures `pcc -J`, conforming struct layout, and
 **needs three runs** -- gcc, then `pcc -DPLAN9` WITHOUT `-J` (which
 must fail ~12 checks), then with it. *The middle run is the control*:
@@ -2342,11 +2347,31 @@ live either way.
     exists to put APE on the model everything else uses.
     **Run `apeabi-probe` FIRST** -- the recorded rule for exactly this
     -- two compiles and an acid diff naming every struct that moves,
-    from the compiler itself, before an object is rebuilt. Five public
-    APE headers hold a bit field at all and only a group with a member
-    AFTER it moves anything; *but "looks small" is what the probe is
-    for, and `-J`'s own history is that the feared cost and the
-    measured cost were different sizes.*
+    from the compiler itself, before an object is rebuilt.
+  - **AND THE PROBE COULD NOT SEE THE CHANGE IT WAS BEING REACHED FOR:
+    ITS THIRTY-ONE HEADERS CONTAIN NOT ONE BIT FIELD.** The diff would
+    have come back EMPTY and an empty diff there reads exactly like a
+    change that costs nothing -- *the void-measurement shape this very
+    file records for the `pcc` that appended `-J` to both sides.* Four
+    headers added and a four-shape CONTROL beside them, so one dump
+    says which allocation rule the compiler in front of it follows.
+    **And the axis is two COMPILERS, not `-J` against `-9`**: the
+    bit-field line was never gated on `conformalign`, so after the
+    rebuild no flag asks for the old rule and the `before` dump must be
+    taken first or it is gone.
+  - **FOUR public APE headers hold a bit field, swept rather than
+    recalled, and only TWO move.** `resolv.h` (`ndots:4, nsort:4` then
+    `unsigned char unused[3]`) and `curl.h` (`includeSubDomains:1` then
+    `char expire[18]`) -- *both written expecting the shared container;
+    `__res_state` is glibc's own layout.* `fenv_arch.h` does NOT move
+    (an `int` cannot share a container with only 2 bytes left) and
+    `obstack.h` does not (the group is last). `iostream.h` was a false
+    hit of a looser grep. **The public headers are a LOWER BOUND**: the
+    change reaches every APE compile, and no acid dump of one
+    translation unit sees libap's own sources or `external/`.
+    *But "looks small" is what the probe is for, and `-J`'s own
+    history is that the feared cost and the measured cost were
+    different sizes.*
   - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
     the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
     is the **libsupc++/libc++abi layer** -- new/delete, vtables, RTTI,
