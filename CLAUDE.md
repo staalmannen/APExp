@@ -322,9 +322,21 @@ share the container's tail -- the only shape that moves. It **gates
 nothing**: EDG's 266 hits are the change's purpose, not its cost.
 `structalign-test.c` measures `pcc -J`, conforming struct layout, and
 **needs three runs** -- gcc, then `pcc -DPLAN9` WITHOUT `-J` (which
-must fail ~12 checks), then with it. *The middle run is the control*:
-a pass under `-J` alone cannot distinguish a working flag from a
-compiler that never had the bug.
+must fail **21** checks), then with it. *The middle run is the
+control*: a pass under `-J` alone cannot distinguish a working flag
+from a compiler that never had the bug. **Section 9 carries the four
+bit-field shapes, and the two that must NOT move are the valuable
+half** -- `bf_aligned` and `bf_trailing` agree with gcc under both
+rules, so either failing means a change did more than share a
+container's tail.
+**`sualign-model.py` is a host MODEL rather than a test**, and exists
+because kencc's own sources need Plan 9's `<u.h>`, so the first build
+of any `cc/` change is the VM's. It transcribes `sualign()`'s TSTRUCT
+arm under both rules and checks it against gcc. **Its control is
+`__res_state`**: it must reproduce `tmp/abi-bf-before.acid` -- the
+real pcc's real answer -- or it refuses to print anything, since a
+transcription that cannot reproduce the known answer is modelling some
+other compiler.
 `edgtuoff-probe.c` is a PROBE and asks ONE question: does the struct
 offset EDG folded into its generated C match the offset the compiler
 building that C computes? It is a **reduction** of
@@ -2417,9 +2429,45 @@ live either way.
     package-internal ones, one dead header, and EDG. *`-J`'s history
     was that the feared and measured costs were different sizes; this
     time they are the same size, and the measurement says so rather
-    than the expectation.* Next: `cc/sualign()`, the four shapes into
-    `structalign-test`, the after-dump (`aligned`/`trailing` identical
-    is the refutation condition), `mk distclean`, then cpfe.
+
+    than the expectation.*
+  - **AND `sualign()` IS PATCHED -- SIX LINES, gated on
+    `conformalign`.** Under `-J` a bit-field group no longer reserves
+    the whole `tfield` unit: `w` advances by `ceil((shift+nbits)/8)`
+    from the container's offset, so the next ordinary member sits in
+    what is left of it at its own alignment. Gated because native `6c`
+    links the host's own `libc.a`, which is the reason `-J` exists.
+  - **The sharing opens a hazard the old rule could not have, and it
+    is guarded**: `sub.c`'s `makedot` types a bit-field reference as
+    `tfield` itself, so every read and write of one is a whole 4-byte
+    access at the container -- and with the tail shared, `w` can stop
+    at `o+1`. **Under `#pragma pack on` that is a three-byte
+    over-WRITE past the end of the object**, since setting a bit field
+    is a read-modify-write. One line makes the width cover the last
+    container, and *the arithmetic rather than a measurement says it
+    is free elsewhere*: any struct with a bit field has `talign >= 4`,
+    `o` is a multiple of 4 and `w >= o+1`, so `Asu2` already rounds to
+    at least `o+4`. It can only bite where `packflg` took `talign` to 1.
+  - **AND THE MODEL REFUTED THE PATCH'S OWN COMMENT BEFORE THE VM SAW
+    IT.** I wrote that the `nw > w` guard was load-bearing because
+    kencc does not restart the container when an ordinary member sits
+    BETWEEN two bit fields -- and **`cc.y`'s `edecor: xdecor` arm does
+    `lastbit = 0; firstbit = 1;` for every ordinary declarator**, so
+    it does restart and the guard cannot fire today. *An almost-true
+    claim presented as verified is worse than none* -- the
+    `cmd/edg/mkfile` lesson, caught this time before the build rather
+    than after. The guard stays, marked DEFENSIVE: the invariant it
+    protects lives two files away.
+  - **Predicted, from the model, before the run**: `__res_state`
+    `unused` 368 -> **365**, `sort_list` 372 -> **368**, `sizeof`
+    456 -> **448** -- a drop of 8, not the 4 I first wrote, because
+    `dnsrch` is `char *[]` so `talign` is 8. `structalign-test` under
+    `-9` must fail **21** rather than 14. **Refutation conditions**:
+    `bf_aligned` or `bf_trailing` moving, any fourth name in the acid
+    diff, or a `-9` count that is not 21.
+  - Then: `cd sys/src/cmd && mk install`, the after-dump, `mk
+    distclean`, and cpfe.
+
   - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
     the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
     is the **libsupc++/libc++abi layer** -- new/delete, vtables, RTTI,
@@ -2683,6 +2731,32 @@ item -- *a port that builds and has never run is not a port*:
   under pcc.
   **The exit status is NOT the failure count** (BaCon's `END` takes no
   value, its `EXIT` leaves a SUB), so read the `N failures` line.
+  **AND THE VM RUN'S TWO FAILURES ARE 1b AND 2a, WHICH ARE THE
+  INVARIANT THE FILE EXISTS TO MEASURE RATHER THAN A REGRESSION.**
+  BaCon's NUMBER is a C `long` and kencc's is 32 bits, so a value past
+  2^31 wraps -- *and NUMBER is the only integer type a BaCon program
+  has*, so that is every arithmetic result in every program, not a
+  curiosity. They stay as FAILURES rather than becoming a probe:
+  demoting the loudest true thing the file measures would hide it.
+  The test now PRINTS the diagnosis beside the count.
+  **MY FIRST SIZING OF THE FIX WAS WRONG BY TWO ORDERS, and the
+  generated output settled it in one second where a grep had not.** I
+  counted `"long"` in the GENERATOR -- 232 sites, 175 distinct
+  literals -- and called the change large. The generated C contains
+  none of them: every NUMBER goes through **one** line,
+  `#define NUMBER long`, and the 232 are the generator's own
+  bookkeeping. *Counting the thing that emits is not counting the
+  thing emitted.*
+  **BUT IT IS NOT ONE LINE EITHER, AND THAT IS WHAT `6c` IS FOR.** A
+  FUNCTION's return type is written as the bare word `long`
+  (`bacon.bac:2322`), not as NUMBER, so widening the define alone is a
+  MIXED build -- **chicken's `C_LLP` without `C_SIXTY_FOUR`, exactly**.
+  Measured on the host in all three configurations: as generated **0**
+  failures; NUMBER and returns both `int` (kencc's shape) **3** --
+  1b, 2a, 6c; and the HALF-FIX, NUMBER widened with returns left
+  alone, **1 -- 6c alone**. *Without 6c a half-fix and a whole one
+  print the same thing.* **So the VM count becomes 3, and the third is
+  newly MEASURED rather than newly broken.**
   **AND THE RECIPE THIS FILE RECORDED WAS WRONG IN BOTH HALVES, which
   the first VM run said in one screen.**
   - **`-c cc`, not `-c pcc`.** bacon writes a `Makefile.bacon` naming
