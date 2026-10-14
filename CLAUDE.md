@@ -290,6 +290,21 @@ function that nothing in its include closure declares -- the missing
 prototype invariant in its RETURN-value form. Run it after adding
 files to libap; its limits are in its own header and it is a lower
 bound.
+**`rceq-sweep.py` is a host SWEEP and it GATES**: which mkfile RECIPE
+line hands rc a bare `=` that is not a leading assignment, and so
+cannot parse. Every hit is a recipe that cannot run -- unlike
+`ishadow-sweep`, there is no intent case. Run it after editing any
+mkfile recipe; its discriminator (a leading assignment is legal, and
+`if (cond) NAME=value` is a working precedent) is what keeps it from
+reporting 16 lines of which 11 are fine.
+**`initzero-test.c` asks whether a compound literal ZEROES the members
+its initialiser list leaves out** -- muon's crash, `*sb = (struct
+tstr){.flags=..,.buf=..,.cap=..}` with `.len` omitted and then used as
+a `memset` length. **Its storage is dirtied with 0xAA first and section
+0 checks that the poison arrived**, because against a zero destination
+every check passes for the wrong reason. Section 7 is muon's own
+reduction and is the one whose failure names a program rather than a
+rule.
 **`strerror-xcheck.py` is the second host SWEEP**, and it is a
 script for a reason the other xchecks do not have: **APE's errno
 NUMBERS are its own**, so libap's table and glibc's cannot be lined
@@ -2569,9 +2584,66 @@ live either way.
     and the after-count was re-taken with the before's exact
     commands* -- two compiles differing in anything but the change
     are not a control, which this file records from the `-J` round.
-- **muon** -- in `_OPTIONAL_APPS` commented out. Never built here.
-- **go** -- `go1.4` is in the tree, commented out of `_CORE_APPS`,
-  and is the only thing that mentions `Ureg` outside libap.
+- **muon** -- **IT BUILDS AND IT CRASHES BEFORE IT READS AN ARGUMENT,
+  AND THE STACK NAMES ONE STRUCT MEMBER.** `fault write
+  addr=0x7ffffff000` with `lstk()` giving `memset(c=0x0, n=0x29afb0)` <-
+  `tstr_clear` <- `path_basename` <- `main.c:1447`. **That memset is
+  2,731,952 bytes over a 1024-byte stack buffer**, and `tstr_clear` is
+  two statements -- `memset(sb->buf, 0, sb->len)` and `sb->len = 0`. So
+  `buf` was RIGHT (the memset reached a real address and walked off the
+  top of the stack rather than faulting at once) and exactly one member
+  is wrong: **`len`**.
+  **AND `len` IS THE ONE MEMBER C REQUIRES TO BE ZEROED.**
+  `tstr_init` (`src/lang/string.c:841`) ends `*sb = (struct tstr){
+  .flags = flags, .buf = initial_buffer, .cap = initial_buffer_cap };`
+  -- **`.len` and `.s` are OMITTED**, and C99 6.7.8p21 says an omitted
+  member is initialised as one with static storage duration would be.
+  *A compiler that writes only the named members into the destination
+  leaves `len` holding whatever was there*, which is the whole symptom
+  with nothing left over.
+  **`initzero-test.c` is the instrument, and NEITHER EXISTING TEST
+  COULD HAVE CAUGHT THIS.** `compound-literal-test` asks whether a
+  literal can be addressed, passed and written through -- every check
+  names a member it also initialises; `designated-init-test` asks which
+  member a DESIGNATOR lands on. **Neither asks about the GAPS, and
+  neither assigns a literal THROUGH A POINTER**, which is muon's form.
+  *Correctness and completeness again, the 47-of-97 lesson.*
+  **Its storage is DIRTIED with 0xAA first and section 0 checks that
+  the poison arrived**, because a compiler that writes only the named
+  members passes every check here against a zero destination -- and a
+  fresh frame usually is one. 0 failures on gcc; the broken behaviour
+  replicated beside it gives **3, naming exactly 1a, 1b and 7** and
+  printing a length of `0xAAAAAAAA`, the same shape as the VM's
+  `0x29afb0`. **NOT YET RUN UNDER pcc** -- that run is the measurement.
+  *The gcc sweep over the files muon builds was 0 errors in the classes
+  6c treats as fatal, and it has no 32-bit-`long` assumptions, so both
+  cheap classes were clean and this needed the crash.*
+- **go** -- **IT STOPPED ON THE FIRST FILE, AND `bool` IS A KEYWORD
+  HERE.** `a.h:5 syntax error, last name: bool` compiling `arm.c`:
+  `dist`'s own `typedef int bool;`, against `cc/lex.c:1751`'s
+  `"bool", LBOOL, 0` -- **unconditional in `itab`, so `bool` is a
+  keyword in every kencc dialect**, native and APE alike. C23 says the
+  same, so go1.4 is simply pre-C23 and `gcc -std=c2x` refuses the line
+  too. *This is the opposite of the recorded `syntax error, last name:
+  bool`, which was stock 9front's `6c` not knowing the word.*
+  **THE CLASS IS BOUNDED AND go IS ALONE IN IT.** Five
+  `typedef ... bool;` in `external/` and the other four -- bash,
+  PDCursesMod, curl, libzip -- are already behind `HAVE_C_BOOL`,
+  `__bool_true_false_are_defined`, `HAVE_STDBOOL_H` and `__hpux`.
+  go1.4's had no guard at all. *Sizing the class before fixing the
+  instance cost one command.*
+  **The capability is DECLARED by the build** (`-DHAVE_C_BOOL` in
+  `cmd/go/mkfile.bootstrap`, bash's own spelling) rather than sniffed
+  from a kencc predefine: keying it on `__APEXP_CONFORMALIGN__` would
+  tie `bool` to the struct-layout flag and take the typedef back under
+  `pcc -9`. Nothing in dist stores a non-boolean in one -- every
+  bool-returning function returns 0, 1 or a comparison, swept first.
+  **Host control, in the dialect that reproduces kencc**:
+  `gcc -std=c2x -fsyntax-only` over the nine portable files is
+  **7 errors before and 0 after**. `plan9.c` needs Plan 9's `u.h` and
+  is only measurable on the VM, and what stage two then does is beyond
+  the host entirely.
+  `go1.4` is still the only thing that mentions `Ureg` outside libap.
 
 **Ports built but never exercised**, which is a different and cheaper
 item -- *a port that builds and has never run is not a port*:
@@ -3156,6 +3228,31 @@ in the topic file.
   `LC_ALL = C.UTF-8` in `apexp-sh` is valid and always has been, so
   "no spaces" is a sh rule, not an rc one. A checker written from the
   sh habit flags those eight lines and is wrong.
+  **IT IS MEASURED NOW AND IT IS SWEPT FOR: `sys/lib/tests/rceq-sweep.py`,
+  and it GATES.** clisp's `if (test $name = lispbibl)` answered
+  `/rc/lib/rcmain:24 *eval*:4: token '=': syntax error` on the VM, which
+  closes the question `cmd/clisp/mkfile.runtime` had carried as unmeasured
+  -- *there is no rc on the build host*, so until that run the rule was a
+  recollection. **Three live breaks and one latent**: both clisp mkfiles,
+  the whole `--prefix=`/`--srcdir=` family on its configure line, and
+  `lib/ap/mkfile:63`'s `mk objtype=$objtype install`, which sits in an
+  `installall:V:` a normal build never reaches -- *an untriggered rule
+  gets no diagnostic from anyone*, for the second time after the
+  transpiler rules. 693 recipe lines, 0 now, and the control fires.
+  **AND mk NAMES THE WRONG LINE**, which is why this is a sweep and not
+  a reading: the failure was reported as
+  `mk: mkdir -p build-amd64 ...: exit status=rc: syntax error` -- mk
+  names a recipe by its FIRST line, and the fault was four lines down in
+  a file the message never mentions. *The message names the victim*, a
+  third time after the `lock.h` shadow and `cmd/mkfile:96`.
+  **`if (cond) NAME=value` IS LEGAL and is the sweep's discriminator**:
+  `libc/9syscall/mkfile`'s `if(~ $i seek) j=_seek` is a working
+  precedent, so a naive grep reports 16 lines of which 11 are that shape.
+  *And the sweep's own first run reported its own comments* -- rc treats
+  `#` as a comment too -- which is the cry-wolf failure caught before it
+  shipped. **Its root guard fired on the first run as well**, for
+  `ishadow-sweep`'s exact miss: `sys/lib/tests` is THREE levels below the
+  root and the file said two.
 
 **Testing**
 

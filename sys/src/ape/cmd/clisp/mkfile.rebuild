@@ -42,7 +42,14 @@ sources:V:
 	mkdir -p $BUILD
 	for (name in $DFILES) @{
 		src=$CLISPSRC/$name.d
-		if (test $name = lispbibl) {
+		# `~' rather than `test $name = lispbibl': `=' is a SYNTAX
+		# CHARACTER in rc, so a bare one in an ARGUMENT is a parse
+		# error.  MEASURED on the VM -- this exact line answered
+		# `/rc/lib/rcmain:24 *eval*:4: token '=': syntax error', and
+		# *eval*:4 is this line, since mk names a recipe by its first
+		# line (`mkdir -p build-amd64') rather than by the one that
+		# failed.
+		if (~ $name lispbibl) {
 			$BIN/comment5 $src | sed -e 's/^%% .*//' | $BIN/gctrigger | $BIN/varbrace > $BUILD/$name.c.tmp
 		} if not {
 			$BIN/comment5 $src | $BIN/gctrigger | $BIN/varbrace > $BUILD/$name.c.tmp

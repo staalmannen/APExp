@@ -37,11 +37,24 @@ BUILD=build-$objtype
 # precedent -- and an untriggered rule gets no diagnostic from anyone,
 # which this tree already records from the transpiler rules.
 #
-# *NOT MEASURED: there is no rc on the build host.* One command on the
-# VM settles it for both lines -- `mk -f mkfile.runtime configure'
-# reaching upstream's configure, or `token '=': syntax error'. If rc
-# does accept it, this quoting costs nothing and `lib/ap:63' is fine;
-# if it does not, that line is a second latent break.
+# **MEASURED NOW, AND rc REFUSES IT: `lib/ap:63' IS A REAL LATENT
+# BREAK.** The VM answered
+# `/rc/lib/rcmain:24 *eval*:4: token '=': syntax error' -- not on this
+# file, but on `mkfile.rebuild's `if (test $name = lispbibl)', whose
+# *eval*:4 matches to the digit. So the question this comment left open
+# is closed in the direction that costs something, and `lib/ap:63' is
+# fixed with it.
+#
+# AND THE MESSAGE NAMED THE WRONG FILE, which is why it is swept for
+# rather than read for. mk reported
+# `mk: mkdir -p build-amd64 ...: exit status=rc: syntax error' -- mk
+# names a recipe by its FIRST line, and the fault was four lines down
+# in a file the message never mentions. *The message names the victim*,
+# after the `lock.h' shadow and `cmd/mkfile:96'.
+#
+# `sys/lib/tests/rceq-sweep.py' is the instrument and it GATES: every
+# hit is a recipe that cannot run. It found these two files and
+# `lib/ap:63' and nothing else, over 693 recipe lines.
 
 # THE ARCHITECTURE MACRO, AND WITHOUT IT CLISP SELECTS NO CPU AT ALL.
 #
@@ -78,7 +91,7 @@ configure:V:
 	@{
 		root=`{cd $APEXPROOT; pwd}
 		srcroot=`{cd $CLISPSRC; pwd}
-		if (test $objtype = arm64 || test $objtype = spim) {
+		if (~ $objtype arm64 spim) {
 			echo 'CLISP upstream does not support the 9front '$objtype' target yet'
 			exit 1
 		}
@@ -102,8 +115,14 @@ configure:V:
 		}
 		mkdir -p $BUILD
 		cd $BUILD
+		# EVERY `--opt=value' IS BUILT BY CONCATENATION, for the same
+		# reason the `env' arguments are quoted: rc lexes `=' as a
+		# token wherever it is not a leading assignment, so a literal
+		# `--prefix=/foo' in a recipe never reaches configure -- it
+		# fails in the parser, before the command exists.
+		pfx=$root^/^$objtype
 		if (! test -f config.status) {
-			env 'CC=pcc' 'CPPFLAGS=-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION '^$ARCHDEF 'CFLAGS=-Fw -D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION '^$ARCHDEF sh $srcroot/configure . --srcdir=$srcroot --prefix=$root/$objtype --exec-prefix=$root/$objtype --bindir=$root/$objtype/bin/ape --libdir=$root/$objtype/lib/ape --localedir=$root/sys/lib/ape/locale --ignore-absence-of-libsigsegv --without-ffcall --without-readline --without-dynamic-modules --disable-nls
+			env 'CC=pcc' 'CPPFLAGS=-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION '^$ARCHDEF 'CFLAGS=-Fw -D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION '^$ARCHDEF sh $srcroot/configure . '--srcdir='^$srcroot '--prefix='^$pfx '--exec-prefix='^$pfx '--bindir='^$pfx^/bin/ape '--libdir='^$pfx^/lib/ape '--localedir='^$root^/sys/lib/ape/locale --ignore-absence-of-libsigsegv --without-ffcall --without-readline --without-dynamic-modules --disable-nls
 		}
 	}
 
@@ -115,7 +134,7 @@ install:V: build
 
 installall:V:
 	for (objtype in $CPUS) @{
-		if (test $objtype = arm64 || test $objtype = spim) {
+		if (~ $objtype arm64 spim) {
 			echo '---- clisp skipped for '$objtype' ----'
 		} if not {
 			mk $MKFLAGS install
