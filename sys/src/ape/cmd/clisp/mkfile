@@ -1,0 +1,43 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+# CLISP bootstrap stages:
+#   1. Build the source filters with the 9front C compiler.
+#   2. Generate editable C sources from the upstream *.d files.
+#   3. Configure and run CLISP's upstream GNU-make build on 9front. This
+#      compiles the runtime, compiles the Lisp sources, and builds the base
+#      image. install-bin places the launcher and runtime under this tree.
+
+bootstrap:V:
+	mk $MKFLAGS -f mkfile.bootstrap install
+
+# The parent sys/src/ape/cmd install.dir walks every app and calls its
+# install target. Keep the source-generation helpers available there.
+install:V:
+	mk $MKFLAGS -f mkfile.bootstrap install
+	mk $MKFLAGS -f mkfile.rebuild sources
+	mk $MKFLAGS -f mkfile.runtime install
+
+installall:V:
+	mk $MKFLAGS -f mkfile.bootstrap installall
+	mk $MKFLAGS -f mkfile.rebuild sources
+	mk $MKFLAGS -f mkfile.runtime installall
+
+sources:V:
+	mk $MKFLAGS bootstrap
+	mk $MKFLAGS -f mkfile.rebuild sources
+
+all:V:
+	mk $MKFLAGS sources
+
+clean:V:
+	mk $MKFLAGS -f mkfile.bootstrap clean
+	mk $MKFLAGS -f mkfile.rebuild clean
+	mk $MKFLAGS -f mkfile.runtime clean
+
+nuke:V:
+	mk $MKFLAGS -f mkfile.bootstrap nuke
+	mk $MKFLAGS -f mkfile.rebuild nuke
+	mk $MKFLAGS -f mkfile.runtime nuke
+

@@ -1,0 +1,32 @@
+#
+# configure.in - Input to autoconf for Oracle module
+#
+# This was originally created with autoscan
+#
+# $Id: configure.in,v 1.10 2009/09/13 05:18:19 sds Exp $
+#
+
+# Process this file with autoconf to produce a configure script.
+AC_INIT(oracle-clisp, 0.1, hin@alma.com)
+AC_CONFIG_SRCDIR(oracle.lisp)
+AC_CONFIG_HEADERS(config.h)
+
+RSE_BOLD
+BOLD_MSG([Oracle (Common)])
+CL_MODULE_COMMON_CHECKS([ffi])
+
+BOLD_MSG([Oracle (Programs)])
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+BOLD_MSG([Oracle (Headers)])
+AC_CHECK_HEADERS([stdlib.h string.h])
+
+BOLD_MSG([Oracle (Functions)])
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([strdup])
+
+BOLD_MSG([Oracle (Output)])
+AC_CONFIG_FILES([Makefile link.sh])
+AC_OUTPUT
+BOLD_MSG([Oracle (Done)])

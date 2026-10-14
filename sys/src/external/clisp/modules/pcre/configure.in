@@ -1,0 +1,35 @@
+dnl AUTOCONF configuration for PCRE
+dnl Copyright (C) 2003-2009 Sam Steingold <sds@gnu.org>
+dnl GNU GPL2
+
+AC_PREREQ(2.57)
+AC_INIT(pcre, 1.0, clisp-list)
+AC_CONFIG_SRCDIR(pcre.lisp)
+AC_CONFIG_HEADERS(config.h)
+
+RSE_BOLD
+BOLD_MSG([PCRE (Common)])
+CL_MODULE_COMMON_CHECKS()
+
+dnl Search for libpcre and define LIBPCRE, LTLIBPCRE and INCPCRE.
+AC_LIB_LINKFLAGS([pcre])
+
+BOLD_MSG([PCRE (Headers)])
+AC_CHECK_HEADERS(pcre.h pcre/pcre.h, break)
+if test "$ac_cv_header_pcre_h" = "no" -a "$ac_cv_header_pcre_pcre_h" = "no";
+then AC_MSG_ERROR([cannot find PCRE headers])
+fi
+
+BOLD_MSG([PCRE (Functions)])
+AC_LIB_APPENDTOVAR([LIBS], [$LIBPCRE])
+AC_SEARCH_LIBS(pcre_compile, pcre)
+if test "$ac_cv_search_pcre_compile" = "no"; then
+  AC_MSG_ERROR([cannot find PCRE library])
+fi
+AC_CHECK_FUNCS(pcre_get_stringnumber pcre_config pcre_dfa_exec)
+
+BOLD_MSG([PCRE (Output)])
+AC_CONFIG_FILES(Makefile link.sh)
+AC_OUTPUT
+
+BOLD_MSG([PCRE (Done)])

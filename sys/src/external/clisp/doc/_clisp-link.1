@@ -1,0 +1,352 @@
+'\" t
+.\"     Title: clisp-link
+.\"    Author: Bruno Haible <\m[blue]\fB\%http://www.haible.de/bruno/\fR\m[]>
+.\" Generator: DocBook XSL Stylesheets vsnapshot_8706 <http://docbook.sf.net/>
+.\"      Date: Last modified: 2010-07-07
+.\"    Manual: Platform: @PLATFORM@
+.\"    Source: CLISP 2.49
+.\"  Language: English
+.\"
+.TH "CLISP\-LINK" "1" "Last modified: 2010\-07\-07" "CLISP 2.49" "Platform: @PLATFORM@"
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+clisp-link \- link a new external module to \m[blue]\fB\fBCLISP\fR\fR\m[]\&\s-2\u[1]\d\s+2\&.
+.SH "SYNOPSIS"
+.HP \w'\fBclisp\-link\fR\ 'u
+\fBclisp\-link\fR [\fBcreate\fR] [\fB\fImodule\fR\fR] [\fB\fIfile\fR\fR...]
+.HP \w'\fBclisp\-link\fR\ 'u
+\fBclisp\-link\fR [\fBadd\fR] [\fB\fIsource\fR\fR] [\fB\fIdestination\fR\fR] [\fB\fImodule\fR\fR...]
+.HP \w'\fBclisp\-link\fR\ 'u
+\fBclisp\-link\fR [\fBrun\fR] [\fB\fIsource\fR\fR] [\fB\fImodule\fR\fR...]
+#ifdef DYNAMIC_MODULES
+.HP \w'\fBclisp\-link\fR\ 'u
+\fBclisp\-link\fR [\fBinstall\fR] [\fB\fImodule\fR\fR...]
+#endif
+.SH "DESCRIPTION"
+.PP
+This shell script operates on
+\m[blue]\fB\fBCLISP\fR\fR\m[]\&\s-2\u[1]\d\s+2
+module sets and
+linking sets:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBcreate\fRs new
+module sets out of source files
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBadd\fRs
+module sets to a
+linking set
+to produce a new
+linking set
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBrun\fRs
+\m[blue]\fB\fBCLISP\fR\fR\m[]\&\s-2\u[1]\d\s+2
+with
+module sets added
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fIOnly in \fR\fI\m[blue]\fB\fBCLISP\fR\fR\m[]\&\s-2\u[1]\d\s+2\fR\fI built \fR\fI\fBwithout\fR\fR\fI configure flag \fR\fI\fB\-\-without\-dynamic\-modules\fR\fR\fI\&.\fR
+.sp
+\fBinstall\fRs new
+module sets for general use
+.RE
+.SH "OPTIONS"
+.PP
+\fBcreate\fR
+.RS 4
+The command
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ \fBclisp\-link\fR \fBcreate\fR \fImodule\fR \fIfile\fR \&.\&.\&.
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+creates a
+module set
+in
+\fImodule\fR
+directory which refers (via symbolic links) to files
+\fIfile\fR\&.\&.\&. The files are expected to be modules of their own\&.
+.RE
+.PP
+\fBadd\fR
+.RS 4
+The command
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ \fBclisp\-link\fR \fBadd\fR \fIsource\fR \fIdestination\fR \fImodule\fR \&.\&.\&.
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+combines the
+linking set
+in directory
+\fIsource\fR
+and the
+modules in directories
+\fImodule\fR\&.\&.\&. to a new
+linking set, in the directory
+\fIdestination\fR
+which is newly created\&.
+.RE
+.PP
+\fBrun\fR
+.RS 4
+The command
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ \fBclisp\-link\fR \fBrun\fR \fIsource\fR \fImodule\fR \&.\&.\&.
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+runs the
+linking set
+in directory
+\fIsource\fR, with the
+modules in directories
+\fImodule\fR\&.\&.\&. Unless
+\m[blue]\fB\fBCLISP\fR\fR\m[]\&\s-2\u[1]\d\s+2
+has been built with the configuration option
+\fB\-\-without\-dynamic\-modules\fR, the loading will be performed using
+\fBSYS::DYNLOAD\-MODULES\fR\&. Otherwise \- this is much slower \- a temporary
+linking set
+will be created and deleted afterwards\&.
+.RE
+#ifdef DYNAMIC_MODULES
+.PP
+\fBinstall\fR
+.RS 4
+\fIOnly in \fR\fI\m[blue]\fB\fBCLISP\fR\fR\m[]\&\s-2\u[1]\d\s+2\fR\fI built \fR\fI\fBwithout\fR\fR\fI configure flag \fR\fI\fB\-\-without\-dynamic\-modules\fR\fR\fI\&.\fR
+.sp
+The command
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ \fBclisp\-link\fR \fBinstall\fR \fImodule\fR \&.\&.\&.
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+installs the
+modules in directories
+\fImodule\fR\&.\&.\&. into
+\fICUSTOM:*LIB\-DIRECTORY*\fR
+or, if it is not writable to the user (e\&.g\&., if a system\-wide
+\m[blue]\fB\fBCLISP\fR\fR\m[]\&\s-2\u[1]\d\s+2
+installation is used and the user does not have administrative privileges), into
+\fICUSTOM:*USER\-LIB\-DIRECTORY*\fR\&.
+.sp
+Variable
+\fICUSTOM:*USER\-LIB\-DIRECTORY*\fR
+is initially set to
+(\m[blue]\fB\fBMERGE\-PATHNAMES\fR\fR\m[]\&\s-2\u[2]\d\s+2 "\&.clisp/" (\m[blue]\fB\fBUSER\-HOMEDIR\-PATHNAME\fR\fR\m[]\&\s-2\u[3]\d\s+2))
+if that directory exists, and can be reset in the
+RC file\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+Do
+\fBnot\fR
+add
+\fICUSTOM:*USER\-LIB\-DIRECTORY*\fR
+to
+\fICUSTOM:*LOAD\-PATHS*\fR
+or under any element thereof\&. Use
+\fBREQUIRE\fR
+instead of
+\fBLOAD\fR
+to load dynamic modules\&.
+.sp .5v
+.RE
+For this command to work, each
+\fImodule\fR
+directory must contain a
+Makefile
+with a
+\fBclisp\-module\-distrib\fR
+target which uses
+\fBLN\fR
+to distribute the files necessary to run the module into
+\fBdestdir\fR\&. This is in addition to the general requirement that
+\fBlink\&.sh\fR
+is present\&.
+.RE
+#endif
+.SH "EXAMPLES"
+.PP
+See
+Section\ \&32.2.6, \(lqExample\(rq\&.
+.SH "FILES"
+.PP
+\fBclisp\-link\fR
+needs a
+\(lqlink kit\(rq
+directory containing:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+"modules\&.c"
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+"clisp\&.h"
+.RE
+.sp
+
+\fBclisp\-link\fR
+expects to find these files in a subdirectory
+linkkit/
+of the installation directory (i\&.e\&.,
+\fICUSTOM:*LIB\-DIRECTORY*\fR) which it acquires by running
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ `dirname $0`/clisp \fB\-b\fR
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+This can be overridden by the
+\m[blue]\fBenvironment variable\fR\m[]\&\s-2\u[4]\d\s+2
+\fBCLISP_LINKKIT\fR\&.
+.SH "SEE ALSO"
+.PP
+.RS 4
+CLISP impnotes
+.RE
+.RS 4
+clisp(1)
+.RE
+.SH "AUTHORS"
+.PP
+\fBBruno Haible\fR <\&\m[blue]\fB\%http://www.haible.de/bruno/\fR\m[]\&>
+.RS 4
+The original author and long\-time maintainer\&.
+.RE
+.PP
+\fBMichael Stoll\fR <\&\m[blue]\fB\%http://www.faculty.iu-bremen.de/mstoll/\fR\m[]\&>
+.RS 4
+The original author\&.
+.RE
+.PP
+\fBSam Steingold\fR <\&\m[blue]\fB\%http://sds.podval.org/\fR\m[]\&>
+.RS 4
+Co\-maintainer since 1998\&.
+.RE
+.PP
+\fBOthers\fR
+.RS 4
+See \fICOPYRIGHT (file in the CLISP sources) \fR for the list of other contributors and the license\&.
+.RE
+.SH "COPYRIGHT"
+.br
+Copyright \(co 1992-2010 Bruno Haible
+.br
+Copyright \(co 1998-2010 Sam Steingold
+.br
+.SH "NOTES"
+.IP " 1." 4
+\fBCLISP\fR
+.RS 4
+\%http://clisp.cons.org
+.RE
+.IP " 2." 4
+\fBMERGE-PATHNAMES\fR
+.RS 4
+\%http://www.ai.mit.edu/projects/iiip/doc/CommonLISP/HyperSpec/Body/fun_merge-pathnames.html
+.RE
+.IP " 3." 4
+\fBUSER-HOMEDIR-PATHNAME\fR
+.RS 4
+\%http://www.ai.mit.edu/projects/iiip/doc/CommonLISP/HyperSpec/Body/fun_user-homedir-pathname.html
+.RE
+.IP " 4." 4
+environment variable
+.RS 4
+\%[set $man.base.url.for.relative.links]/basedefs/xbd_chap08.html
+.RE

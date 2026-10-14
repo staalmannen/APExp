@@ -1,0 +1,52 @@
+dnl AUTOCONF configuration for libsvm
+dnl Sam Steingold 2010
+
+AC_PREREQ(2.57)
+AC_INIT(libsvm, 1.0, clisp-list)
+AC_CONFIG_SRCDIR(libsvm.lisp)
+AC_CONFIG_HEADERS(config.h)
+
+RSE_BOLD
+BOLD_MSG([LibSVM (Common)])
+CL_MODULE_COMMON_CHECKS([ffi])
+
+dnl Search for libsvm and define LIBSVM, LTLIBSVM and INCSVM.
+AC_LIB_LINKFLAGS([svm])
+
+BOLD_MSG([LibSVM (Headers)])
+AC_SUBST(LIBSVM_CFLAGS)
+AC_SUBST(LIBSVM_LIBS)
+AC_CHECK_HEADERS(svm.h)
+if test "$ac_cv_header_svm_h" = "no"; then
+  AC_MSG_ERROR([cannot find LibSVM headers])
+fi
+
+BOLD_MSG([LibSVM (Functions)])
+AC_LIB_APPENDTOVAR([LIBS], [$LIBSVM])
+AC_SEARCH_LIBS(svm_train, svm)
+if test "$ac_cv_search_svm_train" = "no"; then
+  AC_MSG_ERROR([cannot find LibSVM library])
+fi
+AC_CHECK_FUNCS(svm_check_parameter dnl
+svm_check_probability_model dnl
+svm_cross_validation dnl
+svm_destroy_model dnl
+svm_destroy_param dnl
+svm_get_labels dnl
+svm_get_nr_class dnl
+svm_get_svm_type dnl
+svm_get_svr_probability dnl
+svm_load_model dnl
+svm_predict dnl
+svm_predict_probability dnl
+svm_predict_values dnl returns a float sice 2.91
+svm_save_model dnl
+svm_train dnl
+svm_set_print_string_function dnl since 2.91
+)
+
+BOLD_MSG([Libsvm (Output)])
+AC_CONFIG_FILES(Makefile link.sh)
+AC_OUTPUT
+
+BOLD_MSG([Libsvm (Done)])

@@ -1,0 +1,4 @@
+This directory contains a CLISP add-on module for calling various POSIX
+functions which do not have good CL counterparts.
+It relies on the system libc or GNU gnulib.
+This is a "base" module, normally present in all CLISP linking sets.

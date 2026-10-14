@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl"
+  href="http://docbook.sf.net/release/xsl/current/manpages/docbook.xsl"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V@DTDVER@//EN"
+          "@DTD@" [
+  <!ENTITY % cl-entities SYSTEM "cl-ent.xml">
+  %cl-entities;
+  <!ENTITY % imp-entities SYSTEM "impent.xml">
+  %imp-entities;
+  <!ENTITY % unix-entities SYSTEM "unix-ent.xml">
+  %unix-entities;
+  <!ENTITY opt-create '<option><link linkend="opt-create">create</link></option>'>
+  <!ENTITY opt-add '<option><link linkend="opt-add">add</link></option>'>
+  <!ENTITY opt-run '<option><link linkend="opt-run">run</link></option>'>
+]>
+
+<refentry id="clisp-link">
+
+<refentryinfo>
+ <title>&clisp-link; version @VERSION@</title>
+ <subtitle>Platform: @PLATFORM@</subtitle>
+ <date>Last modified: @TODAY@</date>
+ <productnumber>@VERSION@</productnumber>
+ <productname>CLISP</productname>
+ &clisp-authors; &clisp-doc-copyright;
+ <abstract id="clisp-abstract"><para>This document describes an
+   auxiliary program for &gnu; &clisp;.</para>
+  &clisp-bugs-and-support;</abstract>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle>clisp-link</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source-name">Manipulate &clisp; &modset;s and
+ &linkset;s.</refmiscinfo>
+<refmiscinfo class="manual">Platform: @PLATFORM@</refmiscinfo>
+</refmeta>
+
+<refnamediv id="summary">
+<refname>clisp-link</refname>
+<refpurpose>link a new external &module; to &clisp;.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv id="synopsis">
+ <cmdsynopsis><command>clisp-link</command> <arg>&opt-create;</arg>
+  <arg><option>&mod-r;</option></arg>
+  <arg rep="repeat"><option>&file-r;</option></arg></cmdsynopsis>
+ <cmdsynopsis><command>clisp-link</command> <arg>&opt-add;</arg>
+  <arg><option>&source-r;</option></arg><arg><option>&dest-r;</option></arg>
+  <arg rep="repeat"><option>&mod-r;</option></arg></cmdsynopsis>
+ <cmdsynopsis><command>clisp-link</command> <arg>&opt-run;</arg>
+  <arg><option>&source-r;</option></arg>
+  <arg rep="repeat"><option>&mod-r;</option></arg></cmdsynopsis>
+<!-- #ifdef DYNAMIC_MODULES -->
+ <cmdsynopsis><command>clisp-link</command> <arg>&opt-install;</arg>
+  <arg rep="repeat"><option>&mod-r;</option></arg></cmdsynopsis>
+<!-- #endif -->
+</refsynopsisdiv>
+
+<refsection id="description"><title>Description</title>
+
+<para>This shell script operates on &clisp; &modset;s and &linkset;s:
+ <itemizedlist><listitem><simpara>&opt-create;s new &modset;s out of
+    source files</simpara></listitem>
+  <listitem><simpara>&opt-add;s &modset;s to a &linkset; to produce a
+    new &linkset;</simpara></listitem>
+  <listitem><simpara>&opt-run;s &clisp; with &modset;s added
+  </simpara></listitem>
+<!-- #ifdef DYNAMIC_MODULES -->
+  <listitem><simpara>&dynmod-only;</simpara>
+   <simpara>&opt-install;s new &modset;s for general use</simpara></listitem>
+<!-- #endif -->
+</itemizedlist></para>
+</refsection>
+
+<refsection id="options"><title>Options</title>
+
+<variablelist>
+<varlistentry id="opt-create"><term>&opt-create;</term>
+ <listitem><para>The command
+   <screen>&sh-prompt; &clisp-link; &opt-create; &mod-r; &file-r; ...</screen>
+   creates a &modset; in &mod-r; directory which refers
+   (via symbolic links) to files &file-r;...
+   The files are expected to be modules of their own.
+</para></listitem></varlistentry>
+
+<varlistentry id="opt-add"><term>&opt-add;</term>
+ <listitem><para>The command
+   <screen>&sh-prompt; &clisp-link; &opt-add; &source-r; &dest-r; &mod-r; ...</screen>
+   combines the &linkset; in directory &source-r; and the &module;s in
+   directories &mod-r;... to a new &linkset;, in the directory &dest-r;
+   which is newly created.</para></listitem></varlistentry>
+
+<varlistentry id="opt-run"><term>&opt-run;</term>
+ <listitem><para>The command
+   <screen>&sh-prompt; &clisp-link; &opt-run; &source-r; &mod-r; ...</screen>
+   runs the &linkset; in directory &source-r;, with the &module;s
+   in directories &mod-r;...
+   Unless &clisp; has been built with the configuration option
+   &without-dynmod;, the loading will be performed using &mod-dynload;.
+   Otherwise - this is much slower - a temporary &linkset; will be created
+   and deleted afterwards.</para></listitem></varlistentry>
+
+<!-- #ifdef DYNAMIC_MODULES -->
+<varlistentry id="opt-install"><term>&opt-install;</term>
+ <listitem><simpara>&dynmod-only;</simpara><para>The command
+   <screen>&sh-prompt; &clisp-link; &opt-install; &mod-r; ...</screen>
+   installs the &module;s in directories &mod-r;... into &libdir; or, if
+   it is not writable to the user (e.g., if a system-wide &clisp;
+   installation is used and the user does not have administrative privileges),
+   into <firstterm>&user-libdir;</firstterm>.</para>
+  <para>Variable &user-libdir; is initially set to
+   <code>(&merge-pathnames; ".clisp/" (&user-homedir-pathname;))</code>
+   if that directory exists, and can be reset in the &RC-file;.</para>
+  <note><para>Do &not-e; add &user-libdir; to &load-paths; or under any
+    element thereof.  Use &require-my; instead of &load-my; to load
+    dynamic modules.</para></note>
+  <simpara>For this command to work, each &mod-r; directory must
+   contain a &make-file; with a <command>clisp-module-distrib</command>
+   target which uses <envar>LN</envar> to distribute the files necessary
+   to run the module into <envar>destdir</envar>. This is in addition to
+   the general requirement that &link-sh; is present.</simpara>
+</listitem></varlistentry>
+<!-- #endif -->
+
+</variablelist>
+
+</refsection>
+
+<refsection id="examples"><title>Examples</title>
+
+<para>See <olink targetdoc="impnotes" targetptr="mod-set-example"/>.</para>
+
+</refsection>
+
+<refsection id="files"><title>Files</title>
+
+<para>&clisp-link; needs a <quote>link kit</quote> directory containing:
+ <itemizedlist>
+  <listitem><simpara><filename>"modules.c"</filename></simpara></listitem>
+  <listitem><simpara>&clisp-h;</simpara></listitem>
+ </itemizedlist> &clisp-link; expects to find these files in a
+ subdirectory <filename>linkkit/</filename> of the installation directory
+ (i.e., &libdir;) which it acquires by running
+ <screen>&sh-prompt; `dirname $0`/clisp &opt-b;</screen>
+ This can be overridden by the &env-var; <envar>CLISP_LINKKIT</envar>.
+</para>
+
+</refsection>
+
+<refsection id="see-also"><title>See also</title>
+
+<para><simplelist>
+  <member><olink targetdoc="impnotes"/></member>
+  <member><olink targetdoc="man"/></member>
+</simplelist></para>
+
+</refsection>
+
+</refentry>

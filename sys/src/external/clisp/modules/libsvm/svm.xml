@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section id="libsvm"><title>LibSVM Interface</title>
+
+<para>This is an &ffi-pac;-based interface to &libsvm-link;.</para>
+
+<para>The package <quote role="package">LIBSVM</quote> is &case-sensitive-k;,
+ and you do not need the <function>svm_</function> prefix.</para>
+
+<simpara>When this module is present, &features-my;
+ contains the symbol <constant>:LIBSVM</constant>.</simpara>
+
+<para>See <filename role="clisp-cvs">modules/libsvm/test.tst</filename>
+ for sample usage.</para>
+
+<section id="libsvm-types"><title>Types</title>
+<para>All data is kept on the &c-lang; side as much as possible, so
+ these foreign types do &not-e; have a &clos; counterpart.</para>
+<variablelist>
+ <varlistentry><term><type>node</type></term>
+  <listitem><simpara>Corresponds to <type>svm_node</type>, represented
+    as a &list-t; on the lisp side.</simpara></listitem></varlistentry>
+ <varlistentry><term><type>problem</type></term>
+  <listitem><simpara>Corresponds to <type>svm_problem</type>, represented
+    as a &list-t; on the lisp side.</simpara></listitem></varlistentry>
+ <varlistentry><term><type>parameter</type></term>
+  <listitem><simpara>Corresponds to <type>svm_parameter</type>, represented
+    as a &vector-t; on the lisp side.</simpara></listitem></varlistentry>
+ <varlistentry><term><type>model</type></term>
+  <listitem><simpara>Corresponds to <type>svm_model</type>, an opaque
+    &foreign-pointer-t;.</simpara></listitem></varlistentry>
+</variablelist>
+</section>
+
+<section id="libsvm-functions"><title>Functions</title>
+
+<section id="libsvm-functions-problem">
+ <title>Functions related to <type>problem</type></title>
+<variablelist>
+ <varlistentry><term><code>(problem-l &problem-r;)</code></term>
+  <listitem><simpara>Return the number of rows in the &problem-r; (a
+    &foreign-variable-t;)</simpara></listitem></varlistentry>
+ <varlistentry><term><code>(problem-y &problem-r;
+    &optional-amp; (&len-r; (problem-l &problem-r;)))</code></term>
+  <listitem><simpara>Return a <literal role="type">(&vector-t;
+    &double-float-t; &len-r;)</literal> representing the targets in the
+    &problem-r; (a &foreign-variable-t;).</simpara></listitem></varlistentry>
+ <varlistentry><term><code>(problem-y-n &problem-r;
+    &n-r; &optional-amp; (&len-r; (problem-l &problem-r;))))</code></term>
+  <listitem><simpara>Return the &double-float-t; representing the &n-r;th
+    target in the &problem-r; (a &foreign-variable-t;).
+ </simpara></listitem></varlistentry>
+ <varlistentry><term><code>(problem-x &problem-r;
+    &optional-amp; (&len-r; (problem-l &problem-r;)))</code></term>
+  <listitem><simpara>Return a <literal role="type">(&vector-t; (&vector-t;
+     node) &len-r;)</literal> representing the predictors in the &problem-r;
+    (a &foreign-variable-t;).</simpara></listitem></varlistentry>
+ <varlistentry><term><code>(problem-x-n &problem-r;
+    &n-r; &optional-amp; (&len-r; (problem-l &problem-r;))))</code></term>
+  <listitem><simpara>Return the <literal role="type">(&vector-t; node)</literal>
+    representing the &n-r;th set of predictors in the &problem-r; (a
+    &foreign-variable-t;).</simpara></listitem></varlistentry>
+ <varlistentry><term><code>(make-problem &key-amp; &l-r; &y-r;
+    &x-r;)</code></term>
+  <listitem><simpara>Allocate a &foreign-variable-t; representing
+    a <type>model</type>.</simpara></listitem></varlistentry>
+ <varlistentry><term><code>(destroy-problem &problem-r;)</code></term>
+  <listitem><simpara>Release the memory taken by the <type>problem</type>
+    object and invalidate the &foreign-variable-t; &problem-r;.</simpara>
+   <warning><simpara>You &must-e; call this function yourself, but only
+     &after-e; deallocating all <type>model</type> objects trained from
+     this &problem-r;.</simpara></warning></listitem></varlistentry>
+ <varlistentry><term><code>(load-problem &filename-r; &key-amp;
+    (&log-r; &standard-output-var;))</code></term>
+  <listitem><simpara>Read a <type>problem</type> from a file in the
+    libsvm/svmlight format. Return two values: the <type>problem</type>
+    and max index (i.e., the number of columns).</simpara>
+   <simpara>Messages go to &log-r;.</simpara>
+ </listitem></varlistentry>
+ <varlistentry><term><code>(save-problem &filename-r; &problem-r;
+    &key-amp; (&log-r; &standard-output-var;))</code></term>
+  <listitem><simpara>Write a <type>problem</type> into a file.</simpara>
+   <simpara>Messages go to &log-r;.</simpara>
+ </listitem></varlistentry>
+</variablelist>
+</section>
+
+<section id="libsvm-functions-model">
+ <title>Functions related to <type>model</type></title>
+<variablelist>
+ <varlistentry><term><code>(destroy-model &model-r;)</code></term>
+  <listitem><simpara>Release the memory taken by the <type>model</type>
+    object and invalidate the &foreign-variable-t; &model-r;.</simpara>
+   <simpara>Calls <function>svm_destroy_model</function>.</simpara>
+   <simpara>You do &not-e; have to call this function yourself, it is
+    attached to the &model-r; by <function>train</function>
+    and <function>load-model</function> via &finalize;.</simpara>
+ </listitem></varlistentry>
+ <varlistentry><term><code>(check-parameter &problem-r; &param-r;)</code></term>
+  <listitem><simpara>Check if the &param-r; is appropriate for the
+    &problem-r;.</simpara>
+   <simpara>Calls <function>svm_check_parameter</function>.</simpara>
+ </listitem></varlistentry>
+ <varlistentry><term><code>(train &problem-r; &param-r;)</code></term>
+  <listitem><simpara>Train a <type>model</type>.</simpara>
+   <simpara>Calls <function>svm_train</function>
+    and <function>check-parameter</function>.</simpara>
+ </listitem></varlistentry>
+ <varlistentry><term><code>(cross-validation &problem-r; &param-r;
+    &n-r;)</code></term>
+  <listitem><simpara>Run &n-r;-fold cross-validation.</simpara>
+   <simpara>Calls <function>svm_cross_validation</function>
+    and <function>check-parameter</function>.</simpara>
+ </listitem></varlistentry>
+ <varlistentry><term><code>(save-model &filename-r; &model-r;)</code></term>
+  <listitem><simpara>Write a <type>model</type> into a file.</simpara>
+   <simpara>Calls <function>svm_save_model</function>.</simpara>
+ </listitem></varlistentry>
+ <varlistentry><term><code>(load-model &filename-r;)</code></term>
+  <listitem><simpara>Read a <type>model</type> from a file.</simpara>
+   <simpara>Calls <function>svm_load_model</function>.</simpara>
+ </listitem></varlistentry>
+ <varlistentry><term><code>(get-svm-type &model-r;)</code></term>
+  <listitem><simpara>Call <function>svm_get_svm_type</function>.
+ </simpara></listitem></varlistentry>
+ <varlistentry><term><code>(get-nr-class &model-r;)</code></term>
+  <listitem><simpara>Call <function>svm_get_nr_class</function>.
+ </simpara></listitem></varlistentry>
+ <varlistentry><term><code>(get-labels &model-r;)</code></term>
+  <listitem><simpara>Call <function>svm_get_labels</function>.
+ </simpara></listitem></varlistentry>
+ <varlistentry><term><code>(get-svr-probability &model-r;)</code></term>
+  <listitem><simpara>Call <function>svm_get_svr_probability</function>.
+ </simpara></listitem></varlistentry>
+ <varlistentry><term><code>(predict-values &model-r; &x-r;)</code></term>
+  <listitem><simpara>Return the decision values
+    (a <literal role="type">(&vector-t; &double-float-t;)</literal>) given
+    by &model-r; for &x-r; (a <literal role="type">(&vector-t; node)</literal>).
+   </simpara><simpara>Calls <function>svm_predict_values</function>.</simpara>
+ </listitem></varlistentry>
+ <varlistentry><term><code>(predict &model-r; &x-r;)</code></term>
+  <listitem><simpara>Call <function>svm_predict</function>.
+ </simpara></listitem></varlistentry>
+ <varlistentry><term><code>(predict-probability &model-r; &x-r;)</code></term>
+  <listitem><simpara>Call <function>svm_predict_probability</function>.
+ </simpara></listitem></varlistentry>
+ <varlistentry><term><code>(check-probability-model &model-r;)</code></term>
+  <listitem><simpara>Call <function>svm_check_probability_model</function>.
+ </simpara></listitem></varlistentry>
+ </variablelist>
+</section>
+
+<section id="libsvm-functions-parameter">
+ <title>Functions related to <type>parameter</type></title>
+<variablelist>
+ <varlistentry><term><code>(destroy-parameter &param-r;)</code></term>
+  <listitem><simpara>Release the memory taken by the <type>parameter</type>
+    object and invalidate the &foreign-variable-t; &param-r;.</simpara>
+   <simpara>Does &not-e; call <function>svm_destroy_param</function>.</simpara>
+   <simpara>You do &not-e; have to call this function yourself, it is
+    attached to the &param-r; by <function>make-parameter</function>
+    via &finalize;.</simpara></listitem></varlistentry>
+ <varlistentry><term><code>(make-parameter &key-amp; :v svm_type
+    kernel_type degree gamma coef0 cache_size eps C nr_weight
+    weight_label weight nu p shrinking probability)</code></term>
+  <listitem><simpara>Allocates a new &foreign-variable-t; of
+    type <type>parameter</type> with the supplied slots.</simpara>
+   <simpara>The defaults come from vector &v-r; (such as returned
+    by <code>(&foreign-value; &param-r;)</code>), if supplied, providing
+    an easy way to copy &param-r;s, otherwise the defaults
+    for <command>svm-train</command> are used.</simpara>
+ </listitem></varlistentry>
+ <varlistentry><term><code>(parameter-alist &param-r;)</code></term>
+  <listitem><simpara>Return the &alist; representing &param-r;.
+ </simpara></listitem></varlistentry>
+</variablelist>
+</section>
+</section>
+</section>

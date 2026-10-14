@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section id="gtk"><title>GTK Interface</title>
+
+<para>This is an &ffi-pac;-based interface to &gtk; version 2.</para>
+
+<para>The package <quote role="package">GTK</quote>
+ is &case-sensitive-k;.</para>
+
+<simpara>When this module is present, &features-my;
+ contains the symbol <constant>:GTK</constant>.</simpara>
+
+<section id="gtk-hi"><title>High-level functions</title>
+<variablelist>
+  <varlistentry><term><code>(glade-load &filename-r;)</code></term>
+  <listitem><simpara>Load and connect the UI described in the
+    &glade;-generated file &filename-r;.</simpara></listitem></varlistentry>
+ <varlistentry><term><code>(run-glade-file &filename-r; &name-r;)</code></term>
+  <listitem><simpara>Run the widget &name-r; described in the
+    &glade;-generated file &filename-r;.</simpara></listitem></varlistentry>
+ <varlistentry><term><code>(gui &filename-r;)</code></term>
+  <listitem><simpara>Run the &clisp; demo GUI described in the
+    &glade;-generated file &filename-r;, normally a variation
+    of <filename role="clisp-cvs">modules/gtk2/ui.glade</filename>.
+ </simpara></listitem></varlistentry>
+</variablelist>
+</section>
+
+</section>

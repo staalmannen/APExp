@@ -1,0 +1,763 @@
+#! /bin/sh
+# Usage: configure [options] [dirname [cc]]
+# Examples:
+#   configure obj
+#   CC=gcc configure make.gcc
+#   CC=cc configure make.cc
+#   configure make.gcc gcc     (deprecated)
+#   configure make.cc cc       (deprecated)
+
+# we source config.cache, therefore this file must be executed by the
+# same shell as executes sub-configures.
+# this is a real problem on such systems as Solaris if CONFIG_SHELL is
+# bash whose config.cache cannot be loaded by /bin/sh
+if test -n "${CONFIG_SHELL}"; then
+  # ensure that CONFIG_SHELL is compatible with /bin/sh:
+  # if CONFIG_SHELL is bash, but /bin/sh is not, restart with bash
+  if test -n "`${CONFIG_SHELL} --version 2>/dev/null | grep bash 2>/dev/null`"
+  then # CONFIG_SHELL is bash
+    test -n "${BASH_VERSION}" || exec ${CONFIG_SHELL} $0 $*
+  fi
+else CONFIG_SHELL=/bin/sh
+fi
+
+fail () { echo "$*" >&2; exit 1; }
+
+info_help () {
+cat << \EOP
+Usage: configure [options] [dirname]
+dirname: Name of directory in which to build CLISP. This allows you to build
+         CLISP with different compilers on the same machine or for different
+         architectures in the same filesystem, sharing the same source.
+         Default is "src".
+options: The following options are recognized:
+  --help                print this message and exit
+  --version             print the CLISP version and exit
+  --config              unix/INSTALL step 3: configuration only
+  --cbc                 unix/INSTALL steps 3-8: Configure, Build, Check
+ The following options set installation parameters:
+  --srcdir=SRCDIR       sets the source directory to SRCDIR
+ The following options are passed to subordinate `configure' scripts:
+  --quiet, --silent     do not print `checking...' messages
+ Installation directories:
+  --prefix=PREFIX       base directory for files to be installed
+  --exec-prefix=PREFIX  base directory for architecture-dependent
+                        files to be installed
+  --fsstnd=STYLE        specify file system standard for installation
+ Fine tuning of the installation directories:
+  --bindir=DIR          user executables
+  --libdir=DIR          object code libraries
+  --includedir=DIR      C header files
+  --datarootdir=DIR     read-only arch.-independent data root
+  --datadir=DIR         read-only architecture-independent data
+  --localedir=DIR       locale-dependent data
+  --mandir=DIR          man documentation
+  --infodir=DIR         info documentation
+  --docdir=DIR          documentation root
+  --htmldir=DIR         html documentation
+  --dvidir=DIR          TeX DVI documentation
+  --pdfdir=DIR          PDF documentation
+  --psdir=DIR           PostScript documentation
+  --elispdir=DIR        Emacs Lisp files
+  --vimdir=DIR          VIM files
+  --aclocaldir=DIR      autoconf files
+ Enable and disable specific packages
+  --with-PACKAGE        use PACKAGE
+  --without-PACKAGE     do not use PACKAGE
+    PACKAGEs available (the default is the opposite of the following):
+   --without-ffcall     do not support Foreign Function Interface
+                        the default is to support it when available
+   --without-dynamic-modules  no Dynamic Modules support
+   --without-unicode       no Unicode support: character=8bit
+   --without-readline      do not link with GNU readline
+   --with-threads=FLAVOR   support multiple threads in one CLISP image
+                  via OS threads [highly experimental - use at your own risk]
+                  FLAVOR: POSIX_THREADS SOLARIS_THREADS WIN32_THREADS
+  --with-jitc=FLAVOR   use a given Just-In-Time Compiler.
+             The only flavor at this time is lightning
+               (GNU lightning must be installed in the standard place).
+  --with-module=MODULE  build with add-on MODULE
+  --help-modules        list the modules included in the distribution
+                        and information on building them
+  --hyperspec=URL       the path to the Common Lisp HyperSpec (the default is
+         http://www.ai.mit.edu/projects/iiip/doc/CommonLISP/HyperSpec/
+         or the value of the environment variable CLHSROOT, if set)
+  --with-debug          pass "debug" to makemake (CFLAGS+=g &c)
+  --with-gmalloc        use the GNU malloc instead of of the libc one
+                        (needed on HP-UX and OpenBSD)
+  --edit-config         edit config.lisp with ${EDITOR:-vi} before make
+                        (useful with --cbc)
+System types:
+  --build=BUILD     configure for building on BUILD [guessed]
+  --host=HOST       cross-compile to build programs to run on HOST [BUILD]
+
+ You can specify the location of dependencies using
+EOP
+
+`dirname $0`/src/configure --help | grep 'with.*prefix'
+
+cat << \EOP
+ See also the --help-modules option.
+
+Example:
+  configure --cbc built-with-gcc
+  su bin
+  cd built-with-gcc
+  make install
+  exit
+Specifying the C compiler:
+  If you wish to specify the C compiler that will get used to build
+  CLISP, set the environment variables CC, CFLAGS, LIBS.
+  Put compiler flags that have to be passed to the preprocessor
+  into the CC variable, not the CFLAGS variable.
+  For example, if you want to use gcc in ANSI C mode,
+  execute the following before calling `configure':
+        setenv CC "gcc -ansi"                 if using csh
+        export CC="gcc -ansi"                 if using bash or ksh
+        CC="gcc -ansi"; export CC             if using sh
+If you have headers in a nonstandard directory <include dir>
+  set CPPFLAGS to "-I<include dir>"
+If you have libraries in a nonstandard directory <lib dir>
+  set LDFLAGS to "-L<lib dir>"
+Using GNU libiconv (only needed if you do not have GNU LIBC 2.2 or better):
+  If you want to use GNU libiconv which is not installed system-wide,
+  you may supply a --with-libiconv-prefix argument
+  (type './src/configure --help' for details).
+  The same goes for non-standard locations of libintl and libsigsegv.
+EOP
+}
+
+# Abort in case something fails.
+set -e
+
+# Nuisances.
+(unset CDPATH) >/dev/null 2>&1 && unset CDPATH
+
+srcdir=''
+# http://www.gnu.org/software/autoconf/manual/html_node/Option-Checking.html
+subdir_configure_args='--disable-option-checking'
+makemake_args=''
+do_config=''
+do_cbc=''
+argcount=0
+edit_config=''
+
+prev=''
+passnext=''
+debug=''
+do_ffi='default'
+target=''
+ignore_absence_of_libsigsegv=''
+
+prefix="/usr/local"
+exec_prefix=${prefix}
+
+getarg(){ echo "$1" | sed 's,^[-_a-zA-Z0-9]*=,,'; }
+
+all_modules=''
+note_module(){
+  all_modules=${all_modules}" $1"
+  makemake_args=${makemake_args}" --with-module=$1"
+}
+
+for arg # in "$@"
+do
+  # If the previous option needs an argument, assign it.
+  if test -n "$prev"; then
+    # If the previous option needs an argument for subdir configures or
+    # makemake, pass it, otherwise set the variable
+    case "$passnext" in
+      configure) subdir_configure_args="$subdir_configure_args $arg" ;;
+      makemake) makemake_args="$makemake_args$arg" ;;
+      both) makemake_args="$makemake_args$arg"
+        subdir_configure_args="$subdir_configure_args $arg" ;;
+      with-module) note_module $arg ;;
+      *) eval "$prev=\$arg" ;;
+    esac
+    passnext=''
+    prev=''
+  else
+
+    case "$arg" in
+
+      --cbc | --cb)
+        do_config=1
+        do_cbc=1 ;;
+
+      --config | --confi | --conf | --con | --co)
+        do_config=1 ;;
+
+      --edit-config | --edit-confi | --edit-conf | --edit-con | --edit-co | \
+      --edit-c | --edit- | --edit | --edi | --ed)
+        edit_config=1 ;;
+
+      --help | --hel | --he)
+        info_help
+        exit 0 ;;
+
+      --version | --versio | --versi | --vers | --ver | --ve | --v)
+        ./src/configure --version
+        exit 0 ;;
+
+      --help-modules | --help-module | --help-modul | --help-modu | --help-mod | --help-mo | --help-m)
+        set +e
+        MODDIR=modules
+        echo "module sets found in the directory '${MODDIR}':"
+        MODLIST=`find ${MODDIR} -name link.sh -o -name link.sh.in | sed -e 's,^${MODDIR}/,,' -e 's,/[^/]*$,,' | sort`
+        for m in ${MODLIST}; do echo " "${m}; done
+        echo "to specify the location of external software:"
+        for m in src ${MODLIST}; do
+          CFG=./${m}/configure
+          if [ -x ${CFG} ]; then
+            tmp=${CFG}.with
+            ${CFG} --help | grep '  --with-[a-zA-Z0-8]*-prefix' > ${tmp}
+            if test -s ${tmp}; then
+              echo "* ${m} (try also '${CFG} --help')"
+              cat ${tmp}
+            fi
+            rm -f ${tmp}
+          fi
+        done
+        exit 0 ;;
+
+      --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
+        srcdir=`getarg "$arg"` ;;
+
+      --srcdir | --srcdi | --srcd | --src | --sr)
+        prev=srcdir
+        passnext=configure ;;
+
+      --prefix=* | --prefi=* | --pref=* | --pre=* | --pr=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        prefix=`getarg "$arg"`
+        makemake_args="$makemake_args --prefix=${prefix}" ;;
+
+      --prefix | --prefi | --pref | --pre | --pr)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --prefix="
+        prev=prefix
+        passnext=both ;;
+
+      --exec_prefix=* | --exec-prefix=* | --exec-prefi=* | --exec-pref=* | --exec-pre=* | --exec-pr=* | --exec-p=* | --exec-=* | -exec=* | --exe=* | --ex=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        exec_prefix=`getarg "$arg"`
+        makemake_args="$makemake_args --exec-prefix="${exec_prefix} ;;
+
+      --exec_prefix | --exec-prefix | --exec-prefi | --exec-pref | --exec-pre | --exec-pr | --exec-p | --exec- | -exec | --exe | --ex)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --exec-prefix="
+        prev=exec_prefix
+        passnext=both ;;
+
+      --fsstnd=* | --fsstn=* | --fsst=* | --fss=* | --fs=* | --f=*)
+        makemake_args="$makemake_args --fsstnd="`getarg "$arg"` ;;
+
+      --bindir=* | --bindi=* | --bind=* | --bin=* | --bi=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --bindir="`getarg "$arg"` ;;
+
+      --bindir | --bindi | --bind | --bin | --bi)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --bindir="
+        prev=bindir
+        passnext=both ;;
+
+      --libdir=* | --libdi=* | --libd=* | --lib=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --libdir="`getarg "$arg"` ;;
+
+      --libdir | --libdi | --libd | --lib)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --libdir="
+        prev=libdir
+        passnext=both ;;
+
+      --includedir=* | --includedi=* | --included=* | --include=* | --includ=* | --inclu=* | --incl=* | --inc=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --includedir="`getarg "$arg"` ;;
+
+      --includedir | --includedi | --included | --include | --includ | --inclu | --incl | --inc)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --includedir="
+        prev=includedir
+        passnext=both ;;
+
+      --datarootdir=* | --datarootdi=* | --datarootd=* | --dataroot=* | --dataroo=* | --dataro=* | --datar=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --datarootdir="`getarg "$arg"` ;;
+
+      --datarootdir | --datarootdi | --datarootd | --dataroot | --dataroo | --dataro | --datar)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --datarootdir="
+        prev=datarootdir
+        passnext=both ;;
+
+      --datadir=* | --datadi=* | --datad=* | --data=* | --dat=* | --da=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --datadir="`getarg "$arg"` ;;
+
+      --datadir | --datadi | --datad | --data | --dat | --da)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --datadir="
+        prev=datadir
+        passnext=both ;;
+
+      --localedir=* | --localedi=* | --localed=* | --locale=* | --local=* | --loca=* | --loc=* | --lo=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --localedir="`getarg "$arg"` ;;
+
+      --localedir | --localedi | --localed | --locale | --local | --loca | --loc | --lo)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --localedir="
+        prev=localedir
+        passnext=both ;;
+
+      --docdir=* | --docdi=* | --docd=* | --doc=* | --do=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --docdir="`getarg "$arg"` ;;
+
+      --docdir | --docdi | --docd | --doc | --do)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --docdir="
+        prev=docdir
+        passnext=both ;;
+
+      --mandir=* | --mandi=* | --mand=* | --man=* | --ma=* | --m=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --mandir="`getarg "$arg"` ;;
+
+      --mandir | --mandi | --mand | --man | --ma | --m)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --mandir="
+        prev=mandir
+        passnext=both ;;
+
+      --infodir=* | --infodi=* | --infod=* | --info=* | --inf=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --infodir="`getarg "$arg"` ;;
+
+      --infodir | --infodi | --infod | --info | --inf)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --infodir="
+        prev=infodir
+        passnext=both ;;
+
+      --htmldir=* | --htmldi=* | --htmld=* | --html=* | --htm=* | --ht=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --htmldir="`getarg "$arg"` ;;
+
+      --htmldir | --htmldi | --htmld | --html | --htm | --ht)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --htmldir="
+        prev=htmldir
+        passnext=both ;;
+
+      --dvidir=* | --dvidi=* | --dvid=* | --dvi=* | --dv=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --dvidir="`getarg "$arg"` ;;
+
+      --dvidir | --dvidi | --dvid | --dvi | --dv)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --dvidir="
+        prev=dvidir
+        passnext=both ;;
+
+      --psdir=* | --psdi=* | --psd=* | --ps=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --psdir="`getarg "$arg"` ;;
+
+      --psdir | --psdi | --psd | --ps)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --psdir="
+        prev=psdir
+        passnext=both ;;
+
+      --pdfdir=* | --pdfdi=* | --pdfd=* | --pdf=* | --pd=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --pdfdir="`getarg "$arg"` ;;
+
+      --pdfdir | --pdfdi | --pdfd | --pdf | --pd)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --pdfdir="
+        prev=pdfdir
+        passnext=both ;;
+
+      --elispdir=* | --elispdi=* | --elispd=* | --elisp=* | --elis=* | --eli=* | --el=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --elispdir="`getarg "$arg"` ;;
+
+      --elispdir | --elispdi | --elispd | --elisp | --elis | --eli | --el)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --elispdir="
+        prev=elispdir
+        passnext=both ;;
+
+      --vimdir=* | --vimdi=* | --vimd=* | --vim=* | --vi=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --vimdir="`getarg "$arg"` ;;
+
+      --vimdir | --vimdi | --vimd | --vim | --vi)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --vimdir="
+        prev=vimdir
+        passnext=both ;;
+
+      --aclocaldir=* | --aclocaldi=* | --aclocald=* | --aclocal=*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --aclocaldir="`getarg "$arg"` ;;
+
+      --aclocaldir | --aclocaldi | --aclocald | --aclocal)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args --aclocaldir="
+        prev=aclocaldir
+        passnext=both ;;
+
+      --hyperspec=* | --hyperspe=* | --hypersp=* | --hypers=* | --hs=* | --hy=*)
+        makemake_args="$makemake_args --hyperspec="`getarg "$arg"` ;;
+
+      --quiet | --quie | --qui | --qu | --q | \
+      --silent | --silen | --sile | --sil | --si)
+        subdir_configure_args="$subdir_configure_args $arg" ;;
+
+      --host=* | --hos=* | --ho=*)
+        target=cross
+        subdir_configure_args="$subdir_configure_args $arg" ;;
+
+      --host | --hos | --ho)
+        target=cross
+        subdir_configure_args="$subdir_configure_args $arg"
+        prev=host
+        passnext=configure ;;
+
+      --build=* | --buil=* | --bui=* | --bu=*)
+        target=cross
+        subdir_configure_args="$subdir_configure_args $arg" ;;
+
+      --build | --buil | --bui | --bu)
+        target=cross
+        subdir_configure_args="$subdir_configure_args $arg"
+        prev=host
+        passnext=configure ;;
+
+      --with-debug)
+        makemake_args="--verbose=yes $makemake_args"
+        debug="debug" ;;
+
+      --without-ffcall | --with-ffcall=no | --with-no-ffcall)
+        subdir_configure_args="$subdir_configure_args $arg"
+        do_ffi="no" ;;
+
+      --with-ffcall | --with-ffcall=yes)
+        subdir_configure_args="$subdir_configure_args $arg"
+        do_ffi="yes" ;;
+
+      --without-dynamic-modules | --with-dynamic-modules=no)
+        makemake_args="--with-dynamic-modules=no ${makemake_args}" ;;
+
+      --with-mingw | --with-no-cygwin | --without-cygwin | --with-cygwin=no)
+        CC="${CC:-gcc} -mno-cygwin"; export CC;
+        makemake_args="$makemake_args --win32gcc" ;;
+
+      --with-module=*) note_module `getarg $arg` ;;
+
+      --with-module)
+        prev=with-module
+        passnext=with-module ;;
+
+      --with-* | --without-*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args $arg" ;;
+
+      --enable-* | --disable-*)
+        subdir_configure_args="$subdir_configure_args $arg"
+        makemake_args="$makemake_args $arg" ;;
+
+      --ignore-absence-of-libsigsegv)
+        ignore_absence_of_libsigsegv=yes ;;
+
+      -*)
+        fail "$0: invalid argument $arg
+$0: Try \`$0 --help'" ;;
+
+      *=*) # set a variable
+        var=`echo $arg | sed 's/\([^=]*\)=.*/\1/'`
+        val=`echo $arg | sed 's/[^=]*=\(.*\)/\1/'`
+        eval "$var='$val'"
+        export $var ;;
+
+      *) # Everything else counts as a positional argument
+        argcount=`expr $argcount + 1`
+        eval "POSARG$argcount=\$arg" ;;
+
+    esac
+
+  fi
+done
+test -n "$prev" && fail "$0: missing argument to $prev
+$0: Try \`$0 --help'"
+
+DIRNAME=$POSARG1
+COMPILER=$POSARG2 # deprecated
+
+if test -z "$do_config" -a -z "$do_cbc"; then
+  # Default is --config
+  do_config=1
+fi
+
+# checking how to copy files
+echo "blabla" > conftest.x
+err=`/bin/sh -c "cp -p conftest.x conftest.y 2>&1 ; exit 0"`
+if test -z "$err"; then
+  CP='cp -p'
+else
+  CP='cp'
+fi
+rm -f conftest*
+
+# get the absolute pathname from a possibly relative one
+abs_pwd () { cd "$1" > /dev/null; pwd; }
+
+# link FILE1 FILE2  is like `ln', but chooses the cheapest alternative:
+# hard link if FILE1 and FILE2 on the same disk, else symbolic link if the
+# system supports that, else file copy.
+link () {
+rm -f "$2";
+# Note: With some versions of "ln" this does not work if FILE2 is a symlink.
+if ln "$1" "$2" 2>/dev/null; then
+  :
+else
+  srcfile_dirname=`echo "$1" | sed -e 's,/[^/]*$,,'`
+  test -n "$srcfile_dirname" || srcfile_dirname='/'
+  srcfile_basename=`echo "$1" | sed -e 's,^.*/,,'`
+  srcfile_absdirname=`abs_pwd "$srcfile_dirname"`
+  if ln -s "$srcfile_absdirname/$srcfile_basename" "$2" 2>/dev/null; then
+    :
+  else
+    $CP "$1" "$2"
+  fi
+fi
+}
+maybe_link () { if [ -f "$1" ]; then link "$1" "$2"; fi; }
+
+# Note that we would need to call `/bin/pwd` if we wanted to compare two
+# directories for equality. But here we only need to get _some_ absolute
+# pathnames, hence `pwd` is enough.
+
+if test -f /bin/pwd ; then
+  ABSPATHPWD=/bin/pwd
+else
+  ABSPATHPWD=pwd
+fi
+
+abs_path_pwd () { cd "$1" > /dev/null; ${ABSPATHPWD}; }
+
+INPLACE=''
+if test -n "$srcdir" ; then
+  test -d "$srcdir" || fail "$0: srcdir: ($srcdir) nonexistent"
+  ABS_SRCDIR=`abs_pwd "$srcdir"`;
+  if [ "$DIRNAME" = "" ] ; then
+    DIRNAME='.'
+  fi
+  mkdir -p "${DIRNAME}";
+  REL_SRCDIR="$ABS_SRCDIR"
+else
+  if test -f ./ANNOUNCE -a -f ./SUMMARY; then
+    srcdir='.'
+    ABS_SRCDIR=`abs_pwd "$srcdir"`
+    if [ "$DIRNAME" = "" ] ; then
+      DIRNAME=src
+    fi
+  else
+    test -f ../ANNOUNCE -a -f ../SUMMARY || \
+      fail "$0: source directory not found, use --srcdir option"
+    srcdir='..'
+    ABS_SRCDIR=`abs_pwd "$srcdir"`
+    if [ "$DIRNAME" = "" ] ; then
+      DIRNAME='.'
+    fi
+  fi
+  mkdir -p "${DIRNAME}";
+  if test `abs_path_pwd "$DIRNAME"/..` = `abs_path_pwd "$srcdir"` ; then
+    REL_SRCDIR='..'
+  else
+    REL_SRCDIR="$ABS_SRCDIR"
+  fi
+fi
+ABS_DIRNAME="`abs_pwd "$DIRNAME"`";
+if test "`abs_path_pwd "$DIRNAME"`" = "`abs_path_pwd "$srcdir"/src`" ; then
+  INPLACE=yes
+fi
+case "$REL_SRCDIR" in
+  /*) RREL_SRCDIR="$REL_SRCDIR";;
+  *)  RREL_SRCDIR="../$REL_SRCDIR";;
+esac
+
+# srcdir        top level source directory
+#               (i.e. this script is $srcdir/configure)
+# ABS_SRCDIR    absolute srcdir
+# REL_SRCDIR    srcdir, relative to $DIRNAME
+# RREL_SRCDIR   srcdir, relative to $DIRNAME/anysubdir
+# DIRNAME       directory in which to build
+# ABS_DIRNAME   absolute DIRNAME
+# INPLACE       set if DIRNAME is the source directory, hence no links needed
+
+if test -n "$do_config"; then
+
+  cd "$ABS_SRCDIR"
+
+  if [ "$COMPILER" != "" ] ; then
+    CC="$COMPILER"
+    export CC
+  fi
+  if test -z "$INPLACE"; then
+    # Create the po subdirectory and fill it
+    for f in po; do
+      if [ -d src/$f ] ; then
+        mkdir -p "${ABS_DIRNAME}/${f}";
+        ( cd src
+          for g in $f/* ; do maybe_link $g "$ABS_DIRNAME/$g"; done; )
+      fi
+    done
+    for f in configure config.h.in makemake.in version.h ; do
+      maybe_link src/$f "$ABS_DIRNAME/$f";
+    done
+  fi
+  # no need to create subdirectories for the modules - makemake handles that
+  # Prepare the configure files.
+  chmod a+x "$ABS_DIRNAME/configure"
+  # Start the configurations.
+  if test -n "$INPLACE"; then
+    subdir_srcdir_args=''
+  else
+    subdir_srcdir_args="--srcdir=$REL_SRCDIR/src"
+  fi
+  cd "${ABS_DIRNAME}";
+  echo "executing `pwd`/configure $*"
+  ${CONFIG_SHELL} configure $subdir_srcdir_args \
+    $subdir_configure_args --cache-file=config.cache
+fi
+
+makemake_args="${makemake_args} ${subdir_srcdir_args}";
+
+. "${ABS_DIRNAME}/config.cache"
+
+test -n "${target}" && target="${target} ${ac_cv_host} ${ac_cv_prog_CC}"
+makemake_args="${makemake_args} ${target} ${debug}";
+
+test -n "${cl_cv_have_ffcall}" || cl_cv_have_ffcall=notchecked
+cat <<EOF
+Configure findings:
+  FFI:        ${cl_cv_have_ffcall} (user requested: ${do_ffi})
+  readline:   ${ac_cv_have_readline} (user requested: ${ac_cv_use_readline})
+  libsigsegv: ${gl_cv_lib_sigsegv}
+EOF
+
+# are any FFI modules requested?
+ffi_modules=''
+for module in ${all_modules}; do
+  mdir=${ABS_SRCDIR}/modules/${module}
+  test -d ${mdir} || fail "$0: ${mdir} is not an exisiting directory"
+  if test -r ${mdir}/configure.in; then
+    grep 'CL_MODULE_COMMON_CHECKS.*ffi' ${mdir}/configure.in > /dev/null 2>&1 && \
+      ffi_modules=${ffi_modules}" ${module}"
+  elif grep '.*\.c.*\.fas.*:\|.*\.fas.*\.c.*:' ${mdir}/Makefile > /dev/null 2>&1 ; then
+    ffi_modules=${ffi_modules}" ${module}"
+  elif grep ':use.*"FFI"' ${mdir}/*.lisp > /dev/null 2>&1; then
+    ffi_modules=${ffi_modules}" ${module}"
+  fi
+done
+if test -n "${ffi_modules}"; then
+  test ${do_ffi} = no && \
+    fail "$0: --without-ffcall is incompatible with requested module(s):${ffi_modules}"
+  test ${cl_cv_have_ffcall} = no && \
+    fail "$0: modules${ffi_modules} require FFI"
+fi
+if [ ${do_ffi} != no -a ${cl_cv_have_ffcall} = yes ]; then
+  makemake_args="--with-dynamic-ffi ${makemake_args}"
+fi
+
+if [ "${gl_cv_lib_sigsegv}" != "yes" ]; then
+  if [ "${ignore_absence_of_libsigsegv}" = "yes" ]; then
+    echo "As you requested, we will proceed without libsigsegv..."
+  else
+    if [ "$ac_cv_build" = "$ac_cv_host" ]; then host_arg="";
+    else host_arg=" --host=$ac_cv_host";
+    fi
+    SIGSEGV=libsigsegv-2.8
+    cat <<EOF 1>&2
+$0: libsigsegv was not detected, thus some features, such as
+  generational garbage collection and
+  stack overflow detection in interpreted Lisp code
+cannot be provided.
+Please install libsigsegv like this:
+EOF
+    if [ "${CC+set}" = "set" ]; then
+      echo "  CC='$CC'; export CC" 1>&2
+    fi
+    cat <<EOF 1>&2
+  mkdir tools; cd tools; prefix=\`pwd\`/${ac_cv_host}
+  wget http://ftp.gnu.org/pub/gnu/libsigsegv/${SIGSEGV}.tar.gz
+  tar xfz ${SIGSEGV}.tar.gz
+  cd ${SIGSEGV}
+  ./configure${host_arg} --prefix=\${prefix} && make && make check && make install
+  cd ../..
+  rm -f ${DIRNAME}/config.cache
+  ./configure --with-libsigsegv-prefix=\${prefix} $*
+If you insist on building without libsigsegv, please pass
+  --ignore-absence-of-libsigsegv
+to this script:
+  ./configure --ignore-absence-of-libsigsegv $*
+If you have installed libsigsegv, but clisp does not detect it,
+you might have installed it incorrectly, see section 2 in in unix/INSTALL.
+EOF
+    exit 1;
+  fi
+fi
+
+# CLISP needs a lot of stack space for bootstrapping,
+# and insufficient stack space manifests itself via arbitrary GC errors.
+# it was believed that 8192 is enough until power5 came along:
+# https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=166347
+STACK_LIMIT=16384
+stacksizelimit=`ulimit -s 2>/dev/null || :` # cygwin /bin/sh ulimit is broken
+# need 3 separate test calls because of "integer expression expected" errors
+# when $stacksizelimit is "" or "unlimited" (no short-circuiting!)
+set +e;
+test -z "$stacksizelimit" || { test "$stacksizelimit" != unlimited && test "$stacksizelimit" -lt ${STACK_LIMIT}; }
+STACK_TOO_SMALL=$?      # 0=true => need to reset; 1=false => big enough
+set -e
+
+cd "$ABS_DIRNAME"
+echo "./makemake $makemake_args > Makefile"
+./makemake $makemake_args > Makefile
+make config.lisp
+
+if test -z "$do_cbc"; then
+  echo
+  echo "To continue building CLISP, the following commands are recommended"
+  echo "  (cf. unix/INSTALL step 4 ff):"
+  if test "$DIRNAME" != "."; then
+    echo "    cd $DIRNAME"
+  fi
+  echo "    ${EDITOR:-vi} config.lisp"
+  if [ "${STACK_TOO_SMALL}" = 0 ]; then
+    cat <<EOF
+# The default stack size on your platform is insufficient
+# and must be increased to at least ${STACK_LIMIT}.  You must do either
+# 'ulimit -s ${STACK_LIMIT}' (for Bourne shell derivatives, e.g., bash and zsh)
+# or 'limit stacksize ${STACK_LIMIT}' (for C shell derivarives, e.g., tcsh)
+EOF
+  fi
+  echo "    make"
+  echo "    make check"
+else
+  if [ -n "${edit_config}" ]; then
+    make config.lisp;
+    ${EDITOR:-vi} config.lisp;
+  fi
+  if [ "${STACK_TOO_SMALL}" = 0 ]; then
+    set +e; ulimit -s ${STACK_LIMIT} 2>/dev/null; set -e;
+  fi
+  make
+  make check
+fi

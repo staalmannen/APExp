@@ -1,0 +1,2 @@
+This directory contains a CLISP add-on module for wildcard matching.
+It relies on the system-wide fnmatch implementation or GNU gnulib.

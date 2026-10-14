@@ -1,0 +1,101 @@
+dnl AUTOCONF configuration for syscalls
+dnl Copyright (C) 2003-2010 Sam Steingold <sds@gnu.org>
+dnl GNU GPL2
+
+AC_PREREQ(2.57)
+AC_INIT(syscalls, 1.0, clisp-list)
+AC_CONFIG_SRCDIR(posix.lisp)
+AC_CONFIG_HEADERS(config.h)
+
+RSE_BOLD
+BOLD_MSG([System Calls (Common)])
+CL_MODULE_COMMON_CHECKS()
+AM_INIT_AUTOMAKE([no-define])
+AC_PROG_RANLIB
+sc_gl_EARLY
+sc_gl_INIT
+
+BOLD_MSG([System Calls (Headers)])
+AC_CHECK_HEADERS(errno.h fcntl.h netdb.h sys/resource.h utime.h wchar.h dnl
+pwd.h sys/time.h sys/unistd.h time.h unistd.h syslog.h signal.h dnl
+grp.h crypt.h utmpx.h stdlib.h shlobj.h netinet/in.h arpa/inet.h dnl
+sys/statvfs.h sys/statfs.h sys/param.h sys/wait.h)
+if test "$ac_cv_header_shlobj_h" = yes ; then
+   LIBS=${LIBS}' -luser32 -lole32 -loleaut32 -luuid';
+fi
+AC_CHECK_SIZEOF(off_t)
+AC_CHECK_SIZEOF(gid_t)
+AC_CHECK_SIZEOF(pid_t)
+AC_CHECK_SIZEOF(uid_t)
+if test "$ac_cv_header_utmpx_h" = "yes"; then
+ AC_CHECK_MEMBERS([struct utmpx.ut_host],,,[#include <utmpx.h>])
+fi
+
+BOLD_MSG([System Calls (Functions)])
+CL_RLIMIT
+CL_SOCKET dnl for getservbyport et al
+AC_SEARCH_LIBS(crypt, crypt)
+AC_SEARCH_LIBS(erf, m)
+AC_CHECK_FUNCS(getloadavg confstr fcntl gethostent sysconf dnl
+getlogin getpwent getpwnam getpwuid endpwent setpwent dnl
+getservbyport getservbyname getservent setservent endservent dnl
+openlog setlogmask syslog closelog dnl
+getppid getpgid getsid setpgid setsid kill pathconf fpathconf realpath dnl
+getpgrp setpgrp getgrgid getgrnam getgrent endgrent setgrent dnl
+endutxent getutxent getutxid getutxline pututxline setutxent dnl
+mkfifo mkdir creat mkstemp tempnam mkdtemp dnl
+getegid geteuid getgid getuid setegid seteuid setgid setuid dnl
+setreuid setregid getgroups setgroups wait4 dnl
+fchmod fchown fstat link stat symlink utime mknod chmod umask fsync sync dnl
+ftruncate truncate getusershell endusershell dnl
+erf erfc lgamma tgamma fstatvfs statvfs getpriority setpriority dnl
+crypt encrypt setkey GlobalMemoryStatusEx strerror dnl
+gethostid sethostid getdomainname setdomainname)
+AC_FUNC_CHOWN
+gl_FUNC_MKTIME
+gl_FUNC_GNU_STRFTIME
+gl_FUNC_STRPTIME
+gl_TIME_MODULE_INDICATOR([strptime])
+gl_FUNC_STRVERSCMP
+gl_STRING_MODULE_INDICATOR([strverscmp])
+gl_FUNC_UNAME
+gl_SYS_UTSNAME_MODULE_INDICATOR([uname])
+AC_CHECK_DECLS([signgam],,,[#include <math.h>])
+CL_STAT
+if test "$ac_cv_header_sys_statvfs_h" = "yes"; then
+ AC_MSG_CHECKING([whether f_fsid is scalar])
+ AC_TRY_COMPILE([#include <sys/statvfs.h>], [struct statvfs x; x.f_fsid = 0;],
+  ac_cv_struct_fsid_scalar=yes, ac_cv_struct_fsid_scalar=no)
+ AC_MSG_RESULT([$]ac_cv_struct_fsid_scalar)
+ if test "$ac_cv_struct_fsid_scalar" = yes; then
+  AC_DEFINE([HAVE_SCALAR_FSID], 1,
+    [Define to 1 if the f_fsid member of 'struct statvfs' has a integral type.])
+ fi
+ AC_CHECK_SIZEOF(fsblkcnt_t,,[#include <stdio.h>
+#include <sys/statvfs.h>])
+ AC_CHECK_SIZEOF(fsfilcnt_t,,[#include <stdio.h>
+#include <sys/statvfs.h>])
+fi
+CL_RUSAGE
+gl_FUNC_LINK_FOLLOWS_SYMLINK
+if test "$ac_cv_func_setpgrp" = "yes"; then
+dnl BSD versions of setpgrp() are identical to setpgid()
+AC_CACHE_CHECK([whether setpgrp() is POSIX],ac_cv_func_setpgrp_posix,[
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#include <sys/types.h>
+],[[pid_t pid = setpgrp();]])],
+ac_cv_func_setpgrp_posix=yes,ac_cv_func_setpgrp_posix=no)])
+if test "$ac_cv_func_setpgrp_posix" = "yes"; then
+AC_DEFINE(HAVE_SETPGRP_POSIX,1,
+[Define to 1 if setpgrp() does not accept arguments])
+fi
+fi
+
+BOLD_MSG([System Calls (output)])
+AC_CONFIG_FILES([Makefile link.sh gllib/Makefile])
+AC_OUTPUT
+
+BOLD_MSG([System Calls (done)])

@@ -90,43 +90,43 @@ typechecking_type_to_arr(struct workspace *wk, type_tag t)
 	} else if (ct == complex_type_enum) {
 		obj sorted;
 		obj_array_sort(wk, NULL, idx, obj_array_sort_by_str, &sorted);
-		obj typestr;
-		obj_array_join(wk, false, sorted, make_str(wk, "|"), &typestr);
+		obj type_string;
+		obj_array_join(wk, false, sorted, make_str(wk, "|"), &type_string);
 
-		typestr = make_strf(wk, "%s[%s]", typechecking_type_to_s(wk, tc_string), get_str(wk, typestr)->s);
+		type_string = make_strf(wk, "%s[%s]", typechecking_type_to_s(wk, tc_string), get_str(wk, type_string)->s);
 
 		obj res;
 		res = make_obj(wk, obj_array);
-		obj_array_push(wk, res, typestr);
+		obj_array_push(wk, res, type_string);
 		return res;
 	}
 
 	struct bucket_arr *typeinfo_arr = &wk->vm.objects.obj_aos[obj_typeinfo - _obj_aos_start];
 	struct obj_typeinfo *ti = bucket_arr_get(typeinfo_arr, idx);
 
-	obj typestr = typechecking_type_to_str(wk, ti->type);
+	obj type_string = typechecking_type_to_str(wk, ti->type);
 
 	if (!ti->subtype) {
 		obj res;
 		res = make_obj(wk, obj_array);
-		obj_array_push(wk, res, typestr);
+		obj_array_push(wk, res, type_string);
 		return res;
 	}
 
 	switch (ct) {
 	case complex_type_or: {
 		obj subtype_arr = typechecking_type_to_arr(wk, ti->subtype);
-		obj_array_push(wk, subtype_arr, typestr);
+		obj_array_push(wk, subtype_arr, type_string);
 		obj sorted;
 		obj_array_sort(wk, NULL, subtype_arr, obj_array_sort_by_str, &sorted);
 		return sorted;
 	}
 	case complex_type_nested: {
-		str_appf(wk, &typestr, "[%s]", typechecking_type_to_s(wk, ti->subtype));
+		str_appf(wk, &type_string, "[%s]", typechecking_type_to_s(wk, ti->subtype));
 
 		obj res;
 		res = make_obj(wk, obj_array);
-		obj_array_push(wk, res, typestr);
+		obj_array_push(wk, res, type_string);
 		return res;
 	}
 	case complex_type_enum: break;
@@ -139,7 +139,7 @@ typechecking_type_to_arr(struct workspace *wk, type_tag t)
 obj
 typechecking_type_to_str(struct workspace *wk, type_tag t)
 {
-	obj typestr;
+	obj type_string;
 
 	t &= ~TYPE_TAG_ALLOW_NULL;
 
@@ -152,12 +152,12 @@ typechecking_type_to_str(struct workspace *wk, type_tag t)
 		modifier = "listify";
 	}
 
-	obj_array_join(wk, false, typechecking_type_to_arr(wk, t), make_str(wk, "|"), &typestr);
+	obj_array_join(wk, false, typechecking_type_to_arr(wk, t), make_str(wk, "|"), &type_string);
 	if (modifier) {
-		typestr = make_strf(wk, "%s[%s]", modifier, get_cstr(wk, typestr));
+		type_string = make_strf(wk, "%s[%s]", modifier, get_cstr(wk, type_string));
 	}
 
-	return typestr;
+	return type_string;
 }
 
 const char *

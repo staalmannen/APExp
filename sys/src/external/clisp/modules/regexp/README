@@ -1,0 +1,4 @@
+This directory contains a CLISP add-on module for regular expression matching
+and searching.
+It relies on the system-wide regex implementation or GNU gnulib.
+This is a "base" module, normally present in all CLISP linking sets.

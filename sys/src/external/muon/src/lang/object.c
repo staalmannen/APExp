@@ -2572,11 +2572,13 @@ obj_to_json(struct workspace *wk, obj o, struct tstr *sb)
 		break;
 	}
 	case obj_feature_opt: {
-		const char *s = (char *[]){
-			[feature_opt_enabled] = "enabled",
-			[feature_opt_disabled] = "disabled",
-			[feature_opt_auto] = "auto",
-		}[get_obj_feature_opt(wk, o)];
+		const char *s;
+		switch (get_obj_feature_opt(wk, o)) {
+		case feature_opt_enabled: s = "enabled"; break;
+		case feature_opt_disabled: s = "disabled"; break;
+		case feature_opt_auto: s = "auto"; break;
+		default: s = "auto"; break;
+		}
 		tstr_pushf(wk, sb, "\"%s\"", s);
 		break;
 	}

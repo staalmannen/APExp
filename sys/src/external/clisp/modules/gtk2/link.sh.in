@@ -1,0 +1,8 @@
+${MAKE-make} clisp-module \
+  CC="${CC}" CPPFLAGS="${CPPFLAGS}" CFLAGS="${CFLAGS}" \
+  CLISP_LINKKIT="$absolute_linkkitdir" CLISP="${CLISP}"
+NEW_FILES="gtk.o"
+NEW_LIBS="${NEW_FILES} @GTK_LIBS@ @LIBGLADE_LIBS@"
+NEW_MODULES="gtk"
+TO_LOAD='gtk'
+TO_PRELOAD='preload'

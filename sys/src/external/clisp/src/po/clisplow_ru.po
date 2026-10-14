@@ -1,0 +1,834 @@
+# Russian messages for CLISP
+# Copyright (C) 1998 Free Software Foundation, Inc.
+# Eduard Haritonov <hed@iis.nsk.su>, 1998.
+# Arseny Slobodjuck <ampy@ich.dvo.ru>, 2002 - 2004.
+# Sam Steingold <sds@gnu.org>, 2004-2008
+#
+# Также принимали участие в переводе:
+#
+# Городняя Лидия Васильевна <gorod@lidia.iis.nsk.su>
+# Дмитрий Иванов            <divanov@aha.ru>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: clisp 2.45\n"
+"Report-Msgid-Bugs-To: clisp-devel@lists.sourceforge.net\n"
+"POT-Creation-Date: 2010-07-07 11:09:16-0400\n"
+"PO-Revision-Date: 2008-05-04 20:34-0400\n"
+"Last-Translator: Sam Steingold <sds@gnu.org>\n"
+"Language-Team: Russian <ru@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=koi8-r\n"
+"Content-Transfer-Encoding: 8-bit\n"
+
+#: spvw.d:852
+msgid "*** - Program stack overflow. RESET"
+msgstr "*** - Переполнение программного стека. СБРОС"
+
+#: spvw.d:867
+msgid "*** - Lisp stack overflow. RESET"
+msgstr "*** - Переполнение стека Лиспа. СБРОС"
+
+#: spvw.d:1096
+msgid "Unknown FSUBR signature: %d %d %d\n"
+msgstr "Неизвестная сигнатура FSUBR: %d %d %d\n"
+
+#: spvw.d:1204
+msgid "Unknown SUBR signature: %d %d %d %d"
+msgstr "Неизвестная сигнатура SUBR: %d %d %d %d"
+
+#: spvw.d:1945
+msgid "module '%s' requires package %s.\n"
+msgstr "модуль `%s' требует пакета %s.\n"
+
+#: spvw.d:1955
+msgid "module '%s' redefines symbol "
+msgstr "модуль `%s' переопределяет символ "
+
+#: spvw.d:1957
+msgid " in the locked package "
+msgstr " в заблокированном пакете "
+
+#: spvw.d:1959
+msgid ""
+"\n"
+"old definition: "
+msgstr ""
+"\n"
+"старое определение: "
+
+#: spvw.d:1996
+msgid "is an ANSI Common Lisp implementation."
+msgstr " - реализация ANSI Common Lisp."
+
+#: spvw.d:1998
+msgid ""
+"This image does not process the usual command line arguments.\n"
+"To create a normal image \"myclisp\", please do\n"
+"%s --clisp-x '(ext:saveinitmem \"myclisp\" :executable t :init-function nil)'\n"
+msgstr ""
+
+#: spvw.d:2003
+#, fuzzy
+msgid ""
+"Usage:  %s [options] [lispfile [argument ...]]\n"
+" When 'lispfile' is given, it is loaded and '*ARGS*' is set\n"
+" to the list of argument strings. Otherwise, an interactive\n"
+" read-eval-print loop is entered.\n"
+msgstr ""
+" [опции] [Лисп-файл [аргумент1 ...]]\n"
+" Если задан Лисп-файл, он загружается, при этом параметр `*ARGS*'\n"
+" принимает значения списка аргументов. Если файл не задан, происходит\n"
+" вход в интерактивный режим `чтение-выполнение-печать'.\n"
+
+#: spvw.d:2007
+#, fuzzy
+msgid "Informative output:"
+msgstr "Информативный вывод:\n"
+
+#: spvw.d:2008
+#, fuzzy
+msgid " -h, --help    - print this help and exit"
+msgstr " -h, --help    - вывод этой справки и выход\n"
+
+#: spvw.d:2009
+#, fuzzy
+msgid " --version     - print the version information"
+msgstr " --version     - вывод информации о версии программы\n"
+
+#: spvw.d:2010
+#, fuzzy
+msgid " --license     - print the licensing information"
+msgstr " --license     - вывод информации о лицензии\n"
+
+#: spvw.d:2011
+#, fuzzy
+msgid " -help-image   - print image-specific help and exit"
+msgstr " -h, --help    - вывод справки о данном образе памяти и выход\n"
+
+#: spvw.d:2012
+#, fuzzy
+msgid "Memory image selection:"
+msgstr "Выбор файла с образом памяти:\n"
+
+#: spvw.d:2013
+#, fuzzy
+msgid " -B lisplibdir - set the installation directory"
+msgstr " -B библ-дир   - задать директорию установки\n"
+
+#: spvw.d:2015
+#, fuzzy
+msgid " -K linkingset - use this executable and memory image"
+msgstr " -K линк-набор - задать исполнимый файл и образ памяти\n"
+
+#: spvw.d:2017
+#, fuzzy
+msgid " -M memfile    - use this memory image"
+msgstr " -M образ      - использовать файл образа памяти\n"
+
+#: spvw.d:2018
+#, fuzzy
+msgid " -m size       - memory size (size = nB or nKB or nMB)"
+msgstr " -m размер     - размер памяти (размер = nB или nKB или nMB)\n"
+
+#: spvw.d:2019
+#, fuzzy
+msgid "Internationalization:"
+msgstr "Интернационализация:\n"
+
+#: spvw.d:2020
+#, fuzzy
+msgid " -L language   - set user language"
+msgstr " -L язык       - задать язык\n"
+
+#: spvw.d:2021
+#, fuzzy
+msgid " -N nlsdir     - NLS catalog directory"
+msgstr " -N nlsdir     - задать каталог с NLS\n"
+
+#: spvw.d:2022
+#, fuzzy
+msgid " -Edomain encoding - set encoding"
+msgstr ""
+" -Eтиппотока кодировка - задавать кодировки для различных типов потоков.\n"
+"           Осн. типы: file, terminal, pathname, foreign, misc.\n"
+"           Осн. кодировки: koi8-r, koi8-ru, koi8-u, CP866, CP1251,\n"
+"           ISO-8859-5. См. impnotes.\n"
+
+#: spvw.d:2023
+#, fuzzy
+msgid "Interoperability:"
+msgstr "Взаимодействие:\n"
+
+#: spvw.d:2024
+#, fuzzy
+msgid ""
+" -q, --quiet, --silent, -v, --verbose - verbosity level:\n"
+"     affects banner, *LOAD-VERBOSE*/*COMPILE-VERBOSE*,\n"
+"     and *LOAD-PRINT*/*COMPILE-PRINT*"
+msgstr ""
+" -q, --quiet, --silent, -v, --verbose - степень болтливости:\n"
+"     приветствие, *LOAD-VERBOSE*/*COMPILE-VERBOSE*,\n"
+"     и *LOAD-PRINT*/*COMPILE-PRINT*\n"
+
+#: spvw.d:2027
+#, fuzzy
+msgid " -w            - wait for a keypress after program termination"
+msgstr " -w            - ожидать нажатия клавиши после работы\n"
+
+#: spvw.d:2028
+#, fuzzy
+msgid " -I            - be ILISP-friendly"
+msgstr " -I            - дружить с ILISP\n"
+
+#: spvw.d:2029
+msgid " -disable-readline - do not use the gnu readline library"
+msgstr ""
+
+#: spvw.d:2030
+#, fuzzy
+msgid "Startup actions:"
+msgstr "Загрузка:\n"
+
+#: spvw.d:2031
+#, fuzzy
+msgid " -ansi         - more ANSI CL compliance"
+msgstr " -ansi         - большее соответствие стандарту ANSI CL\n"
+
+#: spvw.d:2032
+#, fuzzy
+msgid " -traditional  - traditional (undoes -ansi)"
+msgstr " -traditional  - традиционные установки clisp (отменяет -ansi)\n"
+
+#: spvw.d:2033
+#, fuzzy
+msgid " -modern       - start in a case-sensitive lowercase-preferring package"
+msgstr " -modern       - запускаться в пакете чувствительном к регистру и предпочитающем нижний регистр\n"
+
+#: spvw.d:2034
+#, fuzzy
+msgid " -p package    - start in the package"
+msgstr " -p пакет      - запускаться в пакете\n"
+
+#: spvw.d:2035
+#, fuzzy
+msgid " -C            - set *LOAD-COMPILING* to T"
+msgstr " -C            - установить *LOAD_COMPILING* в T\n"
+
+#: spvw.d:2036
+#, fuzzy
+msgid " -norc         - do not load the user ~/.clisprc file"
+msgstr " -norc         - не грузить ~/.clisprc\n"
+
+#: spvw.d:2037
+#, fuzzy
+msgid " -lp dir       - add dir to *LOAD-PATHS* (can be repeated)"
+msgstr " -lp директория - добавить директорию в *LOAD-PATHS* (можно повторять)\n"
+
+#: spvw.d:2038
+#, fuzzy
+msgid " -i file       - load initfile (can be repeated)"
+msgstr " -i файл       - загрузить файл инициализации (можно повторять)\n"
+
+#: spvw.d:2039
+#, fuzzy
+msgid "Actions:"
+msgstr "Действия:\n"
+
+#: spvw.d:2040
+#, fuzzy
+msgid " -c [-l] lispfile [-o outputfile] - compile lispfile"
+msgstr " -c [-l] лисп-файл [-o вых-файл] - компилировать лисп-файл\n"
+
+#: spvw.d:2041
+#, fuzzy
+msgid " -x expressions - execute the expressions, then exit"
+msgstr " -x выражения   - выполнить выражения и завершить работу\n"
+
+#: spvw.d:2042
+#, fuzzy
+msgid " Depending on the image, positional arguments can mean:"
+msgstr " В зависимости от образа памяти, позиционные аргументы могут значить:\n"
+
+#: spvw.d:2043
+#, fuzzy
+msgid "   lispscript [argument ...] - load script, then exit"
+msgstr "   лисп-файл [аргумент ...]  - загрузить лисп файл и завершить работу\n"
+
+#: spvw.d:2044
+#, fuzzy
+msgid "   [argument ...]            - run the init-function"
+msgstr "   [аргумент ...]            - выполнить инициализационную функцию\n"
+
+#: spvw.d:2045
+#, fuzzy
+msgid "  arguments are placed in EXT:*ARGS* as strings."
+msgstr "  аргументы содержатся в EXT:*ARGS* в виде строк.\n"
+
+#: spvw.d:2046
+#, fuzzy
+msgid "These actions put CLISP into a batch mode, which is overridden by"
+msgstr "Эти действия поместят CLISP в пакетный режим, если не задан\n"
+
+#: spvw.d:2047
+#, fuzzy
+msgid " -on-error action - action can be one of debug, exit, abort, appease"
+msgstr " -on-error действие - действие может быть debug, exit, abort, appease\n"
+
+#: spvw.d:2048
+#, fuzzy
+msgid " -repl            - enter the interactive read-eval-print loop when done"
+msgstr " -repl             - по окончании войти в интерактивный цикл чтение-выполнение-печать.\n"
+
+#: spvw.d:2049
+#, fuzzy
+msgid "Default action is an interactive read-eval-print loop."
+msgstr "По умолчанию - интерактивный цикл чтение-выполнение-печать.\n"
+
+#: spvw.d:2058
+msgid "%s: use '-h' for help"
+msgstr "%s: воспользуйтесь аргументом '-h' для справки"
+
+#: spvw.d:2062
+msgid "invalid argument"
+msgstr "неправильный аргумент"
+
+#: spvw.d:2369
+msgid "Syntax for %s: nnnnnnn or nnnnKB or nMB"
+msgstr "Синтаксис для %s: nnnnnnn, или nnnnKB, или nMB"
+
+#: spvw.d:2375
+msgid "warning: %s %lu too small, using %lu instead"
+msgstr "предупреждение: %s %lu слишком мал, использую %lu вместо него"
+
+#: spvw.d:2381
+msgid "warning: %s %lu too large, using %lu instead"
+msgstr "предупреждение: %s %lu слишком велик, использую %lu вместо него"
+
+#: spvw.d:2532
+msgid "memory size"
+msgstr "размер памяти"
+
+#: spvw.d:2558
+msgid "multiple -B"
+msgstr "несколько -B"
+
+#: spvw.d:2591
+msgid "-E requires an argument"
+msgstr "-E требует аргумент"
+
+#: spvw.d:2822
+msgid "-l without -c is invalid"
+msgstr "-l без -c не допускается"
+
+#: spvw.d:2828
+msgid "-x with -c is invalid"
+msgstr "-x вместе с -c не допускается"
+
+#: spvw.d:2833
+msgid "-x with lisp-file is invalid"
+msgstr "-x вместе с лисп-файлом не допускается"
+
+#: spvw.d:2945
+msgid "Return value of malloc() = %lx is not compatible with type code distribution."
+msgstr "Значение функции malloc() = %x не совместимо с распределением кодов типов."
+
+#: spvw.d:2952
+msgid "Only %ld bytes available."
+msgstr "Доступно только %d байтов."
+
+#: spvw.d:3157
+msgid "Could not determine the end of the SP stack!"
+msgstr "Невозможно определить конец стека SP !"
+
+#: spvw.d:3892
+msgid "%s: Not enough memory for Lisp."
+msgstr "%s: Недостаточно памяти для Лиспa."
+
+#: spvw_alloca.d:48
+msgid "*** - Virtual memory exhausted. RESET"
+msgstr "*** - Исчерпана виртуальная память. СБРОС"
+
+#: spvw_alloca.d:50
+msgid "*** - Memory exhausted. RESET"
+msgstr "*** - Исчерпана память. СБРОС"
+
+#: spvw_mmap.d:64 spvw_mmap.d:184 spvw_mmap.d:345
+msgid "Cannot map memory to address 0x%lx ."
+msgstr "Невозможно спроецировать память на адрес 0x%lx ."
+
+#: spvw_mmap.d:157
+msgid "Cannot reserve address range at 0x%lx ."
+msgstr "Невозможно зарезервировать адресный диапазон в 0x%lx ."
+
+#: spvw_mmap.d:167
+msgid "Cannot reserve address range 0x%lx-0x%lx ."
+msgstr "Невозможно зарезервировать адресный диапазон 0x%lx-0x%lx ."
+
+#: spvw_mmap.d:211
+msgid "CreateFileMapping() failed."
+msgstr "CreateFileMapping(): ошибка."
+
+#: spvw_mmap.d:219
+msgid "MapViewOfFileEx(addr=0x%x,off=0x%x) failed."
+msgstr "MapViewOfFileEx(addr=0x%x,off=0x%x): ошибка."
+
+#: spvw_mmap.d:225
+msgid "MapViewOfFileEx() returned 0x%x instead of 0x%x."
+msgstr "MapViewOfFileEx() вернула 0x%x вместо 0x%x."
+
+#: spvw_mmap.d:240
+msgid "VirtualFree() failed."
+msgstr "VirtualFree(): ошибка."
+
+#: spvw_mmap.d:254
+msgid "VirtualProtect() failed."
+msgstr "VirtualProtect(): ошибка."
+
+#: spvw_mmap.d:325
+msgid "Cannot open <%s>."
+msgstr "Невозможно открыть <%s>."
+
+#: spvw_fault.d:273
+msgid "mprotect(0x%lx,%d,%d) failed."
+msgstr "mprotect(0x%lx,%d,%d): ошибка."
+
+#: spvw_sigsegv.d:25
+msgid "GC count: %lu"
+msgstr ""
+
+#: spvw_sigsegv.d:27
+msgid "Space collected by GC:"
+msgstr ""
+
+#: spvw_sigsegv.d:41
+msgid "Run time:"
+msgstr ""
+
+#: spvw_sigsegv.d:43
+msgid "Real time:"
+msgstr ""
+
+#: spvw_sigsegv.d:45
+msgid "GC time:"
+msgstr ""
+
+#: spvw_sigsegv.d:48
+msgid "Permanently allocated: %lu bytes."
+msgstr "Постоянно размещено: %lu байтов."
+
+#: spvw_sigsegv.d:51
+msgid "Currently in use: %lu bytes."
+msgstr "Используется сейчас: %lu байтов."
+
+#: spvw_sigsegv.d:54
+msgid "Free space: %lu bytes."
+msgstr "Свободная память: %lu байтов."
+
+#: spvw_sigsegv.d:65
+msgid "SIGSEGV cannot be cured. Fault address = 0x%lx."
+msgstr "SIGSEGV не удается исправить. Ошибочный адрес = 0x%lx."
+
+#: spvw_sigsegv.d:185
+msgid "Apollo 13 scenario: Stack overflow handling failed. On the next stack overflow we will crash!!!"
+msgstr "Сценарий Аполло-13: Обработка переполнения стека закончилась неудачей. Следующее переполнение стека приведет к разрушению!!!"
+
+#: spvw_garcol.d:2560 spvw_garcol_old.d:1961
+msgid "munmap() failed."
+msgstr "munmap(): ошибка."
+
+#: spvw_allocate.d:103
+msgid "*** - No more room for LISP objects: RESET"
+msgstr "*** - Нет места для объектов Лиспа: СБРОС"
+
+#: spvw_allocate.d:314 spvw_allocate.d:373 spvw_allocate.d:456
+msgid "Trying to make room through a GC..."
+msgstr "Освобождаем память - вызываем GC..."
+
+#: spvw_memfile.d:981 spvw_memfile.d:1833
+msgid "%s: operating system error during load of initialization file `%s'"
+msgstr "%s: ошибка операционной системы во время загрузки файла инициализации `%s'"
+
+#: spvw_memfile.d:1501
+msgid "%s: Cannot map the initialization file `%s' into memory."
+msgstr "%s: Невозможно разместить файл инициализации `%s' в памяти."
+
+#: spvw_memfile.d:1838
+msgid "%s: initialization file `%s' was not created by this version of CLISP runtime"
+msgstr "%s: файл инициализации `%s' был создан не этой версией исполнителя CLISP"
+
+#: spvw_memfile.d:1842
+msgid "%s: not enough memory for initialization"
+msgstr "%s: недостаточно памяти для инициализации"
+
+#: spvw_memfile.d:1893
+msgid "%s: 'image size' method failed, but found image header at %d\n"
+msgstr "%s: метод 'размер образа' провалился, но заголовок образа найден в %d\n"
+
+#: errunix.d:58
+msgid "Invalid multibyte or wide character"
+msgstr "Неверный многобайтный или широкий знак"
+
+#: errunix.d:65
+msgid "Operation not permitted"
+msgstr "Операция не разрешена"
+
+#: errunix.d:71
+msgid "No such file or directory"
+msgstr "Нет такого файла или каталога"
+
+#: errunix.d:77
+msgid "No such process"
+msgstr "Нет такого процесса"
+
+#: errunix.d:83
+msgid "Interrupted system call"
+msgstr "Прерванный системный вызов"
+
+#: errunix.d:89
+msgid "I/O error"
+msgstr "Ошибка ввода/вывода"
+
+#: errunix.d:95
+msgid "No such device or address"
+msgstr "Нет такого устройства или адреса"
+
+#: errunix.d:101
+msgid "Arg list too long"
+msgstr "Слишком длинный список аргументов"
+
+#: errunix.d:107
+msgid "Exec format error"
+msgstr "Ошибка формата программного файла"
+
+#: errunix.d:113
+msgid "Bad file number"
+msgstr "Неверный номер файла"
+
+#: errunix.d:119
+msgid "No child processes"
+msgstr "Нет порожденных процессов"
+
+#: errunix.d:125
+msgid "No more processes"
+msgstr "Не осталось процессов"
+
+#: errunix.d:131
+msgid "Not enough memory"
+msgstr "Недостаточно памяти"
+
+#: errunix.d:137
+msgid "Permission denied"
+msgstr "Доступ запрещён"
+
+#: errunix.d:143
+msgid "Bad address"
+msgstr "Неверный адрес"
+
+#: errunix.d:149
+msgid "Block device required"
+msgstr "Требуется блочное устройство"
+
+#: errunix.d:155
+msgid "Device busy"
+msgstr "Устройство занято"
+
+#: errunix.d:161
+msgid "File exists"
+msgstr "Файл существует"
+
+#: errunix.d:167
+msgid "Cross-device link"
+msgstr "Ссылка между устройствами"
+
+#: errunix.d:173
+msgid "No such device"
+msgstr "Нет такого устройства"
+
+#: errunix.d:179
+msgid "Not a directory"
+msgstr "Не каталог"
+
+#: errunix.d:185
+msgid "Is a directory"
+msgstr "Является каталогом"
+
+#: errunix.d:191
+msgid "Invalid argument"
+msgstr "Неправильный аргумент"
+
+#: errunix.d:197
+msgid "File table overflow"
+msgstr "Переполнение таблицы файлов"
+
+#: errunix.d:203
+msgid "Too many open files"
+msgstr "Слишком много открытых файлов"
+
+#: errunix.d:209
+msgid "Inappropriate ioctl for device"
+msgstr "Неподходящий ioctl для устройства"
+
+#: errunix.d:215
+msgid "Text file busy"
+msgstr "Текстовый файл занят"
+
+#: errunix.d:221
+msgid "File too large"
+msgstr "Файл слишком большой"
+
+#: errunix.d:227
+msgid "No space left on device"
+msgstr "Не осталось свободного места на устройстве"
+
+#: errunix.d:233
+msgid "Illegal seek"
+msgstr "Некорректный seek"
+
+#: errunix.d:239
+msgid "Read-only file system"
+msgstr "Файловая система с доступом `только на чтение'"
+
+#: errunix.d:245
+msgid "Too many links"
+msgstr "Слишком много ссылок"
+
+#: errunix.d:251
+msgid "Broken pipe, child process terminated or socket closed"
+msgstr "Сломаный конвейер (pipe), выполнение дочернего процесса прервано или закрыт сокет"
+
+#: errunix.d:261
+msgid "Argument out of domain"
+msgstr "Аргумент вне области определения"
+
+#: errunix.d:267
+msgid "Result too large"
+msgstr "Результат слишком большой"
+
+#: errunix.d:274
+msgid "Operation would block"
+msgstr "Операция будет блокировать"
+
+#: errunix.d:280
+msgid "Operation now in progress"
+msgstr "Операция выполняется"
+
+#: errunix.d:286
+msgid "Operation already in progress"
+msgstr "Операция уже выполняется"
+
+#: errunix.d:293
+msgid "Too many levels of symbolic links"
+msgstr "Слишком много уровней символьных ссылок"
+
+#: errunix.d:299
+msgid "File name too long"
+msgstr "Слишком длинное имя файла"
+
+#: errunix.d:305
+msgid "Directory not empty"
+msgstr "Каталог не пуст"
+
+#: errunix.d:312
+msgid "Stale NFS file handle"
+msgstr "Отработанный номер файла NFS"
+
+#: errunix.d:318
+msgid "Too many levels of remote in path"
+msgstr "Слишком много уровней удаленности в пути"
+
+#: errunix.d:325
+msgid "Socket operation on non-socket"
+msgstr "Операция применена не к сокету"
+
+#: errunix.d:331
+msgid "Destination address required"
+msgstr "Требуется адрес назначения"
+
+#: errunix.d:337
+msgid "Message too long"
+msgstr "Сообщение слишком длинное"
+
+#: errunix.d:343
+msgid "Protocol wrong type for socket"
+msgstr "Протокол неверного типа для сокета"
+
+#: errunix.d:349
+msgid "Option not supported by protocol"
+msgstr "Возможность не поддерживается протоколом"
+
+#: errunix.d:355
+msgid "Protocol not supported"
+msgstr "Протокол не поддерживается"
+
+#: errunix.d:361
+msgid "Socket type not supported"
+msgstr "Тип сокета не поддерживается"
+
+#: errunix.d:367
+msgid "Operation not supported on socket"
+msgstr "Операция не поддерживается на сокете"
+
+#: errunix.d:373
+msgid "Protocol family not supported"
+msgstr "Семейство протоколов не поддерживается"
+
+#: errunix.d:379
+msgid "Address family not supported by protocol family"
+msgstr "Семейство адресов не поддерживается семейством протоколов"
+
+#: errunix.d:385
+msgid "Address already in use"
+msgstr "Адрес уже используется"
+
+#: errunix.d:391
+msgid "Cannot assign requested address"
+msgstr "Невозможно присвоить требуемый адрес"
+
+#: errunix.d:397
+msgid "Network is down"
+msgstr "Сеть сломалась (down)"
+
+#: errunix.d:403
+msgid "Network is unreachable"
+msgstr "Сеть недостижима"
+
+#: errunix.d:409
+msgid "Network dropped connection on reset"
+msgstr "Сеть потеряла связи при сбросе"
+
+#: errunix.d:415
+msgid "Software caused connection abort"
+msgstr "Программа вызвала прерывание связи"
+
+#: errunix.d:421
+msgid "Connection reset by peer"
+msgstr "Сброс слишком медленной связи"
+
+#: errunix.d:427
+msgid "No buffer space available"
+msgstr "Нет свободного места в буфере"
+
+#: errunix.d:433
+msgid "Socket is already connected"
+msgstr "Сокет уже подключен"
+
+#: errunix.d:439
+msgid "Socket is not connected"
+msgstr "Сокет не подключен"
+
+#: errunix.d:445
+msgid "Cannot send after socket shutdown"
+msgstr "Невозможно послать данные после отключения сокета"
+
+#: errunix.d:451
+msgid "Too many references: cannot splice"
+msgstr "Слишком много ссылок: невозможно склеить"
+
+#: errunix.d:457
+msgid "Connection timed out"
+msgstr "Время связи истекло"
+
+#: errunix.d:463
+msgid "Connection refused"
+msgstr "В связи отказано"
+
+#: errunix.d:468
+msgid "Remote peer released connection"
+msgstr "Удаленный компьютер освободил соединение"
+
+#: errunix.d:473
+msgid "Host is down"
+msgstr "Сервер выключен"
+
+#: errunix.d:479
+msgid "Host is unreachable"
+msgstr "Сервер недоступен по сети"
+
+#: errunix.d:484
+msgid "Networking error"
+msgstr "Сетевая ошибка"
+
+#: errunix.d:490
+msgid "Too many processes"
+msgstr "Слишком много процессов"
+
+#: errunix.d:496
+msgid "Too many users"
+msgstr "Слишком много пользователей"
+
+#: errunix.d:502
+msgid "Disk quota exceeded"
+msgstr "Превышена квота диска"
+
+#: errunix.d:509
+msgid "Not a stream device"
+msgstr "Не поточное устройство"
+
+#: errunix.d:515
+msgid "Timer expired"
+msgstr "Таймер закончил отсчет"
+
+#: errunix.d:521
+msgid "Out of stream resources"
+msgstr "Ресурсы потока истекли"
+
+#: errunix.d:527
+msgid "No message of desired type"
+msgstr "Нет сообщений желаемого типа"
+
+#: errunix.d:533
+msgid "Not a data message"
+msgstr "Не сообщение с данными"
+
+#: errunix.d:540
+msgid "Identifier removed"
+msgstr "Идентификатор удален"
+
+#: errunix.d:547
+msgid "Resource deadlock would occur"
+msgstr "Коллизия блокировки (deadlock) ресурсов"
+
+#: errunix.d:553
+msgid "No record locks available"
+msgstr "Нет доступных блокировок записи (record locks)"
+
+#: errunix.d:560
+msgid "Machine is not on the network"
+msgstr "Машина не в сети"
+
+#: errunix.d:566 errunix.d:572
+msgid "Object is remote"
+msgstr "Объект является удаленным (remote)"
+
+#: errunix.d:578
+msgid "Link has been severed"
+msgstr "Связь разорвана"
+
+#: errunix.d:584
+msgid "Advertise error"
+msgstr "Ошибка объявления (advertise)"
+
+#: errunix.d:590
+msgid "Srmount error"
+msgstr "Ошибка srmount"
+
+#: errunix.d:596
+msgid "Communication error on send"
+msgstr "Ошибка обмена при передаче"
+
+#: errunix.d:602
+msgid "Protocol error"
+msgstr "Ошибка протокола"
+
+#: errunix.d:608
+msgid "Multihop attempted"
+msgstr "Попытка multihop"
+
+#: errunix.d:620
+msgid "Remote address changed"
+msgstr "Удаленный (remote) адрес изменен"
+
+#: errunix.d:627
+msgid "Function not implemented"
+msgstr "Функция не реализована"

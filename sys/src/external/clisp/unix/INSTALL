@@ -1,0 +1,289 @@
+Installation on Unix:
+---------------------
+
+This file describes the standard installation procedure.
+Please do read this entire file before starting
+- or, if you are impatient, start with step 2 and then skip to step 12.
+Special hints for some platforms can be found in file unix/PLATFORMS.
+Despite this file's location, it is applicable to cygwin and mingw as well.
+
+1. (Optional)
+   Choose which C compiler to use for building CLISP.
+   This is normally not necessary; if GNU C is available under the
+   name "gcc", it will be used.
+
+   For example, if you were wanting to use gcc with full warnings, then
+   type, if you are using csh:
+
+         setenv CC "gcc -Wall"
+
+   or if you are using bash or ksh:
+
+         export CC="gcc -Wall"
+
+   or if you are using sh:
+
+         CC="gcc -Wall"
+         export CC
+
+   On bi-arch systems, such as sparc, you *must* select word size explicitly,
+   by setting CC to "gcc -m64".
+
+2. (Recommended)
+   Install a few libraries on which CLISP relies:
+   * GNU libsigsegv
+      + Highly recommended: needed for generational garbage collection
+        and for stack overflow detection in interpreted Lisp code.
+      <ftp://ftp.gnu.org/pub/gnu/libsigsegv/>
+      <http://sourceforge.net/projects/libsigsegv/>
+   * GNU libffcall
+      + Highly recommended: needed for the foreign function interface.
+      <ftp://ftp.gnu.org/pub/gnu/libffcall/>
+      <http://www.gnu.org/software/libffcall/>
+   * GNU libiconv
+      + Not needed on systems with glibc 2.2 or newer, or MacOS X 10.3 or
+        newer, but recommended on all other systems for additional encodings.
+      <ftp://ftp.gnu.org/pub/gnu/libiconv/>
+      <http://sourceforge.net/projects/libiconv/>
+   * GNU readline
+      + Recommended: needed if you want terminal command line editing.
+      <ftp://ftp.gnu.org/pub/gnu/readline/>
+      <http://cnswww.cns.cwru.edu/~chet/readline/rltop.html>
+   * GNU gettext
+      + Not needed on systems with glibc 2.2 or newer, but recommended on all
+        other systems: needed if you want CLISP with native language support.
+      <ftp://ftp.gnu.org/pub/gnu/gettext/>
+      <http://www.gnu.org/software/gettext/>
+
+   When you install your libraries in a non-standard location, you will
+   need to tell the location to the top-level configure, e.g.:
+
+   ./configure --with-libreadline-prefix=/sw               \
+               --with-libsigsegv-prefix=/usr/local         \
+               --with-libiconv-prefix=/home/user/my/prefix \
+               --with-module=libsvm --with-module=rawsock  \
+               --cbc my-build-directory
+
+   Note that on bi-arch systems, such as sparc, the 64-bit libraries are
+   searched for in $prefix/lib64, not in $prefix/lib.
+   This means that if you want to build a 64-bit CLISP on such a system,
+   you will need to build, say, libsigsegv, like this:
+
+   ./configure CC='gcc -m64' --prefix=<prefix> --libdir='${exec_prefix}/lib64'
+   make && make check && make install
+
+   and then build CLISP like this:
+
+   ./configure CC='gcc -m64' --with-libsigsegv-prefix=<prefix> ...
+
+3. Choose the name of a directory in which to build CLISP.
+   (This allows you to build CLISP with different compilers on the same
+   machine or for different architectures in the same filesystem, sharing
+   the same source.)
+   For example, depending on the chosen compiler, let's use build-with-gcc.
+   Then execute
+
+         ./configure build-with-gcc
+
+   This will prepare a directory build-with-gcc/ and figure out many
+   system and compiler dependent parameters needed by CLISP.
+
+   (Note: Some `make's - for example the HP-UX make - have problems
+   with symbolic links. You may avoid these by calling
+
+         ./configure
+
+   without argument. Then CLISP will be built in the src/ directory
+   itself.)
+
+   Note that the argument to configure can be an absolute pathname.
+   For example, the following command will also work.
+
+         ./configure /tmp/with-gcc-wall
+
+   Note that you should not use a directory name with spaces in it.
+   This is especially relevant to woe32-based systems, such as mingw and cygwin.
+   Specifically, if your source distribution is in
+     "C:\Documents and Settings\username\...\clisp\"
+   then your best bet is "./configure /tmp/build-clisp",
+   not "./configure build".
+
+4. The previous step printed a recommendation how to continue.
+   Follow the recommendation: go to this directory
+
+         cd build-with-gcc
+
+   For platform specific adjustment of the makefile, take a look at the
+   PLATFORMS file.
+
+5. If you wish to build CLISP with add-on modules, edit Makefile and
+   change the line defining the MODULES variable.
+   The list of modules included with the distribution is available via
+
+         ./configure --help-modules
+
+   This can be automated by adding --with-module= arguments to the ./configure
+   invocation in step 2.
+
+6. Edit the contents of config.lisp appropriately for your site,
+   especially the definitions of short-site-name and long-site-name.
+
+7. Type
+
+         make
+
+   to build CLISP.
+   If you are an expert in building CLISP, you may alternatively do this
+   in eleven easy to remember steps:
+         make init                prepares all symbolic links and utilities
+         make allc                makes all *.c files
+         make lisp.run            makes the executable runtime
+           (cygwin & mingw: use "make lisp.exe" instead)
+         make interpreted.mem     a memory image with everything uncompiled
+         make halfcompiled.mem    a memory image with compiler.fas and
+                                   the rest uncompiled
+         make lispinit.mem        makes all *.fas files and
+                                   a memory image with everything compiled
+         make manual              makes the documentation
+         make modular             prepares for module building
+         make boot                makes the boot linking set (just the core)
+         make base                makes the base linking set
+                                   (boot + regexp + syscalls + i18n + readline)
+         make full                makes the full linking set (base + your
+                                   MODULES variable in Makefile, see step 5)
+
+   If something goes wrong, check and optionally modify the contents of
+   the file config.h and retry this step. Yes, there are many warnings,
+   we know. Most of them are harmless.
+
+   If you need to switch to a different compiler, execute a
+         make distclean
+         cd ..
+   and go back to step 1.
+
+8. (Optionally)
+   Three more tests for CLISP. Let the compiler (now compiled!) recompile
+   itself:
+
+         make check-recompile
+
+   Check whether CLISP passes the XCL/CLISP test suite:
+
+         make check-tests
+
+   Check whether CLISP passes the Minejima/SACLA test suite
+     (CVS tree only, not in the tar ball):
+
+         make check-sacla-tests
+
+   Check whether CLISP passes the Dietz/GCL test suite
+     (CVS tree only, not in the tar ball):
+
+         make check-ansi-tests
+
+   Or run all available tests with one shot:
+
+         make check
+
+   If you build with some modules, you can test those of them that come
+   with a test suite with:
+
+         make mod-check
+
+   Note that the modules may use external libraries, and test failures
+   may indicate bugs in those libraries rather than in CLISP.
+   See the specific test suite for detail.
+
+9. Edit the `prefix' variable in the makefile (you could also have specified
+   it as command line option --prefix=... to `configure' in step 3), then type
+
+         make install
+
+   If `prefix' is /usr/local, then this will install the CLISP binaries
+   into /usr/local/bin and /usr/local/lib (creating a directory
+   /usr/local/lib/clisp) and the manual page into /usr/local/man/man1.
+   You may need superuser privileges for this step when installing into
+   public directories.
+   If you built with static modules (./configure --without-dynamic-modules)
+   there will be two "linking sets" in /usr/local/lib/clisp/ - "base"
+   and "full" (see <http://clisp.cons.org/impnotes.html#modules>).
+   You can chose which linking set to run by using "-K" option of clisp
+   (see <http://clisp.cons.org/clisp.html#opt-link-set>)
+   Note that some modules (i18n, regexp, syscalls and readline at this time)
+   are included in the "base" linking set by default,
+   see BASE_MODULES in build-dir/Makefile.
+   Other modules can be REQUIREd at run time.
+
+10. If you want other people to benefit from your work, you can make a binary
+   distribution of CLISP for your platform which we will distribute.
+   To do this, make sure you have executed step 7 above,
+   adjust the definition of ROFF_MAN in the makefile,
+   then type
+
+         make distrib
+
+   to create a binary distribution in a clisp-*.tar.gz file.
+   Tell us about your success, and make that file available to us.
+
+   If you want to distribute the binaries, recall that you have to accompany
+   them with full source; see the files COPYING and GNU-GPL.
+
+11. The last thing to do:
+
+         cd ..
+
+12. If you are lazy and have too few spare neurons to remember this long
+    process, just use the shortcut, like I do:
+
+         ./configure --with-module=rawsock --cbc build-dir
+
+    this covers the build process through step 8 (except mod-check).
+
+
+Additional Information for Maintainers of Binary Packages:
+----------------------------------------------------------
+
+1. CLISP build process respects the CFLAGS environment variable,
+   and, when GCC is used and CFLAGS is unset, "-g -O2" is used, see
+   <http://www.gnu.org/software/autoconf/manual/html_node/C-Compiler.html>.
+   This means that if your distribution's policy is to minimize executables'
+   size at the expense of debuggability you should configure CLISP like this:
+        ./configure CFLAGS='' ...
+   and let CLISP choose the optimization options.
+   The often used alternative - to strip the executables before packaging -
+   breaks DISASSEMBLE on functions written in C: (DISASSEMBLE #'CAR) prints
+   the disassembly of the whole executable instead of just a few lines
+   that constitute the function CAR.
+   Note that makemake (the script run by configure and "make Makefile")
+   will set the appropriate optimization level,
+   so it does not matter if you set CFLAGS to "-O", "-O2" or just "".
+   See <https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=199887>.
+
+2. Despite whatever ldd may say to the contrary, CLISP is linked
+   _statically_ against libsigsegv, so whenever you upgrade libsigsegv,
+   you MUST recompile CLISP.
+   See <https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=199525>.
+
+3. Module selection: it is up to you which modules to distribute.
+   The trade off is offering extra functionality while increasing dependency
+   on other packages, the executable size, and the distribution size.
+   Another issue is offering a uniform experience to all CLISP users
+   regardless of platform or distribution.
+   We recommend keeping the base linking set (i18n, regexp, syscalls, readline)
+   intact and adding rawsock to the full linking set (see step <12> above).
+   This will create a CLISP distribution with _no_ external dependencies.
+   Then you can distribute individual pre-built modules with their own
+   dependencies, e.g., the pcre module would depend on libpcre, postgresql
+   module would depend on libpq, new-clx would depend on X &c.
+   See <http://clisp.cons.org/impnotes/modules.html#base-modules>
+   and "./configure --help-modules".
+
+Authors:
+--------
+
+        Bruno Haible
+        Michael Stoll
+        Sam Steingold
+
+Email: clisp-list@lists.sourceforge.net
+

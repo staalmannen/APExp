@@ -1,0 +1,52 @@
+# Makefile for the CLISP module set gtk2
+
+srcdir = @srcdir@
+CC = @CC@
+CPPFLAGS = @CPPFLAGS@
+CFLAGS = @CFLAGS@
+LIBS = @LIBS@
+# defined by AM_PATH_GTK_2_0
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_LIBS = @GTK_LIBS@
+# defined by PKG_CHECK_MODULES
+LIBGLADE_CFLAGS = @LIBGLADE_CFLAGS@
+LIBGLADE_LIBS = @LIBGLADE_LIBS@
+
+CLISP = @CLISP@ -norc -q
+CLISP_LINKKIT = @CLISP_LINKKIT@
+
+LN = @LN@
+LN_S = @LN_S@
+
+MAKE = make
+
+SHELL = /bin/sh
+
+GENERATED = gtk.fas gtk.o preload.lisp
+DISTRIBFILES = link.sh Makefile $(GENERATED) \
+	$(srcdir)/gtk-server.cfg $(srcdir)/gtk.lisp $(srcdir)/ui.glade
+distribdir =
+
+# default target: make the module
+clisp-module : $(GENERATED)
+
+gtk.fas gtk.c : $(srcdir)/gtk.lisp $(srcdir)/gtk-server.cfg
+	$(CLISP) -c $(srcdir)/gtk.lisp -o ./
+
+gtk.o : gtk.c config.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -I$(CLISP_LINKKIT) $(GTK_CFLAGS) \
+		$(LIBGLADE_CFLAGS) -c gtk.c
+
+preload.lisp : $(srcdir)/preload.lisp
+	$(LN_S) $(srcdir)/preload.lisp .
+
+# Make a module distribution into $(distribdir)
+clisp-module-distrib : clisp-module force
+	$(LN) $(DISTRIBFILES) $(distribdir)
+
+clean : force
+	rm -f core *.o *.a *.fas *.lib
+
+distclean : clean
+
+force :

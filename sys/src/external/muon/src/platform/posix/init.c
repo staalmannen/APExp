@@ -15,7 +15,7 @@ static struct {
 } platform_sigabrt_handler_ctx;
 
 void
-platform_sigabrt_handler(int signo, siginfo_t *info, void *ctx)
+platform_sigabrt_handler(int signo)
 {
 	if (platform_sigabrt_handler_ctx.handler) {
 		platform_sigabrt_handler_ctx.handler(platform_sigabrt_handler_ctx.ctx);
@@ -25,13 +25,7 @@ platform_sigabrt_handler(int signo, siginfo_t *info, void *ctx)
 void
 platform_init(void)
 {
-	{
-		struct sigaction act = {
-			.sa_flags = SA_SIGINFO,
-			.sa_sigaction = platform_sigabrt_handler,
-		};
-		sigaction(SIGABRT, &act, 0);
-	}
+	signal(SIGABRT, platform_sigabrt_handler);
 }
 
 void

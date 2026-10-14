@@ -1,0 +1,128 @@
+--- clisp-conversion2/src/makemake.in	Sat Feb 15 17:51:44 2003
++++ clisp-conversion/src/makemake.in	Sat Feb 15 12:58:42 2003
+@@ -1962,7 +1962,6 @@
+   echol "SHELL = /bin/sh"
+   echol
+ fi
+-echol "COMMENT5 = ${HERE}comment5"
+
+ if [ -n "$XCC_SUNPRO" ] ; then
+   XASM_NEED_CCPAUX=true
+@@ -2099,7 +2098,6 @@
+ if [ $NEED_CCPAUX = true ] ; then
+   UTILS=$UTILS' ccpaux'
+ fi
+-UTILS=$UTILS' comment5'
+ UTILS=$UTILS' ansidecl'
+ UTILS=$UTILS' varbrace'
+ if [ $XCC_NEED_DEEMA = true -a $HOS != unix ] ; then
+@@ -2188,40 +2186,18 @@
+     echotab_to_HEXE "\$(CC) \$(CFLAGS) \$(CLFLAGS)" "${SRCTOPDIR}os2/${util}.c" "${util}"
+     echol
+   fi
+-  if [ $util = comment5 ] ; then
+-    if [ $CC_NEED_CCPAUX = true ] ; then
+-      echol "${util}${HEXE} : ${UTILDIR_M}${util}.c ${CCPAUX}"
+-      echotab "${HERE}ccpaux${HEXE} < ${UTILDIR_}${util}.c > ${util}.c"
+-      echotab_to_HEXE "\$(CC) \$(CFLAGS) \$(CLFLAGS)" "${util}.c" "${util}"
+-      echotab "\$(RM) ${util}.c"
+-      echol
+-      OBSOLETE=$OBSOLETE" ${util}.c"
+-    else
+-      echol "${util}${HEXE} : ${UTILDIR_M}${util}.c"
+-      if [ ${HSYS} = "win32gcc" ]; then
+-        # **HACK**: avoid -mno-cygwin so that comment5.exe
+-        #           understands symbolic links
+-        echotab_to_HEXE "gcc \$(CFLAGS) \$(CLFLAGS)" "${UTILDIR_CC}${util}.c" "${util}"
+-      else
+-        echotab_to_HEXE "\$(CC) \$(CFLAGS) \$(CLFLAGS)" "${UTILDIR_CC}${util}.c" "${util}"
+-      fi
+-      echol
+-    fi
+-  fi
+   if [ $util = ansidecl ] ; then
+     flags="${ANSIDECLFLAGS}"
+-    echol "${util}${HEXE} : ${UTILDIR_M}${util}.d comment5${HEXE}"
+-    echotab "\$(LN_S) ${UTILDIR_}${util}.d ${util}.d"
+-    echotab "\$(COMMENT5) ${util}.d ${util}.c"
+-    echotab "\$(RM) ${util}.d"
++    echol "${util}${HEXE} : ${UTILDIR_M}${util}.d"
++    echotab "\$(LN_S) ${UTILDIR_}${util}.d ${util}.c"
+     echotab_to_HEXE "\$(CC) \$(CFLAGS) \$(CLFLAGS)${flags}" "${util}.c" "${util}"
+     echotab "\$(RM) ${util}.c"
+     echol
+     OBSOLETE=$OBSOLETE" ${util}.c"
+   fi
+   if [ $util = varbrace ] ; then
+-    echol "${util}${HEXE} : ${UTILDIR_M}${util}.d comment5${HEXE} ansidecl${HEXE}"
+-    echotabpipe "\$(COMMENT5) ${UTILDIR_CC}${util}.d | \$(ANSIDECL) > ${util}.c"
++    echol "${util}${HEXE} : ${UTILDIR_M}${util}.d ansidecl${HEXE}"
++    echotabpipe "\$(CAT) ${UTILDIR_CC}${util}.d | \$(ANSIDECL) > ${util}.c"
+     echotab_to_HEXE "\$(CC) \$(CFLAGS) \$(CLFLAGS)" "${util}.c" "${util}"
+     echotab "\$(RM) ${util}.c"
+     echol
+@@ -2281,14 +2257,14 @@
+ echol
+
+ for f in $DFILES ; do
+-  echol "${f}.c : ${f}.d comment5${HEXE}${XDECL_DEPENDENCIES}"
+-  echotabpipe "\$(COMMENT5) ${f}.d${CHSCONVERT_FILTER} ${XDECL_FILTER} > ${f}.c"
++  echol "${f}.c : ${f}.d ${XDECL_DEPENDENCIES}"
++  echotabpipe "\$(CAT) ${f}.d${CHSCONVERT_FILTER} ${XDECL_FILTER} > ${f}.c"
+   echol
+ done
+
+ for f in $ARI_ASMD $SP_ASMD ; do
+-  echol "${f}.c : ${f}.d comment5${HEXE} ${XCCPAUX}"
+-  echotabpipe "\$(COMMENT5) ${f}.d${XASMCCPAUX_FILTER} > ${f}.c"
++  echol "${f}.c : ${f}.d ${XCCPAUX}"
++  echotabpipe "\$(CAT) ${f}.d${XASMCCPAUX_FILTER} > ${f}.c"
+   echol
+ done
+
+@@ -3618,7 +3594,7 @@
+   echotab "-\$(RM) MAGIC.add"
+ fi
+ echotab "-\$(RMRF) data"
+-echotab "-\$(RM) comment5${HEXE} ansidecl${HEXE} varbrace${HEXE} ccpaux${HEXE} deema${HEXE} txt2c${HEXE} ccmp2c${HEXE} modprep${HEXE} clisp${HEXE}"
++echotab "-\$(RM) ansidecl${HEXE} varbrace${HEXE} ccpaux${HEXE} deema${HEXE} txt2c${HEXE} ccmp2c${HEXE} modprep${HEXE} clisp${HEXE}"
+ echol
+ cat <<!!
+ # clean6 lets us go back to "makemake > Makefile".
+--- clisp-conversion2/src/lispbibl.d	Sat Feb 15 18:03:58 2003
++++ clisp-conversion/src/lispbibl.d	Sat Feb 15 18:10:20 2003
+@@ -84,7 +84,7 @@
+ # Acorn        Risc PC            RISC OS 3.x                   GNU           [__]arm, [__]riscos, __GNUC__
+ # Acorn        Risc PC            RISC OS 3.x                   Norcroft      [__]arm, [__]riscos
+ # APPLE IIGS   Apple              ??                            ??
+-# For ANSI-C-Compiler: use pre-processors comment5, ansidecl
++# For ANSI-C-Compiler: use pre-processors ansidecl
+ #   (and maybe gcc-cpp, ccpaux).
+
+
+--- clisp-conversion2/utils/ccmp2c.c	Mon Dec  2 06:22:30 2002
++++ clisp-conversion/utils/ccmp2c.c	Sat Feb 15 16:41:19 2003
+@@ -58,8 +58,6 @@
+ #define MAXARGCOUNT        50
+ /* define as 1 if C++ style comments "//" shall be understood */
+ #define CPLUSPLUS_COMMENTS 1
+-/* define as 1 if comment5 style comments "# " shall be understood */
+-#define COMMENT5_COMMENTS  1
+ /* functions are split after this many statements */
+ #define MAXFUNCLENGTH  20
+
+@@ -368,14 +366,6 @@
+         if (within_prep_directive)
+           goto separator;
+         else
+-#if COMMENT5_COMMENTS
+-          if (peek_char(infile) == ' ') {
+-            next_char(infile);
+-            do { c = next_char(infile); }
+-            while (c!=EOF && c!='\n');
+-            goto restart;
+-          } else
+-#endif
+             {
+               while(1) {
+                 token_t* subtoken = nexttoken(infile,tokens,FALSE,TRUE);

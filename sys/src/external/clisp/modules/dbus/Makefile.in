@@ -1,0 +1,43 @@
+# Makefile for CLISP module set dbus
+
+srcdir = @srcdir@
+CC = @CC@
+CPPFLAGS = @CPPFLAGS@
+CFLAGS = @CFLAGS@
+# defined by PKG_CHECK_MODULES
+DBUS_CFLAGS = @DBUS_CFLAGS@
+DBUS_LIBS = @DBUS_LIBS@
+
+CLISP = @CLISP@ -norc -q
+CLISP_LINKKIT = @CLISP_LINKKIT@
+
+LN = @LN@
+
+MAKE = make
+
+SHELL = /bin/sh
+
+GENERATED = dbus.o dbus.fas
+DISTRIBFILES = link.sh Makefile $(GENERATED) $(srcdir)/dbus.lisp
+distribdir =
+
+# default target: make the module
+clisp-module : $(GENERATED)
+
+dbus.c dbus.fas : $(srcdir)/dbus.lisp
+	$(CLISP) -c $(srcdir)/dbus.lisp -o ./
+
+dbus.o : dbus.c config.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -I$(CLISP_LINKKIT) $(DBUS_CFLAGS) -c dbus.c
+
+# Make a module distribution into $(distribdir)
+clisp-module-distrib : clisp-module force
+	$(LN) $(DISTRIBFILES) $(distribdir)
+
+clean : force
+	rm -f core *.o *.a *.fas *.lib
+
+distclean : clean
+
+force :
+

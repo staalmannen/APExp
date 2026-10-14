@@ -1,0 +1,9 @@
+# link.sh for FastCGI library
+# $Id: link.sh.in,v 1.4 2009/09/10 21:26:25 sds Exp $
+${MAKE-make} clisp-module \
+  CC="${CC}" CPPFLAGS="${CPPFLAGS}" CFLAGS="${CFLAGS}" \
+  CLISP_LINKKIT="$absolute_linkkitdir" CLISP="${CLISP}"
+NEW_FILES="fastcgi.o fastcgi_wrappers.o"
+NEW_LIBS="${NEW_FILES} @LIBS@"
+NEW_MODULES="fastcgi"
+TO_LOAD="fastcgi"

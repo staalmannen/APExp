@@ -1,0 +1,71 @@
+dnl AUTOCONF configuration for postgresql
+dnl Copyright (C) 2003-2009 Sam Steingold <sds@gnu.org>
+dnl GNU GPL2
+
+AC_PREREQ(2.57)
+AC_INIT(postgresql, 1.0, clisp-list)
+AC_CONFIG_SRCDIR(postgresql.lisp)
+AC_CONFIG_HEADERS(config.h)
+
+RSE_BOLD
+BOLD_MSG([PostgreSQL (Common)])
+CL_MODULE_COMMON_CHECKS([ffi])
+
+dnl Search for libpq and define LIBPQ, LTLIBPQ and INCPQ.
+AC_LIB_LINKFLAGS([pq])
+
+BOLD_MSG([PostgreSQL (Headers)])
+AC_CHECK_HEADERS(postgres_ext.h postgresql/postgres_ext.h pgsql/postgres_ext.h)
+if test "$ac_cv_header_postgres_ext_h" = "no" \
+     -a "$ac_cv_header_postgresql_postgres_ext_h" = "no" \
+     -a "$ac_cv_header_pgsql_postgres_ext_h" = "no"; then
+  AC_MSG_ERROR([cannot find PostgreSQL headers])
+fi
+
+BOLD_MSG([PostgreSQL (Functions)])
+AC_LIB_APPENDTOVAR([LIBS], [$LIBPQ])
+AC_SEARCH_LIBS(PQconnectdb, pq)
+if test "$ac_cv_search_PQconnectdb" = "no"; then
+  AC_MSG_ERROR([cannot find PostgreSQL library])
+fi
+AC_CHECK_TYPES([Oid, pqbool],,,[#if defined(HAVE_POSTGRES_EXT_H)
+#  include <postgres_ext.h>
+#elif defined(HAVE_POSTGRESQL_POSTGRES_EXT_H)
+#  include <postgresql/postgres_ext.h>
+#elif defined(HAVE_PGSQL_POSTGRES_EXT_H)
+#  include <pgsql/postgres_ext.h>
+#else
+#  error PostgreSQL is not found
+#endif])
+AC_CHECK_FUNCS(PQconnectStart PQconnectPoll PQconnectdb PQsetdbLogin dnl
+PQfinish PQconndefaults PQconninfoFree PQresetStart PQresetPoll PQreset dnl
+PQgetCancel PQfreeCancel PQcancel PQrequestCancel PQdb PQuser PQpass PQhost dnl
+PQport PQtty PQoptions PQstatus PQtransactionStatus PQparameterStatus dnl
+PQprotocolVersion PQserverVersion PQerrorMessage PQsocket PQbackendPID dnl
+PQconnectionNeedsPassword PQconnectionUsedPassword PQconninfoParse dnl
+PQclientEncoding PQsetClientEncoding PQgetssl PQinitSSL PQinitOpenSSL dnl
+PQsetErrorVerbosity PQtrace PQuntrace PQsetNoticeReceiver dnl
+PQsetNoticeProcessor PQexec PQexecParams PQprepare PQexecPrepared dnl
+PQsendQuery PQsendQueryParams PQsendPrepare PQsendQueryPrepared PQgetResult dnl
+PQisBusy PQconsumeInput PQnotifies PQputCopyData PQputCopyEnd PQgetCopyData dnl
+PQgetline PQputline PQgetlineAsync PQputnbytes PQendcopy PQsetnonblocking dnl
+PQisnonblocking PQflush PQfn PQresultStatus PQresStatus PQresultErrorMessage dnl
+PQisthreadsafe PQnparams PQparamtype PQdescribePrepared PQdescribePortal dnl
+PQsendDescribePrepared PQsendDescribePortal dnl
+PQresultErrorField PQntuples PQnfields PQbinaryTuples PQfname PQfnumber dnl
+PQftable PQftablecol PQfformat PQftype PQfsize PQfmod PQcmdStatus dnl
+PQoidStatus PQoidValue PQcmdTuples PQgetvalue PQgetlength PQgetisnull dnl
+PQclear PQfreemem PQmakeEmptyPGresult PQescapeString PQescapeBytea dnl
+PQcopyResult PQsetResultAttrs PQresultAlloc PQsetvalue dnl
+PQescapeStringConn PQescapeByteaConn dnl
+PQunescapeBytea PQprint PQdisplayTuples PQprintTuples dnl
+lo_open lo_close lo_read lo_write lo_lseek lo_creat lo_tell lo_unlink dnl
+lo_import lo_import_with_oid lo_export lo_create lo_truncate dnl
+PQmblen PQdsplen PQenv2encoding PQencryptPassword dnl
+pg_char_to_encoding pg_encoding_to_char pg_valid_server_encoding_id)
+
+BOLD_MSG([PostgreSQL (Output)])
+AC_CONFIG_FILES(Makefile link.sh)
+AC_OUTPUT
+
+BOLD_MSG([PostgreSQL (Done)])

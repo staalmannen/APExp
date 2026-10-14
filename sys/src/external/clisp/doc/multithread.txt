@@ -1,0 +1,58 @@
+                              Multithreading
+                              ==============
+
+Is currently being developed but is usable and testable.
+HOWEVER: Various tests on various platforms may fail.
+         CLISP may segfault.
+         Your work may be lost.
+         You have been warned!
+
+Installation
+------------
+
+In the Makefile, define in the CFLAGS the symbol MULTITHREAD and one of
+the symbols POSIX_THREADS, WIN32_THREADS.
+(See xthread.d about their meaning.)
+Alternatively, you can pass "--with-threads=flavor" to the top-level
+configure ("flavor" is one of POSIX_THREADS, WIN32_THREADS).
+
+When building with gcc that does not support __thread qualifier for per
+thread variables it's better to add to CFLAGS: -DUSE_CUSTOM_TLS=3 (or 2).
+Built executable will be significantly faster than the one with default settings
+(if we rely on OS API for thread local storage i.e. pthread_getspecific()).
+See comments in: http://clisp.cvs.sourceforge.net/viewvc/*checkout*/clisp/clisp/src/lispbibl.d
+Platforms on which gcc does not support __thread qualifier are (encountered
+up to now): MacOSX, Win32+mingw
+
+DOCS: impbyte.xml:"gc-mt"; impext.xml:"mt"
+preview: http://clisp.podval.org/impnotes/mt.html
+         http://clisp.podval.org/impnotes/gc-mt.html
+
+Follows a list of TODO/REMARKS items - everything after --NOT IMPLEMENTED YET--
+is not ready.
+
+Packages
+--------
+
+PACKAGE objects have internal mutex and are locked by INTERN before adding
+a symbol. All modifications of internal package data are guarded by this mutex.
+
+Care should be taken when WITH-PACKAGE-ITERATOR is used. While iterating changes
+in packages involved may cause unexpected errors (but no crash). Locking all
+these packages does not seem a good option.
+
+CLOS
+----
+
+DEFCLASS, DEFGENERIC, DEFMETHOD, DEFSTRUCT must get a global "DEF-CLOS"
+lock because they change the global class hierarchy.
+(This is a consequence of the Parallelizability Principle.)
+--NOT IMPLEMENTED YET--
+
+
+WIN32
+-----
+
+--NOT IMPLEMENTED YET--
+Currently blocking I/O cannot be interrupted. The interrupt will be handled
+after the call returns

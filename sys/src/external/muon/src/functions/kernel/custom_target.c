@@ -96,31 +96,34 @@ format_cmd_arg_cb(struct workspace *wk, uint32_t node, void *_ctx, const struct 
 		cmd_arg_fmt_key_count,
 	};
 
-	const struct {
-		char *key;
-		bool valid;
-		bool needs_name;
-	} key_names[cmd_arg_fmt_key_count] = {
-		[key_input             ] = { "INPUT", ctx->opts->input },
-		[key_output            ] = { "OUTPUT", ctx->opts->output },
-		[key_outdir            ] = { "OUTDIR", ctx->opts->output },
-		[key_depfile           ] = { "DEPFILE", ctx->opts->depfile },
-		[key_plainname         ] = { "PLAINNAME", ctx->opts->input },
-		[key_basename          ] = { "BASENAME", ctx->opts->input },
-		[key_private_dir       ] = { "PRIVATE_DIR", ctx->opts->output, true, },
-		[key_source_root       ] = { "SOURCE_ROOT", true },
-		[key_build_root        ] = { "BUILD_ROOT", true },
-		[key_build_dir         ] = { "BUILD_DIR", ctx->opts->build_dir },
-		[key_current_source_dir] = { "CURRENT_SOURCE_DIR", true },
-	};
-
 	enum cmd_arg_fmt_key key;
+	const char *key_name;
+	bool key_valid, key_needs_name;
 	for (key = 0; key < cmd_arg_fmt_key_count; ++key) {
-		if (!str_eql(strkey, &STRL(key_names[key].key))) {
+		key_needs_name = false;
+		switch (key) {
+		case key_input: key_name = "INPUT"; key_valid = ctx->opts->input != 0; break;
+		case key_output: key_name = "OUTPUT"; key_valid = ctx->opts->output != 0; break;
+		case key_outdir: key_name = "OUTDIR"; key_valid = ctx->opts->output != 0; break;
+		case key_depfile: key_name = "DEPFILE"; key_valid = ctx->opts->depfile != 0; break;
+		case key_plainname: key_name = "PLAINNAME"; key_valid = ctx->opts->input != 0; break;
+		case key_basename: key_name = "BASENAME"; key_valid = ctx->opts->input != 0; break;
+		case key_private_dir:
+			key_name = "PRIVATE_DIR";
+			key_valid = ctx->opts->output != 0;
+			key_needs_name = true;
+			break;
+		case key_source_root: key_name = "SOURCE_ROOT"; key_valid = true; break;
+		case key_build_root: key_name = "BUILD_ROOT"; key_valid = true; break;
+		case key_build_dir: key_name = "BUILD_DIR"; key_valid = ctx->opts->build_dir != NULL; break;
+		case key_current_source_dir: key_name = "CURRENT_SOURCE_DIR"; key_valid = true; break;
+		case cmd_arg_fmt_key_count: continue;
+		}
+		if (strkey->len != strlen(key_name) || memcmp(strkey->s, key_name, strkey->len) != 0) {
 			continue;
 		}
 
-		if (!key_names[key].valid || (key_names[key].needs_name && !ctx->opts->name)) {
+		if (!key_valid || (key_needs_name && !ctx->opts->name)) {
 			return format_cb_not_found;
 		}
 

@@ -1,0 +1,30 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+GOSRC=../../../external/go1.4
+GOSRCABS=$APEXPROOT/sys/src/external/go1.4
+BIN=$APEXPROOT/$objtype/bin/ape
+GOARCH=$objtype
+GOTOOLDIR=$GOSRCABS/pkg/tool/plan9_$GOARCH
+
+# Stage 2 follows src/make.rc. dist bootstrap builds lib9/libbio/liblink,
+# the host C compiler tools and go_bootstrap in cmd/dist/build.c's
+# buildorder. It also generates architecture tables and runtime source
+# files during the build. Go packages are built by ape/lib2/go, after
+# this compiler bootstrap has completed.
+install:V:
+	cd $GOSRC/src && $BIN/go-dist bootstrap -a -v
+
+installall:V:
+	mk install
+
+clean:V:
+	if(test -x $BIN/go-dist) @{
+		cd $GOSRC/src && $BIN/go-dist clean
+	}
+	rm -f $BIN/go
+
+nuke:V:
+	mk clean
+	rm -f $BIN/go-dist
