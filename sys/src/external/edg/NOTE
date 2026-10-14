@@ -1035,3 +1035,121 @@ BROKEN and therefore readable:
   4. The same command on an EMPTY `.cpp'.  Same `pc' means the input
      is irrelevant and the fault is in start-up; a different outcome
      means it is in translating this particular source.
+
+
+THE STACK IS IN, AND IT IS A BAKED-IN STRUCT OFFSET: EDG FOLDS
+`offsetof' INTO THE GENERATED C
+----------------------------------------------------------------
+
+`ps' shows the Broken cpfe, `acid' attaches, and `lstk()' names the
+line in one command:
+
+	f_add_orphaned_file_scope_il_entry(...)+0x11a   src/il.c:4936
+	edg::void_type()+0x4c
+	edg::make_global_operator_new_or_delete_symbol(...)+0x351
+	predeclare_entities()+0x1ff
+	edg::fe_translation_unit_init()+0x189
+	edg::process_translation_unit(...)+0x1b8
+	cfe_main(argc=0x360000000d, argv=0x7ffffffdee20)+0x77
+
+(`argc' reads as garbage for the recorded reason -- acid takes eight
+bytes for a four-byte int, so the LOW half `0d' is 13, the argument
+count of that command line, and the high half is the neighbouring
+slot.  Calibrate before believing a value.)
+
+`il.c:26113' is
+
+	orphan_array   = tup->orphaned_file_scope_il_entries;
+	last_entry_ptr = &orphan_array[entry_kind].last_entry;
+
+with `entry_kind' 6 in the frame.  `an_orphaned_il_entry_list' is 16
+bytes -- 1616/101, from the registration's own arguments -- so
+`6*16 + 8' is **104 = 0x68 exactly**.  *The faulting address is that
+subscript of a NULL array, and an address the arithmetic reproduces to
+the digit is a measurement rather than a resemblance.*  The other arm
+of that `if' reads a global ARRAY, which cannot be null, so the branch
+is settled too.
+
+AND THE MEMBER IS NULL BECAUSE THE C CARRIES A STRUCT OFFSET AS AN
+INTEGER LITERAL.  `src/trans_unit.h' is upstream's own:
+
+	#define register_trans_unit_variable_with_field(var, field) \
+	  (f_register_trans_unit_variable((a_void_ptr)&var, sizeof(var), \
+	     offsetof(a_translation_unit, field)))
+
+and cpfe FOLDS that `offsetof' when it translates.  The whole 133-file
+corpus holds exactly TWO non-zero ones against 359 zeros:
+
+	il.c:51481        orphaned_file_scope_il_entries   400
+	host_envir.c      module_id_ptr                    416
+
+If the compiler BUILDING the C lays the struct out differently, the
+registration files the pointer under the wrong member, the member it
+was meant for stays null, and the first read of it faults a long way
+downstream.  Nothing diagnoses it: every type is right and every
+symbol resolves.
+
+***THIS NOTE ALREADY SAID "EDG BAKES IN NO STRUCT SIZES", AND THAT WAS
+TRUE OF THE WRONG QUESTION.***  It was measured by grepping for
+cfront's `sizeof X == N' markers and finding zero -- but a folded
+`offsetof' has no marker and is indistinguishable from any other
+integer literal.  *The sweep that cleared cfront's whole class of
+problem could not see this one, and the sentence read as though the
+class had been cleared.*
+
+`sys/lib/tests/edgtuoff-probe.c' IS THE INSTRUMENT, and it is a
+REDUCTION rather than an extraction: every pointer member becomes
+`void *' and every scalar keeps its written type, so it is twenty
+lines and needs no part of EDG.  **The gcc control is what licenses
+that** -- the host must print 424 and 440, which `gdb' reads out of
+the DWARF of a real `gcc -g -c mem_manage.c'.  It does:
+
+	sizeof(a_scope_pointers_block) = 160   (host 160)
+	sizeof(an_il_header)           = 208   (host 208)
+	CONTROL: host layout reproduced (424/440) -- reduction is faithful
+	orphaned_file_scope_il_entries: compiler 424  baked 400  *** MISMATCH ***
+
+*A reduction that reproduces the known answer is layout-faithful; one
+that does not is measuring a different struct, which is how a probe
+passes its control and still answers the wrong question.*
+
+THE PREDICTION FOR pcc, WRITTEN DOWN BEFORE THE RUN.  Two members
+carry the whole difference:
+
+  - `unsigned long' is 8 on the host and **4 under kencc**, and
+    `an_il_header' holds FIVE of them, so it is 208 there and **184**
+    here.  That is 24 less, which is exactly 424 - 400 -- *so the fold
+    already used kencc's `long', and the corpus is right about that
+    half.*  The target description reached the translation after all,
+    at least for scalar widths.
+
+  - `a_scope_pointers_block' ends `unsigned int x : 1; char
+    __dummy[7];' -- EDG's OWN explicit tail padding, sized so the bit
+    field's unit and the array together make 160.  **kencc allocates a
+    bit field in a whole `tfield' unit** and does not pack a following
+    `char' into it; that is recorded in CLAUDE.md as the one
+    non-conformance `-J' does NOT fix, and `structalign-test' reports
+    it as a probe rather than asserting it.  So the array starts at
+    156, the struct is **168**, and every member after it moves up 8.
+
+So: **408 and 424 under pcc against the baked 400 and 416**, a uniform
+8-byte shift, and the probe reports MISMATCH.  That puts the orphan
+array over `exported_template_file' and leaves the real member null --
+the fault, exactly, with a second corruption behind it.
+
+REFUTATION, and it is the useful outcome either way.  If pcc prints
+400 and 416 the layouts AGREE, the folded constants are right, this
+reading is wrong, and the next round belongs in `trans_unit.c' and the
+registration machinery rather than in the compiler.  *A probe whose
+two outcomes point at two different files is worth more than one that
+can only confirm.*
+
+AND THE FIX IS A RE-TRANSLATION, NOT A PATCH.  Nothing here should
+edit a folded constant by hand: the next regeneration puts it back,
+silently, and the fault returns looking new.  The two candidates are
+the same shape as everything else in this section -- either cpfe is
+told about kencc's bit-field rule, or the corpus is regenerated by a
+cpfe whose target says so.  **And the second `offsetof' is the better
+evidence for that**: `module_id_ptr' is shifted by the same 8, so a
+hand-edit would have to find both, and the next one added would be
+wrong again.

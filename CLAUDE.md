@@ -312,6 +312,14 @@ tree-wide rebuild.
 must fail ~12 checks), then with it. *The middle run is the control*:
 a pass under `-J` alone cannot distinguish a working flag from a
 compiler that never had the bug.
+`edgtuoff-probe.c` is a PROBE and asks ONE question: does the struct
+offset EDG folded into its generated C match the offset the compiler
+building that C computes? It is a **reduction** of
+`a_translation_unit` (pointers to `void *`, scalars as written), and
+**its gcc control is what makes the reduction admissible** -- the host
+must print 424/440, the numbers `gdb` reads from the DWARF of a real
+`gcc -g -c mem_manage.c`. Run it with plain `pcc`, which is the rule
+the whole APE world is built under; exit status is the mismatch count.
 `random-xcheck.c` is the same idea for `random`/`srandom`/
 `initstate`/`setstate`, and needs TWO compiles for the
 `strftime-xcheck` reason. Its **section 0 is a control of the
@@ -2215,6 +2223,57 @@ live either way.
     and **`lstk()`** (locals, not `stk()`'s arguments -- twice burnt),
     then whether `/tmp/t.c` exists and whether an EMPTY input faults at
     the same `pc`.
+  - **AND `lstk()` NAMED IT: EDG FOLDS `offsetof` INTO THE GENERATED C,
+    SO THE C CARRIES A STRUCT OFFSET AS AN INTEGER LITERAL.** The stack
+    is `predeclare_entities` -> `make_global_operator_new_or_delete_symbol`
+    -> `void_type` -> `f_add_orphaned_file_scope_il_entry`, and
+    `il.c:26113` is `&tup->orphaned_file_scope_il_entries[entry_kind]
+    .last_entry` with `entry_kind` 6 in the frame. The list element is
+    **16** bytes (1616/101, from the registration's own arguments), so
+    `6*16 + 8` is **104 = 0x68 exactly** -- *the faulting address is
+    that subscript of a NULL array, and an address the arithmetic
+    reproduces to the digit is a measurement rather than a
+    resemblance.* (`argc` printed as `0x360000000d`: the LOW half is
+    13, the real count -- **calibrate acid before believing a value**,
+    for the second time.)
+    **`trans_unit.h`'s `register_trans_unit_variable_with_field` is
+    `offsetof(a_translation_unit, field)` and cpfe FOLDS it.** The whole
+    corpus holds exactly TWO non-zero ones against 359 zeros -- 400 for
+    `orphaned_file_scope_il_entries`, 416 for `module_id_ptr`. If the
+    compiler BUILDING the C disagrees, the registration files the
+    pointer under the wrong member, the real one stays null, and the
+    first read faults far downstream with every type right and every
+    symbol resolved.
+    ***THE NOTE ALREADY SAID "EDG BAKES IN NO STRUCT SIZES", AND THAT
+    WAS TRUE OF THE WRONG QUESTION***: it was measured by grepping for
+    cfront's `sizeof X == N` markers, and **a folded `offsetof` has no
+    marker** -- indistinguishable from any other integer literal. *The
+    sweep that cleared cfront's whole class could not see this one, and
+    the sentence read as though the class had been cleared.*
+    **`sys/lib/tests/edgtuoff-probe.c` is the instrument, and it is a
+    REDUCTION rather than an extraction** -- pointers to `void *`,
+    scalars as written, twenty lines, no part of EDG. **The gcc control
+    is what licenses that**: the host must print 424/440, the numbers
+    `gdb` reads from the DWARF of a real `gcc -g -c mem_manage.c`, and
+    it does. *A reduction that reproduces the known answer is
+    layout-faithful; one that does not is measuring a different struct.*
+    **Predicted for pcc, before the run: 408 and 416+8, a uniform
+    8-byte shift.** `unsigned long` 8 -> **4** makes `an_il_header`
+    208 -> 184, which is exactly the 24 of 424-400 -- *so the fold
+    already used kencc's `long` and the corpus is right about scalar
+    widths.* What moves is `a_scope_pointers_block`'s
+    `unsigned int x:1; char __dummy[7];` -- EDG's own explicit padding,
+    sized for a bit field packed with the `char` -- against **kencc
+    allocating a bit field in a whole `tfield` unit**, the one
+    non-conformance `-J` does NOT fix and which this file already
+    records. 160 -> **168**, everything after it up 8.
+    **Refuted if pcc prints 400/416**, which would send the next round
+    to `trans_unit.c`'s registration machinery instead of the compiler
+    -- *a probe whose two outcomes name two different files is worth
+    more than one that can only confirm.* **The fix is a
+    re-translation, not a patch**: a hand-edited constant is put back
+    by the next regeneration, and the second `offsetof` is the evidence
+    for that, since it is shifted by the same 8.
   - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
     the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
     is the **libsupc++/libc++abi layer** -- new/delete, vtables, RTTI,
