@@ -297,6 +297,19 @@ cannot parse. Every hit is a recipe that cannot run -- unlike
 mkfile recipe; its discriminator (a leading assignment is legal, and
 `if (cond) NAME=value` is a working precedent) is what keeps it from
 reporting 16 lines of which 11 are fine.
+**`execfd-test.sh` is a SHELL script for the `bash-fdloop-test` reason**
+-- the thing under test is the shell's own `exec N>file` redirection.
+clisp's `configure` printed `line NNNN: 5: Bad file descriptor` on
+hundreds of lines, and **autoconf keeps `config.log` on fd 5**, so the
+run's closing `C compiler cannot create executables` is downstream of a
+lost descriptor rather than a statement about pcc. Seven sections
+separate a low fd from fd 5, append from truncate, a reopened NUMBER, a
+high fd (bash's `move_to_high_fd` territory), `<>` and a child writing
+the parent's descriptor; **section 0 is the control**, an ordinary
+`> file`, so an all-fail run names the filesystem instead. *Section 5 is
+`redir.tests:83` verbatim*, the `exec 6<>` hunk CLAUDE.md records as
+having moved for an unidentified reason -- so this asks one question
+where there were two. 0 failures on glibc.
 **`mkrecipe-probe/mkfile` is a PROBE and is a whole mk DIRECTORY**,
 which it has to be: the question is what `mk` hands `rc`, so the
 instrument is an mkfile rather than a program. `mk -k all` in it runs
@@ -1891,8 +1904,32 @@ blamed.
   with it.** *That is `cmd2/vts/test` in a new spelling.* Both are
   `rm -rf $BUILD` now: `$BUILD` is build output in full, so removing it
   cannot hang and the cost is a reconfigure.
-- **go, FIXED, one word**: `CC=pcc -c`. See the go entry below.
-- **perl, OPEN.** `miniperl` links and then faults running
+- **go, FIXED TWICE and still not built**: `CC=pcc -c`, then the
+  Makefile backslashes in `-DGOROOT_FINAL`. See the go entry below.
+- **AND clisp's `configure` RUNS NOW AND ITS LOG DESCRIPTOR IS GONE.**
+  Both mkfile parses are past, `comment5`/`gctrigger`/`varbrace` build,
+  all 130-odd `.d` files generate, and `configure` reaches
+  `checking whether the C compiler works... no`. **But between those
+  lines it printed `configure: line NNNN: 5: Bad file descriptor`
+  hundreds of times**, and autoconf keeps `config.log` on **fd 5**
+  (`exec 5>>config.log`, then `echo ... >&5` for everything after). So
+  the compiler verdict at the end is the verdict of a configure that
+  could not write its own log, which is not a statement about pcc.
+  *`sh: warning: process exceeds 100/200 file descriptors` sits two
+  lines above the first one*, which is bash's `move_to_high_fd` and has
+  already been measured harmless once -- so it is a neighbour, not yet
+  a cause. **`sys/lib/tests/execfd-test.sh` asks it in seven sections**
+  and section 5 is `run-redir`'s own `exec 6<>` line, so the recorded
+  unexplained hunk and this are one question now.
+  **AND THE PLAN IS TO STOP RUNNING configure AT ALL**, which is the
+  user's call and matches what this tree already does for perl and
+  bash: a hand-answered `config.h` plus an mkfile, rather than an
+  autoconf run and a 300-Makefile GNU make build driven from inside
+  `mk`. *The honest size of that: `lisp.run` is the tractable half and
+  a native mkfile for it answers "does kencc build clisp"; the memory
+  image is a second half, since CLISP compiles its own Lisp sources
+  with the interpreter it has just built.* Not started.
+- **perl, OPEN -- AND THE NEXT RUN NARROWED IT RATHER THAN MOVING IT.** `miniperl` links and then faults running
   `writemain("perlmain.c")`: `suicide: sys: trap: fault write
   addr=0x3000000f0 pc=0x22e50f`. **`0x3000000f0` is high half 3, low
   half 0xf0** -- an eight-byte slot assembled from two four-byte ones,
@@ -1918,6 +1955,37 @@ blamed.
   Until it builds, `perl` has to stay commented out of
   `_OPTIONAL_APPS` or it aborts the whole tree's `mk` -- the reason
   `edg` and `c++lib` are out.
+  **THE SECOND RUN WAS `mk clean; mk install` IN `cmd/perl` ALONE, AND
+  THAT IS READING (a) RATHER THAN REFUTING IT.** `libperl.a` is built
+  in **`sys/src/ape/lib/perl`**, which that clean never touched, so
+  `op.c`, `perl.c` and `universal.c` were recompiled with the new
+  bit-field rule and the other fifty-odd objects were not. *Both halves
+  of miniperl handle `OP *`.*
+  **The arithmetic says how far apart they are.** `BASEOP` is three
+  pointers and a `PADOFFSET`, so the bit-field container lands at 28;
+  under the old rule `op_flags` is at 32 and `op_private` at 33 with
+  `sizeof(OP)` **40**, under the new one they are at 30 and 31 with
+  `sizeof(OP)` **32**. perl allocates ops out of its own slabs by that
+  size and walks them with it, so one half writing a 40-byte op into a
+  32-byte slot at the end of a slab is a write a few bytes past the
+  arena -- which is the shape of `fault write addr=0x2ffffff0`, a
+  heap-top address rather than a wild pointer. *The first run's
+  `0x3000000f0` and this one's `0x2ffffff0` are the same neighbourhood,
+  which a random corruption would not be.*
+  **So the next run is `cd sys/src/ape/lib/perl && mk clean && mk
+  install` BEFORE `cmd/perl`** -- or, now that clisp's clean no longer
+  hangs, a complete `mk distclean`. **Predict: miniperl writes
+  `perlmain.c` and perl links.** *Refuted if it faults again at the
+  same `pc`*, and that would move the bit-field change itself into
+  frame, where `structalign-test`'s three runs and the `apeabi-probe`
+  acid diff -- both still unrun -- are what price it.
+
+- **edg, AND IT IS THE ONE GOOD NEWS OF THE ROUND**: `lib/edg` and
+  `cmd/edg` both build and `cpfe` runs. **No functional test yet**, so
+  read it as "it builds and starts" rather than as a port -- the thing
+  that would say anything is a translation whose output `pcc -c`
+  accepts, and `--target win64` with the `0x68` fault is where that
+  stopped.
 
 ## What is open, as a list
 
@@ -2831,6 +2899,24 @@ blamed.
   *A fix that makes a process reach code it never reached before can
   expose anything on that path* -- for the third time, and here the
   thing exposed was one line of the mkfile that had never run.
+  **AND THE WALL AFTER THAT WAS THE SAME MKFILE LINE'S OTHER HALF: THE
+  BACKSLASHES IN `-DGOROOT_FINAL=\\"...\\"`.** With `-c` in place `arm.c`
+  and `buf.c` compiled and `build.c` answered
+  **`build.c:21[stdin:207] syntax error, last name: goroot`** -- which
+  is `char *goroot = GOROOT_FINAL;`, a C syntax error two files on,
+  naming the VARIABLE rather than the flag that broke it. cpp had
+  defined the macro as `\"...\"`, backslash and quote, which is not a
+  string literal. *Those backslashes are a MAKEFILE idiom.* **mk gives
+  double quotes no meaning and passes them through** -- the mechanism
+  `cmd/c++lib`'s `CLEANFILES= "*.c"` paid a round for, from the other
+  side -- and rc never re-lexes the CONTENTS of an expanded variable,
+  which is the same fact that makes every `-DFOO=1` safe through
+  `$CFLAGS` and a literal `=` in a recipe fatal. So a plain `"` reaches
+  cpp exactly as written and no escape was ever wanted.
+  **Three walls in three rounds, each one file further in**, and every
+  one of them in this mkfile rather than in go: the `bool` keyword, the
+  missing `-c`, the Makefile escaping. *That is what a port that has
+  never run looks like from outside.*
 
 **Ports built but never exercised**, which is a different and cheaper
 item -- *a port that builds and has never run is not a port*:
