@@ -7,6 +7,25 @@
  *   pcc -c    -a apeabi-probe.c > /tmp/abi-new.acid
  *   diff /tmp/abi-old.acid /tmp/abi-new.acid
  *
+ * **AND THERE ARE TWO AXES NOW, which the one command above does not
+ * distinguish.** The `-J'/`-9' pair below is the layout RULE that is
+ * already in the tree. The open question is the bit-field allocation
+ * change, and its two sides are two different COMPILERS -- HEAD's
+ * `pcc' and a patched one -- with the same flags:
+ *
+ *   # before the sualign patch
+ *   pcc -c -a apeabi-probe.c > /tmp/abi-bf-before.acid
+ *   # after rebuilding sys/src/cmd
+ *   pcc -c -a apeabi-probe.c > /tmp/abi-bf-after.acid
+ *   diff /tmp/abi-bf-before.acid /tmp/abi-bf-after.acid
+ *
+ * The `before' side has to be taken FIRST and kept, because once the
+ * compiler is rebuilt there is no flag that asks for the old
+ * allocation -- `-9' is the old TAIL-PADDING rule and the bit-field
+ * line was never gated on `conformalign' at all. *An irreversible
+ * change takes its own baseline with it*, which is the reason `-9'
+ * exists and the same reason this file gives for it below.
+ *
  * **Conforming layout is the DEFAULT now, so the flags have swapped
  * round**: plain `pcc' conforms and `-9' asks for the 9front rule.
  * The answer this probe gave when it was first run is recorded in
@@ -74,6 +93,63 @@
  * includes both, which `apehdr-sweep's together case already records.
  * `<curses.h>' and friends are out because they want `bool' as a
  * keyword and this file has to compile under both compilers.
+ *
+ * ------------------------------------------------------------------
+ * THE BIT-FIELD SECTION, AND WHY IT HAD TO BE ADDED BEFORE THE PROBE
+ * COULD PRICE THE CHANGE IT WAS BEING REACHED FOR.
+ *
+ * The open kencc question is no longer `-J' -- it is the ONE
+ * non-conformance `-J' deliberately did not fix: kencc allocates a
+ * bit field in a whole `tfield' unit and does NOT let a following
+ * ordinary member share the container's tail, which is MSVC's rule
+ * (measured on the VM: `struct{unsigned x:1; char c;}' gives `c' at
+ * 4 and sizeof 8, against gcc's 1 and 4). EDG's generated C is sized
+ * for the shared-container rule in 958 places, which is what makes
+ * that gap worth closing.
+ *
+ * **The thirty-one headers above contain NOT ONE BIT FIELD.** So the
+ * acid diff for that change -- which is HEAD's `pcc' against a
+ * patched one, a different axis from `-J' against `-9' -- would have
+ * come back EMPTY, and an empty diff here reads exactly like a change
+ * that costs nothing. *That is the void-measurement shape this file's
+ * own header already records for a `pcc' that appended `-J' to both
+ * sides.* An instrument has to include the thing it is measuring.
+ *
+ * FOUR PUBLIC APE HEADERS CONTAIN A BIT FIELD AT ALL, swept rather
+ * than recalled, and only TWO of them move -- because the rule only
+ * bites when the member AFTER the group is small enough to sit in the
+ * container's tail at its OWN alignment:
+ *
+ *   resolv.h    `unsigned ndots:4, nsort:4;' then
+ *               `unsigned char unused[3];'   -- 3 free bytes, a char
+ *               array needs 1-byte alignment: MOVES, and everything
+ *               after it (`sort_list') with it. *Written expecting
+ *               the shared container* -- it is glibc's own layout.
+ *   curl.h      `unsigned int includeSubDomains:1;' then
+ *               `char expire[18];'           -- MOVES, same shape.
+ *   fenv_arch.h `__opcode:11; __unused4:5;' then
+ *               `unsigned int __data_offset;' -- does NOT move: an
+ *               `int' wants 4-byte alignment and only 2 bytes of the
+ *               container remain, so gcc puts it at the next unit too.
+ *   obstack.h   three 1-bit fields are the LAST members, nothing
+ *               follows, and the struct's alignment is a pointer's
+ *               8 either way -- does NOT move.
+ *
+ * `iostream.h' matched a looser grep and is a FALSE HIT; it is named
+ * here so the next sweep does not re-find it.
+ *
+ * **And the public headers are a LOWER BOUND, which is the honest
+ * limit of this probe.** The change reaches every APE compile, so any
+ * struct in libap's own sources or in any package under `external/'
+ * with a bit-field group followed by a small member moves too, and no
+ * acid dump of this translation unit can see those. What it does give
+ * is the public surface -- the part that crosses a library boundary
+ * and so fails SILENTLY -- named struct by struct.
+ *
+ * `<curl/curl.h>' is behind `-DAPEABI_CURL' rather than included
+ * outright: curl is an OPTIONAL app, its header is not core APE, and
+ * a probe that fails to compile measures nothing at all. Take it with
+ * the flag when curl is installed.
  */
 
 #include <stdio.h>
@@ -107,6 +183,14 @@
 #include <arpa/inet.h>
 #include <termios.h>
 #include <pthread.h>
+
+/* the four bit-field headers; see the header note above */
+#include <fenv.h>
+#include <obstack.h>
+#include <resolv.h>
+#ifdef APEABI_CURL
+#include <curl/curl.h>
+#endif
 
 /*
  * The acid dump only describes types the translation unit actually
@@ -155,6 +239,66 @@ pthread_mutex_t		_abi_pthread_mutex;
 pthread_cond_t		_abi_pthread_cond;
 pthread_rwlock_t	_abi_pthread_rwlock;
 sigset_t		_abi_sigset;
+
+/* the bit-field bearers */
+fenv_t			_abi_fenv;
+struct obstack		_abi_obstack;
+struct __res_state	_abi_res_state;
+#ifdef APEABI_CURL
+struct curl_hstsentry	_abi_hstsentry;
+#endif
+
+/*
+ * A CONTROL OF THE RULE, not of the headers -- the four shapes the
+ * question turns on, so one acid dump says which allocation rule the
+ * compiler in front of it follows even if a header above is absent or
+ * has changed. These are deliberately NOT a second copy of any
+ * header's struct: each isolates one case.
+ *
+ *   `_abi_bf_shares'   8 bits then a char array that FITS the tail.
+ *                      kencc today: `c' at 4, sizeof 8.
+ *                      gcc/EDG:     `c' at 1, sizeof 4.
+ *                      This is `resolv.h's shape and the one that
+ *                      decides the change.
+ *   `_abi_bf_aligned'  16 bits then an `int', which cannot share a
+ *                      4-byte container at its own alignment.
+ *                      BOTH rules answer 4 and 8 -- `fenv_arch.h's
+ *                      shape, and it must NOT move. *A section that
+ *                      stays still is what separates the rule from a
+ *                      compiler that merely stopped padding.*
+ *   `_abi_bf_trailing' a group with nothing after it -- `obstack.h's
+ *                      shape; must not move either.
+ *   `_abi_bf_split'    two groups of different base types, which is
+ *                      where a container is CLOSED for a reason other
+ *                      than an ordinary member following it.
+ *
+ * MEASURED ON gcc, so the reference is a number and not a claim --
+ * `offsetof(c)' / `sizeof' for the four in order:
+ *
+ *   shares    1 / 4      aligned   4 / 8
+ *   trailing      16     split     1 / 4
+ *
+ * `split' answering 1 is worth noticing: gcc shares the container
+ * ACROSS base types, so a `short' group after an `unsigned' one is
+ * not a boundary. That is reported rather than asserted -- it is a
+ * third rule, distinct from both of the two in frame, and nothing
+ * here depends on which way kencc answers it.
+ *
+ * Predicted for HEAD's `pcc', written down before the run: `shares'
+ * 4/8, `aligned' 4/8, `trailing' 16, `split' unknown. So `aligned'
+ * and `trailing' must be IDENTICAL in the two acid dumps and
+ * `shares' must move; a diff in which `aligned' also moved would mean
+ * the patch changed more than the sharing rule.
+ */
+struct _abi_bf_shares   { unsigned a:4, b:4; unsigned char c[3]; };
+struct _abi_bf_aligned  { unsigned a:11, b:5; unsigned int c; };
+struct _abi_bf_trailing { void *p; unsigned a:1, b:1, c:1; };
+struct _abi_bf_split    { unsigned a:3; unsigned short b:3; char c; };
+
+struct _abi_bf_shares   _abi_bf_shares;
+struct _abi_bf_aligned  _abi_bf_aligned;
+struct _abi_bf_trailing _abi_bf_trailing;
+struct _abi_bf_split    _abi_bf_split;
 
 int
 main(void)

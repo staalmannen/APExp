@@ -1379,3 +1379,89 @@ headers contain a bit field at all (`obstack.h`, `resolv.h`,
 a bit-field group with a member AFTER it moves anything.  But "looks
 small" is what the probe is for, and `-J`'s own history is that the
 feared cost and the measured cost were different sizes.
+
+
+AND THE PROBE COULD NOT PRICE IT -- ITS THIRTY-ONE HEADERS CONTAIN
+NOT ONE BIT FIELD
+------------------------------------------------------------------
+
+The sentence above says to run `apeabi-probe` first.  It was reached
+for, it was compiled and run, and it printed nothing -- which is
+correct (the output is the acid dump `-a` writes to stdout, and the
+program is never run), but it sent me to read the file, and the file
+does not include a single header with a bit field in it.
+`<stdio.h>`, `<sys/stat.h>`, `<pthread.h>` and the other twenty-eight
+have none.
+
+**So the diff would have come back EMPTY, and an empty diff there
+reads exactly like a change that costs nothing.**  That is the
+void-measurement shape this very probe's own header already records
+for a different reason -- the `pcc` that appended `-J` to both sides
+of its own comparison, where the two files being byte-identical was
+how it would have shown.  *An instrument has to include the thing it
+is measuring*, and this one has now had that mistake twice, from two
+unrelated directions.
+
+**AND THE AXIS IS TWO COMPILERS, NOT TWO FLAGS.**  `-J`/`-9` is the
+TAIL-PADDING rule, already in the tree.  The bit-field allocation line
+was never gated on `conformalign` -- `structalign-test`'s section 8
+passing under both is what says so -- so after the patch there is no
+flag that asks for the old allocation.  The `before` dump has to be
+taken and kept BEFORE `sys/src/cmd` is rebuilt, or the baseline is
+gone.  *An irreversible change takes its own measurement with it*,
+which is the argument `-9` exists for, arriving one level down.
+
+FOUR HEADERS, SWEPT RATHER THAN RECALLED, AND ONLY TWO MOVE.  The
+note above said five and the fifth was `iostream.h`, which a looser
+grep matched and which has none.  The four are real, and the rule only
+bites when the member AFTER the group fits the container's tail at its
+OWN alignment:
+
+  resolv.h     `unsigned ndots:4, nsort:4;` then
+               `unsigned char unused[3];` -- three free bytes, a char
+               array aligns to 1.  MOVES, and `sort_list` after it.
+  curl.h       `unsigned int includeSubDomains:1;` then
+               `char expire[18];` -- MOVES, same shape.
+  fenv_arch.h  `__opcode:11; __unused4:5;` then `unsigned int
+               __data_offset;` -- an `int` wants 4-byte alignment and
+               two bytes remain, so gcc puts it at the next unit too.
+               DOES NOT MOVE.
+  obstack.h    three 1-bit fields are the LAST members and the
+               struct's alignment is a pointer's 8 either way.
+               DOES NOT MOVE.
+
+**BOTH MOVERS ARE STRUCTS WRITTEN EXPECTING THE SHARED CONTAINER.**
+`struct __res_state` is glibc's own layout, `unused[3]` and all; the
+three bytes are there precisely because the group leaves three bytes.
+So on those two the change makes the header RIGHT rather than
+different -- which is the same statement the 958 `__dummy[N]` make
+from EDG's side.  Consumers are contained: `__res_state` is reached
+only from `lib/ap/network/` (and libressl's own compat copy), and
+`curl_hstsentry` only from curl, so both are inside one self-consistent
+world after a `distclean`.
+
+**THE PUBLIC HEADERS ARE A LOWER BOUND AND THE PROBE SAYS SO.**  The
+change reaches every APE compile, so any struct in libap's sources or
+in any package under `external/` with a group followed by a small
+member moves too, and no acid dump of one translation unit can see
+them.  What the probe gives is the surface that crosses a library
+boundary -- the part that fails SILENTLY, with every symbol still
+resolving -- named struct by struct.  That is the part worth having
+before the rebuild; the rest fails loudly or not at all.
+
+AND IT GAINED A CONTROL OF THE RULE ITSELF, four shapes measured on
+gcc first so the reference is a number rather than a claim
+(`offsetof(c)` / `sizeof`):
+
+  shares    `unsigned a:4,b:4; unsigned char c[3];`   1 / 4
+  aligned   `unsigned a:11,b:5; unsigned int c;`      4 / 8
+  trailing  `void *p; unsigned a:1,b:1,c:1;`              16
+  split     `unsigned a:3; unsigned short b:3; char c;` 1 / 4
+
+Predicted for HEAD's `pcc`: `shares` 4/8, `aligned` 4/8, `trailing`
+16, `split` unknown.  **`aligned` and `trailing` must be IDENTICAL in
+the two dumps** -- a diff in which they moved too would mean the patch
+changed more than the sharing rule, and that is the half a
+shares-only check could not have told apart.  `split` answering 1 on
+gcc is reported rather than asserted: gcc shares a container ACROSS
+base types, which is a third rule and one nothing here depends on.
