@@ -302,14 +302,24 @@ reporting 16 lines of which 11 are fine.
 clisp's `configure` printed `line NNNN: 5: Bad file descriptor` on
 hundreds of lines, and **autoconf keeps `config.log` on fd 5**, so the
 run's closing `C compiler cannot create executables` is downstream of a
-lost descriptor rather than a statement about pcc. Seven sections
+lost descriptor rather than a statement about pcc. Sections 1-7
 separate a low fd from fd 5, append from truncate, a reopened NUMBER, a
 high fd (bash's `move_to_high_fd` territory), `<>` and a child writing
 the parent's descriptor; **section 0 is the control**, an ordinary
 `> file`, so an all-fail run names the filesystem instead. *Section 5 is
 `redir.tests:83` verbatim*, the `exec 6<>` hunk CLAUDE.md records as
 having moved for an unidentified reason -- so this asks one question
-where there were two. 0 failures on glibc.
+where there were two.
+**ALL EIGHT CAME BACK 0 ON 9front, so the CONSTRUCT IS CLEARED and
+three sections were added for the axes that run could not cover.**
+8 is a child that forks AND EXECS (where `/env/_fdinfo` has to carry
+the descriptor, and where one arrived poisoned before); 9 is the shell
+**re-execing ITSELF**, which is literally configure's first act
+(`exec $CONFIG_SHELL "$as_myself"`); 10 holds fd 5 across 300 forks and
+**reports the iteration it first fails at**, because every other
+section runs in a shell that has just started while configure's failure
+arrives thousands of lines in, immediately after the kernel's
+100/200-descriptor warning. 0 failures on glibc, 11 sections.
 **`mkrecipe-probe/mkfile` is a PROBE and is a whole mk DIRECTORY**,
 which it has to be: the question is what `mk` hands `rc`, so the
 instrument is an mkfile rather than a program. `mk -k all` in it runs
@@ -1919,9 +1929,31 @@ blamed.
   *`sh: warning: process exceeds 100/200 file descriptors` sits two
   lines above the first one*, which is bash's `move_to_high_fd` and has
   already been measured harmless once -- so it is a neighbour, not yet
-  a cause. **`sys/lib/tests/execfd-test.sh` asks it in seven sections**
-  and section 5 is `run-redir`'s own `exec 6<>` line, so the recorded
-  unexplained hunk and this are one question now.
+  a cause. **`sys/lib/tests/execfd-test.sh` asks it**, and section 5 is
+  `run-redir`'s own `exec 6<>` line, so the recorded unexplained hunk
+  and this were one question.
+  **MEASURED: 0 FAILURES, ALL EIGHT SECTIONS, ON 9front.** `exec 5>`,
+  `exec 5>>`, the reopened number, `exec 200>`, `exec 6<>` and a
+  subshell writing the parent's descriptor all work. **So the
+  CONSTRUCT is not the bug** -- and `redir.tests:83` is cleared with
+  it, which answers the recorded "if it comes back it is flaky" in the
+  good direction rather than leaving a third story.
+  *That makes the clisp question sharper rather than closing it*, and
+  the difference is what the test did NOT reproduce: **every section
+  ran in a shell that had just started.** configure's failure arrives
+  thousands of lines in, it forks hundreds of children, and -- the
+  thing a reading of the construct cannot reach -- **autoconf's own
+  first act is `exec $CONFIG_SHELL "$as_myself"`, replacing its own
+  process image while `exec 5>>config.log` is meant to stay open
+  across it.** `/env/_fdinfo` is the only thing that carries
+  per-descriptor state over an APE exec, and *a descriptor has already
+  arrived poisoned through exactly that file once in this tree*.
+  Sections 8, 9 and 10 ask those three (fork+exec, self re-exec,
+  scale) and 10 reports the ITERATION it first fails at, since "it
+  broke at 140" and "it never worked" are different findings. Also
+  worth noting from the same screen: **the fd warnings fired and every
+  section still passed**, which is the third independent confirmation
+  that they are noise.
   **AND THE PLAN IS TO STOP RUNNING configure AT ALL**, which is the
   user's call and matches what this tree already does for perl and
   bash: a hand-answered `config.h` plus an mkfile, rather than an
@@ -2786,6 +2818,18 @@ blamed.
     and read exactly like a translation bug. Generate an explicit
     table of test functions from the `TEST(` names instead, or fix
     static init first and let the suite be what confirms it.
+    **AND THE 720 HEADERS DO NOT BELONG IN `sys/include/ape`** -- the
+    import under `sys/src/external` is the whole of it, reached with an
+    `-I` from whatever translates it, exactly as Tcl's own build reaches
+    `-I$TCLSRC/generic`. Three reasons, each already a rule here: a
+    public APE header's blast radius is **every package in the tree**
+    (`reject` cost a build over one name); `apehdr-sweep` compiles every
+    header in that directory **standalone as C**, so 720 C++-only files
+    would turn a gating instrument into 720 findings; and **nothing in
+    the tree includes them**, which is the test `Plan9libnet.h` was
+    deleted for failing. *Install a header when a program needs to say
+    `#include <...>` and not before* -- and if a C++ program here ever
+    does, it wants its own subdirectory, not the top level.
   - **AND THE RUNTIME ADDS NOTHING libap ALREADY PROVIDES, checked
     rather than assumed.** `lib_src` holds `exit.c`, `main.c`,
     `error.c` and `memzero.c`, which is the shape that cost this tree
