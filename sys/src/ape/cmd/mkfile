@@ -67,11 +67,7 @@ _OPTIONAL_APPS=\
 #	clisp\
 	tclsh\
 	itclsh\
-# perl is OUT until miniperl stops faulting: it links and then dies \
-# `fault write addr=0x3000000f0' generating perlmain.c, and one failing \
-# entry aborts the whole tree's mk. See CLAUDE.md, "The first full \
-# rebuild after the compound-literal and bit-field work". \
-#	perl\
+	perl\
 # GUI \
 	wish\
 # transpilers \
@@ -79,7 +75,7 @@ _OPTIONAL_APPS=\
 	p2c\
 	chicken\
 	objc\
-#	edg\
+	edg\
 	basic\
 # dev tools \
 	adeb\

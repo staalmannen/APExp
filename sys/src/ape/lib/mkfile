@@ -18,6 +18,7 @@ _OPTIONAL_LIBS=\
 	curses\
 	dwarf\
 	dwarfp\
+	edg\
 	fortran\
 	lua\
 	lz4\
