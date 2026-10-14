@@ -1834,10 +1834,15 @@ tree* -- what remains is a 1980s front end that cannot tell two
 overloads apart on a 64-bit target, which is a C++ problem and not a
 Plan 9 one.
 
-**NEITHER IS ENABLED IN `cmd/mkfile' YET, deliberately**: one failing
-entry aborts the whole tree's `mk', and bacon has never been through
-pcc. Build `cmd/basic' by hand first; the line is one character from
-live either way.
+**`basic' IS ENABLED NOW and `c++lib' is not** -- this paragraph used
+to say neither was, and it was stale. `sys/src/ape/cmd/mkfile:71' is
+an uncommented `basic\\', so bacon is in `_OPTIONAL_APPS' and a
+tree-wide `mk' builds it; `muon' at :81 is live too; `edg' at :70 and
+`c++lib' stay commented. *The reason for caution is unchanged and is
+worth keeping beside the fact*: one failing entry aborts the whole
+tree's `mk', so anything newly enabled is a thing the next full
+rebuild can stop on, and a port that has only been built by hand has
+not been measured in that position.
 
 ## What is open, as a list
 
@@ -2593,8 +2598,13 @@ live either way.
     and the after-count was re-taken with the before's exact
     commands* -- two compiles differing in anything but the change
     are not a control, which this file records from the `-J` round.
-- **muon** -- **IT BUILDS AND IT CRASHES BEFORE IT READS AN ARGUMENT,
-  AND THE STACK NAMES ONE STRUCT MEMBER.** `fault write
+- **muon** -- **IT BUILDS AND IT RUNS. Read the rest of this entry as
+  the record of how, not as an open problem.** It crashed before it
+  read an argument, the cause was a kencc bug rather than muon's, and
+  the fix is `clitzero()` in `cc/dcl.c`; the confirmation is at the
+  end.
+  **IT CRASHED BEFORE IT READ AN ARGUMENT, AND THE STACK NAMED ONE
+  STRUCT MEMBER.** `fault write
   addr=0x7ffffff000` with `lstk()` giving `memset(c=0x0, n=0x29afb0)` <-
   `tstr_clear` <- `path_basename` <- `main.c:1447`. **That memset is
   2,731,952 bytes over a 1024-byte stack buffer**, and `tstr_clear` is
@@ -2675,10 +2685,31 @@ live either way.
   compiles and produces a working compiler, which is the weakest
   useful result for a front-end change and the precondition for the
   rest of the order.
-  **What it does NOT yet say is whether muon runs**: its binary was
-  built by the old compiler, so the fix reaches it only after a
-  rebuild. *A test passing and the program working are two claims*,
-  and the second is the one this started from.
+  **AND muon RUNS -- the behavioural confirmation, end to end.**
+  Rebuilt with the fixed compiler it reaches its own dispatcher and
+  prints its own usage: `muon` alone answers `error missing command`,
+  `muon -h` lists `analyze devenv fmt install internal options samu
+  setup subprojects test version`. *No `fault write addr=0x7ffffff000`
+  anywhere* -- the memset that walked off the top of the stack is
+  gone, because `tstr_init`'s `.len` is now the zero C always said it
+  was. **The chain is measured end to end rather than argued**:
+  `lstk()` named the member, `initzero-test` reproduced it, `cc/dcl.c`
+  explained why only compound literals had it, and the program that
+  crashed now runs.
+  **`muon --help` answering `illegal option -- -` is NOT ours**: muon
+  has no long options -- its own usage lists `-h` -- and `--help` is
+  not the bare `--` that ends an option list, so POSIX getopt parses
+  it as the option character `-`. glibc prints the same thing.
+  **The `[31m`/`[0m` printed literally is rio**, not a bug: muon
+  colours its diagnostics and rio speaks no escape sequences. Under
+  `vts` it renders, which is one of the three things vts was for.
+  **It is LIVE in `_OPTIONAL_APPS`, not commented out** -- this file
+  said otherwise and was stale; so is `basic`, which is live too.
+  Only `edg` and `c++lib` remain off.
+  **What is NOT measured is muon doing any WORK**: printing a usage
+  exercises argument handling and one `tstr`. *A port that builds and
+  prints its usage is not a port either* -- `muon setup` on a real
+  `meson.build` is the next thing that would say anything.
   *The gcc sweep over the files muon builds was 0 errors in the classes
   6c treats as fatal, and it has no 32-bit-`long` assumptions, so both
   cheap classes were clean and this needed the crash.*
@@ -2933,7 +2964,10 @@ item -- *a port that builds and has never run is not a port*:
   again is the end-to-end check -- the same shape as EDG's
   self-translation. Do the small test first, because when self-hosting
   fails it says nothing about which feature broke.
-  `cmd/basic` is still commented out of `_OPTIONAL_APPS`.
+  **`cmd/basic` is LIVE in `_OPTIONAL_APPS` now** -- this line said
+  the opposite and was stale -- so the next tree-wide `mk` builds
+  bacon, and anything it reports is newly *measured* rather than
+  newly broken.
 - **the archivers** -- bzip2, xz, unrar, unace, unarj, clzip. See the
   tar section: `-J` retires the padding hunt, so this is now a check
   rather than a hunt, and the way to do it is to run each one on a
