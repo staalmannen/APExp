@@ -1,0 +1,26 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+CLISPSRC=$APEXPROOT/sys/src/external/clisp
+BIN=$APEXPROOT/$objtype/bin/ape
+TARG=comment5 gctrigger varbrace
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -D_POSIX_SOURCE
+
+%.$O: $CLISPSRC/utils/%.c
+	$CC $CFLAGS $prereq
+
+$O.comment5: comment5.$O
+	$LD -o $target $prereq
+
+$O.gctrigger: gctrigger.$O
+	$LD -o $target $prereq
+
+$O.varbrace: varbrace.$O
+	$LD -o $target $prereq
+

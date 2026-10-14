@@ -1,0 +1,28 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+# CLISP bootstrap stages:
+#   1. Build the source filters with the 9front C compiler.
+#   2. Generate editable C sources from the upstream *.d files.
+#   3. Compile the configured runtime (mkfile.runtime, once its Plan 9
+#      configuration and object list are in place).
+
+bootstrap:V:
+	mk $MKFLAGS -f mkfile.bootstrap install
+
+sources:V:
+	mk $MKFLAGS bootstrap
+	mk $MKFLAGS -f mkfile.rebuild sources
+
+all:V:
+	mk $MKFLAGS sources
+
+clean:V:
+	mk $MKFLAGS -f mkfile.bootstrap clean
+	mk $MKFLAGS -f mkfile.rebuild clean
+
+nuke:V:
+	mk $MKFLAGS -f mkfile.bootstrap nuke
+	mk $MKFLAGS -f mkfile.rebuild nuke
+

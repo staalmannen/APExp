@@ -1,0 +1,60 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+CLISPSRC=$APEXPROOT/sys/src/external/clisp/src
+BIN=$APEXPROOT/$objtype/bin/ape
+
+# CLISP's non-assembly C inputs for the Unix configuration, adapted from
+# makemake.in. This port disables dynamic FFI, threads, and optional modules.
+CPARTS=\
+	spvw spvwtabf spvwtabs spvwtabo\
+	eval control encoding pathname stream socket io funarg\
+	array hashtabl list package record weak sequence charstrg debug\
+	error misc time predtype symbol lisparit i18n unixaux built
+EVERY_INCLUDES=\
+	lispbibl fsubr subr pseudofun constsym constobj constobj_tl unix
+OTHER_INCLUDES=constpack avl sort subrkw bytecode
+SPVW_INCLUDES=\
+	spvw_module spvw_debug spvw_alloca spvw_mmap spvw_singlemap\
+	spvw_page spvw_heap spvw_global spvw_gcstat spvw_space spvw_mark\
+	spvw_objsize spvw_update spvw_fault spvw_sigsegv spvw_sigcld\
+	spvw_sigpipe spvw_sigint spvw_sigwinch spvw_sigterm spvw_garcol\
+	spvw_garcol_old spvw_genera1 spvw_gcmark spvw_genera2 spvw_weak\
+	spvw_genera3 spvw_allocate spvw_typealloc spvw_circ spvw_walk\
+	spvw_ctype spvw_language spvw_memfile
+LISPARIT_INCLUDES=\
+	aridecl arilev0 arilev1 intelem intlog intplus intcomp intbyte\
+	intmal intdiv intgcd int2adic intsqrt intprint intread intserial\
+	rational sfloat ffloat dfloat lfloat flo_konv flo_rest realelem\
+	realrand realtran compelem comptran arilev1c arilev1e arilev1i
+DFILES=$CPARTS $EVERY_INCLUDES $OTHER_INCLUDES $SPVW_INCLUDES\
+	errunix $LISPARIT_INCLUDES genclisph noreadline
+
+# Stage two: turn CLISP's comment-annotated C in *.d into ordinary C.
+# This intentionally keeps generated files in this directory, where the
+# 9front-specific C adjustments can be made and reviewed before stage 3.
+CLEANFILES=*.c *.tmp
+
+all:V: sources
+
+sources:V:
+	for (name in $DFILES) @{
+		src=$CLISPSRC/$name.d
+		if (test $name = lispbibl) {
+			$BIN/comment5 $src | sed -e 's/^%% .*//' | $BIN/gctrigger | $BIN/varbrace > $name.c.tmp
+		} if not {
+			$BIN/comment5 $src | $BIN/gctrigger | $BIN/varbrace > $name.c.tmp
+		}
+		if (test -s $name.c.tmp) mv $name.c.tmp $name.c
+		if not { rm -f $name.c.tmp; exit 1 }
+	}
+	$BIN/comment5 $CLISPSRC/lispbibl.d | sed -e '/^%% /{s///p;d;}' -e '/^#line /!s/.*//' > gen.lispbibl.c.tmp
+	if (test -s gen.lispbibl.c.tmp) mv gen.lispbibl.c.tmp gen.lispbibl.c
+	if not { rm -f gen.lispbibl.c.tmp; exit 1 }
+
+clean:V:
+	rm -f *.c *.tmp
+
+nuke:V:
+	rm -f *.c *.tmp
+
