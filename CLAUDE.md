@@ -1875,7 +1875,8 @@ Plan 9 one.
 to say neither was, and it was stale. `sys/src/ape/cmd/mkfile:71' is
 an uncommented `basic\\', so bacon is in `_OPTIONAL_APPS' and a
 tree-wide `mk' builds it; `muon' at :81 is live too; `edg' at :70 and
-`c++lib' stay commented, and so now do `go', `clisp' and `perl'.
+`c++lib' stays commented, and so do `go' and `clisp'; `perl' and
+`edg' are back in, each after it had actually built.
 *The reason for caution is unchanged and is worth keeping beside the
 fact*: one failing entry aborts the whole tree's `mk', so anything
 newly enabled is a thing the next full rebuild can stop on, and a port
@@ -1979,6 +1980,30 @@ blamed.
   same `pc`*, and that would move the bit-field change itself into
   frame, where `structalign-test`'s three runs and the `apeabi-probe`
   acid diff -- both still unrun -- are what price it.
+  **CONFIRMED: THE WHOLE TREE BUILT WITHOUT INTERRUPTION AND perl
+  WORKS.** With the clean reaching every directory, `miniperl` writes
+  `perlmain.c`, perl links and runs. *The prediction was written down
+  before the run and the refutation condition did not fire*, so
+  reading (a) stands and reading (b) is out: **the `sualign()`
+  bit-field change is not implicated**.
+  **AND THAT IS THE FIRST BEHAVIOURAL EVIDENCE THE BIT-FIELD CHANGE
+  HAS, which is worth more than the absence of a crash.** perl's
+  `struct op` is the shape that moves -- `sizeof(OP)` 40 -> 32 -- so a
+  perl built entirely under the new rule, running its own module
+  loader and generating its own `perlmain.c`, is a program exercising
+  the moved struct rather than merely linking against it. *Weak, and
+  weak is what a layout change can get from a build*: every symbol
+  resolves either way, so this says the tree is SELF-CONSISTENT and
+  nothing more. `structalign-test`'s three runs and the `apeabi-probe`
+  acid diff still price the change BY NAME and are still unrun -- they
+  are no longer blocking anything, and the `-9` count of **21** and
+  the `__res_state` numbers (`unused` 368 -> 365, `sort_list` 372 ->
+  368, `sizeof` 456 -> 448) are still the written-down predictions
+  waiting for a run.
+  **`perl` is LIVE in `_OPTIONAL_APPS` again**, which means the next
+  tree-wide `mk` is the first that builds it IN THAT POSITION -- the
+  recorded caution, since a package built by hand has not been
+  measured there.
 
 - **edg, AND IT IS THE ONE GOOD NEWS OF THE ROUND**: `lib/edg` and
   `cmd/edg` both build and `cpfe` runs. **No functional test yet**, so
@@ -1986,6 +2011,17 @@ blamed.
   that would say anything is a translation whose output `pcc -c`
   accepts, and `--target win64` with the `0x68` fault is where that
   stopped.
+  **BUILT TWICE NOW, so it is LIVE**: `edg` in `cmd/mkfile`'s
+  transpilers and `edg` in `lib/mkfile`'s `_OPTIONAL_LIBS` -- *lib
+  before cmd, because `cmd/edg`'s link line names `libedg.a` and the
+  tree walks lib first.* It was out under the "by hand first" rule and
+  has now been built by hand twice; that rule is satisfied, not
+  waived.
+- **AND THE TREE BUILDS WITHOUT INTERRUPTION.** That is the first
+  complete run since the compound-literal and bit-field work, and the
+  thing it settles is the one a build can settle: nothing in the tree
+  fails to compile or link under the new layout rule. **go and clisp
+  are the only two still out.**
 
 ## What is open, as a list
 
@@ -2848,8 +2884,9 @@ blamed.
   `vts` it renders, which is one of the three things vts was for.
   **It is LIVE in `_OPTIONAL_APPS`, not commented out** -- this file
   said otherwise and was stale; so is `basic`, which is live too.
-  Off now: `edg`, `c++lib`, and **`go`, `clisp` and `perl`**, the three
-  the first rebuild after the compiler work stopped on.
+  Off now: **`c++lib`, `go` and `clisp`**. `perl` and `edg` went back
+  in once each had built: perl after a COMPLETE clean, edg after two
+  by-hand builds.
   **What is NOT measured is muon doing any WORK**: printing a usage
   exercises argument handling and one `tstr`. *A port that builds and
   prints its usage is not a port either* -- `muon setup` on a real
