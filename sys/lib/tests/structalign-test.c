@@ -38,6 +38,17 @@
  * a way back from a default, the control cannot be taken at all --
  * *an irreversible default takes the measurement with it.*
  *
+ * **THE CONTROL RUN'S COUNT IS 21 NOW, NOT 14, AND IT IS WRITTEN
+ * HERE BEFORE THE RUN RATHER THAN READ OFF IT.** The bit-field
+ * sharing rule added seven: section 4's two (`sizeof bits' 8 against
+ * 4, `offsetof(bits,c)' 4 against 1 -- the probe that became a
+ * check), and section 9's `bf_shares' two, `bf_split' two and
+ * `bf_overflow' ONE, since only its SIZE moves and its offset is 8
+ * under both rules. **`bf_aligned' and `bf_trailing' contribute
+ * NOTHING to that count in either run**, which is the point of
+ * having them: a `-9' run in which either of those fails means the
+ * change did more than share a container's tail.
+ *
  * *a check that cannot fail is not a check*, which this tree has
  * now paid for in `strftime-xcheck', `ctype-xcheck' and twice in
  * `random-xcheck'. Expect section 1 and section 2 to fail without
@@ -162,6 +173,52 @@ struct cs {
 	const void	*noarg_value;
 };
 
+/*
+ * ---- section 9: the four shapes the sharing rule turns on ----
+ *
+ * Section 4 asks ONE bit-field question and a one-shape check cannot
+ * tell a fixed RULE from a compiler that merely stopped padding. These
+ * four partition it, and **the two that must NOT move are the more
+ * valuable half**: they already agree with gcc under both rules, so a
+ * patch that changed more than the sharing of a container's tail shows
+ * up here and nowhere else.
+ *
+ *   bf_shares    8 bits then a char array that FITS the tail.
+ *                kencc was c@4 / 8, gcc is c@1 / 4.  MOVES.
+ *   bf_aligned   16 bits then an `int', which cannot share a 4-byte
+ *                container at its own alignment.  c@4 / 8 under BOTH
+ *                rules and on gcc.  MUST NOT MOVE.
+ *   bf_trailing  a group with nothing after it.  16 both ways.
+ *                MUST NOT MOVE.
+ *   bf_split     two groups of different base types -- a container
+ *                closed for a reason other than an ordinary member.
+ *                kencc was c@4 / 8, gcc is c@1 / 4.  MOVES.
+ *   bf_overflow  two 30-bit fields, so the SECOND starts a new
+ *                container, then a char.  c@8 / 12 on gcc, and it was
+ *                c@8 / 16 here -- the one case where only the SIZE
+ *                moves and the offset does not.
+ *
+ * Every number came from a gcc run, not from arithmetic: my own
+ * arithmetic has been wrong once in this file already (149 against
+ * gcc's 150 in section 1).
+ *
+ * AND THE LAST TWO ARE A PROBE, deliberately, because they are a
+ * DIFFERENT rule: a bit field FOLLOWING a small ordinary member.
+ * kencc rounds the container up to a `tfield' boundary when the group
+ * starts, where gcc puts it at the next free byte -- so
+ * `struct{char c; unsigned a:1; char d;}' is d@2 / 4 on gcc and
+ * d@5 / 8 here even with the sharing in. *Asserting it would make this
+ * test report a failure for something the change never promised*,
+ * which is exactly what section 4 used to say about the case above.
+ */
+struct bf_shares   { unsigned a : 4, b : 4; unsigned char c[3]; };
+struct bf_aligned  { unsigned a : 11, b : 5; unsigned int c; };
+struct bf_trailing { void *p; unsigned a : 1, b : 1, c : 1; };
+struct bf_split    { unsigned a : 3; unsigned short b : 3; char c; };
+struct bf_overflow { unsigned a : 30; unsigned b : 30; char c; };
+struct bf_after    { char c; unsigned a : 1; char d; };
+struct bf_between  { unsigned a : 1; char x; unsigned b : 1; char y; };
+
 /* ---- section 5: #pragma pack must still win ---- */
 #ifdef PLAN9
 #pragma pack on
@@ -259,25 +316,28 @@ main(void)
 	eq("offsetof(mixed, trail)", (long)offsetof(struct mixed, trail), 6);
 	eq("sizeof struct mixed", (long)sizeof(struct mixed), 8);
 
-	printf("\nSection 4: unions, and a bit-field PROBE\n");
+	printf("\nSection 4: unions, and the bit-field probe that GREW UP\n");
 	eq("sizeof union{char a[3];short;}", (long)sizeof(union u3), 4);
 	/*
-	 * A PROBE, not a check, and the distinction is the point: -J
-	 * does not claim to fix this and asserting it would make the
-	 * test report a failure for something the flag never promised.
+	 * **THIS WAS A PROBE AND IS NOW A CHECK**, which is the whole
+	 * record of one round and is worth keeping as a sentence.
 	 *
-	 * gcc answers 4 -- it puts the two bit fields in one byte of the
-	 * storage unit and places `c' in the next. kencc allocates bit
-	 * fields in whole `tfield' units (dcl.c: `w += tfield->width'),
-	 * so `c' lands at offset 4 and the struct is 8. That is a
-	 * SEPARATE non-conformance, in different code, and it is
-	 * recorded here rather than silently folded into this flag's
-	 * result.
+	 * It used to read: *"-J does not claim to fix this and asserting
+	 * it would make the test report a failure for something the flag
+	 * never promised"* -- true, and the number it printed was 8
+	 * where gcc says 4, because kencc allocated a bit field in a
+	 * whole `tfield' unit and refused the tail to the `char' after
+	 * it. That is MSVC's rule, measured against gcc's 1/4 rather
+	 * than recalled.
+	 *
+	 * `sualign()' shares the container's tail under `conformalign'
+	 * now, so the answer is gcc's and the probe has become the
+	 * assertion it was waiting to be. *A probe is a question whose
+	 * answer nothing has promised; when something promises it, the
+	 * probe is the regression test, already written.*
 	 */
-	printf("     %-34s %ld   (gcc says 4; kencc allocates bit fields\n"
-	       "     %-34s      in whole int units, so 8 is expected here\n"
-	       "     %-34s      and -J does not change it)\n",
-	    "sizeof struct{u:3;u:5;char;}", (long)sizeof(struct bits), "", "");
+	eq("sizeof struct{u:3;u:5;char;}", (long)sizeof(struct bits), 4);
+	eq("offsetof(bits, c)", (long)offsetof(struct bits, c), 1);
 
 	printf("\nSection 5: #pragma pack still wins over -J\n");
 	/*
@@ -365,6 +425,36 @@ main(void)
 		    (long)offsetof(struct cs, noarg_value), 24);
 		eq("sizeof struct cs", (long)sizeof(struct cs), 32);
 	}
+
+	printf("\nSection 9: the four shapes the sharing rule turns on\n");
+	eq("sizeof bf_shares",      (long)sizeof(struct bf_shares), 4);
+	eq("offsetof(bf_shares,c)", (long)offsetof(struct bf_shares, c), 1);
+
+	/* the two that must NOT move -- see the header above */
+	eq("sizeof bf_aligned",      (long)sizeof(struct bf_aligned), 8);
+	eq("offsetof(bf_aligned,c)", (long)offsetof(struct bf_aligned, c), 4);
+	eq("sizeof bf_trailing",     (long)sizeof(struct bf_trailing), 16);
+
+	eq("sizeof bf_split",       (long)sizeof(struct bf_split), 4);
+	eq("offsetof(bf_split,c)",  (long)offsetof(struct bf_split, c), 1);
+
+	eq("sizeof bf_overflow",      (long)sizeof(struct bf_overflow), 12);
+	eq("offsetof(bf_overflow,c)", (long)offsetof(struct bf_overflow, c), 8);
+
+	/*
+	 * PROBE, not a check: a bit field following a small ordinary
+	 * member is the OTHER rule, which this change does not touch.
+	 * gcc answers d@2/4 and y@3/4.
+	 */
+	printf("     %-30s off(d)=%ld size=%ld   (gcc: 2 and 4 --\n"
+	       "     %-30s                        a SECOND rule, see header)\n",
+	    "PROBE struct{char;u:1;char;}",
+	    (long)offsetof(struct bf_after, d), (long)sizeof(struct bf_after),
+	    "");
+	printf("     %-30s off(y)=%ld size=%ld   (gcc: 3 and 4)\n",
+	    "PROBE struct{u:1;char;u:1;char;}",
+	    (long)offsetof(struct bf_between, y),
+	    (long)sizeof(struct bf_between));
 
 	printf("\n%d failures\n", failures);
 	return failures;

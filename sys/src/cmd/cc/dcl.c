@@ -931,7 +931,7 @@ void
 sualign(Type *t)
 {
 	Type *l;
-	long o, w;
+	long o, w, nw, bw;
 	int a, ma;
 
 	/*
@@ -965,6 +965,7 @@ sualign(Type *t)
 	case TSTRUCT:
 		t->offset = 0;
 		w = 0;
+		bw = 0;
 		a = 1;
 		for(l = t->link; l != T; l = l->down) {
 			if(l->nbits) {
@@ -972,9 +973,59 @@ sualign(Type *t)
 					l->shift = -l->shift;
 					w = round(w, tfield->width);
 					o = w;
-					w += tfield->width;
+					if(!conformalign)
+						w += tfield->width;
+					else if(o + tfield->width > bw)
+						bw = o + tfield->width;
 				}
 				l->offset = o;
+				if(conformalign) {
+					/*
+					 * CONFORMING: the group holds bits
+					 * [0, shift+nbits) of the container at
+					 * `o', so the next ordinary member may
+					 * sit in what is LEFT of it, at its own
+					 * alignment. The old rule reserved the
+					 * whole `tfield' unit above instead --
+					 * MSVC's rule, and the one thing `-J'
+					 * had deliberately not fixed.
+					 *
+					 * `nw > w' RATHER THAN A BARE
+					 * ASSIGNMENT, and the honest account
+					 * is that it CANNOT FIRE TODAY.
+					 *
+					 * I wrote first that kencc does not
+					 * restart the container when an
+					 * ordinary member comes BETWEEN two bit
+					 * fields, so `nw' for the second could
+					 * be below `w' and a bare assignment
+					 * would move `w' BACKWARDS, putting a
+					 * later member on top of an earlier
+					 * one. **The GRAMMAR says otherwise**:
+					 * `cc.y's `edecor: xdecor' arm does
+					 * `lastbit = 0; firstbit = 1;' for
+					 * every ordinary declarator, so
+					 * `struct{unsigned a:1; char x;
+					 * unsigned b:1; char y;}' gives `b' a
+					 * fresh container at the next 4-byte
+					 * boundary and `nw' only ever grows.
+					 *
+					 * *It stays because the invariant it
+					 * protects -- `w' never retreats -- is
+					 * not local to this function*: it holds
+					 * only as long as that grammar action
+					 * does, which is two files away, and
+					 * one comparison is a cheaper guard
+					 * than a rule nobody re-checks. Marked
+					 * as defensive rather than left to read
+					 * as load-bearing, which is the
+					 * almost-true-claim trap this tree has
+					 * already paid for once.
+					 */
+					nw = o + (l->shift + l->nbits + 7) / 8;
+					if(nw > w)
+						w = nw;
+				}
 			} else {
 				if(l->width < 0 ||
 				   l->width == 0 && l->down != T)
@@ -993,6 +1044,33 @@ sualign(Type *t)
 			if(ma > a)
 				a = ma;
 		}
+		/*
+		 * AND THE STRUCT MUST STILL COVER THE LAST BIT-FIELD
+		 * CONTAINER, which only the sharing rule can break.
+		 *
+		 * `sub.c's `makedot' types a bit-field reference as
+		 * `tfield' itself, so EVERY read and write of one is a
+		 * whole `tfield->width' access at `o' -- and with the
+		 * tail now shared, `w' can stop at `o+1'.
+		 *
+		 * **UNDER `#pragma pack on' THAT IS A THREE-BYTE
+		 * OVER-ACCESS PAST THE END OF THE OBJECT**, and a write
+		 * at that, since setting a bit field is a
+		 * read-modify-write of the container. The old rule could
+		 * not produce it: it reserved the whole unit, so the
+		 * size always covered it.
+		 *
+		 * *It costs nothing anywhere else, and the arithmetic
+		 * rather than a measurement is what says so*: any struct
+		 * holding a bit field has `talign >= tfield->width'
+		 * (`memberalign' answers `align(1, tfield, Ael1)' for
+		 * one), `o' is a multiple of that width, and `w >= o+1`,
+		 * so `Asu2' already rounds to at least `o+width'. The
+		 * line can only bite where `packflg' took `talign' to 1
+		 * -- which is exactly where it is needed.
+		 */
+		if(conformalign && bw > w)
+			w = bw;
 		t->talign = a;
 		w = align(w, t, Asu2);
 		t->width = w;

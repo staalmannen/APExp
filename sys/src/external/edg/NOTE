@@ -1575,3 +1575,105 @@ WHAT REMAINS BEFORE THE PATCH, in order:
   4. `mk distclean' then `mk install'.  It is an ABI change and no
      mkfile lists a header as a dependency.
   5. Then cpfe on the VM: the `0x68' fault is what all of this is for.
+
+
+sualign() IS PATCHED -- SIX LINES, AND A MODEL CAUGHT ITS COMMENT
+------------------------------------------------------------------
+
+`cc/dcl.c`'s TSTRUCT arm, gated on `conformalign` for the reason `-J`
+itself is gated: native `6c` links the host's own `libc.a`, and a
+bit-field layout change there would be the silent ABI split the flag
+was built to avoid.  The old line reserved the whole unit --
+
+    w = round(w, tfield->width);  o = w;  w += tfield->width;
+
+-- and now the `w +=` runs only under the 9front rule.  Under `-J` the
+width advances per FIELD instead, `nw = o + (shift + nbits + 7)/8`,
+which is EDG's own `offset_after_field` non-Microsoft arm written out:
+the group holds bits [0, shift+nbits) of the container at `o`, and the
+next ordinary member takes what is left at its own alignment.
+
+**AND IT OPENS A HAZARD THE OLD RULE COULD NOT HAVE.**  `sub.c`'s
+`makedot` types a bit-field reference as `tfield` itself, so every
+reference is a whole `tfield->width` access at `o` -- and setting a bit
+field is a read-modify-WRITE of that container.  With the tail shared,
+`w` can stop at `o+1`, and **under `#pragma pack on` the struct would
+then end three bytes before the access does**.  The old rule could not
+produce it, because reserving the unit always made the size cover it.
+One line fixes it, and *the arithmetic rather than a measurement says
+it costs nothing elsewhere*: any struct holding a bit field has
+`talign >= tfield->width` (memberalign answers `align(1, tfield, Ael1)`
+for one), `o` is a multiple of that width, and `w >= o+1`, so `Asu2`
+already rounds to at least `o+width`.  **It can only bite where
+`packflg` took `talign` to 1 -- exactly where it is needed.**
+
+AND THE MODEL REFUTED THE PATCH'S OWN COMMENT, WHICH IS WHY IT EXISTS.
+`sys/lib/tests/sualign-model.py` transcribes the loop and checks it
+against gcc, because kencc's sources need Plan 9's `<u.h>` and the
+first build of any `cc/` change is the VM's -- the weaker position `-J`,
+the `auto` grammar fix and `-C` all shipped from.  **Its control is
+`__res_state`**: it must reproduce `tmp/abi-bf-before.acid` to the
+digit (pfcode 360, ndots 364, unused 368, sort_list 372, sizeof 456)
+or it refuses to print, since a transcription that cannot reproduce the
+known answer is modelling a different compiler.  Breaking `TFIELD` to 8
+makes it refuse, so the control fires.
+
+**What it caught was a sentence, not a line of code.**  The `nw > w`
+monotone guard was commented as load-bearing, on the claim that kencc
+does not restart the container when an ordinary member sits BETWEEN two
+bit fields.  The model disagreed, and `cc.y` settles it:
+`edecor: xdecor { lastbit = 0; firstbit = 1; }` fires for every
+ordinary declarator, so the container DOES restart and `nw` can never
+go backwards.  *An almost-true claim presented as verified is worse
+than none* -- `cmd/edg/mkfile`'s `_Z`-mangled assertion again, caught
+before the build this time instead of after it.  The guard stays and is
+marked DEFENSIVE: the invariant it protects is two files away.
+
+THE MODEL'S PREDICTIONS, written before the VM sees anything:
+
+  case       HEAD                PATCHED             gcc
+  shares     c@4 / 8             c@1 / 4             c@1 / 4    MOVES
+  aligned    c@4 / 8             c@4 / 8             c@4 / 8    must not
+  trailing       16                  16                  16     must not
+  split      c@4 / 8             c@1 / 4             c@1 / 4    MOVES
+  overflow   c@8 / 16            c@8 / 12            c@8 / 12   SIZE only
+
+  __res_state   unused 368 -> 365, sort_list 372 -> 368,
+                sizeof 456 -> **448**
+
+**448 CORRECTS MY OWN EARLIER 452**, and the reason is in the struct:
+`dnsrch` is `char *[]`, so `talign` is 8 rather than 4, and 448 rounds
+to 448 where 452 would round to 456.  *The arithmetic I did by hand was
+wrong and the model's is checked against a measured dump* -- which is
+the second time in this file that hand arithmetic lost to a run.
+
+`structalign-test` gains **section 9** with those five shapes, and
+**section 4's bit-field PROBE becomes a CHECK**: it used to print 8
+beside a note that `-J` never promised to fix it, and the thing that
+promises it now exists.  *A probe is a question nothing has promised;
+when something promises it, the probe is the regression test, already
+written.*  Its `-9` control count goes **14 -> 21**, written down
+before the run: section 4's two, `bf_shares` two, `bf_split` two, and
+`bf_overflow` ONE -- only its size moves.  **`bf_aligned` and
+`bf_trailing` contribute nothing to that count in either run**, which
+is what makes them the control rather than decoration.
+
+AND A SECOND DIVERGENCE IS NAMED WITH NUMBERS AND LEFT ALONE.  kencc
+rounds the container up to a `tfield` boundary when a group STARTS, so
+a bit field following a small ordinary member does not share THAT
+member's unit: `struct{char c; unsigned a:1; char d;}` is `d@2 / 4` on
+gcc and `d@5 / 8` here even patched.  Section 9 carries it as a PROBE
+with gcc's numbers beside it, for the same reason section 4 used to
+carry the first one.  **EDG's corpus needs only the tail sharing**, so
+this is out of scope rather than forgotten.
+
+ORDER FROM HERE, and the first step is not the tree:
+  1. `cd sys/src/cmd && mk install` -- the compilers first, and this
+     matters for every package rather than only the ones with `-J` in
+     frame.  **It is also the first time these six lines are COMPILED
+     by anything**, so a syntax error surfaces here.
+  2. `structalign-test` three runs: gcc 0, `pcc -9` **21**, `pcc` 0.
+  3. `pcc -c -a apeabi-probe.c > tmp/abi-bf-after.acid` and diff
+     against the committed before.
+  4. `mk distclean` then `mk install`.
+  5. cpfe: the `0x68` fault is what all of this is for.
