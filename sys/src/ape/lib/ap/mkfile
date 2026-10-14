@@ -60,7 +60,14 @@ install all:V:
 
 installall:V:
 	for(objtype in $CPUS)@{
-		mk objtype=$objtype install
+		# NOT `mk objtype=$objtype install'.  `=' is a syntax
+		# character in rc, so that spelling is a parse error
+		# (`token '=': syntax error') -- MEASURED on the VM, where
+		# clisp's `test $name = lispbibl' answered exactly that.
+		# This line sits in `installall:V:', which a normal
+		# `mk install' never reaches, so it has never been run and
+		# nothing has ever reported it.
+		mk 'objtype='^$objtype install
 	}
 
 

@@ -29,7 +29,17 @@ UPDATE=\
 
 CC=pcc
 LD=pcc
-CFLAGS=-FTVwp+ -DPLAN9 -DGOROOT_FINAL=\\"$APEXPROOT/sys/src/external/go1.4\\"
+# -DHAVE_C_BOOL: kencc's `bool' is a keyword, so dist's own
+# `typedef int bool;' in a.h is a syntax error and the build stopped on
+# the first file.  The guard is upstream-shaped (bash's bashansi.h uses
+# this exact name) and the capability is declared HERE rather than sniffed
+# from a compiler macro -- see the comment in a.h.
+#
+# `-V' and `-+' are 6c flags pcc does not name, so it prints
+# `cc: flag -V ignored' twice per file and carries on.  They are left in
+# because they are upstream's own list from src/make.rc and removing them
+# would make this line diverge from the one go documents.
+CFLAGS=-FTVwp+ -DPLAN9 -DHAVE_C_BOOL -DGOROOT_FINAL=\\"$APEXPROOT/sys/src/external/go1.4\\"
 
 # make.rc generates the Plan 9 libc declarations before compiling dist.
 libc_plan9.h:V:

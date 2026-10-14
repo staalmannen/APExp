@@ -2,7 +2,31 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+/*
+ * APExp: kencc has `bool' as a real keyword (cc/lex.c's itab, unconditional
+ * in every dialect -- native and APE alike), so `typedef int bool;' is a
+ * constraint violation and the build stopped on the FIRST file with
+ * `a.h:5 syntax error, last name: bool'.  C23 says the same thing: gcc
+ * -std=c23 refuses this line too, so go1.4 is simply pre-C23 here.
+ *
+ * The capability is DECLARED by the build (cmd/go/mkfile.bootstrap passes
+ * -DHAVE_C_BOOL) rather than inferred from a compiler macro: keying it on
+ * one of kencc's own predefines would tie `bool' to a flag about something
+ * else -- __APEXP_CONFORMALIGN__ is the struct-layout marker and would take
+ * the typedef back under `pcc -9'.
+ *
+ * Nothing in dist stores a non-boolean in one: every bool-returning
+ * function returns 0, 1 or a comparison, swept before this was written, so
+ * kencc's one-byte bool is semantically what `int' was being used for.
+ *
+ * go1.4 is ALONE in this tree.  A sweep of external/ finds five
+ * `typedef ... bool;' and the other four (bash, PDCursesMod, curl, libzip)
+ * are already behind HAVE_C_BOOL / __bool_true_false_are_defined /
+ * HAVE_STDBOOL_H / __hpux.  This one had no guard at all.
+ */
+#ifndef HAVE_C_BOOL
 typedef int bool;
+#endif
 
 // The Time unit is unspecified; we just need to
 // be able to compare whether t1 is older than t2 with t1 < t2.
