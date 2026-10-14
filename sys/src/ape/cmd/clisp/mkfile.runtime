@@ -19,15 +19,29 @@ BUILD=build-$objtype
 # ARGUMENTS, which is the recorded parse error
 # (`token '=': syntax error'), the same one `fdwatch' paid a round for
 # with `awk -v name=$name' and `cmd/edg/mkfile' paid another for with
-# `-D_main=__edg_main'. **There is no working precedent for the
-# unquoted form anywhere in this tree** -- one grep over every mkfile
-# finds this line and nothing else, which is the check that would
-# have cleared it had there been one.
+# `-D_main=__edg_main'.
 #
-# *NOT MEASURED: there is no rc on the build host, so this is the
-# recorded rule plus the absent precedent rather than a run.* If the
-# configure step was in fact reaching upstream before, the quoting
-# costs nothing and this comment is the thing to correct.
+# **AND THE MECHANISM IS WHY EVERY `-DFOO=1' IN THIS TREE IS FINE.**
+# Those arrive through `$CFLAGS', and mk exports its variables into
+# rc's environment, so rc EXPANDS them after it has parsed -- the `='
+# never reaches the parser as text. A literal one typed into a recipe
+# does, which is exactly what `cmd/edg/mkfile' records.
+#
+# **I FIRST WROTE THAT NO PRECEDENT EXISTS AND THAT WAS WRONG.** A
+# sweep of every recipe line in `sys/src' -- as opposed to every
+# tab-indented line, which also catches assignment continuations and
+# was 83 hits of noise -- finds exactly one other:
+# `sys/src/ape/lib/ap/mkfile:63', `mk objtype=$objtype install'.
+# *But it sits in `installall:V:', which a normal `mk install' never
+# reaches*, so it is an UNTRIGGERED line rather than a demonstrated
+# precedent -- and an untriggered rule gets no diagnostic from anyone,
+# which this tree already records from the transpiler rules.
+#
+# *NOT MEASURED: there is no rc on the build host.* One command on the
+# VM settles it for both lines -- `mk -f mkfile.runtime configure'
+# reaching upstream's configure, or `token '=': syntax error'. If rc
+# does accept it, this quoting costs nothing and `lib/ap:63' is fine;
+# if it does not, that line is a second latent break.
 
 # THE ARCHITECTURE MACRO, AND WITHOUT IT CLISP SELECTS NO CPU AT ALL.
 #
