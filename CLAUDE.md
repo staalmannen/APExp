@@ -2711,6 +2711,55 @@ blamed.
     **a provenance paragraph saying which lines are measured and
     which are only recalled or searched** are in the NOTE. *Nothing
     started; none of it blocks anything already working.*
+    **AND A FIFTH CANDIDATE WAS MEASURED RATHER THAN RECALLED --
+    Paragon's `paragon_portable_stl`, MIT, header-only.** It is the
+    first one whose properties were read out of the source instead of
+    from memory, and on the technical axes it is better than anything
+    on the list above:
+    - **ZERO `#include <...>` in all 720 headers.** No host C++
+      standard library, no C library headers -- the property that
+      disqualifies libc++ and uClibc++ here, satisfied by
+      construction rather than by porting.
+    - **C++14** (`CMakeLists.txt`'s `CXX_STANDARD 14`), well inside
+      what EDG's own self-translation already exercises.
+    - **Exception-free is a real mode, not a flag that stops
+      throwing**: parallel `exception/` and `noexception/` trees and
+      an `expected<T, portable_stl_error>` error channel. *That
+      matters more here than anywhere else*, since EDG's EH is
+      setjmp-based with its own regions and `lib_src`'s EH has never
+      been exercised.
+    - **Every `__builtin_*` sits behind `__has_builtin` with a pure
+      C++ `generic/` fallback** -- 19 builtins, every one guarded --
+      so a compiler with none of them still compiles.
+    - The type-trait intrinsics it uses unguarded
+      (`__is_trivially_copyable`, `__is_constructible`,
+      `__underlying_type`, `__is_class`, `__is_polymorphic`,
+      `__is_aggregate`, ...) are **the ones already checked present
+      in cpfe's table** in the paragraph above. *Two directions, one
+      answer.*
+    **AND IT IS STILL DISQUALIFIED FOR THE JOB, ON THE AXIS THIS
+    FILE ALREADY NAMES, TWICE OVER.** `namespace portable_stl`, 1283
+    occurrences, not `std` -- *a renamed STL serves NEW code; only a
+    `std::` one serves a PORT.* **And a rename would not even be
+    enough**, which is the stronger half and is the measurement
+    rather than the rule: `vector::push_back` returns
+    `::portable_stl::expected<void, ::portable_stl::portable_stl_error>`
+    where C++ says `void`, so the API differs from the standard's and
+    no aliasing recovers it. Coverage is partial too -- string,
+    string_view, vector, list, forward_list, map, set, array,
+    variant, tuple, function, memory, ranges, algorithm, and **no
+    iostreams, locale, regex, threads, deque or unordered
+    containers**.
+    **SO IT IS THE WRONG ANSWER TO THAT QUESTION AND A GOOD ANSWER TO
+    A DIFFERENT ONE: a CONFORMANCE CORPUS for cpfe.** 720 headers of
+    heavy template metaprogramming that need no C++ library, no
+    exceptions and no runtime support, translated by cpfe and
+    compiled by pcc, is a far better measurement of "does this port
+    work on real C++" than the toy the NOTE prescribes -- and it
+    costs a translation run rather than a port. *Its own `unit_test`
+    is NOT free*: 131 files include `<gtest/gtest.h>` and several
+    include `<vector>` and `<algorithm>`, so that suite runs on the
+    host against the host's STL and says nothing about kencc.
   - **AND THE RUNTIME ADDS NOTHING libap ALREADY PROVIDES, checked
     rather than assumed.** `lib_src` holds `exit.c`, `main.c`,
     `error.c` and `memzero.c`, which is the shape that cost this tree
