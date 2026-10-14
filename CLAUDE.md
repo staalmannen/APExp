@@ -311,7 +311,15 @@ the output is the acid dump on stdout, not the program. **It now
 carries a BIT-FIELD section too**, for the second axis: there the two
 sides are two COMPILERS (HEAD's `pcc` against a patched one) with the
 same flags, and the `before` dump must be taken and kept first,
-because no flag asks for the old allocation afterwards.
+because no flag asks for the old allocation afterwards. The baseline
+is committed at `tmp/abi-bf-before.acid`.
+**`bfmove-sweep.py` is the companion SWEEP and exists because of the
+probe's own limit**: an acid dump covers only the structs its one
+translation unit lays out, i.e. the public headers, while the change
+reaches every APE compile. It asks which bit-field groups anywhere in
+`lib/ap` and `external/` are followed by a member small enough to
+share the container's tail -- the only shape that moves. It **gates
+nothing**: EDG's 266 hits are the change's purpose, not its cost.
 `structalign-test.c` measures `pcc -J`, conforming struct layout, and
 **needs three runs** -- gcc, then `pcc -DPLAN9` WITHOUT `-J` (which
 must fail ~12 checks), then with it. *The middle run is the control*:
@@ -2372,6 +2380,46 @@ live either way.
     *But "looks small" is what the probe is for, and `-J`'s own
     history is that the feared cost and the measured cost were
     different sizes.*
+  - **THE BASELINE IS TAKEN AND EVERY NUMBER WAS WRITTEN DOWN FIRST**
+    (`tmp/abi-bf-before.acid`, 1751 lines). All four controls answered
+    as predicted -- `shares` 4/8, `aligned` 4/8, `trailing` 16 -- and
+    **the two that matter are the two that already AGREE with gcc**:
+    `aligned` and `trailing` must be IDENTICAL in the after-dump, or
+    the patch changed more than the sharing rule, which a shares-only
+    check could not have told apart. `split` was left unknown and is
+    now answered: **kencc closes the container across base types too**,
+    where gcc shares -- a third rule, reported not asserted.
+    `__res_state` is the **only** mover in the public surface
+    (`unused[3]` at 368 against gcc's 365, so `sort_list` and the size
+    move by 4); `fenv_t` and `obstack` are identical under both rules,
+    exactly as called. **And the acid dump swept ITSELF** -- every
+    `aggr` scanned for two members at one offset, acid's signature for
+    a bit-field group -- finding those same three and nothing else, the
+    rest being unions. *Two routes to one answer, as with EDG's
+    duplicate count.*
+  - **AND THE PART NO ACID DUMP CAN SEE IS MEASURED:
+    `sys/lib/tests/bfmove-sweep.py`.** `lib/ap` 3 groups / 1 mover;
+    `external/` 43093 groups / **268** movers -- and **266 of the 268
+    are EDG**, which is the change's purpose arriving as its own cost
+    line, since the 958 `__dummy[N]` paddings ARE this shape. The other
+    two are `sqlite3.c`'s `struct Column` and curl's
+    `curl_hstsentry`, each internal to one package. **The one `lib/ap`
+    hit is a LATENT BUG rather than a cost**: `include/meta.h` is
+    musl's mallocng header, whose `pad[UNIT - sizeof(ptr) - 1]` is
+    sized so the struct is exactly UNIT *only if the bit field shares*
+    -- wrong under kencc by construction, costing nothing because
+    **nothing includes it**, and the change would FIX it.
+    *The sweep's first version allowed `\**` and reported perl's
+    `char *subbeg` -- a POINTER, which can never share a 4-byte tail;
+    **a regex that matches the type NAME is not one that matches the
+    TYPE**, and that was the whole 284 -> 268.*
+  - **So the price is paid and it is small**: one public struct, two
+    package-internal ones, one dead header, and EDG. *`-J`'s history
+    was that the feared and measured costs were different sizes; this
+    time they are the same size, and the measurement says so rather
+    than the expectation.* Next: `cc/sualign()`, the four shapes into
+    `structalign-test`, the after-dump (`aligned`/`trailing` identical
+    is the refutation condition), `mk distclean`, then cpfe.
   - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
     the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
     is the **libsupc++/libc++abi layer** -- new/delete, vtables, RTTI,

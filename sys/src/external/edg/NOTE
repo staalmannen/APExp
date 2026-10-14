@@ -1465,3 +1465,113 @@ changed more than the sharing rule, and that is the half a
 shares-only check could not have told apart.  `split` answering 1 on
 gcc is reported rather than asserted: gcc shares a container ACROSS
 base types, which is a third rule and one nothing here depends on.
+
+
+THE BASELINE IS TAKEN, AND EVERY NUMBER IN IT WAS WRITTEN DOWN FIRST
+------------------------------------------------------------------
+
+`pcc -c -a apeabi-probe.c' on the VM, committed at `tmp/abi-bf-before.acid'
+(1751 lines).  **All four controls answer exactly as predicted**, and
+the two that matter most are the two that AGREE with gcc:
+
+  shape      gcc        kencc (HEAD)   predicted
+  shares     c@1 / 4    c@4 / 8        4/8   MOVES
+  aligned    c@4 / 8    c@4 / 8        4/8   must NOT move
+  trailing       16         16          16   must NOT move
+  split      c@1 / 4    c@4 / 8        unknown
+
+*`aligned' and `trailing' being identical to gcc already is what makes
+the after-dump readable*: if either moves too, the patch changed more
+than the sharing rule, and a shares-only check could not have told the
+two apart.  `split' was left unknown deliberately and is now answered:
+**kencc closes the container across base types as well** (an `unsigned'
+group then an `unsigned short' group), where gcc shares -- a third rule,
+reported rather than asserted, and one more struct shape that would move.
+
+AND THE THREE REAL HEADERS CONFIRM THE READING TO THE BYTE:
+
+  __res_state   `ndots'/`nsort' at 364, `unused[3]' at **368** -- the
+                NEXT container, where gcc puts it at 365.  So `unused',
+                `sort_list' (372) and `sizeof' (456) all move by 4.
+                **The only mover in the whole public surface.**
+  fenv_t        `__opcode'/`__unused4' at 20, `__data_offset' at **24**
+                under BOTH rules.  Does not move, as called.
+  obstack       the three 1-bit fields are last, at 80, and the struct
+                is 88 either way.  Does not move, as called.
+  curl          NOT in this dump -- `-DAPEABI_CURL' was not passed, so
+                `curl_hstsentry' remains a READING rather than a
+                measurement.  Saying which of the four is which is the
+                point of recording it.
+
+**AND THE ACID DUMP SWEPT ITSELF, WHICH IS A SECOND ROUTE TO THE SAME
+ANSWER.**  Rather than trusting the header grep, every `aggr' in the
+1751 lines was scanned for two consecutive members at ONE offset --
+acid's own signature for a bit-field group.  It finds exactly three:
+`_20_' (fenv_t), `obstack' and `__res_state'.  Everything else sharing
+an offset is a UNION -- `sigval', `sa_handler'/`sa_sigaction', the
+pthread `__i'/`__vi'/`__p' trio, obstack's `chunkfun'/`freefun' -- which
+genuinely share offset 0 and are not bit fields at all.  *A textual
+sweep of the headers and the compiler's own output of the compiled
+translation unit agreeing is better evidence than either alone*, and it
+is the same pairing that settled the EDG duplicate count (3094 from
+annotations, 3124 from objects).
+
+THE PART THE PROBE CANNOT SEE IS NOW MEASURED TOO, AND IT IS THE
+RESULT: `sys/lib/tests/bfmove-sweep.py'.
+
+  lib/ap           3 groups,   1 would move
+  external/    43093 groups, 268 would move
+
+**266 of the 268 are EDG.**  That is the change's PURPOSE arriving as
+its own cost line: EDG's 958 `char __dummy[N]' paddings ARE this shape,
+emitted for a compiler that shares the container, so the sweep counting
+them is the corpus saying again what the folded `offsetof' said.  The
+other two are **sqlite3.c's `struct Column'** (`notNull:4' then
+`char affinity') and **curl's `curl_hstsentry'** -- each internal to one
+package, rebuilt together, no cross-library surface.
+
+**AND THE ONE libap HIT IS A LATENT BUG FOUND ON THE WAY, NOT A COST.**
+`include/meta.h' is musl's mallocng header and `struct group' is
+`struct meta *meta; unsigned char active_idx:5; char pad[UNIT -
+sizeof(struct meta *) - 1];` -- *upstream sized that pad so the struct
+is exactly UNIT, which is only true if the bit field shares*.  Under
+kencc the arithmetic is wrong by construction.  **Nothing in the tree
+includes the file** (this tree's allocator is Plan 9's own), so it costs
+nothing today and is recorded rather than fixed -- but it would break
+silently the day mallocng were built here, and the change would FIX it.
+Its base type is `unsigned char' and nothing has measured what kencc
+does with a sub-int container, so the direction is named and the number
+is not.
+
+**THE SWEEP'S FIRST VERSION HAD A FALSE-POSITIVE CLASS AND IT NAMED
+ITSELF.**  The "shareable member" regex allowed `\**', so
+`perl/regexp.h:198' reported `compflags:9' followed by `char *subbeg'
+-- a POINTER, 8-byte aligned, which can never sit in a 4-byte tail.
+*A regex that matches the type NAME is not a regex that matches the
+TYPE.*  268 is the count after pointers were excluded; 284 was the
+count before, and the sixteen difference was entirely that.
+
+SO THE PRICE IS PAID AND IT IS SMALL: **one public struct
+(`__res_state', inside `lib/ap/network/' and libressl's own compat
+copy), two package-internal structs, one dead header, and EDG -- which
+is what the change is for.**  `-J's own history was that the feared
+cost and the measured cost were different sizes; this time they are the
+same size, and the measurement is what says so rather than the
+expectation.
+
+WHAT REMAINS BEFORE THE PATCH, in order:
+  1. `cc/sualign()': let a following member share the container tail.
+     The TSTRUCT arm already carries `o' (the unit's offset) and `ma'
+     (the max member alignment) separately since the `_convM2D' round,
+     so the two uses that collided there are already apart.
+  2. `structalign-test.c' gains the four control shapes, so the change
+     has a REGRESSION test and not only a diff.  Its section 8 already
+     guards the `o'/`ma' collision and must stay at 0 under both `-J'
+     and `-9'.
+  3. `pcc -c -a apeabi-probe.c > tmp/abi-bf-after.acid', diff against
+     the committed before.  **`aligned' and `trailing' identical,
+     `shares' and `split' moved, `__res_state' 456 -> 452, and NOTHING
+     ELSE** -- any fourth name in that diff is the refutation condition.
+  4. `mk distclean' then `mk install'.  It is an ABI change and no
+     mkfile lists a header as a dependency.
+  5. Then cpfe on the VM: the `0x68' fault is what all of this is for.
