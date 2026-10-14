@@ -2756,10 +2756,36 @@ blamed.
     exceptions and no runtime support, translated by cpfe and
     compiled by pcc, is a far better measurement of "does this port
     work on real C++" than the toy the NOTE prescribes -- and it
-    costs a translation run rather than a port. *Its own `unit_test`
-    is NOT free*: 131 files include `<gtest/gtest.h>` and several
-    include `<vector>` and `<algorithm>`, so that suite runs on the
-    host against the host's STL and says nothing about kencc.
+    costs a translation run rather than a port. **And the corpus has
+    NO libap SURFACE AT ALL** -- zero system includes -- so a failure
+    is cpfe's or kencc's and cannot be libap's. *That partition is
+    worth as much as the coverage*: every earlier C++ question here
+    has had both halves live at once.
+    **THE SUITE IS BIGGER THAN "a number of tests", AND ITS SHAPE IS
+    MEASURED**: 110 `.cpp`, **1253 `TEST(`** plus 16 `TEST_F`, and
+    **15,897 assertions** -- almost entirely `ASSERT_EQ/TRUE/FALSE`
+    and `EXPECT_EQ/TRUE/FALSE` (14,606 of the 15,897), with a short
+    tail of `GT/LT/LE/GE/NE`. **What is NOT a plain comparison is
+    small and nameable**: 18 `ASSERT_THAT` (gmock matchers), 16
+    `TEST_F` fixtures, 22 throw-related, and **19 of the 110 files
+    pull the host's `<vector>`/`<list>`/`<algorithm>`** and have to
+    be left out. So a gtest SHIM of about ten macros reaches ~92% of
+    it -- a behavioural C++ suite this target has never had. *As
+    shipped it is not free*: 131 files include `<gtest/gtest.h>`, and
+    gtest itself wants a real `std::`, which is the thing that does
+    not exist here.
+    **AND THE 22 THROW ASSERTIONS ARE THE VALUABLE TAIL RATHER THAN
+    THE AWKWARD ONE**: `ASSERT_THROW`/`ASSERT_NO_THROW`/
+    `ASSERT_ANY_THROW` are the only exercise of EDG's setjmp-based EH
+    this tree could get, and `lib_src`'s EH has never been run.
+    ***THE SHIM MUST NOT REGISTER TESTS WITH STATIC CONSTRUCTORS, and
+    naming that now is worth a round***: gtest's `TEST()` builds its
+    registry from static initialisers, and **nothing calls
+    `_Z12__call_ctorsv`** -- the static-init gap recorded above, open
+    and unfixed. A suite registered that way would report zero tests
+    and read exactly like a translation bug. Generate an explicit
+    table of test functions from the `TEST(` names instead, or fix
+    static init first and let the suite be what confirms it.
   - **AND THE RUNTIME ADDS NOTHING libap ALREADY PROVIDES, checked
     rather than assumed.** `lib_src` holds `exit.c`, `main.c`,
     `error.c` and `memzero.c`, which is the shape that cost this tree
