@@ -1231,3 +1231,151 @@ five public APE headers.
 the knob.* Only a rebuilt cpfe can say, so a section asserting it
 would measure a guess; the probe asks the compiler in front of it
 about the rule instead.
+
+
+MEASURED: kencc IS MSVC's RULE, AND THE KNOB IS SET
+----------------------------------------------------------------
+
+Section 2 on the VM:
+
+	struct{unsigned x:1; char c;}        c at 4, sizeof 8
+	struct{unsigned a:3,b:5; char c;}    c at 4, sizeof 8
+	-> this compiler follows: MSVC
+
+against the host control's 1,4 / 1,4.  So the identification is a
+measurement now rather than a recollection, and
+`TARG_MICROSOFT_BIT_FIELD_ALLOCATION 1' is in `kencc_targ.h' with that
+output quoted beside it.
+
+**AND THE REGENERATION'S OWN PREDICTION, written before it is run,
+because it is NOT the one that reads naturally.**  The obvious guess
+is that the two constants become 408 and 416+8.  *They do not: they
+stay 400 and 416, and only the PADDING changes.*
+
+	19 pointers                                  0..152
+	`unsigned x:1' in a four-byte container    152..156
+	struct alignment 8, so pad to              156..160
+	-> EDG emits `char __dummy[4]' where it emitted `__dummy[7]'
+
+and kencc on THAT C reads 152, closes the unit at 156, lays the four
+bytes 156..160, rounds to 160 -- **the same 160, by a different
+route**.  `a_translation_unit' is then 24+160 = 184, source_file to
+192, `an_il_header' 184 bytes to 376, three pointers to **400**.  So
+the fix is confirmed by the constants NOT moving while the padding
+does, which is the opposite of what the symptom suggests.
+
+Refutation: a regenerated `src/il.c` whose `400ULL' has changed, or
+whose `__dummy[7]' has not, means the knob did something other than
+this and the arithmetic above is wrong somewhere.
+
+**AND THE CONTROL WAS NEARLY TAKEN ON THE WRONG BUILD.** There are TWO
+cpfe trees in the scratchpad, and the first rebuild I started was the
+one `regen.sh` does not use:
+
+	edg/build/kencc        -include <scratchpad>/kencc_targ.h   (older)
+	edgsrc/repo/build/kencc -include <repo>/sys/src/external/edg/kencc_targ.h
+
+*The tree that matters pre-includes the REPO file directly*, so an
+edit there reaches it with nothing copied -- and the other tree reads
+a scratchpad COPY, so a rebuild of it would have measured the old
+configuration while looking exactly like a measurement of the new one.
+**`name the build that RUNS, not the one with the right name`** -- the
+shadowed-`config.h` rule for the fourth time, and the first time it
+has been two build directories rather than two headers.
+
+**AND THE PROBE GOES STALE WITH THE CORPUS, which is worth saying
+where the probe is.**  `edgtuoff-probe.c` transcribes
+`char __dummy[7]` because that is what the committed corpus says.
+After a regeneration it must be re-transcribed, or it measures the
+previous corpus and reports AGREE or MISMATCH about a file nobody is
+building.  *A probe that copies generated text inherits that text's
+version, and nothing in it says so by itself.*
+
+
+AND THE KNOB IS NOT THE FIX: TWO AXES, AND I CONFLATED THEM
+----------------------------------------------------------------
+
+The prediction above -- `__dummy[7]' becomes `__dummy[4]', the
+constants stay -- was wrong, and a host rebuild said so before anyone
+regenerated anything.  **The identification was right and the
+inference from it was not.**
+
+`TARG_MICROSOFT_BIT_FIELD_ALLOCATION 1' DOES take, measured on a
+four-line input through a cpfe rebuilt with it:
+
+	struct S { unsigned x: 1; char c; };
+	off_c = 4ULL    siz = 8ULL         (was 1 and 4)
+	struct S { void *p[19]; unsigned x: 1; };
+	sizeof = 160ULL  offsetof(next) = 160ULL
+
+-- which is kencc's answer exactly.  **And the emitted padding did not
+move**: a regenerated `src/mem_manage.c` still carries
+`add_symbols_to_inactive_list: 1;char __dummy[7];`, character for
+character what the committed corpus has.
+
+**`c_gen_be.c:3833` is why, and it names a DIFFERENT variable.**
+Padding is `type->size - offset_after_field(last_field)`, and
+`offset_after_field` (`c_gen_be.c:3132`) chooses between two arms:
+
+	} else if (msvc_is_generated_code_target && ...) {
+	    offset_after = container_offset + container_type->size;
+	} else {   /* Non-Microsoft bit field. */
+	    offset_after = field->offset +
+	                   (char_bit - 1 + declared_bit_size +
+	                    offset_bit_remainder) / char_bit;
+
+The second gives 152 + 1 = **153**, so padding is 160 - 153 = 7, which
+is what it emits and what kencc then reads as 168.
+
+**`targ_microsoft_bit_field_allocation` is the FRONT END's own layout;
+`msvc_is_generated_code_target` is what the C back end assumes about
+the compiler that will build its output.  Two axes.**  The first
+decides what cpfe computes -- including the folded `offsetof' -- and
+the second decides the padding it writes.  *This NOTE already records
+exactly this mistake once*, as "the `__weak__` suppression is a
+property of the cpfe BUILD; the `TARG_*` widths are read when
+`target.c` is TRANSLATED -- two different macro environments, treated
+as one".  Third time, and the first where it cost a prediction that
+had been written down.
+
+**AND THE SECOND AXIS IS NOT AVAILABLE.**
+`MSVC_IS_GENERATED_CODE_TARGET` gates **18 sites in `c_gen_be.c`**
+alone, plus `cmd_line.c`, `cp_gen_be.c`, `il_to_str.c` and
+`target.c` -- `__cdecl`, `__declspec`, the inline model, the
+file-scope init routine.  *The padding calculation is one of
+eighteen*, and the other seventeen emit Microsoft dialect kencc cannot
+parse.  Turning it on to fix one of them is not a trade worth
+measuring.
+
+So `TARG_MICROSOFT_BIT_FIELD_ALLOCATION` is **REVERTED**, and not
+merely as useless: with the remaining fix below it would be actively
+wrong, since cpfe would then model a rule kencc no longer follows.
+
+WHAT IS LEFT IS kencc's OWN ALLOCATION, AND IT IS THE BETTER ANSWER
+ANYWAY -- **it needs no regeneration at all.**  Everything in the
+committed corpus is already correct for a compiler that shares the
+container: EDG's model says 160, gcc says 160, the folded constants
+400 and 416 are right, and all 958 `__dummy[N]` are sized for it.
+*The 2.9M lines are not wrong; the compiler reading them is the one
+that is alone.*  One compiler change makes the corpus correct as it
+stands, where the EDG-side route needs a regeneration AND a dialect
+nobody wants.
+
+It is also the conforming direction.  C11 6.7.2.1p11 leaves the
+addressable unit to the implementation, so kencc is not *illegal* --
+but it disagrees with gcc, clang, EDG and the generated C of every
+source-to-source tool, and `-J` exists precisely to put APE's layout
+on the model everything else uses.  This tree already records the gap:
+*"One non-conformance `-J` does NOT fix ... kencc allocates bit fields
+in whole `tfield` units"*, reported by `structalign-test` as a probe
+rather than asserted.
+
+**RUN `apeabi-probe` FIRST, which is the recorded rule for exactly
+this** -- two compiles and a diff of the acid dumps name every APE
+struct the change moves, from the compiler itself, before a single
+object is rebuilt.  The surface looks small: **five** public APE
+headers contain a bit field at all (`obstack.h`, `resolv.h`,
+`fenv_arch.h`, `curl.h`, and `iostream.h`'s is a false hit), and only
+a bit-field group with a member AFTER it moves anything.  But "looks
+small" is what the probe is for, and `-J`'s own history is that the
+feared cost and the measured cost were different sizes.

@@ -2309,6 +2309,44 @@ live either way.
     *What cpfe would EMIT under the knob is deliberately not in the
     probe*: only a rebuilt cpfe can say, so asserting it would measure
     a guess.
+  - **MEASURED 4 AND 8 -- kencc IS MSVC's RULE -- AND THE KNOB IS
+    STILL NOT THE FIX, WHICH A HOST REBUILD SAID BEFORE ANY
+    REGENERATION.** With `TARG_MICROSOFT_BIT_FIELD_ALLOCATION 1` a
+    rebuilt cpfe answers `offsetof 4 / sizeof 8` and `sizeof 160` for
+    the real shape -- kencc's numbers exactly -- **and the emitted
+    padding does not move**: a regenerated `mem_manage.c` still says
+    `char __dummy[7]`, character for character.
+    **`c_gen_be.c:3132`'s `offset_after_field` names a DIFFERENT
+    variable**: its bit-field arm is gated on
+    `msvc_is_generated_code_target`, and the other arm gives
+    `offset + ceil(bits/8)` = 153, so padding is 160-153 = 7.
+    ***`targ_microsoft_bit_field_allocation` is the FRONT END's layout;
+    `msvc_is_generated_code_target` is what the C BACK END assumes
+    about the compiler that will build its output. Two axes, and I
+    conflated them*** -- which is the *"`__weak__` is the BUILD, the
+    `TARG_*` widths are the TRANSLATION"* mistake **a third time**,
+    and the first time it cost a prediction that had been written
+    down. **And the second axis is unavailable**: it gates **18 sites
+    in `c_gen_be.c`** plus four more files -- `__cdecl`, `__declspec`,
+    the inline model -- and the padding is one of the eighteen.
+    **REVERTED**, and not merely as useless: with the real fix it
+    would be actively wrong.
+    **What is left is kencc's own allocation, and it needs NO
+    REGENERATION** -- *the 2.9M lines are already correct for a
+    compiler that shares the container* (EDG 160, gcc 160, constants
+    400/416 right, all 958 paddings sized for it), so one compiler
+    change makes the committed corpus correct as it stands. It is the
+    conforming direction too: C11 6.7.2.1p11 leaves the unit to the
+    implementation, so kencc is not illegal, but it is alone against
+    gcc, clang, EDG and every source-to-source tool's output, and `-J`
+    exists to put APE on the model everything else uses.
+    **Run `apeabi-probe` FIRST** -- the recorded rule for exactly this
+    -- two compiles and an acid diff naming every struct that moves,
+    from the compiler itself, before an object is rebuilt. Five public
+    APE headers hold a bit field at all and only a group with a member
+    AFTER it moves anything; *but "looks small" is what the probe is
+    for, and `-J`'s own history is that the feared cost and the
+    measured cost were different sizes.*
   - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
     the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
     is the **libsupc++/libc++abi layer** -- new/delete, vtables, RTTI,
