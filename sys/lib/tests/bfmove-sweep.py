@@ -42,9 +42,10 @@
 #     hit under `lib/ap' is `include/meta.h', musl's mallocng header,
 #     which nothing in this tree includes.
 #
-# MEASURED, 2026-10:
-#   lib/ap        3 groups, 1 would move (meta.h, dead -- see below)
-#   external/ 43093 groups, 268 would move -- and **266 of the 268 are
+# MEASURED, 2026-10 (the UNKNOWN column is the later one -- see the
+# note beside `unknown' below, and `perl/op.h:55' in it):
+#   lib/ap        3 groups, 1 would move, 0 unknown (meta.h, dead)
+#   external/ 43108 groups, 268 would move, 978 unknown -- and **266 of the 268 are
 #                   EDG**, which is the whole point: EDG's explicit
 #                   `char __dummy[N]' padding IS this shape, emitted
 #                   for a compiler that shares the container.  The
@@ -88,6 +89,29 @@ sharer = re.compile(
     r'^\s*(?:unsigned\s+|signed\s+|const\s+|volatile\s+)*'
     r'(?:char|u?int8_t|_Bool|bool)\s+[A-Za-z_]\w*\s*(\[[^\]]*\])?\s*;')
 
+# AND A THIRD COLUMN, BECAUSE THE SECOND MISSED perl'S CENTRAL STRUCT.
+# `sharer' matches a type NAME, and a package that spells its small
+# types as TYPEDEFS is invisible to it: `op.h:55' is perl's `BASEOP',
+# eight `PERL_BITFIELD16' fields followed by `U8 op_flags; U8
+# op_private;' -- `U8' is `unsigned char', it shares the tail, and this
+# sweep reported 268 movers with perl not among them.  *The same
+# mistake as the pointer false positive one round earlier, from the
+# other side: a regex over type names is not a regex over types, and it
+# can be wrong in BOTH directions.*
+#
+# A typedef cannot be resolved textually, so these are reported as
+# UNKNOWN rather than counted as movers: a single-identifier type that
+# is not a known-large keyword MAY be one byte and may be eight.  The
+# count is an upper bound where `movers' is a lower one, and the two
+# together are the honest statement.  Read each hit; `U32 arena_size'
+# and `UV sv_debug_serial' are in this class and neither can share a
+# 4-byte tail.
+NOTSMALL = {'int', 'long', 'double', 'float', 'void', 'short', 'struct',
+            'union', 'enum', 'size_t', 'unsigned', 'signed', 'const',
+            'volatile', 'static', 'return', 'typedef', 'extern', 'register'}
+unknown = re.compile(r'^\s*([A-Za-z_]\w*)\s+([A-Za-z_]\w*)\s*'
+                     r'(\[[^\]]*\])?\s*;')
+
 def skippable(l):
     s = l.strip()
     return not s or s.startswith(('/*', '*', '//', '#'))
@@ -95,6 +119,7 @@ def skippable(l):
 def sweep(roots):
     groups = 0
     movers = []
+    maybe = []
     for r in roots:
         for dp, _, fns in os.walk(r):
             for fn in fns:
@@ -117,20 +142,30 @@ def sweep(roots):
                             k += 1
                         if k < len(L) and sharer.match(L[k]):
                             movers.append((p, i + 1, L[i].strip(), L[k].strip()))
+                        elif k < len(L):
+                            m = unknown.match(L[k].replace('\\', ''))
+                            if m and m.group(1) not in NOTSMALL:
+                                maybe.append((p, i + 1, L[i].strip(),
+                                              L[k].strip()))
                         i = j
                     else:
                         i += 1
-    return groups, movers
+    return groups, movers, maybe
 
 def main():
     roots = sys.argv[1:]
     if not roots:
         print("usage: bfmove-sweep.py <dir> [dir ...]", file=sys.stderr)
         return 2
-    groups, movers = sweep(roots)
+    groups, movers, maybe = sweep(roots)
     print("bit-field groups found:                        %d" % groups)
     print("groups followed by a shareable member (MOVE):  %d" % len(movers))
     for p, n, a, b in movers:
+        print("  %s:%d" % (p, n))
+        print("     %s" % a)
+        print("     %s" % b)
+    print("groups followed by a TYPEDEF member (UNKNOWN):  %d" % len(maybe))
+    for p, n, a, b in maybe:
         print("  %s:%d" % (p, n))
         print("     %s" % a)
         print("     %s" % b)

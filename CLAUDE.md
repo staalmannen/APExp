@@ -297,6 +297,19 @@ cannot parse. Every hit is a recipe that cannot run -- unlike
 mkfile recipe; its discriminator (a leading assignment is legal, and
 `if (cond) NAME=value` is a working precedent) is what keeps it from
 reporting 16 lines of which 11 are fine.
+**`mkrecipe-probe/mkfile` is a PROBE and is a whole mk DIRECTORY**,
+which it has to be: the question is what `mk` hands `rc`, so the
+instrument is an mkfile rather than a program. `mk -k all` in it runs
+six recipes -- a plain comment, a comment holding a bare `=`, a comment
+holding backquotes and apostrophes, `} if not {` on one line, a `#`
+inside a quoted sed argument, and a leading assignment inside `@{ }` --
+and each prints `ok N` or an rc syntax error. **`-k` is not optional**:
+mk stops at the first failing recipe and the point is one run rather
+than one round each. **Case 1 is the control** (a plain recipe comment
+must work -- `external/perl/plan9/mkfile:88` is one and perl builds)
+and **case 5 has a known answer** (`cmd/tar/mkfile:126` echoes a
+literal `#ifndef` and tar's header comes out right), so a failure there
+says the probe is measuring something other than rc.
 **`initzero-test.c` asks whether a compound literal ZEROES the members
 its initialiser list leaves out** -- muon's crash, `*sb = (struct
 tstr){.flags=..,.buf=..,.cap=..}` with `.len` omitted and then used as
@@ -344,6 +357,17 @@ reaches every APE compile. It asks which bit-field groups anywhere in
 `lib/ap` and `external/` are followed by a member small enough to
 share the container's tail -- the only shape that moves. It **gates
 nothing**: EDG's 266 hits are the change's purpose, not its cost.
+**Its second column is a LOWER bound and its third says by how much.**
+`sharer` matches a type NAME, so a package spelling its small types as
+TYPEDEFS is invisible to it -- **perl's `op.h:55` is `BASEOP`, eight
+`PERL_BITFIELD16` fields followed by `U8 op_flags; U8 op_private;`, and
+the 268 did not include it.** *The pointer false positive one round
+earlier was the same mistake from the other side: a regex over type
+names is not a regex over types, and it can be wrong in both
+directions.* A typedef cannot be resolved textually, so there is now an
+UNKNOWN column (978 under `external/`) reported rather than counted --
+read each hit, since `U32 arena_size` is in it and cannot share a
+4-byte tail.
 `structalign-test.c` measures `pcc -J`, conforming struct layout, and
 **needs three runs** -- gcc, then `pcc -DPLAN9` WITHOUT `-J` (which
 must fail **21** checks), then with it. *The middle run is the
@@ -1834,10 +1858,66 @@ tree* -- what remains is a 1980s front end that cannot tell two
 overloads apart on a 64-bit target, which is a C++ problem and not a
 Plan 9 one.
 
-**NEITHER IS ENABLED IN `cmd/mkfile' YET, deliberately**: one failing
-entry aborts the whole tree's `mk', and bacon has never been through
-pcc. Build `cmd/basic' by hand first; the line is one character from
-live either way.
+**`basic' IS ENABLED NOW and `c++lib' is not** -- this paragraph used
+to say neither was, and it was stale. `sys/src/ape/cmd/mkfile:71' is
+an uncommented `basic\\', so bacon is in `_OPTIONAL_APPS' and a
+tree-wide `mk' builds it; `muon' at :81 is live too; `edg' at :70 and
+`c++lib' stay commented, and so now do `go', `clisp' and `perl'.
+*The reason for caution is unchanged and is worth keeping beside the
+fact*: one failing entry aborts the whole tree's `mk', so anything
+newly enabled is a thing the next full rebuild can stop on, and a port
+that has only been built by hand has not been measured in that
+position. **The first rebuild after the compound-literal and bit-field
+work proved it three times in one run** -- see the section of that name
+below.
+
+## The first full rebuild after the compound-literal and bit-field work
+
+**THREE PACKAGES STOPPED IT AND THE DISTCLEAN NEVER FINISHED, which is
+one fact about the other two.** `mk clean` and `mk distclean` both hung
+**in clisp**, and only then did `mk install` run -- so the tree that
+was built was a MIXTURE of objects from before and after a LAYOUT
+CHANGE. That is the silent ABI split this file has a rule for, and it
+is the reading the next run has to rule out before anything else is
+blamed.
+- **clisp, FIXED twice over.** `mkfile.rebuild` answered `token '='`
+  again with the only `=` left inside a recipe COMMENT -- see the `=`
+  rule above and `sys/lib/tests/mkrecipe-probe`. And the hang is its
+  own bug: `clean`/`nuke` in `mkfile.runtime` were
+  `$BIN/make -C $BUILD clean`, so a tree-wide clean drove a
+  300-Makefile autoconf build that can reconfigure, can prompt and can
+  wait for ever -- **and mk propagates the failure up through every
+  enclosing directory, so one hung package takes the whole tree's clean
+  with it.** *That is `cmd2/vts/test` in a new spelling.* Both are
+  `rm -rf $BUILD` now: `$BUILD` is build output in full, so removing it
+  cannot hang and the cost is a reconfigure.
+- **go, FIXED, one word**: `CC=pcc -c`. See the go entry below.
+- **perl, OPEN.** `miniperl` links and then faults running
+  `writemain("perlmain.c")`: `suicide: sys: trap: fault write
+  addr=0x3000000f0 pc=0x22e50f`. **`0x3000000f0` is high half 3, low
+  half 0xf0** -- an eight-byte slot assembled from two four-byte ones,
+  which is what a MOVED STRUCT OFFSET looks like from outside, and this
+  tree has seen that shape twice before.
+  **Two readings, and they need different next steps.** (a) The
+  half-cleaned tree: `libperl.a` holds objects from before the
+  `sualign()` bit-field change and `miniperl` was linked after it.
+  (b) The change itself: **perl's `struct op` is exactly the shape that
+  moves** -- `PERL_BITFIELD16 op_type:9` and seven more, then
+  `U8 op_flags; U8 op_private;`, which now share the container's tail.
+  *`bfmove-sweep` did not report it and the reason is the sweep's, not
+  perl's* -- see its UNKNOWN column above.
+  **(a) is cheap and must go first**: with clisp's clean fixed, a
+  COMPLETE `mk distclean` followed by `mk install` either fixes perl or
+  does not, and either answer is worth more than a reading. **If it
+  faults again at the same pc**, the bit-field change is implicated and
+  `structalign-test`'s three runs and the `apeabi-probe` acid diff --
+  both written down before any of this and both still unrun -- are what
+  price it.
+  *A `sys:` trap leaves the process Broken and readable*, so `acid`
+  plus `lstk()` on the faulting miniperl names the member either way.
+  Until it builds, `perl` has to stay commented out of
+  `_OPTIONAL_APPS` or it aborts the whole tree's `mk` -- the reason
+  `edg` and `c++lib` are out.
 
 ## What is open, as a list
 
@@ -2593,8 +2673,13 @@ live either way.
     and the after-count was re-taken with the before's exact
     commands* -- two compiles differing in anything but the change
     are not a control, which this file records from the `-J` round.
-- **muon** -- **IT BUILDS AND IT CRASHES BEFORE IT READS AN ARGUMENT,
-  AND THE STACK NAMES ONE STRUCT MEMBER.** `fault write
+- **muon** -- **IT BUILDS AND IT RUNS. Read the rest of this entry as
+  the record of how, not as an open problem.** It crashed before it
+  read an argument, the cause was a kencc bug rather than muon's, and
+  the fix is `clitzero()` in `cc/dcl.c`; the confirmation is at the
+  end.
+  **IT CRASHED BEFORE IT READ AN ARGUMENT, AND THE STACK NAMED ONE
+  STRUCT MEMBER.** `fault write
   addr=0x7ffffff000` with `lstk()` giving `memset(c=0x0, n=0x29afb0)` <-
   `tstr_clear` <- `path_basename` <- `main.c:1447`. **That memset is
   2,731,952 bytes over a 1024-byte stack buffer**, and `tstr_clear` is
@@ -2664,8 +2749,43 @@ live either way.
   tail loop removed must report a gap, and it does. All cases ok, and a
   fully-covered literal costs no stores at all, so `(int){i}` and
   `&(T){...}` keep their `addable` path.
-  **NOT COMPILED ANYWHERE: the first build is the VM's**, the same
-  weaker position `-J`, the `auto` grammar fix and `-C` shipped from.
+  **CONFIRMED ON THE VM: 6 FAILURES -> 0, every section PASS.** The
+  six that moved are exactly the six that failed -- 1a, 2b, 3a, 4a,
+  6a and 7 -- while 1b, 2a and 6b, which had passed by luck, still
+  pass. *A blanket fix and a correct one look different here*: had
+  `clitzero()` zeroed too much it would have broken 1c, 3b and 4b,
+  which assert that the NAMED members survive, and they did not move.
+  **And that run is also the first build of every pending `cc/`
+  change**, `sualign()`'s six lines included -- so the compiler
+  compiles and produces a working compiler, which is the weakest
+  useful result for a front-end change and the precondition for the
+  rest of the order.
+  **AND muon RUNS -- the behavioural confirmation, end to end.**
+  Rebuilt with the fixed compiler it reaches its own dispatcher and
+  prints its own usage: `muon` alone answers `error missing command`,
+  `muon -h` lists `analyze devenv fmt install internal options samu
+  setup subprojects test version`. *No `fault write addr=0x7ffffff000`
+  anywhere* -- the memset that walked off the top of the stack is
+  gone, because `tstr_init`'s `.len` is now the zero C always said it
+  was. **The chain is measured end to end rather than argued**:
+  `lstk()` named the member, `initzero-test` reproduced it, `cc/dcl.c`
+  explained why only compound literals had it, and the program that
+  crashed now runs.
+  **`muon --help` answering `illegal option -- -` is NOT ours**: muon
+  has no long options -- its own usage lists `-h` -- and `--help` is
+  not the bare `--` that ends an option list, so POSIX getopt parses
+  it as the option character `-`. glibc prints the same thing.
+  **The `[31m`/`[0m` printed literally is rio**, not a bug: muon
+  colours its diagnostics and rio speaks no escape sequences. Under
+  `vts` it renders, which is one of the three things vts was for.
+  **It is LIVE in `_OPTIONAL_APPS`, not commented out** -- this file
+  said otherwise and was stale; so is `basic`, which is live too.
+  Off now: `edg`, `c++lib`, and **`go`, `clisp` and `perl`**, the three
+  the first rebuild after the compiler work stopped on.
+  **What is NOT measured is muon doing any WORK**: printing a usage
+  exercises argument handling and one `tstr`. *A port that builds and
+  prints its usage is not a port either* -- `muon setup` on a real
+  `meson.build` is the next thing that would say anything.
   *The gcc sweep over the files muon builds was 0 errors in the classes
   6c treats as fatal, and it has no 32-bit-`long` assumptions, so both
   cheap classes were clean and this needed the crash.*
@@ -2695,6 +2815,22 @@ live either way.
   is only measurable on the VM, and what stage two then does is beyond
   the host entirely.
   `go1.4` is still the only thing that mentions `Ureg` outside libap.
+  **AND THE NEXT WALL ARRIVED IMMEDIATELY, WHICH IS THE `bool` FIX
+  DOING ITS JOB: `CC=pcc` WITH NO `-c`.** With `a.h` compiling, `arm.c`
+  answered **`_apemain: undefined: main in _apemain`** -- a LINK error
+  on a file that has no `main` and never should. `pcc` without `-c`
+  compiles AND LINKS (`pcc.c`'s `if(!cflag)` arm), and `mkone`'s own
+  `%.$O: %.c` rule is `$CC $CFLAGS $stem.c` with no `-c` of its own, so
+  the flag has to arrive through `CC` or `CFLAGS` and
+  `mkfile.bootstrap` had it in neither. **Every other APE package in
+  the tree says `CC=pcc -c`** (`cmd/tar/mkfile:79`,
+  `cmd/core/mkfile:206`) or puts `-c` first in CFLAGS
+  (`cmd/muon/mkfile:165`); this one said plain `pcc`. *The message is
+  about the second half of a command whose first half worked*, which is
+  why it reads like a missing symbol in libap. One word.
+  *A fix that makes a process reach code it never reached before can
+  expose anything on that path* -- for the third time, and here the
+  thing exposed was one line of the mkfile that had never run.
 
 **Ports built but never exercised**, which is a different and cheaper
 item -- *a port that builds and has never run is not a port*:
@@ -2920,7 +3056,10 @@ item -- *a port that builds and has never run is not a port*:
   again is the end-to-end check -- the same shape as EDG's
   self-translation. Do the small test first, because when self-hosting
   fails it says nothing about which feature broke.
-  `cmd/basic` is still commented out of `_OPTIONAL_APPS`.
+  **`cmd/basic` is LIVE in `_OPTIONAL_APPS` now** -- this line said
+  the opposite and was stale -- so the next tree-wide `mk` builds
+  bacon, and anything it reports is newly *measured* rather than
+  newly broken.
 - **the archivers** -- bzip2, xz, unrar, unace, unarj, clzip. See the
   tar section: `-J` retires the padding hunt, so this is now a check
   rather than a hunt, and the way to do it is to run each one on a
@@ -3304,6 +3443,24 @@ in the topic file.
   shipped. **Its root guard fired on the first run as well**, for
   `ishadow-sweep`'s exact miss: `sys/lib/tests` is THREE levels below the
   root and the file said two.
+  **AND IT CAME BACK A SECOND TIME WITH THE SWEEP AT 0, WHICH IS WHY
+  THE RULE NOW HAS A SECOND HALF: a comment inside a recipe is rc's,
+  not mk's.** `mkfile.rebuild` answered
+  `/rc/lib/rcmain:24 *eval*:13: token '=': syntax error` after the
+  bare-`=` line had been replaced by `~` -- and **the only `=`
+  characters left in that recipe were the two inside the COMMENT that
+  explained the fix**, plus one leading assignment rc allows. mk hands a
+  recipe to rc verbatim, so every tab-indented `#` line is rc source.
+  *Writing the rule down inside the recipe is what broke the recipe.*
+  **WHICH CONSTRUCT IT IS IS NOT SETTLED, and saying so matters**: rc
+  ought to treat `#` as a comment, the tree has working precedents for
+  both a plain recipe comment (`external/perl/plan9/mkfile:88`) and a
+  `#` inside a quoted argument (`cmd/tar/mkfile:126`), and *there is no
+  rc on the build host*, so every reading of its lexer here is a
+  recollection. `sys/lib/tests/mkrecipe-probe` is one `mk -k` run that
+  names it. Until then both clisp mkfiles carry **no comments inside
+  any recipe at all** -- the prose is at column 0, where mk eats it --
+  and that is the conservative form under every hypothesis.
 
 **Testing**
 

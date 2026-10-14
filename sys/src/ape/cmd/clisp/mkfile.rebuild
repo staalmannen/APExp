@@ -36,30 +36,58 @@ DFILES=$CPARTS $EVERY_INCLUDES $OTHER_INCLUDES $SPVW_INCLUDES\
 # configure and GNU-make build use the same sources on 9front.
 CLEANFILES=*.c *.tmp
 
+# A COMMENT INSIDE A RECIPE IS rc's, NOT mk's, AND IT IS NOT FREE.
+#
+# mk passes a recipe to rc verbatim, so every tab-indented line here is
+# rc source -- including the comment lines.  They used to carry the whole
+# explanation of the `=' rule, apostrophes and backquotes and all, and
+# the VM answered
+#
+#	/rc/lib/rcmain:24 *eval*:13: token '=': syntax error
+#
+# with the ONLY `=' characters in the recipe being the two inside those
+# comments and one leading assignment.  *Which construct it is has not
+# been settled* -- `sys/lib/tests/mkrecipe-probe' is one `mk' run that
+# names it -- so the recipe below is written to contain no `#', no bare
+# `=', and no `} if not {' at all, and the prose lives out here at
+# column 0 where mk eats it and rc never sees it.
+#
+# The rule it is written against is the recorded one: `=' is a SYNTAX
+# CHARACTER in rc, legal as a leading per-command assignment or inside
+# quotes and nowhere else.  `test $name = lispbibl' is a parse error;
+# `~ $name lispbibl' is the rc spelling of the same question.
+# `sys/lib/tests/rceq-sweep.py' gates on it.
+#
+# AND mk NAMES THE WRONG LINE, which is why this is swept for rather
+# than read for: mk reports a recipe by its FIRST line, so the failure
+# arrived as `mk: mkdir -p build-amd64 ...: exit status=rc: syntax
+# error' with nothing in it about the line that failed or even the file.
+# *The message names the victim*, after the `lock.h' shadow and
+# `cmd/mkfile:96'.
+
 all:V: sources
 
 sources:V:
 	mkdir -p $BUILD
 	for (name in $DFILES) @{
-		src=$CLISPSRC/$name.d
-		# `~' rather than `test $name = lispbibl': `=' is a SYNTAX
-		# CHARACTER in rc, so a bare one in an ARGUMENT is a parse
-		# error.  MEASURED on the VM -- this exact line answered
-		# `/rc/lib/rcmain:24 *eval*:4: token '=': syntax error', and
-		# *eval*:4 is this line, since mk names a recipe by its first
-		# line (`mkdir -p build-amd64') rather than by the one that
-		# failed.
-		if (~ $name lispbibl) {
-			$BIN/comment5 $src | sed -e 's/^%% .*//' | $BIN/gctrigger | $BIN/varbrace > $BUILD/$name.c.tmp
-		} if not {
-			$BIN/comment5 $src | $BIN/gctrigger | $BIN/varbrace > $BUILD/$name.c.tmp
+		if (~ $name lispbibl)
+			$BIN/comment5 $CLISPSRC/$name.d | sed -e 's/^%% .*//' | $BIN/gctrigger | $BIN/varbrace > $BUILD/$name.c.tmp
+		if not
+			$BIN/comment5 $CLISPSRC/$name.d | $BIN/gctrigger | $BIN/varbrace > $BUILD/$name.c.tmp
+		if (! test -s $BUILD/$name.c.tmp) {
+			echo 'clisp: empty generation for' $name
+			rm -f $BUILD/$name.c.tmp
+			exit clispgen
 		}
-		if (test -s $BUILD/$name.c.tmp) mv $BUILD/$name.c.tmp $BUILD/$name.c
-		if not { rm -f $BUILD/$name.c.tmp; exit 1 }
+		mv $BUILD/$name.c.tmp $BUILD/$name.c
 	}
 	$BIN/comment5 $CLISPSRC/lispbibl.d | sed -e '/^%% /{s///p;d;}' -e '/^#line /!s/.*//' > $BUILD/gen.lispbibl.c.tmp
-	if (test -s $BUILD/gen.lispbibl.c.tmp) mv $BUILD/gen.lispbibl.c.tmp $BUILD/gen.lispbibl.c
-	if not { rm -f $BUILD/gen.lispbibl.c.tmp; exit 1 }
+	if (! test -s $BUILD/gen.lispbibl.c.tmp) {
+		echo 'clisp: empty gen.lispbibl.c'
+		rm -f $BUILD/gen.lispbibl.c.tmp
+		exit clispgen
+	}
+	mv $BUILD/gen.lispbibl.c.tmp $BUILD/gen.lispbibl.c
 
 clean:V:
 	rm -f $BUILD/*.c $BUILD/*.tmp

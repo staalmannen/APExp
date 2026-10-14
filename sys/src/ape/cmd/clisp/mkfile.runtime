@@ -87,6 +87,23 @@ BUILD=build-$objtype
 # **Unknown architectures fail loudly rather than selecting nothing**,
 # which is the recorded rule: a configuration that silently does
 # nothing produces a failure that looks like a different bug.
+#
+# THE RECIPE BELOW CARRIES NO COMMENTS, and that is deliberate rather
+# than tidy: mk hands a recipe to rc verbatim, so a tab-indented `#'
+# line is rc source and its text -- apostrophes, backquotes, `=' --
+# gets lexed by something.  `mkfile.rebuild' lost a build to exactly
+# that and `sys/lib/tests/mkrecipe-probe' is the one `mk' run that will
+# name the construct.  Two things the recipe needs and the prose does
+# not have to sit next to:
+#
+# - ARCHDEF is computed INSIDE the recipe because a mkfile takes
+#   assignments and rules, and a bare `if' at column 0 is a syntax
+#   error that stops the whole `cmd/' walk.
+# - EVERY `--opt=value' on the configure line is built by
+#   CONCATENATION, for the same reason the `env' arguments are quoted:
+#   rc lexes `=' as a token wherever it is not a leading assignment, so
+#   a literal `--prefix=/foo' in a recipe never reaches configure -- it
+#   fails in the parser, before the command exists.
 configure:V:
 	@{
 		root=`{cd $APEXPROOT; pwd}
@@ -95,9 +112,6 @@ configure:V:
 			echo 'CLISP upstream does not support the 9front '$objtype' target yet'
 			exit 1
 		}
-		# computed HERE rather than at mkfile level: a mkfile takes
-		# assignments and rules, and a bare `if' outside a recipe is
-		# a syntax error that stops the whole cmd/ walk.
 		ARCHDEF=()
 		if (~ $objtype amd64)        ARCHDEF='-D__x86_64__'
 		if (~ $objtype 386)          ARCHDEF='-D__i386__'
@@ -115,11 +129,6 @@ configure:V:
 		}
 		mkdir -p $BUILD
 		cd $BUILD
-		# EVERY `--opt=value' IS BUILT BY CONCATENATION, for the same
-		# reason the `env' arguments are quoted: rc lexes `=' as a
-		# token wherever it is not a leading assignment, so a literal
-		# `--prefix=/foo' in a recipe never reaches configure -- it
-		# fails in the parser, before the command exists.
 		pfx=$root^/^$objtype
 		if (! test -f config.status) {
 			env 'CC=pcc' 'CPPFLAGS=-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION '^$ARCHDEF 'CFLAGS=-Fw -D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION '^$ARCHDEF sh $srcroot/configure . '--srcdir='^$srcroot '--prefix='^$pfx '--exec-prefix='^$pfx '--bindir='^$pfx^/bin/ape '--libdir='^$pfx^/lib/ape '--localedir='^$root^/sys/lib/ape/locale --ignore-absence-of-libsigsegv --without-ffcall --without-readline --without-dynamic-modules --disable-nls
@@ -134,16 +143,32 @@ install:V: build
 
 installall:V:
 	for (objtype in $CPUS) @{
-		if (~ $objtype arm64 spim) {
-			echo '---- clisp skipped for '$objtype' ----'
-		} if not {
+		if (~ $objtype arm64 spim)
+			echo '---- clisp skipped for' $objtype '----'
+		if not
 			mk $MKFLAGS install
-		}
 	}
 
+# CLEAN DOES NOT RUN GNU make, AND THAT IS THE FIX RATHER THAN THE
+# STYLE.  Both of these used to be
+# `if (test -f $BUILD/Makefile) $BIN/make -C $BUILD clean', and a
+# tree-wide `mk clean' and `mk distclean' both STOPPED HERE -- a clean
+# rule that drives a 300-Makefile autoconf build can reconfigure, can
+# prompt, and can wait for ever, and mk propagates the failure up
+# through every enclosing directory, so one hung package takes the
+# whole tree's clean with it.  *That is the `cmd2/vts/test' rule in a
+# new spelling: one directory failed a clean and the tree's clean
+# failed with it.*
+#
+# $BUILD is build OUTPUT IN FULL -- configure writes into it, the
+# generated `.c' from `mkfile.rebuild' land in it, and `.gitignore'
+# covers it -- so removing the directory outright is the honest clean
+# and it cannot hang.  The cost is that a clean forces a reconfigure,
+# which is the right direction to be wrong in for a package that has
+# never finished building here.
 clean:V:
-	if (test -f $BUILD/Makefile) $BIN/make -C $BUILD clean
+	rm -rf $BUILD
 
 nuke:V:
-	if (test -f $BUILD/Makefile) $BIN/make -C $BUILD distclean
+	rm -rf $BUILD
 
