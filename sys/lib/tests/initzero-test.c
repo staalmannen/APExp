@@ -85,6 +85,14 @@
  * is the whole bug*, and it is why no ordinary C in this tree ever
  * tripped over it.
  *
+ * AND THE FIX IS CONFIRMED: 6 -> 0 under `pcc', every section PASS.
+ * The six that moved are exactly the six that failed; 1b, 2a and 6b,
+ * which had passed by luck, still pass.  **1c, 3b and 4b are what make
+ * that a correct fix rather than a blanket one** -- they assert the
+ * NAMED members survive, so a `clitzero()' that zeroed too much, or
+ * ran after the member stores instead of before, would have broken
+ * them.  They did not move.
+ *
  * 0 failures on gcc.  Exit status is the failure count.
  */
 

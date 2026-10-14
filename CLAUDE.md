@@ -2664,8 +2664,21 @@ live either way.
   tail loop removed must report a gap, and it does. All cases ok, and a
   fully-covered literal costs no stores at all, so `(int){i}` and
   `&(T){...}` keep their `addable` path.
-  **NOT COMPILED ANYWHERE: the first build is the VM's**, the same
-  weaker position `-J`, the `auto` grammar fix and `-C` shipped from.
+  **CONFIRMED ON THE VM: 6 FAILURES -> 0, every section PASS.** The
+  six that moved are exactly the six that failed -- 1a, 2b, 3a, 4a,
+  6a and 7 -- while 1b, 2a and 6b, which had passed by luck, still
+  pass. *A blanket fix and a correct one look different here*: had
+  `clitzero()` zeroed too much it would have broken 1c, 3b and 4b,
+  which assert that the NAMED members survive, and they did not move.
+  **And that run is also the first build of every pending `cc/`
+  change**, `sualign()`'s six lines included -- so the compiler
+  compiles and produces a working compiler, which is the weakest
+  useful result for a front-end change and the precondition for the
+  rest of the order.
+  **What it does NOT yet say is whether muon runs**: its binary was
+  built by the old compiler, so the fix reaches it only after a
+  rebuild. *A test passing and the program working are two claims*,
+  and the second is the one this started from.
   *The gcc sweep over the files muon builds was 0 errors in the classes
   6c treats as fatal, and it has no 32-bit-`long` assumptions, so both
   cheap classes were clean and this needed the crash.*
