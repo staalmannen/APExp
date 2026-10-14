@@ -2274,6 +2274,41 @@ live either way.
     re-translation, not a patch**: a hand-edited constant is put back
     by the next regeneration, and the second `offsetof` is the evidence
     for that, since it is shifted by the same 8.
+  - **CONFIRMED ON THE VM TO THE DIGIT: 408 and 424, `long` 4,
+    `an_il_header` 184, `a_scope_pointers_block` 168.** Every number
+    was written down before the run and every one matched, and the two
+    halves were independent: 208 -> 184 is the five `unsigned long`,
+    which is exactly the 24 of 424-400, *so the fold did use kencc's
+    `long`*; 160 -> 168 is the bit-field container. **408 is where the
+    array was filed and 400 is `exported_template_file`, so the
+    registration wrote over a different live member** -- the `0x68`
+    fault is the second consequence and the first has not been looked
+    for.
+    **AND THE KNOB IS `TARG_MICROSOFT_BIT_FIELD_ALLOCATION`, which
+    reverses nothing but completes a plan that had no mechanism in
+    it.** `kencc_targ.h` sets no bit-field variable at all.
+    `targ_bit_field_container_size` is NOT it -- upstream's comment
+    says -1 is already "the base type", a four-byte container, and EDG
+    still shared its tail, so *the container governs alignment, not
+    sharing*, and stopping at that variable's name would have cost a
+    round. The sharing one is a **`TARG_` macro rather than a
+    command-line flag**, which is exactly what a pre-include can set,
+    and **one of the eight shipped configurations already uses it**.
+    **The scope is the corpus, not the struct**: EDG emits explicit
+    padding after EVERY bit-field group -- 33 of 33 in `src/il.c`, 958
+    `__dummy[N]` across 74 files -- so one rule decides all of them.
+    **Section 2 of the probe decides it and is not yet run**: the
+    identification *"kencc's rule is MSVC's"* is recalled rather than
+    measured, and a 2.9M-line regeneration is too much to rest on a
+    recollection, so it asks pcc for `struct{unsigned x:1; char c;}`.
+    **4 and 8 means the knob is the fix; 1 and 4 is gcc's shared
+    container (the host control, which fires); anything else means the
+    knob is not the fix** and the remaining option is kencc's own
+    allocation under `-J` -- the recorded non-conformance, five public
+    APE headers wide, with `apeabi-probe` already built to price it.
+    *What cpfe would EMIT under the knob is deliberately not in the
+    probe*: only a rebuilt cpfe can say, so asserting it would measure
+    a guess.
   - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
     the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
     is the **libsupc++/libc++abi layer** -- new/delete, vtables, RTTI,
