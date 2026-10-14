@@ -10,7 +10,56 @@ BUILD=build-$objtype
 # Upstream's configure and GNU make rules build lisp.run, compile the Lisp
 # sources into *.fas, construct the base linking set and memory image, and
 # build the clisp launcher. Run them natively in the 9front APE environment.
+#
+# THE `env' ARGUMENTS ARE QUOTED, AND THAT IS NOT STYLE.
+#
+# mk hands a recipe to `rc', where **`=' is a SYNTAX CHARACTER** --
+# legal as a leading per-command assignment or inside quotes, and
+# nowhere else. `env CC=pcc CPPFLAGS=...' puts bare `=' signs in
+# ARGUMENTS, which is the recorded parse error
+# (`token '=': syntax error'), the same one `fdwatch' paid a round for
+# with `awk -v name=$name' and `cmd/edg/mkfile' paid another for with
+# `-D_main=__edg_main'. **There is no working precedent for the
+# unquoted form anywhere in this tree** -- one grep over every mkfile
+# finds this line and nothing else, which is the check that would
+# have cleared it had there been one.
+#
+# *NOT MEASURED: there is no rc on the build host, so this is the
+# recorded rule plus the absent precedent rather than a run.* If the
+# configure step was in fact reaching upstream before, the quoting
+# costs nothing and this comment is the thing to correct.
 
+# THE ARCHITECTURE MACRO, AND WITHOUT IT CLISP SELECTS NO CPU AT ALL.
+#
+# `lispbibl.d' picks its target from the macros a unix compiler
+# predefines -- `__x86_64__', `__i386__', `__arm__' and so on -- and
+# **kencc predefines only `__STDC__', `_POSIX_SOURCE' and the two
+# `__APEXP_*' markers**. Measured on the host by preprocessing
+# `lispbibl.d's first 304 lines with kencc's predefine set: the answer
+# is `NONE SELECTED', where the same file under gcc's own predefines
+# answers `AMD64'. *That is chicken's `C_SIXTY_FOUR' for the third
+# time in this tree -- an upstream list naming spellings this compiler
+# does not use.*
+#
+# **`_PLAN9_SOURCE' in `lispbibl.d:124' CANNOT FIX IT, and would be
+# the wrong target if it could.** That `#if' also requires one of
+# `i386'/`__i386__'/`__x86_64__'/`__amd64__', so with none defined the
+# whole condition is false and the edit is inert. And the thing it
+# reaches is `PC386' -> `I80386' -> **`pointer_bitsize 32'**, on a
+# machine with 64-bit pointers: clisp's object representation `uintP'
+# is derived from exactly that (`lispbibl.d:1611'), so it would have
+# been half the width of a pointer in a garbage-collected Lisp.
+# *An inert edit that would have been actively wrong had it fired.*
+#
+# The widths themselves are NOT a problem here: `long_bitsize' and
+# `pointer_bitsize' are separate settings and `uintP' follows the
+# pointer one, so LLP64 is expressible -- better than chicken, where
+# the word type had to be patched -- and `configure' MEASURES both
+# with the real compiler rather than assuming them.
+#
+# **Unknown architectures fail loudly rather than selecting nothing**,
+# which is the recorded rule: a configuration that silently does
+# nothing produces a failure that looks like a different bug.
 configure:V:
 	@{
 		root=`{cd $APEXPROOT; pwd}
@@ -19,10 +68,28 @@ configure:V:
 			echo 'CLISP upstream does not support the 9front '$objtype' target yet'
 			exit 1
 		}
+		# computed HERE rather than at mkfile level: a mkfile takes
+		# assignments and rules, and a bare `if' outside a recipe is
+		# a syntax error that stops the whole cmd/ walk.
+		ARCHDEF=()
+		if (~ $objtype amd64)        ARCHDEF='-D__x86_64__'
+		if (~ $objtype 386)          ARCHDEF='-D__i386__'
+		if (~ $objtype arm)          ARCHDEF='-D__arm__'
+		if (~ $objtype mips)         ARCHDEF='-D__mips__'
+		if (~ $objtype sparc sparc64) ARCHDEF='-D__sparc__'
+		if (~ $objtype 68020)        ARCHDEF='-D__m68k__'
+		if (~ $objtype power power64) ARCHDEF='-D__powerpc__'
+		if (~ $#ARCHDEF 0) {
+			echo 'clisp: no CPU macro known for objtype '$objtype
+			echo '       lispbibl.d would select NO architecture and'
+			echo '       the build would fail somewhere else entirely.'
+			echo '       Add the spelling from lispbibl.d:150-210.'
+			exit 1
+		}
 		mkdir -p $BUILD
 		cd $BUILD
 		if (! test -f config.status) {
-			env CC=pcc CPPFLAGS='-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION' CFLAGS='-Fw -D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION' sh $srcroot/configure . --srcdir=$srcroot --prefix=$root/$objtype --exec-prefix=$root/$objtype --bindir=$root/$objtype/bin/ape --libdir=$root/$objtype/lib/ape --localedir=$root/sys/lib/ape/locale --ignore-absence-of-libsigsegv --without-ffcall --without-readline --without-dynamic-modules --disable-nls
+			env 'CC=pcc' 'CPPFLAGS=-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION '^$ARCHDEF 'CFLAGS=-Fw -D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION '^$ARCHDEF sh $srcroot/configure . --srcdir=$srcroot --prefix=$root/$objtype --exec-prefix=$root/$objtype --bindir=$root/$objtype/bin/ape --libdir=$root/$objtype/lib/ape --localedir=$root/sys/lib/ape/locale --ignore-absence-of-libsigsegv --without-ffcall --without-readline --without-dynamic-modules --disable-nls
 		}
 	}
 
