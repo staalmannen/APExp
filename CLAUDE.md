@@ -2444,6 +2444,7 @@ live either way.
     package-internal ones, one dead header, and EDG. *`-J`'s history
     was that the feared and measured costs were different sizes; this
     time they are the same size, and the measurement says so rather
+
     than the expectation.*
   - **AND `sualign()` IS PATCHED -- SIX LINES, gated on
     `conformalign`.** Under `-J` a bit-field group no longer reserves
@@ -2481,6 +2482,7 @@ live either way.
     diff, or a `-9` count that is not 21.
   - Then: `cd sys/src/cmd && mk install`, the after-dump, `mk
     distclean`, and cpfe.
+
   - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
     the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
     is the **libsupc++/libc++abi layer** -- new/delete, vtables, RTTI,
