@@ -2809,20 +2809,63 @@ blamed.
     frame then calls ITSELF with **`(entry_ptr=0x8,
     entry_kind=0x45)`**. A child pointer and kind read out of the node
     came back as 8 and 69.
-    **0x45 is MEASURED garbage rather than assumed**: `an_il_entry_kind`
-    is an enum of about 61 members in `src/il.c`, so 69 is outside it.
-    **And `an_il_entry_prefix` is EXCLUDED, also by measurement**: it
-    is five `unsigned int:1` followed by `char __dummy[3]`, the bit
-    field FIRST -- the shape `edgtuoff-probe` already measured at 4
-    under both compilers once the container is shared. *So the suspect
-    is the kind-specific entry struct for kind 0x19, not the prefix*,
-    and the next step is that struct's member offsets under pcc beside
-    gcc -- a bounded reduction of the `edgtuoff-probe` shape, not a
-    reading.
-    **The cheapest control is the HOST**: the same `/tmp/t.cpp` through
-    the host cpfe. Clean there puts this on the kencc/libap side; a
-    crash there puts it on the toy. *(The run's command carried three
-    `--sys_include`, not four -- `/sys/include/ape` was missing. Inert
+    ***I CALLED 0x45 GARBAGE AND IT IS NOT: IT IS `iek_ms_attribute`,
+    AND THE CALL IS CORRECT.*** I counted commas in a 100-line window
+    of the generated enum, got "about 61", and concluded 69 was
+    outside it. **`an_il_entry_kind` has 114 enumerators**, and worse,
+    *the count was the wrong question*: the enum has `#if`-guarded
+    members (`MICROSOFT_EXTENSIONS_ALLOWED` and more), so **its
+    numbering depends on the macro configuration** -- decode against
+    `src/il_def.h` and you get a different answer from the corpus that
+    actually runs. Against `src/il.c`'s own config-resolved enum:
+    0x0b is `iek_routine`, 0x19 is `iek_scope`, 0x45 is
+    **`iek_ms_attribute`**, and the first two match their frames
+    exactly. *A WINDOW onto an enum is not the enum, and a header's enum is
+    not the generated one.*
+    **AND THE SECOND WRONG STEP WAS READING THE LINE NUMBERS IN THE
+    WRONG FILE.** `walk_tree_and_set_needed` is **40 lines** in
+    `src/il_walk.c` (527-567), so `:2678` and `:3034` are not in it --
+    its body is `src/walk_entry.h`, **4457 lines**, included with the
+    routine name as a macro. *The `#line` directives follow the
+    INCLUDED body, not the file that names the function.*
+    **SO THE CALL IS EXACTLY RIGHT AND THE VALUE IS NOT.**
+    `walk_entry.h:3032`, inside `case iek_scope:`, is literally
+    `walk_list(eptr->ms_attributes, an_ms_attribute_ptr,
+    iek_ms_attribute)` -- so the walker was reading `a_scope`'s LAST
+    member, and the kind it passed is that line's own constant.
+    **`eptr->ms_attributes` answered 8.**
+  - **AND `a_scope` IS THE SHAPE OF THE SECOND, STILL-OPEN RULE.**
+    `il.c:13799` gives its prefix as three pointers, an `int32_t`
+    `number`, an **`unsigned char kind`**, and THEN seven
+    `unsigned int :1` -- *a bit-field group FOLLOWING ordinary
+    members*, which is the case `structalign-test` section 9 reports
+    as a probe and says of: "nothing has measured what it costs".
+    **`sys/lib/tests/edgscope-probe.c` measures it**, in EDG's real
+    prefix rather than a toy, and its **section 2 is the control**:
+    the same shape with the `unsigned char` removed, so the bit field
+    is first -- the case `edgtuoff-probe` already measured as agreeing
+    once the container is shared. *If the control disagrees too, the
+    finding is not about the following rule at all.* gcc: 0
+    disagreements, so the reduction reproduces the known answer.
+    **WHAT IT WILL AND WILL NOT SHOW, written down before the run.**
+    A disagreement says every member of `a_scope` after the bit-field
+    group sits where EDG, gcc and the generated C do not expect.
+    **It does NOT on its own prove that is the fault** -- kencc
+    computes every offset from the same declaration, so a
+    different-but-consistent layout costs nothing until something
+    BAKES an offset in. *That mechanism is the one already measured
+    here*, the folded `offsetof`, and the next question is whether any
+    folded constant names a scope member. Predicted: `after` at 40 and
+    `sizeof` 48 against the host's 32 and 40.
+  - **AND THE HOST CONTROL IS CLEAN, so the partition holds.** The
+    same `/tmp/t.cpp` through the host `cpfe` built from the same
+    commit, with the same `--target win64
+    --clear_flag=use_predefined_macro_file` and four `--sys_include`:
+    **exit 0, 3793 bytes of correct C** -- vtables, Itanium mangling,
+    `struct D { struct B __b_1B; }`. So the toy is innocent and EDG is
+    innocent, and this is the kencc/libap side -- *the cfront
+    partition for the third time.* *(The VM command carried three
+    `--sys_include`, not four: `/sys/include/ape` was missing. Inert
     for a toy that includes no headers, and not inert for anything
     else.)*
 
