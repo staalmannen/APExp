@@ -2857,6 +2857,47 @@ blamed.
     here*, the folded `offsetof`, and the next question is whether any
     folded constant names a scope member. Predicted: `after` at 40 and
     `sizeof` 48 against the host's 32 and 40.
+  - **MEASURED ON THE VM, EXACTLY AS PREDICTED: 40 and 48 against 32
+    and 40, and THE CONTROL IS WHAT MAKES IT READABLE.** Section 2 --
+    the same prefix with the `unsigned char` removed, so the bit field
+    is first -- **PASSES at 32 and 40**, so the disagreement is the
+    FOLLOWING rule specifically and not bit fields in general. Section
+    3 reproduces `structalign-test`'s two probe shapes to the digit
+    (5/8 against 2/4, 5/8 against 3/4). 6 disagreements, 0 on gcc.
+  - ***AND THE "NOTHING HAS MEASURED WHAT IT COSTS" LINE IS NOW FALSE,
+    WHICH IS THE ROUND'S REAL FINDING: THE CORPUS BAKES THAT OFFSET AS
+    A `memcpy` LENGTH.*** Grepping EDG's own sources for `offsetof`
+    gives nine sites, and `src/exprutil.h:577` is
+    `memcpy((char*)this, (char*)src, offsetof(an_operand, variant))`.
+    In the generated C that is **`expr.c:64388`,
+    `memcpy(..., 152ULL)`** -- *a folded `offsetof` used as a LENGTH,
+    baked as a literal.*
+    **AND `an_operand` IS THE SAME SHAPE AS `a_scope`**: two
+    `unsigned char` (`kind`, `state`) and then **23 bit fields**
+    (`il.c:17826`). So kencc's `offsetof(an_operand, variant)` is not
+    152, and that `memcpy` copies the wrong number of bytes on every
+    operand copy in expression handling -- **short, leaving the last
+    members of the copy holding whatever was there.** It compounds:
+    `a_name_reference` is embedded BY VALUE at `:17919` and has the
+    same shape again.
+    *This is the `0x68` class and it is worse than the `0x68` case
+    was*: that one filed a pointer under the wrong member of one
+    struct, this is a wrong LENGTH on a copy the front end performs
+    constantly. **`ms_attributes` answering 8 is consistent with it
+    and is not proven to be it** -- a different struct, and the chain
+    from one to the other has not been drawn.
+  - **SO THE SECOND RULE IS A PORT BLOCKER WITH A NAMED MECHANISM
+    rather than a curiosity, and the fix is the COMPILER rather than a
+    regeneration** -- the same argument the sharing change already
+    won: *the 2.9M lines are already correct for a compiler that lays
+    out like gcc*, so one change makes the committed corpus right as
+    it stands, and a hand-edited 152 would be put back by the next
+    regeneration. It is six lines in the `sualign()` arm already
+    patched, gated on `conformalign` for the same reason, with
+    `structalign-test` section 9 turning from a PROBE into an
+    assertion as the regression test and `sualign-model.py` available
+    to check it before the VM sees it. **Not started -- it reopens a
+    compiler front and the call is the user's.**
   - **AND THE HOST CONTROL IS CLEAN, so the partition holds.** The
     same `/tmp/t.cpp` through the host `cpfe` built from the same
     commit, with the same `--target win64
