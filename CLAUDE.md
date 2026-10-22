@@ -402,11 +402,26 @@ built by hand has not been measured in that position*.
   COMMAND constant, so the only thing left varying is the C. **A
   comparison is not worthless or valuable in itself; it depends on what
   else is held constant.**
-  One command short of proof: `cmp bacon.bac.c src/bacon.bac.c` asks
-  whether the bacon kencc compiled reproduces, byte for byte, what
-  *shell* BaCon produced on the host. `bacon-test.bac` remains 3
-  failures, all three the 32-bit-`long` invariant arriving through a
-  language whose only integer type is that `long`.
+  One command short of proof, and **the command is `./bacon -p -n -q
+  bacon.bac` then `cmp bacon.bac.c src/bacon.bac.c`** — bacon DELETES
+  the C it generated (`bacon.bac:8294` puts it on the temp list,
+  `:10509` removes it), and the flags do not do what their names
+  suggest: **`-n` alone converts and then throws the conversion away**,
+  since the cleanup is outside the no-compile branch. `-p` is the one
+  that keeps it. ***And `-p` also runs `indent` over what it keeps***
+  (`:10399`), which would rewrite the file and make the comparison
+  measure formatting — **safe here only because APExp ships no
+  `indent`**, and bacon says which case it is: `WARNING: 'indent' not
+  found` means the file is untouched, `Applying indentation... done.`
+  means the comparison is void.
+  *`cmp` rather than `diff` is justified rather than assumed*: the `.c`
+  carries no timestamp (the version stamp goes to the `.generic.h`) and
+  **none of `bacon.bac`'s eleven `OS$` conditionals separates Linux from
+  Plan 9** — they test SunOS, Haiku, BSD, OSF1 and Darwin — so a
+  difference would be a real disagreement rather than a platform
+  artefact. `bacon-test.bac` remains 3 failures, all three the
+  32-bit-`long` invariant arriving through a language whose only integer
+  type is that `long`.
   ***And it had to be `./bacon`***: plain `bacon` resolves through
   `$PATH` to generation 1, so the second run would have re-measured the
   first binary and reported a clean, meaningless result.

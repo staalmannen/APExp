@@ -2544,21 +2544,75 @@ boundary is removed.**
 else is being held constant* -- which is the control rule arriving as a
 property of two file sizes rather than of a test.
 
-### What is still one command short
+### What is still one command short -- and the command is not the obvious one
 
-Equal size is not equal bytes. The proof, and it costs nothing:
+Equal size is not equal bytes, so the proof is `cmp bacon.bac.c
+src/bacon.bac.c`. **But bacon deletes the C it just generated**, so
+there is nothing to compare, and the three flags involved do not do what
+their names suggest. Read from `bacon.bac` rather than recalled:
+
+- **The `.c` is on the temp list.** `:8294` adds `g_CFILE$` to
+  `g_TMP_FILES$`, and `:10509` removes every name on that list unless
+  `g_TMP_PRESERVE`. The file lives in the CURRENT directory by default
+  (`:8254`, `g_TEMPDIR$` defaults to `"."`), which is why `cc -c
+  bacon.bac.c` names it bare.
+- **`-p` is the flag**, `:8166`, `CASE 112`. (The options are parsed as
+  CHARACTER CODES, so the table reads `CASE 112` rather than `"p"` --
+  112 is `p`, 110 is `n`, 113 is `q`, 100 is `d`, 111 is `o`.)
+- ***`-n` ALONE THROWS THE CONVERSION AWAY.*** `CASE 110` sets
+  `g_NO_COMPILE`, which skips the compile -- and the cleanup at `:10509`
+  is OUTSIDE that branch, so the `.c` is generated and then deleted with
+  nothing having been built from it. *The obvious flag for "just
+  convert" is the one flag that guarantees you keep nothing.*
+
+### And `-p` does not only preserve: it rewrites the file
+
+`:10399` is `IF ISTRUE(g_TMP_PRESERVE)` followed by **`indent`** over
+every preserved file. So on a system that HAS `indent`, asking bacon to
+keep its output reformats that output, and a `cmp` against the committed
+C then differs for a reason that has nothing to do with the translation
+-- *a diff full of whitespace, reading exactly like a real
+disagreement.* **The instrument would have changed what it measures**,
+conditionally, with the condition being whether a program happens to be
+installed.
+
+**It is safe here, and bacon says so itself rather than leaving it to be
+assumed**: APExp ships no `indent` (`git ls-files` has no such command),
+so the run prints
 
 ```
-	cmp bacon.bac.c src/bacon.bac.c    # gen-1 output vs the committed C
+	WARNING: 'indent' not found on this system!
 ```
 
-Identical means the bacon **kencc compiled** reproduces, byte for byte,
-what **shell BaCon** produced on the host -- the committed
-`src/bacon.bac.c` was regenerated that way -- which would close the
-chain from the host's generator to this machine's. A difference is a
-thing to read rather than a failure: two implementations of one language
-may legitimately differ in a temporary's numbering, and the fixpoint
-above already says the APExp side is internally consistent.
+and leaves the file alone. ***That line is the precondition*** -- if a
+run ever prints `Applying indentation... done.` instead, the comparison
+below is void. Neither message is gated on `-q`.
+
+### Why `cmp` is the right tool rather than `diff`
+
+Two things had to be true and both were checked rather than hoped:
+
+- **No timestamp in the `.c`.** The only version stamp is
+  `COMPILED_BY_WHICH_BACON`, `"BaCon executable " & g_VERSION$`, and
+  `:8777` writes it `TO g_GENERIC` -- the `.generic.h`, not the `.c`.
+- **No host leaks into the `.c`.** `OS$` is read eleven times in
+  `bacon.bac` and **not one of the conditionals separates Linux from
+  Plan 9**: they test SunOS, Haiku, BSD, OSF1 and Darwin, so both
+  machines take the same branch every time. The twelfth hit is the
+  string `"OS$"` inside a runtime error message, not the host.
+
+So the two generators should agree to the byte, and **a difference would
+be a real disagreement between shell BaCon and the bacon kencc compiled
+rather than a platform artefact** -- which is what makes `cmp` worth
+running and its answer worth believing.
+
+```
+	./bacon -p -n -q bacon.bac
+	cmp bacon.bac.c src/bacon.bac.c
+```
+
+`-n` is kept beside `-p` only to skip a compile nobody needs here; it
+changes nothing about what is generated.
 
 ### The one-word trap, recorded because it was avoided rather than hit
 
