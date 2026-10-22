@@ -333,6 +333,11 @@ must work -- `external/perl/plan9/mkfile:88` is one and perl builds)
 and **case 5 has a known answer** (`cmd/tar/mkfile:126` echoes a
 literal `#ifndef` and tar's header comes out right), so a failure there
 says the probe is measuring something other than rc.
+**IT ANSWERED IN ONE RUN: 1, 2, 3, 5 and 6 pass and CASE 4 FAILS** --
+`} if not {` on one line, `token if: syntax error`. *Comments in
+recipes are not the hazard; the brace-if-not is*, and the control
+(case 1) and the known answer (case 5) both held, which is what makes
+the one failure readable.
 **`initzero-test.c` asks whether a compound literal ZEROES the members
 its initialiser list leaves out** -- muon's crash, `*sb = (struct
 tstr){.flags=..,.buf=..,.cap=..}` with `.len` omitted and then used as
@@ -392,8 +397,9 @@ UNKNOWN column (978 under `external/`) reported rather than counted --
 read each hit, since `U32 arena_size` is in it and cannot share a
 4-byte tail.
 `structalign-test.c` measures `pcc -J`, conforming struct layout, and
-**needs three runs** -- gcc, then `pcc -DPLAN9` WITHOUT `-J` (which
-must fail **21** checks), then with it. *The middle run is the
+**needs three runs** -- gcc, then `pcc -9 -DPLAN9`, the control, which
+must FAIL (**22** of its 40 checks, measured), then plain `pcc`, which
+must pass. *The middle run is the
 control*: a pass under `-J` alone cannot distinguish a working flag
 from a compiler that never had the bug. **Section 9 carries the four
 bit-field shapes, and the two that must NOT move are the valuable
@@ -2705,6 +2711,37 @@ blamed.
     `-9` must fail **21** rather than 14. **Refutation conditions**:
     `bf_aligned` or `bf_trailing` moving, any fourth name in the acid
     diff, or a `-9` count that is not 21.
+  - **BOTH RUNS ARE IN: 0 under `pcc`, 22 under `pcc -9`** -- and the
+    count is not 21, so that condition fired. **It is fully
+    attributed**: 40 checks, failing 4/3/4/3/2/1 in sections 1-6, 0 in
+    section 8 and **5 in section 9**, which is 22 exactly.
+    ***THE COUNT WAS A PREDICTION ABOUT THE INSTRUMENT RATHER THAN
+    ABOUT THE COMPILER.*** 14 was measured against a version of
+    `structalign-test.c` that has since gained section 8, gained
+    section 9 and had section 4 "GROW UP", so sections 1-6 alone now
+    answer 17 where they once answered 14; I added my guess at section
+    9's movers to a stale base and was wrong in both terms at once.
+    *Predict the NAMES, not the total* -- which is this file's own
+    "compare per name, never by total" arriving for a prediction
+    instead of for a suite diff, and the per-name condition is the one
+    that mattered.
+  - **AND THE SUBSTANTIVE REFUTATION DID NOT FIRE, which is the
+    result.** `bf_aligned` is 8 with `c` at 4 and `bf_trailing` is 16
+    **under BOTH rules** -- the two shapes that already agree with gcc
+    are untouched, so the patch changed the sharing rule and nothing
+    else. `bf_shares` 8 -> **4** with `c` at 1, `bf_split` 8 -> **4**
+    with `c` at 1 (so the container is shared across base types now
+    too, where kencc used to close it), `bf_overflow` 16 -> **12**
+    with `c` at 8 unmoved. Section 8 passes in both runs, as recorded.
+  - **A SECOND RULE IS STILL OPEN AND THE PROBE LINES SAY SO.** Under
+    `-J`, `struct{char; unsigned:1; char;}` is off(d) 5 / size 8 where
+    gcc says **2 and 4**, and `struct{unsigned:1; char; unsigned:1;
+    char;}` is off(y) 5 / size 8 where gcc says **3 and 4**. (Under
+    `-9` the same two are 8/16 and 12/16, so the change moved both
+    toward gcc without reaching it.) *Reported as a PROBE rather than
+    asserted*, because it is a different rule from the one the patch
+    promised: a bit field FOLLOWING an ordinary member opens a fresh
+    container here. Nothing has measured what it costs.
   - Then: `cd sys/src/cmd && mk install`, the after-dump, `mk
     distclean`, and cpfe.
 
@@ -3110,7 +3147,17 @@ item -- *a port that builds and has never run is not a port*:
   SIDES**, so this cost no VM round: `-U__LP64__ -U_LP64` reproduces
   kencc's configuration exactly. Fixed: `C_word` 8, 0 failures.
   Shipped: `C_SIXTY_FOUR NOT defined`, `C_word` 4, pointer 8, 1
-  failure, exit 1. *Not yet measured on the VM.*
+  failure, exit 1.
+  **AND THE VM RAN THE CONTROL RATHER THAN THE TEST, which is the
+  file's own design working.** Built bare -- without chicken's own
+  `-DC_SIXTY_FOUR -DC_LLP` -- it answers `C_SIXTY_FOUR NOT defined`,
+  `model LLP64`, `C_word` 4, pointer 8, **1 failure**: exactly the
+  shipped configuration the header says must fail. *A probe built
+  without the package's flags measures a different header*, which is
+  `tarblock-probe`'s rule, and here that is the documented control
+  rather than a fault. **Both mkfiles do pass the two flags** (`cmd`
+  :75, `lib` :79), so the port itself is fixed; the flagged run is
+  what remains.
   Recorded not patched: `chicken.h:813-815` define `C_WORD_MIN`/
   `C_WORD_MAX`/`C_UWORD_MAX` as the LONG limits with no `C_LLP` arm,
   so they would be 32-bit limits for a 64-bit word -- **defined and
@@ -3200,7 +3247,18 @@ item -- *a port that builds and has never run is not a port*:
   change in the LEXER and the SWITCH TABLE: nothing downstream of
   either produces a link error, so a completed build is a precondition
   rather than a measurement. `longconst-test` and `switchcase-test`
-  are what measure them, and neither has run on the VM yet.
+  are what measure them.
+  **BOTH ARE IN AND BOTH ARE 0.** `longconst-test` prints `long` 4 and
+  `long long` 8 -- so sections 1 and 2 are asking the question they
+  exist for rather than passing because nothing overflowed, which is
+  what the host run could not do -- and `0x0200000000000000L` survives,
+  `0x8000000000000000UL` survives, the switch label decodes to `0xc2`,
+  and **section 3's control holds**: `0x80000000L` stays long-sized and
+  positive. `switchcase-test` is 0 with **section 2 naming every arm**
+  -- the four wide labels 0x0e/0x1e/0x3e/0x4e reach arms 3-6 rather
+  than `default`, which is the SILENT half, and 3a's wide label
+  truncates to 1 and is selected by 1. *Both compiler fixes are
+  measured now rather than inferred from a build that completed.*
 - **bacon** (BASIC) -- **IT CONVERTS BASIC TO C ON APExp NOW**, 605
   lines in 0.854s for `bacongui-tk.bac`. What stopped the compile was
   not bacon: **pkg-config has never worked in this tree.**
@@ -3258,6 +3316,13 @@ item -- *a port that builds and has never run is not a port*:
   alone, **1 -- 6c alone**. *Without 6c a half-fix and a whole one
   print the same thing.* **So the VM count becomes 3, and the third is
   newly MEASURED rather than newly broken.**
+  **CONFIRMED ON THE VM: 3 failures, and they are 1b, 2a and 6c by
+  name.** The prediction named the count and all three names before the
+  run and every one matched; everything else -- FOR, WHILE, strings,
+  arrays, both other FUNCTION returns -- passes. *That is the 32-bit
+  `long` invariant measured through a language whose only integer type
+  is that `long`*, and the recipe this file records (`-q -c cc`) is
+  what ran.
   **AND THE RECIPE THIS FILE RECORDED WAS WRONG IN BOTH HALVES, which
   the first VM run said in one screen.**
   - **`-c cc`, not `-c pcc`.** bacon writes a `Makefile.bacon` naming
@@ -3694,15 +3759,27 @@ in the topic file.
   explained the fix**, plus one leading assignment rc allows. mk hands a
   recipe to rc verbatim, so every tab-indented `#` line is rc source.
   *Writing the rule down inside the recipe is what broke the recipe.*
-  **WHICH CONSTRUCT IT IS IS NOT SETTLED, and saying so matters**: rc
-  ought to treat `#` as a comment, the tree has working precedents for
-  both a plain recipe comment (`external/perl/plan9/mkfile:88`) and a
-  `#` inside a quoted argument (`cmd/tar/mkfile:126`), and *there is no
-  rc on the build host*, so every reading of its lexer here is a
-  recollection. `sys/lib/tests/mkrecipe-probe` is one `mk -k` run that
-  names it. Until then both clisp mkfiles carry **no comments inside
-  any recipe at all** -- the prose is at column 0, where mk eats it --
-  and that is the conservative form under every hypothesis.
+  **MEASURED NOW, AND THE COMMENTS WERE INNOCENT: THE CONSTRUCT IS
+  `} if not {` ON ONE LINE.** `mk -k all` in
+  `sys/lib/tests/mkrecipe-probe` answers `ok 1`, `ok 2`, `ok 3`,
+  **case 4 `token if: syntax error`**, `ok 5`, `ok 6` -- so a plain
+  recipe comment is fine, *a comment holding a bare `=` is fine*, and
+  one holding backquotes and apostrophes is fine. rc wants a command
+  separator after the closing brace; `}` followed on the same line by
+  `if not` is not one, and the fix is a newline.
+  ***SO MY DIAGNOSIS OF `mkfile.rebuild` WAS WRONG AND THE FIX WAS
+  RIGHT BY ACCIDENT.*** I read `*eval*:13: token '=': syntax error`,
+  found the only `=` left inside a COMMENT, and concluded that mk hands
+  comments to rc as source -- then rewrote BOTH clisp mkfiles to remove
+  every recipe comment *and* to put `if not` on its own line. The
+  second edit is what fixed them. *Two changes in one commit and the
+  wrong one got the credit*, which is the plainest form of the rule
+  this file already carries about experiments that isolate nothing.
+  **The sweep is clean**: `} if not` on one line now appears nowhere in
+  the tree but inside the probe itself and inside a comment describing
+  it. The clisp mkfiles' comment-free recipes can be relaxed whenever
+  anyone wants; they cost nothing and are no longer required by
+  anything measured.
 
 **Testing**
 

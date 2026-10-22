@@ -17,8 +17,25 @@
  *   gcc -o cxaatexit-test cxaatexit-test.c \
  *       ../../src/ape/lib/edg/cxa_atexit.c      # host
  *   pcc -o cxaatexit-test cxaatexit-test.c \
- *       ../../src/ape/lib/edg/cxa_atexit.c      # 9front
+ *       ../../src/ape/lib/edg/cxa_atexit.c \
+ *       ../../src/ape/lib/edg/dso_handle.c      # 9front: TWO files
  *   ./cxaatexit-test
+ *
+ * THE TWO COMMANDS ARE NOT THE SAME AND THE ASYMMETRY IS THIS FILE'S
+ * OWN FINDING, three paragraphs down: `__dso_handle' lives in its own
+ * source **because glibc's `crtbeginS.o' already defines one**, so the
+ * host must NOT compile ours and Plan 9 MUST.  The 9front line here
+ * was copied from the gcc line and inherited its single source, so
+ * following this header exactly used to answer
+ *
+ *   spawner: undefined: __cxa_atexit in spawner
+ *   printf: __dso_handle: not defined
+ *
+ * -- the first name from leaving the file out of the command, the
+ * second from a command that could never have worked on this side.
+ * *A build line that is right on one machine is not a build line*,
+ * which is the `ctype-xcheck'/`strftime-xcheck' two-compiles rule
+ * arriving for a LINK rather than for a rename.
  *
  * SECTIONS 3 AND 4 ARE THE REASON THIS FILE EXISTS.  A plain
  * descending `for' loop over the list passes sections 1 and 2 and
