@@ -63,3 +63,8 @@ sys/src/ape/cmd/c++lib/*.c
 
 # eccp's intermediate C, one per translated .cpp (kept only with -K).
 *.eccp.c
+
+# Python bytecode. `bitinit-model.py' imports `sualign-model.py' by path,
+# which makes CPython write a __pycache__ beside them.
+__pycache__/
+*.pyc

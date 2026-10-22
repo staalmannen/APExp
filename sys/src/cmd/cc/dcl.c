@@ -615,12 +615,79 @@ isstruct(Node *a, Type *t)
 	return 0;
 }
 
+/*
+ * EMIT A BIT-FIELD GROUP'S STATIC INITIALISER BYTE BY BYTE, over the
+ * bytes the GROUP occupies rather than the bytes its CONTAINER does.
+ *
+ * WHAT THIS IS FOR.  `init1' accumulates a group's constants into one
+ * value shifted by each field's `shift', and the old code handed that
+ * to `gextern' as a single DATA of `bitaggt->width' -- `tfield's
+ * width, four bytes, at the container's offset.  **A container is not
+ * the group**: with the head of a container shared (`sualign's
+ * conforming arm) the three bytes before the group belong to ordinary
+ * members, and with the tail shared the bytes after it do.  A DATA
+ * four bytes wide at the container therefore writes over them, and
+ * `6l' answers `multiple initialization' -- not a false alarm, since
+ * the same four bytes really were written twice.
+ *
+ * GNU make's `struct function_table_entry' is what found it: a union,
+ * a `const char *', `len', `minimum_args' and `maximum_args' as three
+ * `unsigned char', then `expand_args:1, alloc_fn:1, adds_command:1'.
+ * The ordinary members end at byte 19, so the group's container is the
+ * aligned unit at 16 and its one live byte is 19 -- and the link
+ * reported exactly `DATA function_table_init<8>+16(SB)/4,$16777216'
+ * for every one of eighty-odd entries, 0x01000000 being `expand_args'
+ * at shift 24.
+ *
+ * **THE TAIL RULE HAD THE SAME LATENT DEFECT**, which is worth saying
+ * rather than filing this as the head rule's cost:
+ * `struct{unsigned a:1; char c;} x = {1, 'z'};' puts `c' at byte 1,
+ * inside the same container, so a four-byte DATA at 0 would have
+ * clobbered it.  Nothing in the tree had statically initialised that
+ * shape, so it never fired.  *A bug that needs two features at once to
+ * become reachable is still one bug, and this is the fix for both.*
+ *
+ * BYTE BY BYTE RATHER THAN ONE NARROWER DATA, and the linker decides
+ * that: `6l/asm.c's `datblk' switches on `p->from.scale' with
+ * **`case 1, 2, 4, 8` and a `diag("bad nuxi")` default**, so a group
+ * spanning three bytes -- 24 bits, or 17 starting at a byte boundary
+ * -- has no width to ask for.  One-byte records always exist, need no
+ * per-architecture width table across the eleven linkers, and cost at
+ * most four DATA lines per statically-initialised group.
+ *
+ * Zero bytes are skipped because a DATA-less byte is already zero;
+ * `init1' relies on that for whole zero initialisers two hundred lines
+ * above, so it is this file's own invariant rather than an assumption.
+ *
+ * `first' and `end' are BIT positions within the struct, and `ct' is
+ * the group's first field -- its `offset' is the container, which is
+ * what the accumulated value's shifts are relative to.
+ */
+static void
+gbitagg(Sym *s, Node *a, long o, Type *ct, long first, long end)
+{
+	vlong v;
+	long b, b0, b1;
+
+	if(a == Z || ct == T)
+		return;
+	v = a->vconst;
+	b0 = first/8;
+	b1 = (end + 7)/8;
+	for(b = b0; b < b1; b++) {
+		a->vconst = (v >> ((b - ct->offset)*8)) & 0xffLL;
+		if(a->vconst != 0)
+			gextern(s, a, o + b, 1);
+	}
+	a->vconst = v;
+}
+
 Node*
 init1(Sym *s, Type *t, long o, int exflag)
 {
 	Node *a, *l, *r, *pre, nod;
 	Type *t1;
-	long e, w, so, mw, bitoff;
+	long e, w, so, mw, bitfirst, bitend;
 	static Node *bitagg;
 	static Type *bitaggt;
 
@@ -898,7 +965,8 @@ init1(Sym *s, Type *t, long o, int exflag)
 			return Z;
 		}
 		l = Z;
-		bitoff = -1;
+		bitfirst = 0;
+		bitend = -1;
 
 	again:
 		for(t1 = t->link; t1 != T; t1 = t1->down) {
@@ -918,14 +986,34 @@ init1(Sym *s, Type *t, long o, int exflag)
 				else
 					nextinit();
 			}
-			if(t1->nbits && (bitoff != t1->offset || !bitagg)) {
-				if(a->op == OELEM && bitoff != -1)
-					diag(a, "named bitfield static initializers not supported %F", a);
-				if(bitagg)
-					gextern(s, bitagg, o+bitaggt->offset, bitaggt->width);
-				bitagg = Z;
-				bitaggt = t1;
-				bitoff = t1->offset;
+			if(t1->nbits) {
+				long fb;
+
+				/*
+				 * A NEW GROUP IS A GAP IN THE BITS, not a
+				 * change of container offset, which is what
+				 * this tested before.  Within a group `cc.y's
+				 * `lastbit' makes the fields contiguous; a
+				 * group boundary always leaves a gap -- either
+				 * an ordinary member between them or an
+				 * overflow into the next unit.  **And with the
+				 * container's head shared the old test is
+				 * wrong rather than merely indirect**: in
+				 * `struct{unsigned a:1; char c; unsigned b:1;}'
+				 * both groups round DOWN to the container at 0,
+				 * so comparing offsets would merge them and
+				 * emit `c's byte from the bit-field value.
+				 */
+				fb = t1->offset*8 + t1->shift;
+				if(bitend != fb || !bitagg) {
+					if(a->op == OELEM && bitend != -1)
+						diag(a, "named bitfield static initializers not supported %F", a);
+					gbitagg(s, bitagg, o, bitaggt, bitfirst, bitend);
+					bitagg = Z;
+					bitaggt = t1;
+					bitfirst = fb;
+				}
+				bitend = fb + t1->nbits;
 			}
 			r = init1(s, t1, o+t1->offset, 1);
 			l = newlist(l, r);
@@ -984,9 +1072,8 @@ init1(Sym *s, Type *t, long o, int exflag)
 		 */
 		if(a && (a->op == OELEM || a->op == OARRAY) && !exflag)
 			diag(a, "structure element not found %F", a);
-		if(bitoff != -1) {
-			if(bitagg)
-				gextern(s, bitagg, o+bitaggt->offset, bitaggt->width);
+		if(bitend != -1) {
+			gbitagg(s, bitagg, o, bitaggt, bitfirst, bitend);
 			bitagg = Z;
 		}
 		return l;

@@ -121,6 +121,7 @@ def layout(members, conformalign, follow=False, packflg=False):
     w = 0; bw = 0; a = 1; o = 0; gbit = 0
     lastbit = 0; firstbit = True
     out = []
+    shifts = {}
     for (nm, wid, al, nbits) in members:
         if nbits is not None:
             lastbit += nbits
@@ -134,7 +135,7 @@ def layout(members, conformalign, follow=False, packflg=False):
                     o = w
                     w += TFIELD             # the whole unit, MSVC's rule
                     firstbit = False
-                out.append((nm, o))
+                out.append((nm, o)); shifts[nm] = shift
             elif not follow:
                 if firstbit:
                     w = rup(w, TFIELD)
@@ -142,7 +143,7 @@ def layout(members, conformalign, follow=False, packflg=False):
                     if o + TFIELD > bw:
                         bw = o + TFIELD     # the cover guard
                     firstbit = False
-                out.append((nm, o))
+                out.append((nm, o)); shifts[nm] = shift
                 nw = o + (shift + nbits + 7) // 8
                 if nw > w:
                     w = nw
@@ -156,7 +157,7 @@ def layout(members, conformalign, follow=False, packflg=False):
                     o = rup((fbit + 7) // 8, TFIELD)
                     gbit += o * 8 - fbit                # carry the group
                     fbit = o * 8
-                out.append((nm, o))
+                out.append((nm, o)); shifts[nm] = fbit - o * 8
                 if o + TFIELD > bw:
                     bw = o + TFIELD
                 nw = (fbit + nbits + 7) // 8
@@ -176,7 +177,7 @@ def layout(members, conformalign, follow=False, packflg=False):
     if conformalign and bw > w:
         w = bw
     talign = a if conformalign else 8       # Asu2: SZ_VLONG when not -J
-    return dict(out), rup(w, talign)
+    return dict(out), rup(w, talign), shifts
 
 
 # ---- the control: the real pcc's real answer, from tmp/abi-bf-before.acid
@@ -247,7 +248,7 @@ CASES = [
 
 
 def main():
-    off, size = layout(RES_STATE, False)
+    off, size, _ = layout(RES_STATE, False)
     bad = [k for k, v in ACID.items() if off[k] != v]
     if bad or size != ACID_SIZE:
         print("CONTROL FAILED -- the model does not reproduce the measured")
@@ -267,7 +268,7 @@ def main():
     fails = 0
     for nm, mem, key, goff, gsize in CASES:
         def f(pair):
-            o, s = pair
+            o, s = pair[0], pair[1]
             return ("size %d" % s) if key is None else \
                    ("off(%s)=%d sz=%d" % (key, o[key], s))
         g = ("size %d" % gsize) if key is None else \
@@ -283,7 +284,7 @@ def main():
 
     print("\n__res_state, the one public APE struct the SHARING rule moves:")
     for lbl, kw in (("share", {}), ("share+follow", {'follow': True})):
-        o, s = layout(RES_STATE, True, **kw)
+        o, s, _ = layout(RES_STATE, True, **kw)
         print("   %-12s unused %d  sort_list %d  sizeof %d" %
               (lbl, o['unused'], o['sort_list'], s))
     print("   -> `follow' moves NOTHING here: pfcode is an int, so `w' is")

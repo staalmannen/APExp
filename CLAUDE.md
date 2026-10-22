@@ -407,6 +407,17 @@ bit-field shapes, and the two that must NOT move are the valuable
 half** -- `bf_aligned` and `bf_trailing` agree with gcc under both
 rules, so either failing means a change did more than share a
 container's tail.
+**`bitinit-model.py` is a host MODEL with an EXTERNAL ORACLE**, which
+the other two models have not got: it runs `cc/dcl.c`'s `gbitagg()`
+byte loop over seven shapes and compares with the bytes **gcc** puts
+in a real object for the same initialiser. **It tracks a written-mask
+and reports OVERLAP**, so it reproduces `6l`'s `multiple
+initialization` rather than only the final image -- *a model comparing
+only the finished bytes scores the old code as correct*. `--old` is
+the control: the replaced code reports 6 of 7 shapes, `ftab`
+overlapping at 16/17/18, the bytes the real linker named, with the
+no-bit-field shape clean in both modes. `bitinit-test.c` is its
+regression test and reads back every member, ordinary ones included.
 **`sualign-model.py` is a host MODEL rather than a test**, and exists
 because kencc's own sources need Plan 9's `<u.h>`, so the first build
 of any `cc/` change is the VM's. It transcribes `sualign()`'s TSTRUCT
@@ -2973,6 +2984,74 @@ blamed.
     so the first build is the VM's** -- and `cd sys/src/cmd && mk
     install` comes before the tree rebuild, as the `sualign` bit-field
     fix already records.
+  - **AND THE REBUILD STOPPED IN gmake AGAIN -- SAME MESSAGE, DIFFERENT
+    BUG, AND IT IS THE STATIC INITIALISER RATHER THAN THE LAYOUT.**
+    `_convM2D: multiple initialization` eighty-odd times, each preceded
+    by `DATA function_table_init<8>+16(SB)/4,$16777216`, stride 24.
+    **Every number reads out**: `gmake/src/function.c:31`'s
+    `struct function_table_entry` is a union, a `const char *`, then
+    `len`/`minimum_args`/`maximum_args` as three `unsigned char`, then
+    `expand_args:1, alloc_fn:1, adds_command:1` -- the `follow` shape.
+    The ordinary members end at byte 19, so the container is the
+    aligned unit at **16**, `expand_args` is at shift **24** and
+    0x01000000 is 16777216, and the struct is 24 bytes. *An address,
+    a width, a value and a stride that the arithmetic reproduces to
+    the digit is a measurement rather than a resemblance* -- for the
+    third time in this file.
+  - ***THE CONTAINER IS NOT THE GROUP, and `init1` was emitting the
+    CONTAINER.*** One DATA of `bitaggt->width` -- `tfield`'s four
+    bytes -- at the container's offset. Bytes 16, 17 and 18 are the
+    three `unsigned char` and have their own one-byte DATA records, so
+    the same four bytes really were written twice and **`6l` was
+    right**. `cc/dcl.c`'s new `gbitagg()` emits the group's OWN bytes,
+    **one at a time**, zeros skipped.
+  - **ONE BYTE AT A TIME BECAUSE THE LINKER DECIDES IT**, not for
+    taste: `6l/asm.c`'s `datblk` switches `p->from.scale` with
+    `case 1, 2, 4, 8` and a `diag("bad nuxi")` default, and a group can
+    span **three** bytes (17 bits after a `char`). There is no width to
+    ask for, one-byte records always exist, and it needs no
+    per-architecture table across the eleven linkers.
+  - **AND THE GROUP-BOUNDARY TEST WAS WRONG TOO, which the head rule
+    turned from indirect into incorrect.** It compared the container
+    OFFSET, and with the container rounded DOWN two groups can share
+    one: `struct{unsigned a:1; char c; unsigned b:1;}` puts both at
+    container 0, so the two would merge and `c`'s byte would be
+    emitted from the bit-field value. It is a gap in the BITS now --
+    within a group `cc.y`'s `lastbit` makes the fields contiguous, and
+    a boundary always leaves one.
+  - ***AND THE TAIL RULE HAD THE SAME DEFECT AND NOTHING EVER FIRED
+    IT***, which is the half worth keeping: `struct{unsigned a:1;
+    char c;} x = {1,'z'};` puts `c` inside the same container, so the
+    four-byte DATA at 0 clobbers it. That rule shipped three commits
+    earlier. *A bug that needs two features at once to become
+    reachable is still one bug*, and this is the fix for both rather
+    than a cost of the second.
+  - **MODELLED AGAINST gcc's OWN OBJECT BYTES BEFORE THE VM SEES IT,
+    because the last round of this cost a full `distclean` plus
+    `install`.** `sys/lib/tests/bitinit-model.py` lays each shape out
+    with `sualign-model`, runs `init1`'s accumulation and `gbitagg`'s
+    byte loop, and compares with the bytes `gcc` actually puts in the
+    object: **7 shapes, 0 problems**, `ftab`'s one live byte at 19
+    exactly where the old code wrote four at 16.
+    **It tracks a WRITTEN-MASK and reports OVERLAP**, which is the
+    half that matters -- it reproduces the LINKER's complaint rather
+    than only the final bytes, and *a model that compared only the
+    finished image would have scored the old code as correct*, since
+    its four-byte write leaves the right bits where the one-byte
+    writes had already put them.
+    **`--old` is the control and it fires**: the replaced code reports
+    **6 of 7** shapes, `ftab` overlapping at **16, 17, 18** -- the
+    bytes the real linker named -- with `plain`, the no-bit-field
+    shape, staying clean in both modes.
+  - **`sys/lib/tests/bitinit-test.c` is the regression test** and
+    reads back **every member, ordinary ones included**: a compiler
+    with the old emission does not LINK, one with too narrow a span
+    gives a wrong bit field, one that writes over a neighbour gives a
+    wrong `char`. **Section 0 is the control** -- a struct with no bit
+    fields at all -- so a change that breaks `init1` in general says
+    so rather than reading as a bit-field span problem. 0 failures on
+    gcc, and section 1 is GNU make's shape as an ARRAY, since the real
+    failure was one record per entry.
   - **THERE IS A DRIVER NOW: `rc/bin/ape/eccp`, AND `c++` IS A
     ONE-LINE FORWARDER TO IT.** With cfront removed the name is free,
     so `CXX=c++` works for autoconf, for GNU make's default and for
