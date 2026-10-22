@@ -2492,3 +2492,178 @@ archive is still the only way to know, and is still worth one round,
 but it is now a check rather than a hunt. tar's own `#pragma pack`
 is a no-op under `-J` (both answers are 500 and 495) and **stays**:
 it documents the on-disk intent and keeps the file right under `-9`.
+
+
+---
+
+## bacon: self-hosting, and a fixpoint at generation 2
+
+```
+  bash-5.3$ bacon -q -c cc bacon.bac           # gen 1 -> gen 2
+  Converting 'bacon.bac'... done, 10518 lines ... in 7.222 seconds.
+  cc -o bacon bacon.bac.o  -lm
+  -rwxr-xr-x 1 glenda glenda 3048736 Sun 22 18:56 bacon
+  2981 -rwxr-xr-x 1 glenda glenda 3052058 Sun 22 18:06 /bin/bacon
+
+  bash-5.3$ ./bacon -q -c cc bacon.bac         # gen 2 -> gen 3
+  Converting 'bacon.bac'... done, 10518 lines ... in 6.895 seconds.
+  cc -o bacon bacon.bac.o  -lm
+  -rwxr-xr-x 1 glenda glenda 3048736 Sun 22 18:58 bacon
+```
+
+**BaCon self-hosts on APExp.** Generation 1 converted its own 10518
+lines, the C compiled and linked, and **generation 2 then did the same
+job** -- which is the half that was missing and the half that matters,
+since *a compiler that produces a binary has not been shown to produce a
+WORKING one*. That is the gap `miniperl` had when it linked and then
+faulted writing `perlmain.c`, and it is closed here by generation 2
+doing real work rather than by generation 2 existing.
+
+**And generation 3 is the same size as generation 2: 3048736 both
+times.** A converter that has reached a fixpoint produces, from its own
+source, a compiler identical to itself; two successive generations
+agreeing to the byte count is what that looks like from outside.
+
+### The size comparison was worthless once and is decisive here, and the difference is the whole lesson
+
+One round earlier this file said, of 3048736 against /bin/bacon's
+3052058, that **the sizes prove nothing** -- because `/bin/bacon` is
+linked by `cmd/basic/mkfile` with APExp's CFLAGS and generation 2 by
+bacon's own generated `Makefile.bacon`, so the comparison was measuring
+the BUILD and not the translation. *That was right, and it was
+incomplete.*
+
+**The gen2-against-gen3 comparison holds the link command constant** --
+both come from `Makefile.bacon`, the same `cc -c` and the same
+`cc -o ... -lm` -- so the only thing left varying is the C, and the C is
+what the question was about all along. **The same measurement that is
+meaningless across a build-system boundary becomes decisive once the
+boundary is removed.**
+
+*A comparison is not worthless or valuable in itself; it depends on what
+else is being held constant* -- which is the control rule arriving as a
+property of two file sizes rather than of a test.
+
+### What is still one command short -- and the command is not the obvious one
+
+Equal size is not equal bytes, so the proof is `cmp bacon.bac.c
+src/bacon.bac.c`. **But bacon deletes the C it just generated**, so
+there is nothing to compare, and the three flags involved do not do what
+their names suggest. Read from `bacon.bac` rather than recalled:
+
+- **The `.c` is on the temp list.** `:8294` adds `g_CFILE$` to
+  `g_TMP_FILES$`, and `:10509` removes every name on that list unless
+  `g_TMP_PRESERVE`. The file lives in the CURRENT directory by default
+  (`:8254`, `g_TEMPDIR$` defaults to `"."`), which is why `cc -c
+  bacon.bac.c` names it bare.
+- **`-p` is the flag**, `:8166`, `CASE 112`. (The options are parsed as
+  CHARACTER CODES, so the table reads `CASE 112` rather than `"p"` --
+  112 is `p`, 110 is `n`, 113 is `q`, 100 is `d`, 111 is `o`.)
+- ***`-n` ALONE THROWS THE CONVERSION AWAY.*** `CASE 110` sets
+  `g_NO_COMPILE`, which skips the compile -- and the cleanup at `:10509`
+  is OUTSIDE that branch, so the `.c` is generated and then deleted with
+  nothing having been built from it. *The obvious flag for "just
+  convert" is the one flag that guarantees you keep nothing.*
+
+### And `-p` does not only preserve: it rewrites the file
+
+`:10399` is `IF ISTRUE(g_TMP_PRESERVE)` followed by **`indent`** over
+every preserved file. So on a system that HAS `indent`, asking bacon to
+keep its output reformats that output, and a `cmp` against the committed
+C then differs for a reason that has nothing to do with the translation
+-- *a diff full of whitespace, reading exactly like a real
+disagreement.* **The instrument would have changed what it measures**,
+conditionally, with the condition being whether a program happens to be
+installed.
+
+**It is safe here, and bacon says so itself rather than leaving it to be
+assumed**: APExp ships no `indent` (`git ls-files` has no such command),
+so the run prints
+
+```
+	WARNING: 'indent' not found on this system!
+```
+
+and leaves the file alone. ***That line is the precondition*** -- if a
+run ever prints `Applying indentation... done.` instead, the comparison
+below is void. Neither message is gated on `-q`.
+
+### Why `cmp` is the right tool rather than `diff`
+
+Two things had to be true and both were checked rather than hoped:
+
+- **No timestamp in the `.c`.** The only version stamp is
+  `COMPILED_BY_WHICH_BACON`, `"BaCon executable " & g_VERSION$`, and
+  `:8777` writes it `TO g_GENERIC` -- the `.generic.h`, not the `.c`.
+- **No host leaks into the `.c`.** `OS$` is read eleven times in
+  `bacon.bac` and **not one of the conditionals separates Linux from
+  Plan 9**: they test SunOS, Haiku, BSD, OSF1 and Darwin, so both
+  machines take the same branch every time. The twelfth hit is the
+  string `"OS$"` inside a runtime error message, not the host.
+
+### It was run, and the recommendation was wrong in BOTH halves
+
+```
+	bash-5.3$ cmp bacon.bac.c src/bacon.bac.c
+	bash-5.3$                                    <- nothing
+	term%   cmp bacon.bac.c src/bacon.bac.c
+	bacon.bac.c src/bacon.bac.c differ: char 17
+```
+
+**Wrong half one: `cmp` itself was broken on this machine.** APE's
+`cmp` printed nothing for two files that plainly differ, because
+`st_rdev` was 0 for every file and that made cmp believe its own stdout
+was `/dev/null`. The full chain is in `docs/notes/libap.md`; it is
+fixed. *The instrument prescribed here was a check that could not fail,
+and prescribing it is what found that out.*
+
+**Wrong half two, and it is the one that matters for bacon: THIS WAS
+NEVER A FIXPOINT TEST.** `src/bacon.bac.c` was produced by
+**`bacon.sh`**, which is not the compiled bacon in another form -- it
+is a **second, independent implementation of BaCon written in bash**.
+Comparing its output with the compiled converter's compares two
+programs, not two generations of one, and byte-identical agreement
+between them was never the expected outcome. The sizes say so plainly:
+529640 against 531079, 1439 bytes apart.
+
+**Byte 17 is the two implementations naming themselves**, and it is
+exactly where the first difference has to be:
+
+```
+  bacon.bac:8328   "/* Created with BaCon "       & g_VERSION$ ...
+  bacon.sh:8560    "/* Created with Shell BaCon " & $g_VERSION ...
+```
+
+`/* Created with ` is sixteen characters. Byte 17 is `B` in one file and
+`S` in the other. *A diagnosis that reproduces the byte offset exactly
+is a measurement rather than a resemblance*, and here it also says the
+difference is the banner rather than the translation.
+
+### The real fixpoint test, which costs the same and asks the right thing
+
+Both sides produced by the COMPILED bacon on the same machine, so the
+only thing varying is which generation wrote it:
+
+```
+	bacon   -p -n -q bacon.bac && mv bacon.bac.c /tmp/gen1.c
+	./bacon -p -n -q bacon.bac
+	cmp /tmp/gen1.c bacon.bac.c          # or Plan 9's cmp
+```
+
+Identical is the expectation and **would be self-hosting proven at the
+source level**, where the equal binary sizes only imply it. `-n` skips
+a compile nobody needs; it changes nothing about what is generated.
+
+*Comparing against `src/bacon.bac.c` is still worth one look, but as a
+question about how far the two implementations have drifted -- not as a
+pass/fail.*
+
+### The one-word trap, recorded because it was avoided rather than hit
+
+***`./bacon`, NOT `bacon`.*** Plain `bacon` resolves through `$PATH` to
+`/bin/bacon`, which is generation **1** -- so the second run would have
+re-measured the binary that was already measured and reported a clean,
+plausible, meaningless result. *A measurement of a build that does not
+contain the change measures nothing*, and nowhere in this tree are two
+builds as easy to confuse as here: one word apart, the same name, and
+both on the path.
