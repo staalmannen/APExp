@@ -398,10 +398,11 @@ read each hit, since `U32 arena_size` is in it and cannot share a
 4-byte tail.
 `structalign-test.c` measures `pcc -J`, conforming struct layout, and
 **needs three runs** -- gcc, then `pcc -9 -DPLAN9`, the control, which
-must FAIL (**22** of its 40 checks, measured), then plain `pcc`, which
+must FAIL (**30** of its 48 checks -- 22 measured, plus eight for the
+SECOND bit-field rule, named in the file), then plain `pcc`, which
 must pass. *The middle run is the
 control*: a pass under `-J` alone cannot distinguish a working flag
-from a compiler that never had the bug. **Section 9 carries the four
+from a compiler that never had the bug. **Section 9 carries nine
 bit-field shapes, and the two that must NOT move are the valuable
 half** -- `bf_aligned` and `bf_trailing` agree with gcc under both
 rules, so either failing means a change did more than share a
@@ -2874,30 +2875,92 @@ blamed.
     baked as a literal.*
     **AND `an_operand` IS THE SAME SHAPE AS `a_scope`**: two
     `unsigned char` (`kind`, `state`) and then **23 bit fields**
-    (`il.c:17826`). So kencc's `offsetof(an_operand, variant)` is not
-    152, and that `memcpy` copies the wrong number of bytes on every
-    operand copy in expression handling -- **short, leaving the last
-    members of the copy holding whatever was there.** It compounds:
-    `a_name_reference` is embedded BY VALUE at `:17919` and has the
-    same shape again.
-    *This is the `0x68` class and it is worse than the `0x68` case
-    was*: that one filed a pointer under the wrong member of one
-    struct, this is a wrong LENGTH on a copy the front end performs
-    constantly. **`ms_attributes` answering 8 is consistent with it
-    and is not proven to be it** -- a different struct, and the chain
-    from one to the other has not been drawn.
-  - **SO THE SECOND RULE IS A PORT BLOCKER WITH A NAMED MECHANISM
-    rather than a curiosity, and the fix is the COMPILER rather than a
-    regeneration** -- the same argument the sharing change already
-    won: *the 2.9M lines are already correct for a compiler that lays
-    out like gcc*, so one change makes the committed corpus right as
-    it stands, and a hand-edited 152 would be put back by the next
-    regeneration. It is six lines in the `sualign()` arm already
-    patched, gated on `conformalign` for the same reason, with
-    `structalign-test` section 9 turning from a PROBE into an
-    assertion as the regression test and `sualign-model.py` available
-    to check it before the VM sees it. **Not started -- it reopens a
-    compiler front and the call is the user's.**
+    (`il.c:17826`).
+  - ***AND THAT LAST STEP WAS WRONG AND IS WITHDRAWN: 152 IS 152 UNDER
+    EVERY RULE.*** I read the shape, saw `a_scope`'s shape, and
+    concluded kencc's `offsetof(an_operand, variant)` could not be 152
+    -- **without computing it.** The member after the 23 bit fields is
+    `a_name_reference name_reference`, and its alignment is **8**, so
+    `round(w, 8)` is **24** under HEAD's rule, under the sharing rule
+    and under the following rule alike; every member after it, `variant`
+    at 152 included, is therefore at gcc's offset in all three. It is
+    the `an_operand` row of `sualign-model.py` now -- three columns and
+    one answer -- and the host oracle agrees (`gcc` says
+    `name_reference` 24, `variant` **152**, `sizeof` 360, read out of a
+    compiled object rather than from a guess).
+    ***A struct with the broken shape is not a struct with a broken
+    offset***: an 8-aligned member after the group absorbs the whole
+    1-3 byte difference. *Almost-true-claim trap, for the second time
+    in this one function's history, and the first time it cost a
+    diagnosis rather than a comment.*
+  - **SO THE SECOND RULE IS CONFORMANCE WORK, NOT cpfe's FAULT, AND THE
+    WHOLE CORPUS SAYS SO IN ONE COMMAND.** EDG's sources hold exactly
+    **two** folded `offsetof` sites -- `trans_unit.h`'s pair, which the
+    sharing rule already put back to 400/416, and this one, which never
+    moved. Every other number EDG bakes is a real `sizeof` expression.
+    **And a consistent-but-different layout costs nothing on its own**:
+    pcc lays `a_scope` out and pcc reads it back. So
+    `ms_attributes` answering 8 is still unexplained and the `0x10`
+    fault needs a different line of attack.
+  - **IT IS WORTH FIXING ANYWAY, AND libap IS WHAT NAMES THE PRICE:
+    `fenv_t` DISAGREES WITH THE ASSEMBLY THAT FILLS IT.**
+    `amd64/include/ape/fenv_arch.h` puts `__opcode:11, __unused4:5`
+    after `unsigned short __cs_selector`, which leaves `w` at 18 --
+    the `follow` shape exactly. gcc answers `__data_offset` 20 and
+    `__mxcsr` **28**; under the sharing rule alone kencc answered 24
+    and **32**. **And 28 is not gcc's choice**: `arch/amd64/fenv.s` is
+    literally `FSTENV (DI)` then `STMXCSR 28(DI)`, with `fesetenv`
+    reading `LDMXCSR 27(DI)` after its `INCQ` -- *the assembly
+    hardcodes the x87 FSTENV image, which the struct is a
+    transcription of.* **Latent rather than live**: nothing in the tree
+    reads a member by name (grep: zero hits outside the header) and
+    36 >= 32, so the 32 bytes the assembly writes still fit. It bites
+    the first time any C reads `env.__mxcsr` or builds a `fenv_t` by
+    hand. *A layout rule found through a C++ front end, paid for by the
+    floating-point environment.*
+    And it matters more than one struct: **cross-compiling to the other
+    ten architectures is the next release's first item**, and a layout
+    rule that is wrong is wrong on every backend at once.
+  - **PATCHED, in the `sualign()` arm the sharing rule already uses and
+    gated on `conformalign` for the same reason.** `gbit` is the whole
+    mechanism: `cc.y`'s OBIT arm counts `lastbit` from the GROUP's
+    start, so `l->shift` is relative and only `sualign` knows the base.
+    **And the crossing test had to be redone here**, which reading the
+    grammar does not give you: `cc.y` already splits a group whose bits
+    pass `tfield->width*8`, but it tests against a container starting
+    at bit 0 of the group, and with the head shared the first container
+    has fewer bits left -- so `struct{char c[3]; unsigned a:16;}`, one
+    field of one group to the grammar, crosses the 32-bit boundary and
+    must begin at the next unit. `o` is bumped and `gbit` carried with
+    it, the carry being for the group's LATER fields since the ones
+    already placed are already right.
+  - **The model is clean before the VM sees it: 0 disagreements with
+    gcc over twelve shapes**, with `__res_state` under HEAD's rule
+    still reproducing `tmp/abi-bf-before.acid` as the control.
+    `structalign-test` section 9 is nine shapes now, the four
+    `follow` ones turned from PROBE into assertions -- *a probe is a
+    question whose answer nothing promised; once something promises
+    it, the probe is the regression test* -- and **`bf_straddle` and
+    `bf_straddle2` are the valuable half**: a patch that shares the
+    head and forgets the crossing passes `bf_after` and `bf_between`
+    and fails exactly those two. 0 failures on gcc, 47 checks.
+  - **Predictions, written down before the run.** `pcc` 0 failures and
+    `pcc -9` **30** rather than 22 (eight added, two each for
+    `bf_after`, `bf_between`, `bf_straddle`, `bf_straddle2`) -- *but
+    predict the NAMES, since the last count prediction was 21 against
+    a measured 22 and the whole error was in a stale instrument base.*
+    `edgscope-probe` 6 -> **0** with its section 2 control still
+    clean. `edgtuoff-probe` **unchanged at 408/424**: every bit-field
+    group in that chain is preceded by a pointer, so `w` is already
+    aligned and `follow` cannot move it. `__res_state` **unchanged**
+    at `unused` 365 / `sort_list` 368 / `sizeof` 448, for the same
+    reason -- `pfcode` is an `int`. **Refuted if any of those three
+    moves**, which would mean the patch reaches structs whose group
+    starts on a boundary and therefore does more than share the head.
+  - **NOT COMPILED ANYWHERE: kencc needs Plan 9's `<u.h>`/`<libc.h>`,
+    so the first build is the VM's** -- and `cd sys/src/cmd && mk
+    install` comes before the tree rebuild, as the `sualign` bit-field
+    fix already records.
   - **AND THE HOST CONTROL IS CLEAN, so the partition holds.** The
     same `/tmp/t.cpp` through the host `cpfe` built from the same
     commit, with the same `--target win64
