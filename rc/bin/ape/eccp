@@ -67,7 +67,39 @@
 #    objtype-to-suffix table and the object names it computes are right
 #    on all eleven.  bacon's recipe paid a round for exactly this.
 #
-# 5. EVERY `--opt=value' IS QUOTED OR BUILT BY CONCATENATION.  In rc `='
+# 5. `--instantiate local' IS WHAT MAKES A TEMPLATE LINK AT ALL HERE.
+#    Without it the first toy with a template translated cleanly, compiled
+#    cleanly and then failed at the link:
+#
+#	main: undefined: _Z5twiceIiET_S0_
+#
+#    which demangles to `int twice<int>(int)'.  That is not a fault in the
+#    translation: under EDG's DEFAULT mode a template instantiation is
+#    emitted by NO translation unit, and a separate `edg_prelink' pass
+#    decides which object shall carry each one and re-runs the front end.
+#    *We have no prelinker and mk cannot naturally express one*, so the
+#    default can never link a template on this target -- the tree's own
+#    notes already measured this from the other end, 556 of 558 undefined
+#    `_Z' names in cpfe's own link being instantiations emitted nowhere.
+#
+#    `local' is upstream's answer for a target with neither a prelinker
+#    nor COMDAT: every instantiation a translation unit needs is emitted
+#    INSIDE it, with internal linkage.  Nothing is left undefined and
+#    nothing can collide, so it settles both halves of the link model at
+#    once -- the half `-C' exists for and the half `-C' could not touch.
+#
+#    THE COST IS REAL AND IS NOT CODE SIZE.  Internal linkage means each
+#    object gets its OWN copy, so a template's static data member, or a
+#    static local inside a template function, stops being one object
+#    shared across the program and becomes one per translation unit.  A
+#    program whose correctness rests on that identity -- a counter, a
+#    registry, a `std::once'-ish guard -- is silently wrong rather than
+#    loudly broken.  Nothing in this tree has measured it, and a single
+#    translation unit (which is every use so far) cannot show it.
+#    `--instantiate used' is one word away for anyone who wants the
+#    default back and has a prelink step to go with it.
+#
+# 6. EVERY `--opt=value' IS QUOTED OR BUILT BY CONCATENATION.  In rc `='
 #    is a SYNTAX CHARACTER, legal only as an assignment at the start of a
 #    command or inside quotes -- so a bare `--sys_include=/sys/include/ape'
 #    is `token '=': syntax error', not an argument.  That is this tree's
@@ -217,6 +249,7 @@ if(~ $rttiflag '') ehopts = ($ehopts --no_rtti)
 
 cpfeopts = ($EDGSTD $ehopts --target win64 \
 	    '--clear_flag=use_predefined_macro_file' \
+	    --instantiate local \
 	    $sysincl $iflags $xxopts)
 
 # ---- running a stage ----

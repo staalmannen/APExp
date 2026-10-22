@@ -575,3 +575,28 @@ pulling in time.h */`):
 `<lock.h>` and so `<u.h>` legitimately — `pthread_mutex_t` is built on
 `Lock` — so that path stays, and a name as common as `nil` should not
 be defined unconditionally at the end of it.
+
+
+---
+
+## NAME_MAX, PATH_MAX, and the deep-path abort
+
+*Moved verbatim out of `CLAUDE.md` when that file
+was split for 0.6.  Only the one-line consequence stayed behind there;
+this is the whole record, including the wrong turns.*
+
+**Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
+`sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very
+end and which `#undef`s and redefines what the outer file had just set.
+255 and 4096 now. **The header marker in `deeppath-test` is what found
+it** -- it reported `came from THIS TREE` while the numbers stayed
+stock-looking, which refuted my own architecture-directory diagnosis.
+**When a constant is wrong, grep for every definition of it.**
+
+**And the deep-path abort was cleared by the full rebuild, not by any
+constant** -- most likely the `fts_alloc` fix from four rounds ago
+finally reaching `tcltest`, which gives the new build rule below.
+
+**Not ours**: `unixFCmd-1.1` wants `EACCES` from walking *through* a
+mode-0 directory; Plan 9 answers "does not exist". The file server's
+choice, so a probe rather than a library rule.

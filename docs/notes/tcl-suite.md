@@ -7325,3 +7325,666 @@ explanations*, arriving for a FILE NAME rather than a test.
   a single cluster by two rather than anything regressing. *A cluster
   sized from a prediction rather than counted from the names, which is
   the same error as sizing `run-redir` from one section head.*
+
+
+---
+
+## Tk's suite and Tcl's suite: the campaign
+
+*Moved verbatim out of `CLAUDE.md` when that file
+was split for 0.6.  Only the one-line consequence stayed behind there;
+this is the whole record, including the wrong turns.*
+
+**Tk's suite**: 97 files, `Total 10027 Passed 8925 Skipped 924
+Failed 178` -> **177** after the whole Tcl campaign, clean exit. **One
+test.** That is information rather than a disappointment: Tk's
+remaining 177 do not share a cause with Tcl's, so the Tk list can be
+worked without waiting on Tcl -- and Tcl was one of its three items. The remaining 178 are mostly out of reach here
+(a second wish process, an X property, a system tray, a scalable font,
+or a constraint that fails on Linux too). The port's own share is
+`focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
+
+**Tcl's suite**: **it finishes and nothing aborts.**
+**`Total 68118 Passed 62159 Skipped 5916 Failed 43`**, 167 files,
+marker, exit 0, no `Test files exiting with errors`, four minutes.
+**All 43 are listed BY NAME in `docs/notes/tcl-suite.md`** with the
+one-command extraction beside them -- the first per-name baseline this
+suite has had, and the thing whose absence made every earlier
+comparison a total. The log is committed at `tmp/tcl-all.out`.
+*(The baseline this is measured against is
+`Passed 62138 Failed 64`, same Total and Skipped; the eighteen are
+discussed in the `-J` section. A run in between reporting `Failed 37`
+was taken under plain `tclsh` after `mk distclean` removed
+`cmd/tclsh/tcltest` and is VOID -- both harnesses now say which
+interpreter they are.)* The entries below are written against the 64. **The whole
+float rewrite -- Gay's `strtod`, `strtof`, `strtold`, and
+`Sudden_Underflow` off for amd64, which switches `_dtoa` to its
+gradual arm -- moved NOTHING: identical totals, empty per-name diff
+both ways.** That is the confirmation it was safe, and the only one
+available, since no test here formats a denormal. The listener
+leak fix took **14** (all eleven of `socket_inet-11.*`, plus `12.1`,
+`2.6`, `socket-14.11.1`); async connect took **13** more with nothing
+moving the other way: `socket-14.2/14.6.0/14.7.0/14.7.2/14.8.2/
+14.11.0/14.12/14.14/14.15/14.18`, `socket_inet-8.1`, and
+`http-4.14.0/4.14.1`. **A feature that has never worked does not fail
+in one place** -- `http.test`'s two were never connected to `-async`
+until it worked.
+
+**136 -> 96 CONFIRMED: forty fixed, none broken, all forty named.**
+`Total` identical, `Skipped` **+5 exactly** (the symlink probe),
+`Passed` +35, empty new-failure column. 12 were `O_NONBLOCK` on a
+regular file, 4 were `6.47`/`8.1`, 2 were `29.27`, 16 were `filename`,
+and **6 were `io`'s encoding tests -- which were on the UNREAD list**
+(`io-75.6.3/75.6.4/75.11/75.13`, `io-bug-73bb42fb-1`,
+`io-bug-73bb43fb-2`). The previous note said a fall of more than twelve
+would mean the reading was incomplete; **it fired and it pointed at the
+right six.** Write the refutation condition down.
+**EPIPE is confirmed twice**: `29.27` passes, and `io-29.33b` -- still
+failing -- changed from `cannot send after transport endpoint shutdown`
+to `broken pipe`, so the mapping reaches the code and `29.33b` is a
+different bug the wrong errno was dressing up as a socket problem.
+
+**A count in the per-file table is executions, not tests**: `clock`'s
+16 were 4 tests run twice each (`.vm:0`/`.vm:1`). Size a cluster from
+the names, not the number.
+
+Open, in order of what the next run should touch:
+
+- **`env` 9: understood, and not ours.** All nine are one line,
+  `path=/bin<0x01>.`, in a child's environment. Tcl never unsets `path`
+  (`envprep` keeps anything whose upper case is in its keep-list, which
+  has `PATH`), and the child's filter `lrem` removes **one** match --
+  while this environment has two spellings, rc's `path` and the `PATH`
+  that `apexp-sh` sets for bash. Checked on a host `tclsh`. Do not fix
+  by hiding `path`. The `_fdinfo`/`_sighdlr` leak into `environ` **is**
+  fixed and confirmed. **The `execve` half was withdrawn: there was no
+  second bug.** `RFCENVG` creates an *empty* environment group -- the
+  `C` is *clear*, `RFENVG` is the one that copies -- so `execve` already
+  delivered exactly `envp`, and the loop added to clear `/env` was
+  removing an empty directory on every exec. `execve-env-test`'s
+  section 3 measured it in one run without rebuilding libap.
+- **`posix_spawnp` discards the `envp` it is handed**: libap's `spawn()`
+  tests `usepath` first and the child calls `execvp`, which passes
+  `environ`. POSIX says `envp` is the child's environment either way.
+  Recorded, not fixed, not measured. Tcl's `exec` is the caller.
+- **`clock` 16 -> 0, CONFIRMED**, and nothing else moved: `Passed` +8,
+  `Total` and `Skipped` identical, no new failure anywhere -- so `%Z`
+  printing the real zone name instead of always `EST`/`EDT` broke
+  nothing. The cause: `$TZ` reached nothing.
+  `tzset()` parsed `getenv("timezone")`, Plan 9's spelling, while
+  `localtime_r` separately read `/env/timezone` **once per process** into
+  a static of its own, and neither had heard of `TZ`. Nothing set
+  `tm_gmtoff`/`tm_zone` either, so `strftime`'s `%Z` was a hardcoded
+  `{"EST","EDT"}` ("hack for now: assume eastern time zone") and `%z`
+  did not exist. `time/tzone.c` is now the single engine -- POSIX TZ
+  strings with DST rules, `/env/timezone` as the fallback, UTC with an
+  **empty** name when neither parses. **`%Z` changing for every zone is
+  the thing to watch beyond `clock`.** No zoneinfo, so
+  `TZ=America/New_York` is UTC; glibc does the same here without tzdata.
+- **`fCmd` 35 -> 22, CONFIRMED, and everything left is out of reach.**
+  The 16 that went were the two bugs: `rename()` of a directory into a
+  *different* directory always failed (the cross-directory copy path did
+  `_CREATE(to, OWRITE, s->mode)` and a directory cannot be opened for
+  writing), which also produced the "invalid operation" two *permission*
+  tests were reading; plus `EINVAL` for a directory moved into itself,
+  compared **by qid up the tree, not by string**; plus `_errno.c` mapping
+  Plan 9's "permission denied" to `EPERM` where POSIX wants `EACCES`.
+  The remaining 22 + `unixFCmd` 2 are 14 symlink, 8 `~USER`,
+  `unixFCmd-1.1` and `unixFCmd-2.2.2`. **24 of 24 accounted for** --
+  reading a cluster all the way through before touching it is what made
+  that possible. **The symlink half is now constrained rather than
+  failing** -- see the `symlinks` entry below.
+- **`close()` on a listening socket freed nothing -- FIXED and
+  CONFIRMED.** `listen()` replaces the descriptor with a **pipe** and
+  forks a child holding the real network fd, so `close()` shut a pipe
+  while the announcement lived in another process. **This was the
+  hundred leaked `listenproc` processes.** `_sock_listenpid.c` records
+  the pid keyed on `dev`/`ino` (a descriptor NUMBER is retired by
+  `dup2()` and raw `_CLOSE()` without clearing, and a stale entry
+  SIGKILLed the wrong process and froze a suite); `close()` kills it,
+  only if `getpid()` matches the recorded owner, and **waits for the
+  death with `_closebuf`'s loop** -- `for(i=0; i<10 &&
+  kill(pid,SIGKILL)==0; i++) _SLEEP(1);` -- because `kill()` POSTS a
+  note and returns. `listenleak-test` 0 failures at mark 3;
+  `chanio.test` passes, so the `chan-io-29.34` freeze belonged to the
+  descriptor-keyed version.
+  **`_sock_listenmark()` is the library's version marker** -- `pcc -o x
+  x.c` relinks against the INSTALLED libap, so a test built from a fresh
+  pull can run days-old library code and say nothing; bump it when the
+  file changes in a way a test must see. `$APEXP_LISTENDEBUG=1` prints
+  one line per decision.
+- **The suite freezes in `socket_inet-2.11`**, file 129 of 167 (it was
+  file 14). The debug lines place it exactly: tcltest runs `-setup`
+  before printing `---- $name start`, so the listener recorded just
+  before that line is 2.11's own, and the body blocks at `vwait sock` --
+  **the connection is never accepted**. The previous test's listener was
+  at the same `fd=10` and had been killed. `listenleak-test` **section 4**
+  (three rounds of listen/connect/accept/exchange/close) **passes**, so
+  that reduction was wrong. Section 5 adds `select()` before the
+  accept and **also passes**, so two reductions have failed and the next
+  step is the frozen process, not a third guess. Reading narrows it:
+  2.11's `vwait sock` has no `after` outstanding, so `select()` arms **no
+  timer** and its only possible wakeup is a copy process reaching
+  `_RENDEZVOUS(&mux->selwait, 0)` -- which matches the debug output, where
+  the timer-reset lines tick eight times and stop. **That is the shape of
+  the recorded, never-measured hazard**: *a copy process reaching EOF
+  before the parent sets `selwait`*. `socket_inet-2.10`, just before,
+  closes its server socket **from inside the accept callback**, so the
+  listener is killed at an unusual point and 2.11 reuses the descriptor.
+  `acid` CONFIRMED the line -- `_buf.c:544`, select's
+  `_RENDEZVOUS(&mux->selwait, 0)`, under `TclpWaitForEvent`/`vwait` --
+  **but refuted the mechanism**: the frame's own arguments show
+  `timeout` non-null and `t = 200ms`, so a timer WAS armed and never
+  fired. **`ps` shows no process in `Sleep`**, and a live timer sits in
+  `_SLEEP`. So this is the failure `_killtimerproc` already describes:
+  `timerpid` stale, `_resettimer()` signalling a corpse, every blocking
+  `select()` that needs a timeout waiting for ever. `acid 12935` shows a SECOND interpreter
+  (a `socket.test` helper), not the timer -- so the timer simply does
+  not exist. **`_resettimer()` now notices and restarts it** (mark 5):
+  `kill` failing with ESRCH is exact, the failure it prevents is total,
+  and the repair is local. What killed the timer is still unknown and is
+  now a separate, non-blocking question -- `_detachbuf` sets
+  `timerpid = -1` in a forked child, so the documented "child took the
+  parent's timer" route is shut.
+  **`plan9/_apdbg.c`** is the shared debug line-printer
+  (`$APEXP_DEBUG` or `$APEXP_LISTENDEBUG`), moved out of
+  `_sock_listenpid.c` because the next question arrived in a file that
+  could not reach it. 2.11 was already failing before this change
+  (a timing result), so the hang is new but the test was never healthy.
+  **With mark 5 `socket.test` COMPLETES** -- `Total 114 Passed 54
+  Skipped 41 Failed 19`, same command that froze -- and `grep
+  resettimer` shows the repair firing **twice**, so the timer really was
+  dead and the diagnosis held end to end.
+  **What KILLS the timer is now the open question and blocks nothing.**
+  `fork()`'s child runs `_detachbuf`, which clears `timerpid`, `_muxsid`
+  and `_mainpid`, so no child can fire either atexit handler; and the
+  `_RFORK` children all leave through `_exit(0)`. Mark 6 is
+  instrumentation only: `_timerproc` prints when a timer is forked and
+  by whom, `_killtimerproc` prints when it fires. If the latter never
+  appears, the killer is elsewhere and `_sock_killlisten`'s ten-note
+  loop is the suspect, being the only new source of SIGKILLs.
+- **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
+  leftover listener was refusing the bind, not the system. **Confirmed**:
+  they stayed failing once ports were genuinely released, as predicted.
+  `notRoot` tests a user *name* as a proxy for a capability and glenda
+  is the host owner, so these are not ours.
+- **`socket-14.14`/`14.15` are the same story, and expose a real gap.**
+  They were passing because `randport` certifies a port free by opening
+  and closing a server socket on it -- and the leak left a listener
+  holding the port it had just certified, which then ANSWERED the
+  connection the test needs refused. Now refused honestly, and that
+  raises the error at `socket -async` rather than on a `fileevent`:
+  **`network/connect.c` has no `O_NONBLOCK`/`EINPROGRESS` path at all,
+  so `socket -async` has never worked.** Nothing broke; something that
+  never worked stopped being hidden. **Async connect is implemented and CONFIRMED**
+  at the library level (mark 7, `asyncconnect-test` 0 failures): `connect()` on an `O_NONBLOCK` descriptor forks
+  `_RFORK(RFFDG|RFPROC|RFNOWAIT)` to do the ctl write and returns
+  `EINPROGRESS`; the child reports its errno down a pipe;
+  `getsockopt(SO_ERROR)` -- which returned a hard-coded 0 -- now gives
+  the real answer. **The remaining approximation**: `select()` calls
+  every write descriptor ready at once, so `SO_ERROR` is asked before
+  the connect resolves and therefore WAITS rather than answering 0. The
+  real fix is `select()` learning about a pending connect. `Rock` gained
+  three APPENDED fields; `unistd/mkfile` gained `HFILES` for `priv.h`.
+  **`socket-14.14`/`14.15` are FIXED**, which was deliberately not
+  predicted: 14.14 needs the failed connect to make the socket
+  *readable*, through the copy process on the data file. It does --
+  now measured rather than assumed.
+- **`filename` 17 -> 1, CONFIRMED** (`Skipped` rose by exactly the five
+  predicted). Read in full, it was three things. Five need
+  symbolic links (ENOSYS, out of reach). **Eleven fail only because
+  those five litter**: `11.17.7` does `file mkdir nonexistent`, then
+  `file link -symbolic` raises, so its `file delete nonexistent` never
+  runs and `-cleanup` removes only `link` -- every later glob test then
+  sees one extra entry, and all eleven differ from expected by exactly
+  that word. The constraint that should have stopped this is hardcoded
+  to 1 outside Windows, so **`fileName.test` now PROBES for the
+  capability** -- the only Tcl test patched, justified because the
+  litter makes eleven tests misreport something unrelated.
+  *(`fCmd.test`/`cmdAH.test` were deliberately left alone at the time;
+  that was reversed the next round with explicit permission -- see
+  `symlinks` below.)*
+  **One is ours and is recorded, not fixed**: `filename-14.9` wants
+  `glob globTest/.*` to yield `.` and `..`, and **Plan 9 directories
+  contain neither**. Synthesising them in `readdir()` changes what every
+  directory read in every program sees, for one measured test; it wants
+  its own round.
+- **`io` 23 and `chan-io` 19 are ~16 questions, not 42** -- `io.test`
+  drives `fconfigure` and `chanio.test` drives `chan`, and `6.31`,
+  `6.43`-`6.47`, `8.1`, `14.1/2`, `29.27`, `32.7/8`, `35.4`, `36.5/6`,
+  `39.9` and `40.3` are in both. **Twelve were one line**: `read()`
+  sent any `O_NONBLOCK` descriptor into the buffered copy-process path
+  whatever kind of file it was, so a REGULAR file reported "would
+  block" when the copy process had not caught up -- an empty file said
+  `fblocked 1, eof 0` for ever. POSIX: `O_NONBLOCK` does nothing to a
+  regular file. Now cached in two free `flags` bits beside `FD_ISTTY`
+  (`FD_ISREG`, `FD_REGCHECKED`), **cleared on the exec-restore path in
+  `_fdinfo.c` for the reason FD_ISTTY records there**. **CONFIRMED.**
+- **`6.47` and `8.1` were that same line -- CONFIRMED**, and called for
+  before the run by reading `PeekAhead()` rather than the tests: when
+  `gets` sees `\r` at the end of a buffer, **Tcl sets the channel
+  non-blocking itself for one read** and puts it back, so an ordinary
+  blocking read of a regular file went through `O_NONBLOCK` after all.
+  `io` 23 -> 10 and `chan-io` 19 -> 10, better than the 15 and 11
+  predicted, by the six encoding tests nobody had opened.
+- **`6.31` and `6.43`-`6.46` are NOT that**, and are recorded rather
+  than fixed: every one uses `openpipe w+ $path(cat)`, and that `cat` is
+  a second tclsh doing **non-blocking reads of its own**, so the bytes
+  cross two copy processes and two event loops. `6.43`/`6.44` give the
+  right values *shifted by one extra blocked result*. **Do not pay for
+  it in `_readbuf`** -- `select()`'s `waitfresh()` is defensible because
+  it is once per descriptor; the same wait in the `noblock` read path
+  would tax every poll of every idle descriptor to make six tests agree
+  about scheduling. The honest fix is a real non-blocking read for
+  pipes (Plan 9's `stat` reports what a pipe has queued), and it is its
+  own round.
+- **`29.27`: `i/o on hungup channel` mapped to ESHUTDOWN, POSIX wants
+  EPIPE** -- one write with no reader left, one answer, pipe and socket
+  alike. **FIXED and CONFIRMED**; `epipe-test.c` asks it without Tcl.
+- **`40.3` is not ours**: no umask on Plan 9, and the file server hands
+  out `perm & (dirperm | ~0666)`, so **0644** where the test computes
+  0666. *(The note said 0664 before the log was read. The mechanism was
+  right and the number was a guess written as though measured.)*
+- **`zipfs` 13 is the biggest unread cluster and ten of it is two
+  `#define`s.** Every `zipfs-file-stat-*`/`-lstat-*` regexp-matches the
+  whole key list of `file stat`, and ours was two keys short: Tcl wraps
+  them in `HAVE_STRUCT_STAT_ST_BLKSIZE`/`_ST_BLOCKS`, which
+  `sys/src/ape/lib/tcl/tclConfig.h` never declared **although APE's
+  `struct stat` has both fields and `dirtostat.c` fills both**. Not a
+  missing capability, a capability not declared -- `file stat` has been
+  short two keys for every program. Declared now; `st_rdev` deliberately
+  NOT, because `dirtostat.c` always sets it to 0 and *a field that is
+  always zero reads as information and is not*. Predict 13 -> 3 (the
+  three left are zipfs's own `invalid password`). **13 -> 3 CONFIRMED**
+  after `mk install`: all ten `-stat-`/`-lstat-` gone, `Passed` +9,
+  `Skipped` and `Total` identical, nothing else moved.
+- **`14.1`/`14.2` (four tests) were the HARNESS, not the library.**
+  `tcl-stdchan-test.tcl` under a plain `tclsh` on 9front answers
+  `line line none` -- correct, at a terminal and redirected alike. That
+  took libap out of it and left only what sits between `tclsh` and the
+  test, and one grep found it: `tcl-runall.tcl` set
+  `fconfigure stderr -buffering line`, **in every child through
+  `-load`**, which is the very interpreter `io-14.1` then asks. *Four
+  failures produced by the instrument measuring them.* It was working
+  against its own purpose too -- stderr starts **unbuffered**, which
+  orders a log better than line buffering -- and `errorChannel` is
+  stderr, so that line was the same bug twice. Fixed in both harnesses;
+  `stdout` keeps its line buffering, which is the half that was needed.
+  **68 -> 64 CONFIRMED**: exactly those four, empty new column, and the
+  log's tail did not truncate -- the thing those lines were for.
+  **The general shape, met three times now**: a table keyed on a
+  descriptor number, a constraint claiming a capability, a log's own
+  buffering. *An instrument that shares state with the thing it
+  measures can be the thing it reports* -- when a measurement disagrees
+  with a direct probe, ask what sits between them.
+  *(The earlier one-line version came back as `bash: fconfigure:
+  command not found` -- **an instruction for the other machine has to
+  name the program that runs it**, and a file is the way to say it.)*
+- **`cmdAH-25.3` is NOT OURS -- settled.** `ls -ld /` says
+  `glenda glenda`, `/dev/user` says `glenda`, so `file owned /`
+  answering 1 is *correct*; the test wants 0 because on a unix `/` is
+  root's. `notRoot` again, joining `socket_inet-5.1`/`5.3` and
+  `unixFCmd-1.1`. **The `/adm/users` mechanism was refuted twice over**:
+  the file exists, and glenda is uid **2** there while the fallback
+  default is 1 (`tor`) -- so even had `_getpw` failed, `/` would have
+  read as someone else's and the test would have *passed* for the wrong
+  reason. `cmdAH-20.5` remains: `file atime $f $t` reads back the
+  current time, so the wstat did not carry it -- `ratrace` first.
+- **`chan-io-28.7`, one test and ours**: `close $s w` (half-close) and
+  the far end reads `{}` where it should read `{Hey DONE}`. `shutdown()`
+  is already in this tree's list of stubs that answered the wrong thing.
+- **`lseq-4.21.4`, read and not diagnosed.** Eight cases; the first
+  five raise `domain error` correctly and the last three do not. The
+  discriminator is not NaN as such -- `lseq NaN count 5` and
+  `lseq NaN count 5 by 100` both raise -- it is **`by NaN`**, which
+  turns the error OFF even for `lseq NaN count 5 by NaN`, where the
+  start alone was enough a line earlier. So a NaN step takes a
+  different path in `tclArithSeries.c` rather than a NaN check being
+  broken, and the next step is to read that path before blaming an
+  `isnan` here. `expr`'s five and `lseq`'s other two went with
+  `scalbn`.
+- **Still unread**: `socket_inet` 4 and
+  eleven singletons (`io-29.33b`, `io-52.22.1`, `chan-io-41.8`,
+  `scan-15.1`, `event-1.1`, `unixInit-1.2`, `Tcl_Main-5.10`,
+  `socket-14.19`, `expr-old-37.21`, `unixFCmd-2.2.2`).
+- **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
+  password database mapping a user to a home directory, which Plan 9
+  has not -- read it before writing it off.
+- **A failed `execve()` destroyed the caller -- FIXED and CONFIRMED,
+  56 -> 54.** POSIX: "If the exec
+  function returns to the calling process image, an error has occurred;
+  ... the process image is unchanged." libap's did the opposite --
+  `_RFORK(RFCENVG)` on its first line, then `/env/_fdinfo` and
+  `/env/_sighdlr` rewritten, then every `FD_CLOEXEC` descriptor closed,
+  all before `_EXEC` was so much as tried. **`exec-10.20.1`/`10.21.1`
+  are what that costs**: Tcl's child reports a failed exec down an
+  error pipe whose *closing* is how the parent tells success from
+  failure -- so it is close-on-exec, so libap had already closed it,
+  so the write got EBADF and Tcl panicked `unable to write to
+  errPipeOut` instead of naming the missing program. Now `execve`
+  **opens the file `OEXEC` first** -- which is the same question Plan
+  9's own exec asks, `namec(..., Aopen, OEXEC, 0)` -- and returns
+  with nothing touched if that fails; and the `FD_CLOEXEC` closes moved
+  from the first loop to immediately before `_EXEC`. **Not a
+  guarantee**: an exec can still fail *after* a successful open, and
+  that case is as destructive as the whole function used to be.
+  `_execpath` already did this with `access(X_OK)`, **but only when it
+  searches** -- a name containing `/` is used as given, and
+  `~non_existent_user/foo/bar` is such a name, which is why the check
+  had to move into `execve`. `execfail-test.c` asks it without Tcl,
+  and its **section 5 is the control that matters**: "never close them"
+  passes everything else and breaks `FD_CLOEXEC` for every program in
+  the tree. `_execmark()` is the version marker, as `_sock_listenmark`
+  is for the listener fix -- and it earned its place: the run reported
+  `_execmark = 1`, so the INSTALLED library was the one measured.
+  **Exactly `exec-10.20.1` and `exec-10.21.1` went, empty new-failure
+  column, `execfail-test` 0 failures.**
+- **`exec-19.1` is the append race, and it is a platform limit.** Four
+  shells `>>` the same file; the test checks only the SIZE, so 24
+  against 26 cannot distinguish "truncated at open, losing the seeded
+  two bytes" from "one two-byte `echo` lost to an overlapping append".
+  `append-test.c` asks the two separately. Plan 9 has no `O_APPEND`:
+  9P's `Twrite` carries an explicit offset and there is no write-at-end
+  request, so libap emulates it with a seek in `open()` and another in
+  `write()` -- **two calls with a window between them**, which is
+  exactly what the test is built to catch. Plan 9's one atomic append
+  is `DMAPPEND`, a permanent mode bit on the **file**; setting it would
+  change that file for every other program and every later open, which
+  is not what `O_APPEND` means for a descriptor. Recorded, not fixed.
+  **MEASURED, and it is not marginal**: `append-test` section 3 loses
+  **1280 of 2050 bytes** with four processes appending flat out, while
+  section 2 shows no truncation and section 4 (one writer, same loop)
+  is exact. So reading (b) is confirmed and (a) is excluded -- and the
+  256-round count was what made the answer unambiguous rather than a
+  coin toss. On glibc the same file reports 0 lost.
+- **libap's `strtod` is now Gay's, and it is CORRECT**: `strtod-xcheck`
+  against glibc gives **0 wrong** in all four sections -- 199887
+  round-trips through `%.17g`, the 629 powers of ten, the seven strings
+  Tcl's `expr` tests use, and the exact values. **The file it replaced
+  was wrong on 148018 of those 199887 (74%)**, and said so in its own
+  first line for as long as it existed. Built on `stdio/_fconv.c`'s
+  Bigint kit, which is Gay's other half; `string/mkfile` gained
+  `HFILES=../include/fconv.h`.
+  **Six bugs, and FOUR were in the shared kit** -- `ULong` for the
+  bignum word, `Long` for the borrow arithmetic in `_diff`/`quorem`,
+  `Bcopy`'s `sizeof(long)`, and **`_d2b` leaving `i` unset** while its
+  denormal arm reads `x[i-1]`. All four are one sentence: *Gay's
+  arithmetic needs a 32-bit word and spells it `long`*, true under
+  kencc and false under gcc -- correct on Plan 9 by accident, and why
+  the cross-check could not run at all until they were fixed.
+  **`_dtoa` was broken by the same `_d2b` bug**, in the shipping printf
+  path: `dtoa-xcheck.c` measures 52 of 99941 wrong before and 3 after,
+  and **subnormals printed as `?`** -- Gay's internal "cannot happen"
+  marker. No test in the tree had ever formatted one.
+  **The freelist was never the bug**, though disabling it took failures
+  169725 -> 3656: it was `ulp()` returning `-0x1p+1023` for the ulp of
+  2.1e-293 (the same `long` wrap), and the *damage* varied with what
+  the freelist handed back. **An experiment that isolates a variable
+  says the variable matters, not which way the causation runs.**
+  The last 52 were the scale-up-by-2^53 arm, which upstream guards with
+  `#ifdef Sudden_Underflow` -- for machines that FLUSH to zero. IEEE
+  has gradual underflow; applying it made `1e-308` come out `0`.
+- **`strtof` and `strtold` are done too.** `strtold` forwards to
+  `strtod`: kencc has no extended precision, so `long double` IS
+  `double` here. **`strtof` needed more than `(float)strtod`** --
+  rounding to 53 bits and then to 24 is not rounding to 24, and when
+  the double lands on a midpoint between two floats the narrowing has
+  no tie-break left. Measured, not argued: `strtof-xcheck` found
+  200000 float round-trips and 200000 random 17-digit decimals all
+  correct, and **12709 of 39694 wrong among decimals BUILT to sit on a
+  float midpoint** -- a sweep of random numbers would have called it
+  clean. `_strtod_cmp()` now returns the nearest double *and* which
+  side of it the decimal lay (strtod's loop has the decimal exactly;
+  the fast paths are skipped when the comparison is wanted), and one
+  `nextafter` moves it off the tie. **Conditional on being exactly on a
+  midpoint**: an unconditional nudge would move a double one ulp away
+  ONTO one. All five sections 0 wrong, with `strtod-xcheck` and
+  `dtoa-xcheck` unchanged.
+- **`expr`'s six are FOUND, and it was `2^1023` in `math/scalbn.c`.**
+  That is `2 XOR 1023` -- an integer exclusive-or, **1021** -- where
+  musl writes `0x1p1023`, a hex float. Someone read the `p` as "power
+  of". `scalbnf.c` had the same with 127 (`2 XOR 127` = 125). The
+  `machexp` probe said it in one run: every constant right, `machexp`
+  1024 against a limit of 1024, and then `SafeLdExp -> 2041.9999999`
+  -- 1021 x 2 exactly. **Not a compiler bug**: 89 other `math/` files
+  use `0x1p...` and are fine.
+  **It was never only those six.** Replicating the old code beside the
+  new, `ldexp-test` fails 13 checks on it: **52 of 2098 double
+  exponents and 23 of 277 float ones**, `scalbn(1.0,-1074)` giving
+  **-2.27e-13** from +1.0 and `scalbn(1.0,1024)` giving 2042 instead of
+  infinity. *Every subnormal any program reached through `ldexp` was
+  wrong, some with the wrong sign.* The arms are only entered when
+  `|n|` exceeds one multiplication's range, which is why nothing had
+  noticed.
+  **And the host cross-check had already passed `scalbn`** -- 299876
+  values, 0 wrong, with `n` from `rand()%200 - 100`, so it never
+  entered the broken branch. *A check that cannot fail is not a check*,
+  and a sweep that cannot reach a branch has not tested it.
+  `ldexp-test.c` bounds every section by the format's own limits
+  instead. **64 -> 56 CONFIRMED**, eight gone and nothing new, with
+  `ldexp-test` 0 failures on the rebuilt library. **The number was
+  right for the wrong reason**: the six were called, `binary-53.25`/
+  `53.26` did NOT move, and `lseq-4.21.2`/`4.21.3` did -- they are
+  lists of `1e5555`, `Inf`, `1e308`, `5e307`. Read by the total alone
+  this would have been logged as "binary fixed", exactly backwards.
+  *Compare per name, never by total.*
+- **`binary-53.25`/`53.26`: FLT_MAX was not FLT_MAX.** C says
+  `FLT_MAX`, `FLT_MIN` and `FLT_EPSILON` have type **float**, and
+  `float_arch.h` wrote them with **no `F` suffix** -- so each was a
+  double holding the nearest double to a rounded decimal.
+  `(double)FLT_MAX` came out `3.4028234999999998e+38` against a true
+  `3.4028234663852886e+38`, about 3.4e30 too big, so the boundary Tcl
+  computes (`FLT_MAX + 2^103`) sat above the value the test feeds it
+  and `binary format R` wrote FLT_MAX where +Inf was required. Fixed
+  with the suffix and full precision.
+  **`binfloat-test.c` named it in ONE run** by listing four suspects
+  and printing all four; every one of them was innocent, including the
+  one the file's own comment called "not an idle suspect". It also
+  prints a `__APEXP_FLOAT_ARCH` marker and the stringified macro,
+  because a wrong constant and the WRONG HEADER look identical from
+  outside -- the `/$objtype/include/ape` shadowing invariant is exactly
+  that trap. Predict `Failed` 56 -> 54; refuted if the marker says the
+  header read was not this tree's.
+  **It took three rounds and the answer was the FIRST one, which I had
+  then argued my way out of.** `tcl-fltmax-probe.tcl` measures what
+  libtcl was actually compiled with -- `binary format R` answers +Inf
+  exactly above `FLT_MAX + 2^103`, so bisecting on the BIT PATTERN
+  recovers the constant exactly, and it prints the constant rather than
+  a verdict. Round 1: `Failed` stayed 56 and the probe said
+  `3.40282347e+38`. Round 2: `mk distclean` **and** `mk install`, and
+  the probe said `3.40282347e+38` again -- from which I concluded the
+  object had been rebuilt and staleness was out. **That conclusion was
+  read off the `distclean` target, not measured.** Round 3: a marker
+  added to `tclBinary.c` -- which is itself an edit, so `mk` recompiled
+  that file -- and the probe now says the CORRECT constant, the marker
+  says `PRESENT (this tree)`, `sizeof(FLT_MAX)=4`, and `binary format
+  R` of `binary-53.25`'s own input gives **`7f800000`**, which is what
+  the test wants.
+  **54 -> 52 CONFIRMED**: exactly those two, empty new-failure column,
+  `Total` and `Skipped` identical, `Passed` +2. The probe is removed
+  from `tclBinary.c` again -- it was an instrument and it answered.
+  **What is left is a BUILD-SYSTEM question, and it is not small**:
+  `tclBinary.$O` was not rebuilt with the current header until the
+  source file changed, so `mk distclean; mk install` did not do it.
+  **`mk clean` was the suspect and is REFUTED by measurement**: run in
+  `sys/src/ape/lib/tcl` it removes `libtcl.a` and `*.6`, and
+  `tclBinary.6` is gone afterwards. So the objects do get cleaned, and
+  the two `clean:V:` rules -- the mkfile's own, after `mklib`'s -- are
+  not the problem.
+  **Which puts the NAMESPACE back, and my refutation of it was
+  UNSOUND.** I argued that a build without the union mount would have
+  given the fixing recompile the old header too; that assumes both
+  builds ran in the same namespace, and they need not have.
+  `./mount-include` no-ops entirely when
+  `/sys/include/ape/THIS_IS_APExp` exists, and on this machine it does
+  (`-rw-r--r-- glenda 32 Sun 19 2026`) -- so `mk install` from a plain
+  `rc` compiles against the machine's INSTALLED headers while the same
+  command inside `apexp-sh` compiles against the repo's. That explains
+  both readings exactly, and it would mean every `mk install` not
+  started from `apexp-sh` has been building against an old APExp.
+  **One word settles it**: the build prints `APExp mounted` or
+  `APExp already mounted`. This is not specific to float and is worth
+  knowing before the next port goes in.
+  **The rule that failed here is one already in this file**: *a
+  measurement of a build that does not contain the change measures
+  nothing* -- and its harder half, which is that **arguing a build
+  DOES contain the change, from the build system's source, is not a
+  measurement either.** The marker is what settled it, and it had to be
+  in `tclBinary.c`: a marker in `tclStrToD.c` answers for
+  `tclStrToD.c`.
+  A loose end that turned out not to be one: three different constants
+  appear across the rounds -- `3.4028234663852886e+38` (correct),
+  `3.40282347e+38` (this tree before the fix, and stock APE) and
+  `3.4028235e+38` transcribed in `docs/notes/libap.md`. The third is in
+  neither version of the header in git, so it came from a build reading
+  something outside the repo. Worth remembering, not worth chasing now.
+  Two host-check lessons on the way: `binary format Q` takes a
+  **double**, not a bit pattern (`W` then `Q` is the reinterpretation),
+  **Tcl's `%x` truncates to 32 bits** without `ll`, and **tclsh 8.6 has
+  no +Inf arm at all**, so the host cannot validate this probe and it
+  says so rather than reporting a false result. Both arms were
+  exercised against a modelled `FormatNumber`.
+- **9front has no symbolic links** (confirmed by grep), so `symlink()`
+  stays ENOSYS. **Do not emulate it with a copy** -- see
+  `docs/notes/tcl-suite.md`. **`tests/apexp-links.tcl` is the one probe
+  for it**, sourced by `fCmd`, `cmdAH`, `chanio`, `unixFCmd` and
+  `fileName`. It declares **`symlinks`**, APExp's own constraint name,
+  and touches upstream's `linkDirectory`/`linkFile`/`symbolicLinkFile`
+  **only when the probe fails** -- so on a system with links it changes
+  nothing and cannot re-enable what Windows disabled. Fourteen tests
+  that used a link without declaring they needed one now carry
+  `symlinks`. **It cannot ask whether a constraint was declared**:
+  `tcltest::SafeFetch` is a read trace that "sets testConstraints($n2)
+  to 0 if it's referenced but never before used", so looking creates it
+  as 0 and absent and false are one observation. The host tclsh caught
+  the first version doing exactly that.
+  **96 -> 77 CONFIRMED, and the refutation condition fired usefully.**
+  Predicted `Skipped` +18; it rose **24**, and `Passed` fell **5**. The
+  per-constraint skip table at the end of every run is what named the
+  difference -- 35 new skips, 11 of them **reattributions** (tcltest
+  charges a skip to one constraint of the list, so `notWine` -7,
+  `win` -2). **The five lost passes were FALSE passes**: `fCmd-28.5`,
+  `28.7`, `28.10`, `28.10.1`, `28.20` are `-returnCodes error` tests
+  asserting only that `file link` RAISES, and on Plan 9 it raises
+  ENOSYS -- so they passed for a reason unrelated to what they test.
+  **A constraint that removes passes is doing its job as much as one
+  that removes failures.**
+  The nineteenth, `io-6.46`, is **flaky not fixed**: its twin
+  `chan-io-6.46` still fails, so count that group by whether the twins
+  agree. **CONFIRMED the next run** -- it came back with nothing
+  touching it.
+
+
+---
+
+## itcl: the port and its fourteen
+
+*Moved verbatim out of `CLAUDE.md` when that file
+was split for 0.6.  Only the one-line consequence stayed behind there;
+this is the whole record, including the wrong turns.*
+
+**itcl BUILDS AND RUNS, first try: `Total 792 Passed 712 Skipped 66
+Failed 14`**, marker present, exit 0, no file errors. The header line
+that matters reads `Itcl 4.2.3, Tcl 9.0.3` -- so `Tcl_StaticLibrary`
+did its job and `package require Itcl` found the compiled-in package
+with nothing to load. See the itcl section of `docs/notes/tcl-suite.md`
+for the 14. `sys/src/ape/lib/itcl` builds
+`libitcl.a` from configure.ac's own `TEA_ADD_SOURCES` list -- taken
+from there and not from `ls generic/*.c`, because the two differ:
+`itclStubLib.c` is `TEA_ADD_STUB_SOURCES` and is the one file that
+forces `USE_TCL_STUBS` on itself, so building it in would put a second
+stub-indirected copy of the entry points beside the real ones.
+`itclTestRegisterC.c` IS in the main list, which is upstream's own
+placement -- so unlike Tcl and Tk **there is no separate `itcltest`
+binary to write**, and looking for one is how a round gets spent.
+**Nothing uses stubs**: Plan 9 has no dlopen, so itcl is linked
+straight into `sys/src/ape/cmd/itclsh` -- Tcl's shell plus an appInit
+we write, since itcl ships none. **`Tcl_StaticLibrary` is the
+load-bearing call there, not `Itcl_Init`**: without it the commands
+exist but `package require Itcl` goes looking for something to load,
+and that is the first line of every test file. Same wall as perl's XS.
+The script library installs to `/sys/lib/itcl4.2.3`, which is where
+`itclBase.c`'s embedded search script looks
+(`[file dirname $tcl_library]/itcl$patchLevel`); `$ITCL_LIBRARY`
+overrides it. The extra `install:V:` rule copies **only** the scripts
+-- `mkone`'s own rule already copies the binary, and in Plan 9 mk every
+`V:` rule for a target runs. *(That is also why `clean` worked in
+`lib/tcl`: both its rule and `mklib`'s ran.)*
+**Four things had to be fixed before it compiled, and the HOST found
+three of them** -- the gcc sweep in `docs/notes/tk-plan9.md` applied to
+a whole package rather than one backend, which is the cheapest thing
+in this round by a wide margin:
+- **`-DBUILD_itcl` is not optional and does not look like a missing
+  define.** `itcl.h:105` turns `USE_ITCL_STUBS` **on** in its absence,
+  so the package compiles as a stub CONSUMER of itself and
+  `itclDecls.h` rewrites every entry point as `(itclStubsPtr->x)`.
+  `itclStubInit.c`, whose whole job is to build the table those macros
+  read, produced **152 errors**. Exactly Tk's `-DBUILD_tk`.
+- **`itclUuid.h` is generated upstream from fossil**, which APExp has
+  not; hand-written now in `lib/itcl` from the tarball's own
+  `manifest.uuid`, the counterpart of `lib/tcl/tclUuid.h`.
+- **`PACKAGE_VERSION` collides.** `tclConfig.h:5` defines it as an
+  UNQUOTED `9.0.3`; `itclBase.c` concatenates it as a string literal.
+  Defining itcl's on the command line is a redefinition cpp refuses,
+  and letting Tcl's stand is a syntax error -- so `itclBase.c` uses
+  itcl's own already-quoted `ITCL_PATCH_LEVEL`.
+- **Two `Tcl_Size` sites**, `itcl2TclOO.c:186` and `itclParse.c:1367`:
+  Tcl 9's `Tcl_GetStringFromObj` takes a `Tcl_Size *` and itcl 4.2.3
+  passes an `int *` in two places, being `Tcl_Size`-aware everywhere
+  else. **6c ERRORS where gcc only WARNS**, which is why a sweep
+  counting errors alone found one of them and a second sweep for
+  `-Wincompatible-pointer-types` found the other. *Sweep for the
+  warning class the target compiler treats as fatal, not for gcc's
+  errors.*
+- **And one the fix itself introduced**: `%.*s` reads an **int**
+  precision from the variadic list, so `(overflow ? limit : nameLen)`
+  with `nameLen` retyped would promote to 64 bits and shift every
+  argument after it. Cast back, explicitly. *A fix in a variadic call
+  changes an ABI, not just a type.*
+
+**"They all look upstream" WAS WRONG, and reading the eight unread
+ones is what showed it.** FOUR of the fourteen were OURS -- a missing
+file -- and the comfortable conclusion would have shipped without
+them:
+- **`sfbug-254.1/.2/.3` and `sfbug-257`: `can't find package itcl`,
+  inside a slave `interp create`. OURS, FIXED, not yet measured.**
+  The main interpreter never needed a package index: `itclAppInit.c`
+  calls `Itcl_Init` directly and it ends by providing both `Itcl` and
+  `itcl` (`itclBase.c:475-476`). **A slave has never run `Itcl_Init`**,
+  and no `pkgIndex.tcl` was installed, so `package require itcl` there
+  had nothing to find. `cmd/itclsh/pkgIndex.tcl` is ours rather than
+  upstream's, because upstream's names a shared library to load and
+  Plan 9 has none: **`load` with an EMPTY filename** is how Tcl reaches
+  a `Tcl_StaticLibrary` registration (`tclLoad.c:251` matches by name
+  when `fullFileName` is empty) and it works from any interpreter in
+  the process. Both spellings, since Tcl package names are
+  case-sensitive.
+  *The general shape: `Tcl_StaticLibrary` makes the package reachable;
+  a pkgIndex is what makes it FINDABLE. Two different things, and the
+  main interp needs only the first.*
+- **`local-1.2`/`1.3`/`1.4` -- upstream, settled at source.**
+  `library/itcl.tcl:35` calls `trace variable`, and **Tcl 9 removed
+  it**: `tclTrace.c:196` lists the options as exactly `add`, `info`,
+  `remove`. `itcl::local` cannot work on this Tcl at all.
+- **`mkindex-1.3` -- upstream, settled at source.** Three of fifteen
+  index entries read `source -encoding utf-8` where the test wants a
+  bare `source`. `auto.tcl:597` emits that string literally, and the
+  three are the plain `proc`s (`mkindex.itcl:59,67,68`) Tcl's own
+  parser handles while itcl's class-aware one writes the rest. No
+  path, no filesystem encoding, nothing platform-shaped.
+- **`fossil-9.0` -- the bug the test regression-tests, still failing;
+  `fossil-9.1` is its cascade.** `9.0`'s setup makes class `N::B`,
+  which creates `::N` as an ordinary namespace; the body then asks for
+  class `N` and must adopt it (fossil `d0126511d9`). It answers
+  `can't create namespace "N": already exists`. `9.1`'s SETUP then
+  finds `N::B` still there from `9.0`'s failed cleanup, so it is one
+  bug and one consequence. No platform surface -- pure namespace
+  bookkeeping -- but not proven upstream either.
+- **`rename-1.3`/`1.4`, `destroy-1.1`, `import-2.5` -- consistent with
+  Tcl 9, not proven.** The first three differ by an extra `oo` child:
+  `namespace children ::dog` answers `{::dog:: oo }` where the test
+  wants it empty.
+**14 -> 10 CONFIRMED, exactly the four `sfbug`s**: `Total` and
+`Skipped` identical, `Passed` 712 -> 716, empty new-failure column.
+**itcl is DONE as a port** -- the remaining ten are upstream or
+Tcl-9's, two of them settled at source, and none is ours.

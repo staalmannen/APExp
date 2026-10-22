@@ -1330,3 +1330,436 @@ asserting it after that branch stops being the live one.* Same family
 as the harness that set `-buffering line` in the interpreter it was
 measuring, and the `vts-bash` that overwrote the `$vtsdebug` its
 caller passed.
+
+
+---
+
+## Raw mode, readline, and what vts is for
+
+*Moved verbatim out of `CLAUDE.md` when that file
+was split for 0.6.  Only the one-line consequence stayed behind there;
+this is the whole record, including the wrong turns.*
+
+**Next after Tcl: a vt, and the first step is DONE but NOT MEASURED.**
+The goal is bash's own tab completion under `vts`, and the blocker was
+not `vts` at all. **`tcsetattr` on a real `/dev/cons` returned 0 and
+changed nothing**, while `tcgetattr` reported a hardcoded
+`ICANON|ECHO` whatever the console was doing -- so readline asked for
+raw, was told it got it, and waited for keystrokes the driver was
+holding until Enter. Tab arrived inside a finished line. Both halves
+silent. `plan9/tty.c` now owns the one switch Plan 9 offers
+(`rawon`/`rawoff` on `/dev/consctl`) and termios drives it; see
+`docs/notes/libap.md`.
+**CONFIRMED**, and the refutation condition did better than refute:
+against the OLD library the test would not LINK -- `main: undefined:
+_ttymark` -- so measuring the stale libap and calling it a pass was
+impossible. That idiom has now paid three times (`_sock_listenmark`,
+`_execmark`, `_ttymark`). On the rebuilt library `_ttymark = 1` and
+`c_lflag` runs `0x57 -> 0x40 -> 0x57` across sections 3 and 4, with
+`ICANON` and `ECHO` reading back clear and then set again. 0 failures.
+**`tcsetattr` now does something.**
+**Watch for**: this makes raw mode actually happen, so every program
+that asked for it and silently did not get it now does -- bash,
+libedit, PDCurses. *A fix that makes a process reach code it never
+reached before can expose anything on that path.* A crash while raw
+self-heals, because the console reverts when the last consctl
+descriptor closes and a dead process has closed it.
+**Section 5 CONFIRMED too**: `read(0) -> 1, byte 0x6a` -- one
+keystroke, no Enter. Raw mode works end to end on 9front.
+**But bash's Tab still only inserted a tab, and that was a SECOND
+bug in a different place.** `sys/src/external/bash/config.h` said
+`/* #undef READLINE */` -- upstream's unconfigured default, since bash
+ships everything off and `configure` turns it on, and APExp
+hand-maintains that file the way it does perl's. So
+`no_line_editing` was 1 from `shell.c:230` and line editing was
+compiled out of the shell; bash read whole lines with `getc` and the
+console echoed the Tab. **Nothing was missing**: `libreadline.a` is
+built from `sys/src/ape/lib/readline`, its headers are installed,
+`bashline.c`/`bashhist.c`/`pcomplete.c`/`pcomplib.c` are all in
+OFILES, and `bi-bind`/`bi-complete`/`bi-fc`/`bi-history`/`bi-shopt`
+are all in OBJBUILTINS. The entire apparatus was compiled, linked and
+switched off by one commented-out line -- *a capability present and
+not declared*, the same shape as zipfs's two missing `file stat` keys.
+`READLINE` and `HISTORY` are now on; `BANG_HISTORY` deliberately is
+not, being a change to what `!` means rather than to line editing.
+**TAB COMPLETION WORKS.** Built, and it took on the first try --
+kencc had no opinions about four files' worth of code that had never
+been compiled here. `$TERM` is **`dumb`**, which is the honest value
+for rio and costs nothing: `terminal.c:583` only clears
+`_rl_term_isansi`, `sys/lib/ape/termcap` has a `dumb` entry, and Tab
+is bound from the keymap regardless.
+**ARROW KEYS DO NOT WORK, AND THAT IS rio, NOT US.** They scroll the
+window instead -- measured with readline running and raw mode on, so
+rio is eating them before bash sees them; a program cannot get those
+keys back under rio at all. **`^P`/`^N` give history today**
+(`emacs_keymap.c:49`/`51`), which is the whole of what the arrows
+would have bought.
+**So vts is no longer on the critical path for completion** -- but it
+is still what would buy arrow keys, colour, cursor addressing and
+anything else needing escape sequences rio does not speak, plus
+session persistence. Keep it; it is a want rather than a blocker.
+**KEEP `vtwin` AND `vts-attach`, AND WRITE NO GLUE.** They are not
+glue -- they are two front ends onto the same 9P interface
+(`/n/vts/<sess>/cells` read for diff frames, `.../cons` written for
+keys). `vtwin` (1281 lines) is the **graphical** half, a rio window;
+`vts-attach` (302 lines) is the **dumb-TTY** half for ssh, drawterm or
+a bare `rc`, which is the session persistence. *Two clients is also
+what makes `cells`/`cons` a real interface rather than vtwin's private
+back door.*
+**The missing piece is not between vts and bash -- it is inside
+`vts/session.c`**, which gives the shell a **pipe** on fd 0, does not
+take `RFNAMEG`, and execs a hardcoded `/bin/rc`.
+**And `isatty` decides the design**: `ap/unistd/isatty.c` matches on
+the PATH ending in `/dev/cons` (the suffix test is there for
+`/mnt/term/dev/cons`), so a cons opened as `/n/vts/1/cons` is not a
+tty however well it behaves. **`rfork(RFNAMEG)` and BIND** the
+session's `cons` and `consctl` over `/dev/cons` and `/dev/consctl`,
+then open `/dev/cons` for 0/1/2 -- `fd2path` then answers `/dev/cons`,
+**no libap change is needed**, and it is what rio does for its own
+windows. Loosening `_isatty` instead would be the "invent semantics to
+make a test pass" shape. That bind is also where the **per-session
+`consctl`** lands, so the two recorded steps are one edit.
+**`vts-bash` IS THE LAUNCHER, and it must run from inside
+`apexp-sh`** -- that is the mechanism, not a convenience: apexp-sh's
+`bind -b` lines are what put `vts`/`vtwin` and `bash` on the path,
+and its `SHELL=bash` is what vts reads to know what to exec. vts forks
+with `RFNAMEG|RFENVG`, both of which COPY, so the shell inherits both.
+From a plain `rc` none of it is true and vts falls back to `/bin/rc`.
+**It lives in `rc/bin/vts-bash`**, which `apexp-sh` binds onto `/bin`,
+so it is `vts-bash` and not `./vts-bash` -- and **`./apexp-sh -v` does
+both steps in one**, dropping back to the shell afterwards rather than
+exec'ing, because the script ends by printing the whole server log and
+a window that closes on it makes that log unreadable. `rc/bin` rather
+than `rc/bin/ape`: it drives NATIVE `cmd2` binaries, and `rc/bin/ape`
+is the APE toolchain wrappers.
+**`lined` is left ON at spawn and the shell turns it off** by writing
+`rawon` to `ttyctl` (which readline's `tcsetattr` already sends):
+9front's rc neither echoes nor cooks, so lined-off would blank every
+non-bash session -- and *the failure mode decides it*, since lined-on
+still gives a usable cooked shell if bash never reaches `tcsetattr`.
+**SECOND RUN: THE SHELL NOW EXITS IMMEDIATELY, AND THAT RETIRES THE
+DOUBLE-ECHO STORY BELOW.** The launching window says
+`/bin/bash forked pid=532 on /mnt/1/tty` -- so `$SHELL` resolved, the
+bind path is right, and **no child complaint appeared**, which clears
+`open /srv/vts`, `mount /mnt`, both binds and `open /dev/cons`, since
+each prints to fd 2 and fd 2 is still that window. Then
+`shell 532 exited: ok` -- and `ok` is not a figure of speech: every
+`_exits` in the child passes a NAME (`srv`, `mount`, `bind`, `cons`,
+`exec`), so an empty message means **bash ran and exited 0**.
+**A shell that exits 0 the instant it starts read EOF on stdin.**
+`fsread` on `tty` has three arms -- serve, **EOF when `!rc_alive`**, or
+block -- and only the middle one ends a shell; `rc_alive` is set right
+after `rfork`, long before the child finishes mounting and exec'ing, so
+that race is not close. **So either something else answers 0 or bash
+never reaches the read, and both are one log line away.**
+`$vtsdebug` now traces the shell's side: what it wrote, whether
+`rawon` arrived, whether it blocked, whether it got EOF. **Not noisy --
+only the shell touches `tty`**; viewers write `cons` and poll `cells`.
+`vts-bash` sets it.
+**And rc HAS NO `break`** (it looked for `./break` four times). A flag
+is how to leave an rc loop; that joins *`sleep` takes whole seconds* on
+the list this script has paid for.
+*(The garbling below is a DIFFERENT build and a different failure --
+that session at least stayed alive to be typed at. Do not carry it
+forward.)*
+
+**FIRST RUN: readline IS RUNNING -- the bind works -- AND THE INPUT IS
+GARBLED.** The session printed `2004h$ 20041`, which is readline's
+bracketed-paste `ESC [ ? 2004 h`/`l` with the `ESC [ ?` missing, and
+`echo $SHELL` came back as `cho Scho SH` / `echo S` / `SHL`. readline
+only emits those sequences when it is driving the line, so
+**`isatty(0)` was true and `/dev/cons` is a real terminal** -- the half
+this change was for is CONFIRMED.
+**The garbling is TWO WRITERS FEEDING ONE VT PARSER.** `engine_feed`
+is a bare pass-through to `vterm_input_write`, which holds parser state
+across calls, so a torn `ESC [ ?` was interrupted by someone else's
+bytes rather than by a write boundary; and the doubled character groups
+are double echo. The only two writers are `fswrite` on `tty` (the
+shell's output) and **`lined`'s redraw, which runs only while
+`s->editor.enabled`** -- so `lined` was on while bash echoed, and the
+`rawon` that should have turned it off never arrived. *(The `cells`
+read is excluded: it holds `s->lock`, and so does the write.)*
+**Two stories fit, they need different fixes, and I have changed my
+mind about this once already -- so the script now ASKS for me.** `ctl`
+carries `raw=` and `lined=`, and `vts-bash` prints it twice: a second
+after the shell starts and again after vtwin exits. `rawoff` plus a
+consctl bind complaint means the bind failed; `rawon` means readline's
+per-line unprep put lined back, and lined must then stay off once a
+shell has ever asked for raw.
+**AND THE FIRST ASKING WAS UNANSWERABLE, WHICH WAS MY FAULT**:
+`cat /n/vts/1/ctl` in another window says `file does not exist`, and
+that is CORRECT. `/srv/vts` is global but **a MOUNT is
+per-namespace**, and `apexp-sh` opens with `rfork en`, so every window
+has its own. The files are reachable from exactly three places --
+`/mnt/<sess>/` inside the session's shell, and `/n/vts/<sess>/` in
+vtwin's window or the one that ran `vts-bash` (which now mounts).
+*On Plan 9 a path is not an address until you say whose namespace it
+is in* -- the same family as an instruction for the other machine
+having to name the program that runs it.
+**`/srv/vts` already existing now ATTACHES rather than refusing**, and
+warns that an already-running server is the OLD binary if vts was
+rebuilt since -- so every conclusion drawn from that window is about
+the old code. `kill vts | rc ; rm -f /srv/vts` replaces it.
+**The consctl bind now happens LAST, after fd 2 is the terminal**, so
+its complaint lands in the window being looked at rather than the one
+vts was launched from.
+**And vts's key interception is the OPPOSITE of what is wanted here**:
+`lined.c` batches keystrokes and flushes whole LINES to the shell, so
+bash's completion needs `edit off`, not `edit on`. The remaining three
+steps are a per-session `consctl` in vts, the shell's fds being a
+`cons` bound to `/dev/cons` rather than the pipe `session.c:124` dups
+(with a pipe, `isatty(0)` is false and bash never starts readline at
+all), and vts spawning bash rather than hardcoded `/bin/rc`.
+**And vts would fix the 80-column wrapping too -- but as TWO fixes, and
+the bigger one is `$TERM`.** *Columns*: vts has a real character grid
+(`cells.h`), so there is an exact number where rio has none -- but
+`srv.c:488`/`594` hardcode `session_init(s, name, 24, 80)`, so today it
+would report a *correct* 80 rather than a *guessed* one. `cellbuf_resize()`
+exists and nothing calls it from a window-size path. Carrying it to the
+shell is two `putenv` calls beside the `putenv("vts"...)` already in
+`session.c` -- `RFENVG` **copies** the environment, and libap's
+`TIOCGWINSZ` already reads `$COLUMNS`/`$LINES`. Resize is still not
+automatic (no `SIGWINCH`), but vts owns both ends and can post a note:
+*the difference is not that vts can measure and rio cannot, it is that
+vts can TELL.* *Wrapping*: correct width alone would NOT have fixed the
+screen. `sys/lib/ape/termcap`'s whole `dumb` entry is
+`:am:co#80:li#24:` -- **no `ce`, no `up`, no `cm`**, so readline
+reprints instead of redrawing, and `terminal.c:584` forces
+`_rl_term_isansi = 0` for that name. vts is what makes a real `$TERM`
+honest, since the engine is **libvterm** (upstream's full state
+machine) and the termcap already ships `vt100|vt100-am` and `xterm`.
+Which VT level is claimed is not the question; having anything true to
+claim is. **Order**: bash on a `cons` not a pipe, per-session
+`consctl`, then `$TERM` (the one that changes the screen), then the
+real grid size, then `COLUMNS`/`LINES` at spawn plus a note on resize.
+
+
+---
+
+## The keystroke thief, kencc's `false`, and the output half
+
+*Moved verbatim out of `CLAUDE.md` when that file
+was split for 0.6.  Only the one-line consequence stayed behind there;
+this is the whole record, including the wrong turns.*
+
+**THE COPY PROCESS IS A KEYSTROKE THIEF -- CONFIRMED, AND THE
+PARTITION IS EXACT.** `echo $SHELL` typed into vtwin: vts received
+`e c h $ S L`, and after `kill vtwin | rc` the launching bash's prompt
+read `o HEL`. **Six plus five is eleven, nothing duplicated, nothing
+lost** -- the two readers *partition* the input, which only two
+processes blocked on one file can do. `ps` shows four `bash` in
+**`Pread`** (a copy process inside `_READ`) beside their parents in
+`Rendez`; only one pair is legitimate and **two are leftovers from
+earlier runs**, which is the `bash`-as-`/bin/sh` accumulation seen
+from the other side. Cause: **libap's `select()` does not poll, it
+forks a process that reads CONTINUOUSLY for the life of the caller**,
+so an interactive bash permanently reads its window's `/dev/cons`.
+**Workaround shipped: `./apexp-sh -r`** runs the same environment with
+**rc** as the launching shell -- no `select()`, no copy process, no
+competition -- while `$SHELL` stays `bash` so the session still runs
+bash. **FIXED AND CONFIRMED** -- all eleven bytes of `echo $SHELL` show
+`cons write -> HANDED -> tty write`, bash ran it and printed `bash`,
+and **the outer prompt is EMPTY**: no theft at all, on a test that
+conserves bytes so a partial fix would have shown as a shorter theft.
+`Muxbuf` gains `ondemand`/`want`/
+`readwait`, **appended after `data[]`** so no existing offset moves
+(but `sizeof` does -- **`mk distclean` first**), and for `FD_ISTTY`
+only the copy process sleeps unless `want` is set, clearing it on
+delivery. One outstanding read per request instead of one for ever;
+pipes and sockets keep the greedy path Tcl exercises. **`want` is
+STATE, tested under `mux->lock`**, so a request arriving while the
+copy process is between its unlock and its rendezvous is seen rather
+than lost -- there is no window to miss. The "both asleep" deadlock is
+prevented identically at all three asking sites: set `want` under the
+lock, clear `readwait` under the same lock, release, wake, *then*
+wait. `select()` asks **before `waitfresh`**, which would otherwise
+spin against a deliberately sleeping copy process. `_bufmark()` is the
+marker. **The regression test is the partition**: `echo $SHELL` into
+vtwin, `kill vtwin | rc`, and the outer bash's prompt must be EMPTY --
+it conserves bytes, so a partial fix shows as a shorter theft rather
+than a pass. **It passed on the first run.** **`execve` killing copy processes is a separate smaller
+fix that does NOT cure this** -- the thief is a living parent.
+**And a win: ARROW KEYS WORK under vtwin**, which rio could never give
+-- one of the three things vts was for.
+
+**What is left in vts is the OUTPUT half, and it is isolated**: vts
+receives `<1b>[?2004h` whole and the screen shows `2004h` as text --
+proved arithmetically, since `ctl` said `cursor=1,60` and 53+5+2 = 60.
+**My kencc hypothesis is REFUTED** -- `bool in_esc : 1` being a
+one-bit field that takes a 1 and ignores a 0. `bitfield-test.c`
+**section 10** passes on 9front: bool holds true, clears to false,
+clears when assigned `0`, and the `unsigned : 1` beside it does the
+same. **The caveat closes too**: APE's `<stdbool.h>` does NOT redefine
+`bool` (it is kencc's own keyword, an `unsigned char`) and `pcc` IS
+`6c` with APE flags, so the test measured the same type and compiler
+libvterm uses. *The branch was written down beforehand and cost one
+30-second command.* **What did the work was the `unsigned : 1` beside
+it** -- both failing would have meant clearing in general, bool alone
+failing the base type; both passing is informative only because they
+were asked together.
+**FOUND, AND IT IS `false` ITSELF: kencc's C23 `false` keyword did
+not evaluate to 0.** `itab` in `cc/lex.c` is
+`{char *name; ushort lexical; ushort type;}` -- the third column is a
+**type index** applied by `lexinit()` as `s->type = types[...]` -- and
+`true`/`false` were written into it as `1` and `0` as though it were a
+value. Nothing set **`yylval.vval`**, which is what the grammar reads
+for `LCONST` (`cc.y`: `$$->vconst = $1`), and `yylex` had already done
+`yylval.sym = s` into the same union member. **So both keywords
+arrived carrying a pointer.** Fixed in `yylex`, which now supplies the
+value on the `LCONST` arm; the table entries are 0/0 with a note
+saying why a value cannot live there.
+**FIX CONFIRMED on the rebuilt compilers**: `truefalse-test` reports
+**0 failures**, 8 of 8, and the two that carry the finding are
+**section 3** (`bool:1 = false clears, straight after = true`) beside
+**section 4** (`= 0`, the control). Section 4 passed before the fix
+too -- *both passing in one run is what separates a fixed keyword
+from a working bit field*, and either alone would have been the
+"two explanations" trap again. Still to measure: libvterm rebuilt
+with this compiler, which is what `vtparse-probe` asks.
+**Not bit-field-specific and not libvterm-specific**: every
+`x = false`, `return true;` and `flag == false` in every **native**
+C23 program had the same junk. **APE code was untouched** because
+APE's `<stdbool.h>` `#define`s them to 1 and 0 -- *which is exactly
+why no test under `sys/lib/tests` could catch it*, and why
+`truefalse-test.c` is native.
+**It cost two refuted hypotheses**, a bit-field overlap and a
+bit-field clear bug, and **both passed their tests because the tests
+were APE, where `false` is a macro** -- `bitfield-test`'s two "clear"
+checks were literally the same line twice after preprocessing.
+`vtlayout-probe` named it by asking `= 0` and `= false` side by side
+on the real struct in the native dialect: `= 0` cleared, `= false`
+did not, and the hex dump showed `state` at offset 0 and `in_esc` at
+offset 4 with no overlap at all.
+
+**`vtparse-probe` CLEARED vts and named the byte**: libvterm prints
+it with no vts, no 9P and no terminal involved. **And its table of
+nine sequences says the shape exactly -- EVERY CSI consumes exactly
+THREE bytes and prints the rest** (`ESC [ 2 J` -> `J`, `ESC [ ? h` ->
+`h`, `ESC [ ? 2004 h` -> `2004h`). `ESC [ H` is clean only because it
+*is* three bytes; *the information was in the arithmetic across rows,
+not in any one row*.
+**One mechanism fits all seven with no slack**: libvterm holds
+`enum {...} state;` immediately followed by `bool in_esc : 1`, and if
+a store to `state` sets the `in_esc` bit, then `ENTER_STATE(CSI_LEADER)`
+(== 1) lights `in_esc`, the next byte takes the escape path instead of
+the CSI path, resets state to NORMAL, and everything after is text.
+`ESC [ H` survives because `H` is 0x48 and hoists to a C1 control.
+**`bitfield-test.c` section 10 HAD that struct and still missed it**,
+because it only ever wrote the bit field and read the neighbour -- an
+overlap is symmetric, and testing one direction is the
+"two explanations" trap one level up. The missing direction is added:
+write the enum, read the bit back, both polarities, both field types,
+with `sizeof` printed. Passes on gcc at 12 bytes.
+**AND IT IS CLOSED: `0 of 9 unexpected`, `CONSUMED`, on the rebuilt
+compiler.** All eight prefixes give 0 chars, every CSI row is empty,
+and the `hi` control still prints -- exactly the prediction, written
+down before the run. libvterm's source did not change a character;
+only `cc/lex.c` did. *The chain is measured end to end: fixed
+keyword -> `in_esc = false` clears -> the parser stays in CSI ->
+`ESC [ ? 2004 h` is swallowed whole.*
+**The probe's own closing text had to be corrected**, and that is
+worth more than the result. It said *"the fault is NOT in libvterm"*
+on a clean run -- true as a branch written while libvterm was
+suspected, false now, because the run came back clean for the OTHER
+reason: libvterm was recompiled. **A clean run of this probe is
+ambiguous from here on** -- it clears the libvterm in front of it,
+built by the compiler in front of it, and a stale `libvterm.a` or a
+vts still linked against one reads identically. So a clean table
+beside a dirty screen is a BUILD question before it is a vts
+question. *An instrument that bakes in the conclusion for a branch
+keeps asserting it after the branch stops being the live one.* (The far-right
+indentation is separate and mine: `session.c`'s child prints with `
+`
+and no `
+` into a raw console.)
+
+**THE SCREEN IS CLEAN: `2004h` IS GONE AND THE WHOLE CHAIN IS
+MEASURED.** A session shows a bare `$` prompt, `echo $SHELL` answers
+`bash`, `echo $TERM` answers **`vt100`**. So: fixed `false` ->
+`in_esc = false` clears -> the parser stays in CSI -> vts consumes the
+bracketed-paste sequence instead of printing it.
+**Two things in that run were better than what was asked for.**
+*`$TERM` is already `vt100`*, not `dumb` -- vts sets it, so the item
+listed as "next" was done, the termcap entry with `ce`/`up`/`cm` is in
+play and readline is redrawing rather than reprinting. And *the run
+was from a PLAIN `apexp-sh`, not `-r`* -- which is a better control
+than the one I proposed, since `-r` existed to dodge the copy-process
+thief and running without it exercises the `want` fix in the exact
+configuration that used to fail. **`-r` is a fallback now, not the
+recommended path**, and it is kept for one good reason: if input ever
+goes missing again, "-r works and plain apexp-sh does not" splits the
+copy process from every other explanation in one command.
+**And the far-right staircase was `\n` into a VT, as recorded** --
+fixed at last: `session.c`'s child now writes `\r\n` for the three
+messages printed AFTER the dup that makes fd 2 the session terminal,
+and `\n` for the ones before it, which go to the launching rio
+window. *The boundary is the `dup()`, not the file* -- the same
+fprint is correct above it and wrong below. Fourth time an instrument
+or a diagnostic has been the visible fault in this area.
+
+**AND THEN `ls` STAIRCASED, WHICH IS THE SAME BUG ONE LAYER OUT.**
+Fixing `session.c`'s own `fprint`s fixed only vts's own messages;
+every *program* ending a line with `\n` still walked down and to the
+right, and `ls` was unreadable. **On a unix the TTY DRIVER does this
+translation** -- `OPOST|ONLCR` -- and the terminal never sees a bare
+LF. Plan 9 has no output post-processing, and libap's termios has
+nowhere to put `ONLCR`: `/dev/cons` offers one switch, `rawon`/
+`rawoff`. **vts is the driver here as well as the terminal**, so the
+translation belongs on its side, and the terminal already has the
+mechanism -- **LNM** (ANSI X3.4-1977), set at `engine_init` by
+feeding `ESC [ 20 h` through upstream's own parser, since `set_mode`
+is static and there is no public setter.
+**Safe for a MEASURED reason, not an assumed one.** On a real DEC
+terminal LNM is symmetric -- it changes what RETURN sends, so a shell
+would read CR LF for one keypress. **In this libvterm it is not**:
+`state->mode.newline` is read in exactly one place, the LF arm at
+`state.c:471`, and nothing in the key path reads it. *That was
+checked before relying on it, because the failure it would have
+caused looks nothing like the one being fixed.* A program emitting
+`\r\n` itself gets CR twice, which is idempotent.
+**CONFIRMED**: clean columns, every line at the left margin, prompt
+at column 0, `ls` readable. **And the refutation condition answered
+too** -- four commands ran in that session, each producing one line,
+so Enter did not double. That is what would have fired had LNM been
+symmetric here, and it confirms the reading of `state.c` rather than
+only the fix.
+**The width did not need fixing after all, at that window size**:
+`ls` columnated correctly. The hardcoded `session_init(s, name, 24,
+80)` is still a hardcode and still wrong for a window that is not
+80 wide -- but it is now the only thing left on the vts list, and it
+is a feature rather than a bug to chase.
+
+**AND THE SESSION NOW WORKS**: `tty read: blocked (1 waiting)`,
+`read: enter fd=0 n=1`, `-> buffered n=1`, then `tty write 1 [c]` --
+bash waits for a keystroke, gets it and echoes it, with `flags=38`
+(`FD_ISOPEN|FD_BUFFERED|FD_ISTTY`) where the failing run had `0x2A`.
+**The diagonal text on screen was the INSTRUMENT, for the third
+time**: `_apdbg` ended lines with `
+` and no `
+`, and since
+`tcsetattr` started working fd 2 is a RAW terminal, where `
+` keeps
+its column -- a staircase that looked exactly like a VT bug. It writes
+`
+` now. Two noise fixes with it: `$APEXP_DEBUG` reaches the shell
+only at `$vtsdebug=2` (its lines land on the session's own SCREEN,
+where vts's own trace goes to a log file), and `close of a descriptor
+with no listener` -- which fired on every close in every program and
+said nothing -- is under `$APEXP_LISTENDEBUG` alone. *An instrument
+sized for a dead shell is the wrong size for a live one.*
+
+**readline wraps at 80 columns under rio, and the mechanism is already
+there.** `READLINE` being on means bash redraws the line, and a long
+command wraps in the wrong place. libap **already** answers
+`TIOCGWINSZ` (`misc/ioctl.c`) correctly: 80x24 by default, overridden
+by **`$COLUMNS`**/**`$LINES`**. Nothing under rio sets either.
+`export COLUMNS=<real width>` fixes it and stays fixed -- bash's
+`checkwinsize` re-asks through the same ioctl, which reads the variable
+bash exported, so the two agree rather than fight.
+**There is no better answer under rio, and that is about rio**: a
+window is a pixel rectangle, the font is proportional, there is no
+character grid to ask and no `SIGWINCH` on resize. **It joins arrow
+keys and colour on the list of what `vts` would buy, and it is the
+strongest of the three** -- vts keeps a real character grid
+(`cells.c`), so it knows the answer exactly and can set `$COLUMNS` per
+session.
