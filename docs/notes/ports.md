@@ -2492,3 +2492,80 @@ archive is still the only way to know, and is still worth one round,
 but it is now a check rather than a hunt. tar's own `#pragma pack`
 is a no-op under `-J` (both answers are 500 and 495) and **stays**:
 it documents the on-disk intent and keeps the file right under `-9`.
+
+
+---
+
+## bacon: self-hosting, and a fixpoint at generation 2
+
+```
+  bash-5.3$ bacon -q -c cc bacon.bac           # gen 1 -> gen 2
+  Converting 'bacon.bac'... done, 10518 lines ... in 7.222 seconds.
+  cc -o bacon bacon.bac.o  -lm
+  -rwxr-xr-x 1 glenda glenda 3048736 Sun 22 18:56 bacon
+  2981 -rwxr-xr-x 1 glenda glenda 3052058 Sun 22 18:06 /bin/bacon
+
+  bash-5.3$ ./bacon -q -c cc bacon.bac         # gen 2 -> gen 3
+  Converting 'bacon.bac'... done, 10518 lines ... in 6.895 seconds.
+  cc -o bacon bacon.bac.o  -lm
+  -rwxr-xr-x 1 glenda glenda 3048736 Sun 22 18:58 bacon
+```
+
+**BaCon self-hosts on APExp.** Generation 1 converted its own 10518
+lines, the C compiled and linked, and **generation 2 then did the same
+job** -- which is the half that was missing and the half that matters,
+since *a compiler that produces a binary has not been shown to produce a
+WORKING one*. That is the gap `miniperl` had when it linked and then
+faulted writing `perlmain.c`, and it is closed here by generation 2
+doing real work rather than by generation 2 existing.
+
+**And generation 3 is the same size as generation 2: 3048736 both
+times.** A converter that has reached a fixpoint produces, from its own
+source, a compiler identical to itself; two successive generations
+agreeing to the byte count is what that looks like from outside.
+
+### The size comparison was worthless once and is decisive here, and the difference is the whole lesson
+
+One round earlier this file said, of 3048736 against /bin/bacon's
+3052058, that **the sizes prove nothing** -- because `/bin/bacon` is
+linked by `cmd/basic/mkfile` with APExp's CFLAGS and generation 2 by
+bacon's own generated `Makefile.bacon`, so the comparison was measuring
+the BUILD and not the translation. *That was right, and it was
+incomplete.*
+
+**The gen2-against-gen3 comparison holds the link command constant** --
+both come from `Makefile.bacon`, the same `cc -c` and the same
+`cc -o ... -lm` -- so the only thing left varying is the C, and the C is
+what the question was about all along. **The same measurement that is
+meaningless across a build-system boundary becomes decisive once the
+boundary is removed.**
+
+*A comparison is not worthless or valuable in itself; it depends on what
+else is being held constant* -- which is the control rule arriving as a
+property of two file sizes rather than of a test.
+
+### What is still one command short
+
+Equal size is not equal bytes. The proof, and it costs nothing:
+
+```
+	cmp bacon.bac.c src/bacon.bac.c    # gen-1 output vs the committed C
+```
+
+Identical means the bacon **kencc compiled** reproduces, byte for byte,
+what **shell BaCon** produced on the host -- the committed
+`src/bacon.bac.c` was regenerated that way -- which would close the
+chain from the host's generator to this machine's. A difference is a
+thing to read rather than a failure: two implementations of one language
+may legitimately differ in a temporary's numbering, and the fixpoint
+above already says the APExp side is internally consistent.
+
+### The one-word trap, recorded because it was avoided rather than hit
+
+***`./bacon`, NOT `bacon`.*** Plain `bacon` resolves through `$PATH` to
+`/bin/bacon`, which is generation **1** -- so the second run would have
+re-measured the binary that was already measured and reported a clean,
+plausible, meaningless result. *A measurement of a build that does not
+contain the change measures nothing*, and nowhere in this tree are two
+builds as easy to confuse as here: one word apart, the same name, and
+both on the path.

@@ -1360,3 +1360,45 @@ observable: with `-K` the generated C is kept, so `grep twice
 regardless of what the link does — *and that separates "the flag did
 nothing" from "the flag worked and something else is undefined"*, which
 the link's own message cannot.
+
+### CONFIRMED: it links
+
+```
+  bash-5.3$ c++ -v -K /tmp/t.cpp
+  cpfe --c++14 --no_exceptions --no_rtti --target win64
+       --clear_flag=use_predefined_macro_file --instantiate local
+       --sys_include=... --gen_c_file_name=/tmp/t.eccp.c /tmp/t.cpp
+  cc -c /tmp/t.eccp.c
+  cc -o a.out t.eccp.o /amd64/lib/ape/libedg.a
+  bash-5.3$ ./a.out
+  bash-5.3$
+```
+
+**The prediction and its refutation condition were both written down
+before the run, and the condition did not fire.** `_Z5twiceIiET_S0_` is
+gone from the link; the C back end does honour `--instantiate local`,
+which reading the option table could establish was *accepted* and never
+that it was *acted on*. So the link model is closed on both halves at
+last: `local` for the templates, `-C` for the runtime's vague-linkage
+typeinfo.
+
+**That makes C++-with-templates a working pipeline here** -- the first
+thing in this port that is a capability rather than a stage.
+
+***AND THE RUN PRINTED NOTHING, WHICH IS A SEPARATE QUESTION AND IS NOT
+ANSWERED.*** `./a.out` returned to the prompt with no output. There are
+two readings and they are a `cat` apart:
+
+  - `/tmp/t.cpp` never printed anything, being a link exercise -- in
+    which case silence is correct and there is nothing here;
+  - it was meant to print, and did not -- in which case the **static
+    constructor gap is the first suspect**, since nothing calls
+    `_Z12__call_ctorsv` and a program whose output depends on a static
+    initialiser running would be silent in exactly this way.
+
+*A program that links and runs is not a program that works*, and the
+difference between those two sentences is the whole of what this round
+measured and did not measure. `cat /tmp/t.cpp` and `echo $status` settle
+it; **and if it is the second reading, that is a better reproducer for
+the static-init gap than anything written down for it so far**, which
+has only ever been reasoned about from the corpus.

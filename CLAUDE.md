@@ -355,13 +355,21 @@ built by hand has not been measured in that position*.
   template here; the tree had already measured this from the other end,
   556 of 558 undefined `_Z` names in cpfe's own link being
   instantiations emitted nowhere.
-  **`eccp` passes `--instantiate local` now, and that is NOT YET
-  MEASURED** — one flag, written down with its prediction: the toy links
-  and runs, because `local` emits each needed instantiation inside the
-  translation unit that needs it, with internal linkage, so nothing is
-  undefined and nothing can collide. *Refuted if the undefined name
-  survives*, which would mean the C back end ignores the mode. **Its
-  cost is named rather than feared**: internal linkage gives each object
+  **`eccp` passes `--instantiate local`, and IT LINKS**: the same
+  command now runs cpfe, `cc -c` and the link with no complaint and
+  `./a.out` returns. *The prediction and its refutation condition were
+  written down before the run and the condition did not fire*, so the C
+  back end does honour the mode and **C++ with templates is a working
+  pipeline on this machine** — which is the first thing in this port
+  that is a capability rather than a stage.
+  **WHAT THE RUN DOES NOT SHOW is whether the program COMPUTED
+  anything**, and that is one command away rather than a doubt to carry:
+  `./a.out` printed nothing, so if `/tmp/t.cpp` was meant to print, the
+  silence is the next finding and the static-init gap below is the first
+  suspect; if it was only ever a link exercise, silence is correct.
+  *A program that links and runs is not a program that works* — read
+  `/tmp/t.cpp` and `echo $status` before calling this closed.
+  **Its cost is named rather than feared**: internal linkage gives each object
   its own copy, so a template's static data member or a static local
   inside a template function stops being one object shared across the
   program — a program whose correctness rests on that identity is
@@ -382,12 +390,26 @@ built by hand has not been measured in that position*.
 - **chicken** — both compiler bugs it found are fixed and measured
   (`longconst-test`, `switchcase-test`, both 0). What remains is running
   `chickenword-probe` with chicken's own flags.
-- **bacon** — converts BASIC to C on APExp. `bacon-test.bac` is 3
-  failures and all three are the 32-bit-`long` invariant arriving through
-  a language whose only integer type is that `long`. The stronger test is
-  SELF-HOSTING (`bacon -c cc bacon.bac`), not yet run. The recipe is
-  `-q -c cc` with `BACON_IN_DOCKER=true`, and both halves of that were
-  wrong once.
+- **bacon** — **IT SELF-HOSTS, and generation 3 is a fixpoint.**
+  `bacon -q -c cc bacon.bac` converts its own 10518 lines, compiles and
+  links; `./bacon -q -c cc bacon.bac` then does the same job, which is
+  the half that matters — *a compiler that produces a binary has not
+  been shown to produce a WORKING one*, the gap `miniperl` had. **And
+  generations 2 and 3 are the same size, 3048736 both times**, which is
+  what a converter that reproduces itself looks like from outside.
+  *The gen1-against-gen2 size difference proved nothing and this one is
+  decisive, for one reason*: the second comparison holds the LINK
+  COMMAND constant, so the only thing left varying is the C. **A
+  comparison is not worthless or valuable in itself; it depends on what
+  else is held constant.**
+  One command short of proof: `cmp bacon.bac.c src/bacon.bac.c` asks
+  whether the bacon kencc compiled reproduces, byte for byte, what
+  *shell* BaCon produced on the host. `bacon-test.bac` remains 3
+  failures, all three the 32-bit-`long` invariant arriving through a
+  language whose only integer type is that `long`.
+  ***And it had to be `./bacon`***: plain `bacon` resolves through
+  `$PATH` to generation 1, so the second run would have re-measured the
+  first binary and reported a clean, meaningless result.
 - **the archivers** — bzip2, xz, unrar, unace, unarj, clzip. `-J` retires
   the padding hunt, so this is a CHECK rather than a hunt, and the way to
   do it is to run each one on a real archive.
