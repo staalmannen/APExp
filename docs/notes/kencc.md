@@ -1387,3 +1387,82 @@ twice** -- `adecl: LAUTO autoadlist ';'` and
 broken identically and is fixed identically. *A conflict counted in
 one state is not the conflict count for a production that appears in
 two*, and the state list before and after is what attributed it.
+
+
+---
+
+## The two bit-field rules and the static initialiser: the measured run
+
+*The narrative is in `CLAUDE.md`'s history and in `docs/notes/edg.md`;
+this is the run that closed it, after the full `mk distclean` plus
+`mk install` that followed the `gbitagg()` fix.*
+
+**All four instruments came back, and three of them matched their written
+prediction exactly.**
+
+```
+  structalign-test   pcc        0 failures   (__APEXP_CONFORMALIGN__ defined)
+  structalign-test   pcc -9    29 failures   (predicted 30)
+  edgscope-probe                0 disagreements with the host  (was 6)
+  edgtuoff-probe                0 mismatches, 408 / 424        (unchanged)
+  bitinit-test                  0 failures, every section
+```
+
+**`edgscope-probe` 6 -> 0 is the head-sharing rule confirmed where it was
+found**, and its **section 2 control is what makes it readable**: the
+same prefix with the `unsigned char` removed, so the bit field is first,
+**passes in both runs at 32/40**. The disagreement was the FOLLOWING rule
+specifically and not bit fields in general, before and after.
+Section 3 reproduces `structalign-test`'s two probe shapes to the digit.
+
+**`edgtuoff-probe` unchanged at 408/424 is a REFUTATION CONDITION THAT
+DID NOT FIRE**, which is worth as much as the two that moved: every
+bit-field group in that chain is preceded by a pointer, so `w` is already
+aligned and the head rule cannot reach it. Had it moved, the patch would
+have been doing more than sharing the head. `__res_state` likewise held
+at 365 / 368 / 448.
+
+**`bitinit-test` is 0 with section 0 (the no-bit-field control) passing**,
+so the static-initialiser path is correct in general as well as for
+spans — and the run existing at all is the loudest half of the result,
+since a compiler with the old emission does not LINK.
+
+### The one number that missed, and where the error was
+
+**29 against a predicted 30.** The prediction was written as "22 plus
+eight — two each for `bf_after`, `bf_between`, `bf_straddle`,
+`bf_straddle2`".
+
+**All eight of those fired.** Every one of the four new shapes failed
+both its offset check and its size check under `-9`, which is the part
+of the prediction that was about the RULE. So the error is entirely in
+the inherited base of 22, and **that is the second time in this
+function's history that a count prediction has been wrong in its base
+rather than in its new term** — the previous round predicted 21 against a
+measured 22 for exactly the same reason, a stale instrument base carried
+forward from before the file grew sections.
+
+***Predict the NAMES, not the total*** is the rule this file already
+carried, and it is the one that saved the round: every per-name
+refutation condition held. `bf_aligned` is 8 with `c` at 4 and
+`bf_trailing` is 16 **under both rules** — the two shapes that already
+agree with gcc are untouched — and section 8 passes in both runs, as it
+must, since `struct cs`'s `type` is at 4 and `noarg_value` at 24 under
+either rule (the group's container lands at 16 both ways and the 8-aligned
+pointer after it absorbs the difference).
+
+**The remaining one-line discrepancy is NOT attributed**, and saying so
+is better than offering a third story: the two screenshots that carry the
+run do not overlap, so three or four lines between them — section 8's
+three offset checks and the start of section 9 — were never read. One
+command settles it and none has been run:
+
+```
+	pcc -9 -DPLAN9 -o sa9 structalign-test.c && ./sa9 | grep -c FAIL
+	pcc -9 -DPLAN9 -o sa9 structalign-test.c && ./sa9 | grep FAIL
+```
+
+*A count is not a measurement until the names under it are read*, and
+until that second command is run the honest statement is: the rule is
+confirmed by name in every shape that was visible, and the total is off
+by one for a reason nobody has looked at.

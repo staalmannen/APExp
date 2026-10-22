@@ -3098,3 +3098,60 @@ references exactly **two** symbols, `_envsetup` and
 `_malloc_watchinit`. `_envsetup.c` defines nothing a program would
 replace, so f2c was the only casualty and there is no second one
 waiting.
+
+
+---
+
+## A descriptor arriving poisoned from an exec
+
+*Moved verbatim out of `CLAUDE.md` when that file
+was split for 0.6.  Only the one-line consequence stayed behind there;
+this is the whole record, including the wrong turns.*
+
+**A DESCRIPTOR ARRIVED POISONED FROM AN EXEC, and it was every APE
+program, not bash and not vts.** bash under vts printed its prompt and
+exited 0 with no read of fd 0 ever reaching the server. One
+instrumented run: `_startbuf: EIO, FD_BUFFEREDX fd=0 flags=42`, then
+`select: -> -1`. readline's `rl_getc()` guards its `read()` with
+`if (result >= 0)` on what `select()` returned, so a negative answer
+means the read never happens and readline calls it EOF.
+**The chain is ordinary**: readline `select()`s on fd 0, so libap
+buffers it (`FD_BUFFERED`); `fork()`'s child runs `_detachbuf`, which
+turns that into `FD_BUFFEREDX`, "poisoned"; and `execve` wrote the
+flags word **verbatim** into `/env/_fdinfo`, where the new image's
+`sfdinit` applied it **verbatim**. So any program started by an APE
+parent that had ever select()ed on a descriptor inherited it
+unreadable. **It only became reachable when `READLINE` was turned on**
+-- nothing here had ever asked select() about a terminal before. *A fix
+that makes a process reach code it never reached before can expose
+anything on that path*, twice now.
+Fixed in the CONSUMER (`sfdinit`), beside the existing `FD_ISTTY` and
+`FD_ISREG` scrubs, because a child cannot trust those bits whoever
+wrote them. `bufexec-test.c` is the regression test and calls
+`_fdinfomark()`, so it **will not link** against a libap predating the
+fix. **CONFIRMED on the rebuilt library**: `_fdinfomark = 1`, both
+calls reach the descriptor, 0 failures.
+**Not fixed, and the same run gave it its first measurement**: the
+child's read answered `errno 3` = **EWOULDBLOCK** where glibc's reads
+all six seeded bytes, so the parent's copy process -- still alive and
+reading the same open file -- had them. Parent and child compete;
+inherent in select() being a copy process, and its own round. The test
+now carries a bounded PROBE (asserting nothing) that waits and says
+whether the bytes ever arrive, because one non-blocking read cannot
+tell "taken" from "not yet here". **gcc caught the first version of
+that probe being worthless** -- run unconditionally it found nothing on
+glibc *because the earlier read had already taken the six*, and
+announced a loss that had not happened.
+**Four rounds of diagnosis and vts was innocent from the first**, which
+is the part worth keeping: `chatty9p` said no read ever arrived;
+`fd2path` said the descriptor was right; **`SHELL=/bin/rc` gave a
+prompt that stayed** and put the fault on the APE side in one command;
+then `$APEXP_DEBUG` named the flag. *Three of the four were controls
+rather than measurements of the thing itself, and each was cheaper than
+the reading it replaced.*
+**Two more found on the way, both recorded as found-not-measured**:
+`_startbuf` never checked its `_RFORK`, so a failed fork left the
+parent waiting for ever on a rendezvous with a process that did not
+exist; and `ioctl(FIONREAD)` stored `*(long*)arg` where every caller
+passes an `int *`, writing eight bytes and smashing four of the
+caller's frame.
