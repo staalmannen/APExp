@@ -38,16 +38,22 @@
  * a way back from a default, the control cannot be taken at all --
  * *an irreversible default takes the measurement with it.*
  *
- * **THE CONTROL RUN'S COUNT IS 21 NOW, NOT 14, AND IT IS WRITTEN
- * HERE BEFORE THE RUN RATHER THAN READ OFF IT.** The bit-field
- * sharing rule added seven: section 4's two (`sizeof bits' 8 against
- * 4, `offsetof(bits,c)' 4 against 1 -- the probe that became a
- * check), and section 9's `bf_shares' two, `bf_split' two and
- * `bf_overflow' ONE, since only its SIZE moves and its offset is 8
- * under both rules. **`bf_aligned' and `bf_trailing' contribute
- * NOTHING to that count in either run**, which is the point of
- * having them: a `-9' run in which either of those fails means the
- * change did more than share a container's tail.
+ * **THE CONTROL RUN'S COUNT IS 30 NOW, AND IT IS WRITTEN HERE BEFORE
+ * THE RUN RATHER THAN READ OFF IT.** 22 was measured, and the SECOND
+ * bit-field rule adds eight: section 9's `bf_after', `bf_between',
+ * `bf_straddle' and `bf_straddle2', two each -- offset and size both
+ * move in all four under `-9'. **`bf_aligned' and `bf_trailing'
+ * contribute NOTHING to that count in either run**, which is the
+ * point of having them: a `-9' run in which either of those fails
+ * means the change did more than the two sharing rules.
+ *
+ * *AND PREDICT THE NAMES, NOT THE TOTAL.* The count was predicted as
+ * 21 once and measured 22, and the error was entirely in the
+ * instrument rather than in the compiler: 14 had been measured
+ * against a version of this file that has since gained section 8,
+ * gained section 9 and had section 4 grow up, so sections 1-6 alone
+ * answered 17 where they once answered 14, and the prediction added a
+ * guess to a stale base. The per-NAME conditions held both times.
  *
  * *a check that cannot fail is not a check*, which this tree has
  * now paid for in `strftime-xcheck', `ctype-xcheck' and twice in
@@ -174,7 +180,7 @@ struct cs {
 };
 
 /*
- * ---- section 9: the four shapes the sharing rule turns on ----
+ * ---- section 9: the nine shapes the two sharing rules turn on ----
  *
  * Section 4 asks ONE bit-field question and a one-shape check cannot
  * tell a fixed RULE from a compiler that merely stopped padding. These
@@ -202,14 +208,30 @@ struct cs {
  * arithmetic has been wrong once in this file already (149 against
  * gcc's 150 in section 1).
  *
- * AND THE LAST TWO ARE A PROBE, deliberately, because they are a
- * DIFFERENT rule: a bit field FOLLOWING a small ordinary member.
- * kencc rounds the container up to a `tfield' boundary when the group
- * starts, where gcc puts it at the next free byte -- so
- * `struct{char c; unsigned a:1; char d;}' is d@2 / 4 on gcc and
- * d@5 / 8 here even with the sharing in. *Asserting it would make this
- * test report a failure for something the change never promised*,
- * which is exactly what section 4 used to say about the case above.
+ * AND THE LAST FOUR WERE A PROBE AND ARE CHECKS NOW, because the
+ * SECOND rule has landed: a bit-field group that FOLLOWS an ordinary
+ * member starts at the next available BIT, in the `tfield'-aligned
+ * unit CONTAINING that bit.  kencc used to round the container UP at
+ * group start, so `struct{char c; unsigned a:1; char d;}' was d@5 / 8
+ * where gcc says d@2 / 4.  *A probe is a question whose answer nothing
+ * promised; once something promises it, the probe is the regression
+ * test* -- third time in this file, after section 4 and section 7.
+ *
+ *   bf_after     a bit field after a `char'.  d@2 / 4.
+ *   bf_between   a bit field between two of them.  y@3 / 4.
+ *   bf_straddle  `char c[3]' then a 16-bit field, which CROSSES the
+ *                32-bit boundary once the head is shared, so it must
+ *                begin at the next unit instead.  d@6 / 8.
+ *   bf_straddle2 the same crossing for the SECOND field of a group,
+ *                where the first fitted.  d@6 / 8.
+ *
+ * **The two straddles are the valuable half of this half**, for the
+ * reason bf_aligned is of the other: sharing the head is the easy part
+ * and re-doing the capacity test is where it can go wrong, since
+ * `cc.y' already split groups against a container it assumed started
+ * on a boundary.  A patch that shares the head and forgets the
+ * crossing passes bf_after and bf_between and fails these two.
+ * gcc's answers, measured rather than computed: 6/8 and 6/8.
  */
 struct bf_shares   { unsigned a : 4, b : 4; unsigned char c[3]; };
 struct bf_aligned  { unsigned a : 11, b : 5; unsigned int c; };
@@ -218,6 +240,8 @@ struct bf_split    { unsigned a : 3; unsigned short b : 3; char c; };
 struct bf_overflow { unsigned a : 30; unsigned b : 30; char c; };
 struct bf_after    { char c; unsigned a : 1; char d; };
 struct bf_between  { unsigned a : 1; char x; unsigned b : 1; char y; };
+struct bf_straddle { char c[3]; unsigned a : 16; char d; };
+struct bf_straddle2{ char c; unsigned a : 16; unsigned b : 16; char d; };
 
 /* ---- section 5: #pragma pack must still win ---- */
 #ifdef PLAN9
@@ -426,7 +450,7 @@ main(void)
 		eq("sizeof struct cs", (long)sizeof(struct cs), 32);
 	}
 
-	printf("\nSection 9: the four shapes the sharing rule turns on\n");
+	printf("\nSection 9: the shapes the two sharing rules turn on\n");
 	eq("sizeof bf_shares",      (long)sizeof(struct bf_shares), 4);
 	eq("offsetof(bf_shares,c)", (long)offsetof(struct bf_shares, c), 1);
 
@@ -441,20 +465,19 @@ main(void)
 	eq("sizeof bf_overflow",      (long)sizeof(struct bf_overflow), 12);
 	eq("offsetof(bf_overflow,c)", (long)offsetof(struct bf_overflow, c), 8);
 
-	/*
-	 * PROBE, not a check: a bit field following a small ordinary
-	 * member is the OTHER rule, which this change does not touch.
-	 * gcc answers d@2/4 and y@3/4.
-	 */
-	printf("     %-30s off(d)=%ld size=%ld   (gcc: 2 and 4 --\n"
-	       "     %-30s                        a SECOND rule, see header)\n",
-	    "PROBE struct{char;u:1;char;}",
-	    (long)offsetof(struct bf_after, d), (long)sizeof(struct bf_after),
-	    "");
-	printf("     %-30s off(y)=%ld size=%ld   (gcc: 3 and 4)\n",
-	    "PROBE struct{u:1;char;u:1;char;}",
-	    (long)offsetof(struct bf_between, y),
-	    (long)sizeof(struct bf_between));
+	/* the SECOND rule: a group that FOLLOWS an ordinary member */
+	eq("offsetof(bf_after,d)",   (long)offsetof(struct bf_after, d), 2);
+	eq("sizeof bf_after",        (long)sizeof(struct bf_after), 4);
+	eq("offsetof(bf_between,y)", (long)offsetof(struct bf_between, y), 3);
+	eq("sizeof bf_between",      (long)sizeof(struct bf_between), 4);
+
+	/* and the crossing, which is where sharing the head can go wrong */
+	eq("offsetof(bf_straddle,d)",
+	    (long)offsetof(struct bf_straddle, d), 6);
+	eq("sizeof bf_straddle",     (long)sizeof(struct bf_straddle), 8);
+	eq("offsetof(bf_straddle2,d)",
+	    (long)offsetof(struct bf_straddle2, d), 6);
+	eq("sizeof bf_straddle2",    (long)sizeof(struct bf_straddle2), 8);
 
 	printf("\n%d failures\n", failures);
 	return failures;

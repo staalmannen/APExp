@@ -47,10 +47,39 @@
  * BREAKS.  Its prefix, from the generated C (`il.c:13799'), is three
  * pointers, an `int32_t', an `unsigned char', and THEN seven
  * `unsigned int :1' -- a bit-field group FOLLOWING ordinary members.
- * `structalign-test' section 9 reports that case as a PROBE and says
+ * `structalign-test' section 9 reported that case as a PROBE and said
  * of it: *"a bit field following an ordinary member opens a fresh
  * container here.  Nothing has measured what it costs."*  This is
  * what it costs.
+ *
+ * ------------------------------------------------------------------
+ * THE RULE IS FIXED NOW, so **a clean run of this is the regression
+ * test and a dirty one is a BUILD question first.**  `cc/dcl.c's
+ * `sualign()' shares the container's head as well as its tail under
+ * `conformalign', so this must come back 0; if it does not, ask
+ * whether `cd sys/src/cmd && mk install' preceded the rebuild before
+ * asking anything about the rule.  *An instrument that bakes in the
+ * conclusion for a branch keeps asserting it after the branch stops
+ * being the live one* -- `vtparse-probe' already paid for that
+ * sentence, so this one says it in advance.
+ *
+ * AND WHAT A CLEAN RUN DOES **NOT** SAY, which is the half to keep.
+ * A consistent-but-different layout costs nothing on its own: pcc
+ * lays `a_scope' out and pcc reads it back.  It bites only where a
+ * constant is BAKED, and the whole 2.9M-line corpus holds exactly two
+ * folded `offsetof' sites -- `trans_unit.h's pair, which the TAIL
+ * rule already put back to 400/416, and `exprutil.h:577's
+ * `offsetof(an_operand, variant)', folded as `expr.c:64388's
+ * `memcpy(..., 152ULL)'.  **That second one never moved**: the member
+ * after `an_operand's 23 bit fields is `a_name_reference', whose
+ * alignment is 8, so `round(w, 8)' is 24 under every rule and
+ * `variant' is 152 under every rule.  Computed, three ways, in
+ * `sys/lib/tests/sualign-model.py's `an_operand' row.
+ *
+ * *So this probe measures a real non-conformance and is NOT known to
+ * be cpfe's `fault read addr=0x10'.*  It was recorded as the cause
+ * for one round on the strength of the 152, and the arithmetic
+ * refutes that.
  *
  * WHAT THIS ASKS.  Section 1 is EDG's real prefix with one pointer
  * after it, so `offsetof(after)' isolates the rule with no union and
@@ -178,11 +207,17 @@ main(void)
 
 	printf("\n%d disagreement(s) with the host\n", fails);
 	if (fails == 0)
-		printf("-> a_scope lays out the same here as where the\n"
-		       "   corpus was generated; the 0x10 fault is NOT this.\n");
+		printf("-> a_scope lays out the same here as where the corpus\n"
+		       "   was generated.  That is the `follow' rule working;\n"
+		       "   it does NOT say anything about the 0x10 fault, for\n"
+		       "   the reason in the header (no baked constant depends\n"
+		       "   on it).\n");
 	else
 		printf("-> every member of a_scope after the bit-field group\n"
 		       "   is at a different offset from the one EDG, gcc and\n"
-		       "   the generated C all assume.\n");
+		       "   the generated C all assume.  Check that\n"
+		       "   `cd sys/src/cmd && mk install' ran before blaming\n"
+		       "   the rule: section 2 clean and section 1 dirty is\n"
+		       "   what a stale compiler looks like too.\n");
 	return fails;
 }

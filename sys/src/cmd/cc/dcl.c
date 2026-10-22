@@ -1035,7 +1035,7 @@ void
 sualign(Type *t)
 {
 	Type *l;
-	long o, w, nw, bw;
+	long o, w, nw, bw, gbit, fbit;
 	int a, ma;
 
 	/*
@@ -1062,8 +1062,14 @@ sualign(Type *t)
 	 * *A variable reused for a second purpose in the same loop is a
 	 * variable with one purpose too many*, and the compiler cannot
 	 * warn: both uses are a `long' holding a small number.
+	 *
+	 * `gbit' IS CARRIED THE SAME WAY and for the same reason -- it
+	 * is where bit 0 of the current group landed, in absolute bits
+	 * -- so it is subject to exactly the hazard above.  Nothing but
+	 * the conforming bit-field arm may write it.
 	 */
 	o = 0;
+	gbit = 0;
 	switch(t->etype) {
 
 	case TSTRUCT:
@@ -1072,64 +1078,136 @@ sualign(Type *t)
 		bw = 0;
 		a = 1;
 		for(l = t->link; l != T; l = l->down) {
-			if(l->nbits) {
+			if(l->nbits && conformalign) {
+				/*
+				 * CONFORMING, THE SECOND RULE: a bit-field
+				 * group that FOLLOWS an ordinary member starts
+				 * at the next available BIT, and its container
+				 * is the `tfield'-aligned unit CONTAINING that
+				 * bit -- rounded DOWN, not up.
+				 *
+				 * The FIRST rule, which landed earlier and is
+				 * folded into this same arm below, shares a
+				 * container's unused TAIL with the member that
+				 * comes after. This shares its unused HEAD with
+				 * the member that came before, which is the
+				 * other half of the same gcc/SysV rule and the
+				 * one `-J' left behind: `w = round(w,
+				 * tfield->width)' at group start closed the
+				 * head unconditionally, so `struct{char c;
+				 * unsigned a:1; char d;}' was `d@5 size 8'
+				 * where gcc says `d@2 size 4'.
+				 *
+				 * `gbit' IS THE WHOLE MECHANISM, and it exists
+				 * because `l->shift' is not absolute.  `cc.y's
+				 * OBIT arm counts `lastbit' from the GROUP's
+				 * start, so a field's `shift' is its bit offset
+				 * within the group, measured as though the
+				 * group began on a container boundary.  `gbit'
+				 * records where bit 0 of the group really went,
+				 * in absolute bits from the struct's start, and
+				 * `fbit = gbit + l->shift' is where this field
+				 * really goes.  *The grammar's own numbers are
+				 * relative and only this function knows the
+				 * base*, which is why the fix cannot be a
+				 * smaller change in cc.y.
+				 *
+				 * AND THE CROSSING TEST HAS TO BE REDONE HERE,
+				 * which is the part reading the grammar does
+				 * not give you.  `cc.y' already splits a group
+				 * whose bits pass `tfield->width*8' -- but it
+				 * tests against a container starting at bit 0
+				 * of the group, and with the head shared the
+				 * first container has fewer bits left than
+				 * that.  So a field the grammar thought fitted
+				 * may not: `struct{char c[3]; unsigned a:16;}'
+				 * is one group of one field to the grammar, and
+				 * bits 24..39 cross the 32-bit boundary.  C and
+				 * the SysV ABI both say such a field begins at
+				 * the next unit boundary, so `o' is bumped and
+				 * `gbit' carried with it -- the carry being for
+				 * the LATER fields of the same group, since the
+				 * ones already placed are already right.
+				 *
+				 * gcc: that struct is size 8 with the field at
+				 * bits 32..47, and `straddle'/`straddle2' in
+				 * `sys/lib/tests/sualign-model.py' measure both
+				 * shapes against it.
+				 *
+				 * ---------------------------------------------
+				 * AND THE TAIL IS SHARED HERE TOO -- this arm
+				 * is both rules, which is why `-9' is the only
+				 * way back to either.  `w' advances to the
+				 * group's last USED byte rather than past its
+				 * container, so the next ordinary member may
+				 * sit in what is left of it at its own
+				 * alignment.
+				 *
+				 * `nw > w' RATHER THAN A BARE ASSIGNMENT, and
+				 * the honest account is that it CANNOT FIRE
+				 * TODAY.  I wrote first that kencc does not
+				 * restart the container when an ordinary member
+				 * comes BETWEEN two bit fields, so `nw' for the
+				 * second could be below `w' and a bare
+				 * assignment would move `w' BACKWARDS, putting
+				 * a later member on top of an earlier one.
+				 * **The GRAMMAR says otherwise**: `cc.y's
+				 * `edecor: xdecor' arm does `lastbit = 0;
+				 * firstbit = 1;' for every ordinary declarator,
+				 * so `b' in `struct{unsigned a:1; char x;
+				 * unsigned b:1; char y;}' starts a fresh group
+				 * and `nw' only ever grows.
+				 *
+				 * *It stays because the invariant it protects
+				 * -- `w' never retreats -- is not local to this
+				 * function*: it holds only as long as that
+				 * grammar action does, which is two files away,
+				 * and one comparison is a cheaper guard than a
+				 * rule nobody re-checks.  Marked as defensive
+				 * rather than left to read as load-bearing,
+				 * which is the almost-true-claim trap this tree
+				 * has already paid for once.
+				 */
+				if(l->shift <= 0) {
+					l->shift = -l->shift;
+					gbit = w*8 - l->shift;
+				}
+				fbit = gbit + l->shift;
+				/*
+				 * round DOWN by division rather than by a
+				 * mask: `round()' next door uses `%' for the
+				 * same reason, and nothing here needs
+				 * `tfield->width' to be a power of two.
+				 */
+				o = (fbit/8) / tfield->width * tfield->width;
+				if(fbit + l->nbits > (o + tfield->width)*8) {
+					o = round((fbit + 7)/8, tfield->width);
+					gbit += o*8 - fbit;
+					fbit = o*8;
+				}
+				l->offset = o;
+				l->shift = fbit - o*8;
+				if(o + tfield->width > bw)
+					bw = o + tfield->width;
+				nw = (fbit + l->nbits + 7)/8;
+				if(nw > w)
+					w = nw;
+			} else if(l->nbits) {
+				/*
+				 * THE 9front RULE, kept for `pcc -9' and for
+				 * native `6c': a group reserves the whole
+				 * `tfield' unit, closed at both ends.  That is
+				 * MSVC's allocation, and `6c' must keep it
+				 * because `cmd2/vts' and `vtwin' link the
+				 * host's own `libc.a'.
+				 */
 				if(l->shift <= 0) {
 					l->shift = -l->shift;
 					w = round(w, tfield->width);
 					o = w;
-					if(!conformalign)
-						w += tfield->width;
-					else if(o + tfield->width > bw)
-						bw = o + tfield->width;
+					w += tfield->width;
 				}
 				l->offset = o;
-				if(conformalign) {
-					/*
-					 * CONFORMING: the group holds bits
-					 * [0, shift+nbits) of the container at
-					 * `o', so the next ordinary member may
-					 * sit in what is LEFT of it, at its own
-					 * alignment. The old rule reserved the
-					 * whole `tfield' unit above instead --
-					 * MSVC's rule, and the one thing `-J'
-					 * had deliberately not fixed.
-					 *
-					 * `nw > w' RATHER THAN A BARE
-					 * ASSIGNMENT, and the honest account
-					 * is that it CANNOT FIRE TODAY.
-					 *
-					 * I wrote first that kencc does not
-					 * restart the container when an
-					 * ordinary member comes BETWEEN two bit
-					 * fields, so `nw' for the second could
-					 * be below `w' and a bare assignment
-					 * would move `w' BACKWARDS, putting a
-					 * later member on top of an earlier
-					 * one. **The GRAMMAR says otherwise**:
-					 * `cc.y's `edecor: xdecor' arm does
-					 * `lastbit = 0; firstbit = 1;' for
-					 * every ordinary declarator, so
-					 * `struct{unsigned a:1; char x;
-					 * unsigned b:1; char y;}' gives `b' a
-					 * fresh container at the next 4-byte
-					 * boundary and `nw' only ever grows.
-					 *
-					 * *It stays because the invariant it
-					 * protects -- `w' never retreats -- is
-					 * not local to this function*: it holds
-					 * only as long as that grammar action
-					 * does, which is two files away, and
-					 * one comparison is a cheaper guard
-					 * than a rule nobody re-checks. Marked
-					 * as defensive rather than left to read
-					 * as load-bearing, which is the
-					 * almost-true-claim trap this tree has
-					 * already paid for once.
-					 */
-					nw = o + (l->shift + l->nbits + 7) / 8;
-					if(nw > w)
-						w = nw;
-				}
 			} else {
 				if(l->width < 0 ||
 				   l->width == 0 && l->down != T)
@@ -1172,6 +1250,21 @@ sualign(Type *t)
 		 * so `Asu2' already rounds to at least `o+width'. The
 		 * line can only bite where `packflg' took `talign' to 1
 		 * -- which is exactly where it is needed.
+		 *
+		 * AND WITH THE HEAD SHARED TOO, THAT SAME `makedot'
+		 * ACCESS NOW COVERS THE MEMBER BEFORE THE GROUP.
+		 * `struct{char c; unsigned a:1; char d;}' puts a's
+		 * container at `o' = 0, so setting `a' is a 4-byte
+		 * read-modify-write across `c' and `d' as well.  It stays
+		 * in bounds (the guard above is what guarantees that) and
+		 * it is correct single-threaded, since the RMW writes
+		 * back what it read.  **What it is not is C11-clean**:
+		 * 3.14 makes `c' and `d' separate memory locations from
+		 * `a', so a concurrent write to either can be lost.
+		 * *Recorded, not fixed* -- gcc had exactly this until C11
+		 * forced it to narrow its accesses, and narrowing here is
+		 * a change to `sub.c's `makedot' rather than to a layout
+		 * rule.  Nothing in this tree has measured it.
 		 */
 		if(conformalign && bw > w)
 			w = bw;

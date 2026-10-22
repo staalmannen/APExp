@@ -1,0 +1,188 @@
+/*
+Part of the EDG Compiler Project, under the Apache License v2.0 with LLVM
+Exceptions.
+See https://edgcpp.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*/
+
+/*
+new -- Include file for C++ default operator new (see ARM 12.5).
+*/
+
+#ifndef __NEW_STDH
+#define __NEW_STDH
+
+#include <edg_internal_defines>
+#ifndef __STDDEF_H
+#include <stddef.h>
+#endif  /* ifndef __STDDEF_H */
+#ifndef _EXCEPTION_H
+#include <exception.h>
+#endif /* _EXCEPTION_H */
+
+#ifndef __EDG_STD_NAMESPACE
+/* If not already defined, define a macro that expands to the namespace
+   containing the standard library. */
+#ifdef __EDG_RUNTIME_USES_NAMESPACES
+#define __EDG_STD_NAMESPACE std
+#else /* ifndef __EDG_RUNTIME_USES_NAMESPACES */
+#define __EDG_STD_NAMESPACE /* nothing */
+#endif /* ifdef __EDG_RUNTIME_USES_NAMESPACES */
+#endif /* ifdef __EDG_STD_NAMESPACE */
+
+
+#ifdef __EDG_RUNTIME_USES_NAMESPACES
+namespace std {
+#endif /* ifdef __EDG_RUNTIME_USES_NAMESPACES */
+
+/* This lets users disable the EDG supplied exception classes. */
+#ifndef __NO_EDG_EXCEPTION_CLASSES
+
+  class bad_alloc : public exception {
+  public:
+    bad_alloc() __EDG_DOES_NOT_THROW;
+    bad_alloc(const bad_alloc&) __EDG_DOES_NOT_THROW;
+    bad_alloc& operator=(const bad_alloc&) __EDG_DOES_NOT_THROW;
+    virtual ~bad_alloc() __EDG_DOES_NOT_THROW;
+    virtual const char* what() const __EDG_DOES_NOT_THROW;
+  };
+
+  class bad_array_new_length : public bad_alloc {
+  public:
+    bad_array_new_length() __EDG_DOES_NOT_THROW;
+    virtual ~bad_array_new_length() __EDG_DOES_NOT_THROW;
+  };
+
+#endif /* ifndef __NO_EDG_EXCEPTION_CLASSES */
+
+  typedef void (*new_handler)();
+  new_handler set_new_handler(new_handler) __EDG_DOES_NOT_THROW;
+  new_handler get_new_handler() __EDG_DOES_NOT_THROW;
+  struct nothrow_t { };
+  // Declaration of object nothrow to permit the use of the placement new
+  // syntax: new (nothrow) T;
+  const nothrow_t nothrow = {};
+
+#ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__
+  // Declaration of the parameter type for the overaligned allocation
+  // and deallocation functions.
+  enum class align_val_t : size_t {};
+#endif /* ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__ */
+ 
+#if defined(__cpp_impl_destroying_delete) && __cpp_impl_destroying_delete
+  struct destroying_delete_t {
+    explicit destroying_delete_t() = default;
+  };
+  inline constexpr destroying_delete_t destroying_delete{};
+#endif /* defined(__cpp_impl_destroying_delete) && __cpp_impl_destroying_... */
+
+#ifdef __EDG_RUNTIME_USES_NAMESPACES
+}  /* namespace std */
+
+#ifdef __EDG_IMPLICIT_USING_STD
+/* Implicitly include a using directive for the STD namespace when this
+   preprocessing flag is TRUE. */
+using namespace std;
+#endif /* ifdef __EDG_IMPLICIT_USING_STD */
+
+#endif /* ifdef __EDG_RUNTIME_USES_NAMESPACES */
+
+/* Normal operator new. */
+void *operator new(size_t) __EDG_NEW_THROWS;
+
+/* Normal operator delete. */
+void operator delete(void*) __EDG_DOES_NOT_THROW;
+
+/* Nothrow version of operator new. */
+void *operator new(size_t, const __EDG_STD_NAMESPACE::nothrow_t&)
+                                                          __EDG_DOES_NOT_THROW;
+
+/* Nothrow version of operator delete. */
+void operator delete(void*, const __EDG_STD_NAMESPACE::nothrow_t&)
+                                                          __EDG_DOES_NOT_THROW;
+
+/* Placement new. */
+void *operator new(size_t, void*) __EDG_DOES_NOT_THROW;
+
+#ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__
+/* Overaligned versions of the operators. */
+void *operator new(size_t, __EDG_STD_NAMESPACE::align_val_t) __EDG_NEW_THROWS;
+void *operator new(size_t, __EDG_STD_NAMESPACE::align_val_t,
+                   const __EDG_STD_NAMESPACE::nothrow_t&) __EDG_DOES_NOT_THROW;
+void operator delete(void*, __EDG_STD_NAMESPACE::align_val_t);
+void operator delete(void*, __EDG_STD_NAMESPACE::align_val_t,
+                     const __EDG_STD_NAMESPACE::nothrow_t&)
+                                                          __EDG_DOES_NOT_THROW;
+#endif /* ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__ */
+
+/* Placement delete. */
+#ifdef __PLACEMENT_DELETE
+void operator delete(void*, void*) __EDG_DOES_NOT_THROW;
+#endif /* ifdef __PLACEMENT_DELETE */
+
+#ifdef __cpp_sized_deallocation
+/* Sized deallocation version of delete. */
+void operator delete(void*, size_t) __EDG_DOES_NOT_THROW;
+
+#ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__
+/* Overaligned version of sized deallocation version of delete. */
+void operator delete(void*, size_t,
+                     __EDG_STD_NAMESPACE::align_val_t) __EDG_DOES_NOT_THROW;
+#endif /* ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__ */
+
+#endif /* __cpp_sized_deallocation */
+
+#ifdef __ARRAY_OPERATORS
+
+/* Array new. */
+void *operator new[](size_t) __EDG_NEW_THROWS;
+
+/* Array delete. */
+void operator delete[](void*) __EDG_DOES_NOT_THROW;
+
+/* Placement array new. */
+void *operator new[](size_t, void*) __EDG_DOES_NOT_THROW;
+
+/* Placement array delete. */
+#ifdef __PLACEMENT_DELETE
+void operator delete[](void*, void*) __EDG_DOES_NOT_THROW;
+#endif /* ifdef __PLACEMENT_DELETE */
+
+#ifdef __cpp_sized_deallocation
+/* Sized deallocation version of array delete. */
+void operator delete[](void*, size_t) __EDG_DOES_NOT_THROW;
+
+#ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__
+/* Overaligned version of sized array delete. */
+void operator delete[](void*, size_t,
+                       __EDG_STD_NAMESPACE::align_val_t) __EDG_DOES_NOT_THROW;
+#endif /* ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__ */
+
+#endif /* __cpp_sized_deallocation */
+
+/* Nothrow version of array new. */
+void *operator new[](size_t,
+                     const __EDG_STD_NAMESPACE::nothrow_t&)
+                                                          __EDG_DOES_NOT_THROW;
+
+/* Nothrow version of array delete. */
+void operator delete[](void*,
+                       const __EDG_STD_NAMESPACE::nothrow_t&)
+                                                          __EDG_DOES_NOT_THROW;
+
+#ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__
+/* Overaligned versions of array operators. */
+void *operator new[](size_t, __EDG_STD_NAMESPACE::align_val_t);
+void operator delete[](void*, __EDG_STD_NAMESPACE::align_val_t);
+void *operator new[](size_t, __EDG_STD_NAMESPACE::align_val_t,
+                     const __EDG_STD_NAMESPACE::nothrow_t&)
+                                                          __EDG_DOES_NOT_THROW;
+void operator delete[](void*, __EDG_STD_NAMESPACE::align_val_t,
+                       const __EDG_STD_NAMESPACE::nothrow_t&)
+                                                          __EDG_DOES_NOT_THROW;
+#endif /* ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__ */
+
+#endif /* __ARRAY_OPERATORS */
+
+#endif  /* ifndef __NEW_STDH */
+

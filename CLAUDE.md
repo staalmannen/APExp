@@ -398,10 +398,11 @@ read each hit, since `U32 arena_size` is in it and cannot share a
 4-byte tail.
 `structalign-test.c` measures `pcc -J`, conforming struct layout, and
 **needs three runs** -- gcc, then `pcc -9 -DPLAN9`, the control, which
-must FAIL (**22** of its 40 checks, measured), then plain `pcc`, which
+must FAIL (**30** of its 48 checks -- 22 measured, plus eight for the
+SECOND bit-field rule, named in the file), then plain `pcc`, which
 must pass. *The middle run is the
 control*: a pass under `-J` alone cannot distinguish a working flag
-from a compiler that never had the bug. **Section 9 carries the four
+from a compiler that never had the bug. **Section 9 carries nine
 bit-field shapes, and the two that must NOT move are the valuable
 half** -- `bf_aligned` and `bf_trailing` agree with gcc under both
 rules, so either failing means a change did more than share a
@@ -779,8 +780,10 @@ gcc and 8 under kencc**. Whether that matters depends on whether
 anything strides over a `node`; field offsets stay right and what
 breaks is `sizeof` used as a stride. *The probe reports the fact and
 does not decide the consequence.*
-**`sys/lib/tests/cfrontsz-probe.py` is the instrument**, the
-`tarblock-probe` idiom generalised: it extracts `main.c`'s preamble
+**`cfrontsz-probe.py` WAS the instrument and is REMOVED with cfront**
+-- its input, cfront's generated `main.c`, is no longer tracked, so it
+could not run; the lesson below is why the paragraph stays. It was the
+`tarblock-probe` idiom generalised: it extracted `main.c`'s preamble
 (the file whose declarations are the largest superset, 47 tagged
 types), emits a probe asking `sizeof` for each beside the recorded
 number, and **runs the gcc control itself** -- 47 of 47, **0
@@ -1863,36 +1866,46 @@ norm()`, `operator delete()'s 2nd argument must be a size_t`,
 compilers reproduce is upstream's, not this tree's.* So cfront has
 stopped being a bug-finder for APExp, and the thing to stop is
 **spending rounds on it**, not the directory.
-**KEEP IT, OFF, for three reasons that are not sentiment.** (1) The
-`-9`/`-J` pair is now the only END-TO-END regression instrument for
-the layout rule this tree has: `structalign-test` measures sizes and
-offsets, while this measures a *program that behaves differently* --
-same input, one flag, `pc=0x280db8` or no fault. Nothing else
-reproduces that. (2) `cfrontsz-probe.py` reads cfront's generated C
-for its 97 recorded struct sizes, and that oracle is the generated
-files. (3) The EDG path, if it is ever taken, wants the same `c++`
-driver, the same `ns_strip`, the same `<values.h>` and the c++lib
-mkfile; deleting now and rewriting later is strictly worse than
-leaving a directory nothing builds. **`c++lib` is already commented
-out of `_OPTIONAL_APPS` and stays out; `cfront` itself stays in**,
-because building the translator is cheap and is what keeps the
-instrument alive.
-**The ONE experiment left, and it is bounded**: remove the seven
-`< 0x200000` guards and run `cmd/c++lib` by hand under each rule.
-Identical output under `-J` plus a worse crash under `-9` is a
-second, independent confirmation of the layout fix and removes seven
-lines that would MASK a recurrence of exactly the bug `-J` repaired.
-*If that comes back clean, cfront is finished as a question for this
-tree* -- what remains is a 1980s front end that cannot tell two
-overloads apart on a 64-bit target, which is a C++ problem and not a
-Plan 9 one.
+**AND IT IS GONE NOW -- THE USER REMOVED IT, AND EVERY ONE OF THE
+THREE REASONS FOR KEEPING IT HAD EXPIRED BY THEN.** The paragraph
+here used to argue (1) the `-9`/`-J` pair was the only end-to-end
+layout instrument, (2) `cfrontsz-probe.py` read cfront's generated C
+for its 97 struct sizes, and (3) the EDG path would want the same
+`c++` driver, `ns_strip`, `<values.h>` and c++lib mkfile. *Each was
+true when written and none survived the round that followed*:
+`structalign-test` now asserts both bit-field rules over nine shapes
+plus the two straddles, `edgscope-probe` and `edgtuoff-probe` measure
+EDG's own structs, and the EDG driver turned out to want **none** of
+cfront's four -- `eccp` is its own pipeline, `ns_strip` has no
+counterpart, and `<values.h>` was always needed by perl, p2c and
+Devel-PPPort rather than by cfront.
+**What went with it, swept rather than recalled**: `cmd/cfront`,
+`cmd/c++lib`, the seventeen pre-standard headers in
+`sys/include/ape/c++`, `cfrontsz-probe.py` (its input `main.c` is no
+longer tracked, so it could not run), and **two committed
+x86-64 Linux ELF binaries under `external/cfront-C4`** -- the host
+ASAN build, unstripped, in a Plan 9 tree. *Those two were the only
+tracked files left in that directory*, so a `git ls-files` is what
+found them where a `ls` would have shown forty untracked `.c` and
+hidden them.
+**And what did NOT go, deliberately: the PROSE.** `pcc.c`,
+`cmd/itclsh/mkfile`, `plan9/callmain.c`, `apeabi-probe.c`,
+`initzero-test.c` and `structalign-test.c` all still name cfront in
+comments, because each is explaining *why the code is as it is* --
+`pcc.c`'s is the reason `-J` is unconditional rather than inside the
+`if(!Aflag)` block, which is still the reason. *A comment recording
+why a decision was made does not become false when its subject is
+removed; rewriting it erases the only evidence for the decision.*
 
-**`basic' IS ENABLED NOW and `c++lib' is not** -- this paragraph used
-to say neither was, and it was stale. `sys/src/ape/cmd/mkfile:71' is
-an uncommented `basic\\', so bacon is in `_OPTIONAL_APPS' and a
-tree-wide `mk' builds it; `muon' at :81 is live too; `edg' at :70 and
-`c++lib' stays commented, and so do `go' and `clisp'; `perl' and
-`edg' are back in, each after it had actually built.
+**`_OPTIONAL_APPS' AS IT STANDS, re-read rather than recalled**: `go'
+and `clisp' are the only two commented out, and `basic', `muon',
+`perl' and `edg' are all live -- each of the last two after it had
+actually built. **`cfront' and `c++lib' are not commented out, they
+are GONE**: no entry, no directory, nothing tracked. *This paragraph
+has been stale twice now, both times by naming a state the mkfile had
+moved past* -- `grep -n 'optional' sys/src/ape/cmd/mkfile' and reading
+the list is the one command that settles it, and line numbers go stale
+faster than names, so none are quoted here any more.
 *The reason for caution is unchanged and is worth keeping beside the
 fact*: one failing entry aborts the whole tree's `mk', so anything
 newly enabled is a thing the next full rebuild can stop on, and a port
@@ -2857,6 +2870,210 @@ blamed.
     here*, the folded `offsetof`, and the next question is whether any
     folded constant names a scope member. Predicted: `after` at 40 and
     `sizeof` 48 against the host's 32 and 40.
+  - **MEASURED ON THE VM, EXACTLY AS PREDICTED: 40 and 48 against 32
+    and 40, and THE CONTROL IS WHAT MAKES IT READABLE.** Section 2 --
+    the same prefix with the `unsigned char` removed, so the bit field
+    is first -- **PASSES at 32 and 40**, so the disagreement is the
+    FOLLOWING rule specifically and not bit fields in general. Section
+    3 reproduces `structalign-test`'s two probe shapes to the digit
+    (5/8 against 2/4, 5/8 against 3/4). 6 disagreements, 0 on gcc.
+  - ***AND THE "NOTHING HAS MEASURED WHAT IT COSTS" LINE IS NOW FALSE,
+    WHICH IS THE ROUND'S REAL FINDING: THE CORPUS BAKES THAT OFFSET AS
+    A `memcpy` LENGTH.*** Grepping EDG's own sources for `offsetof`
+    gives nine sites, and `src/exprutil.h:577` is
+    `memcpy((char*)this, (char*)src, offsetof(an_operand, variant))`.
+    In the generated C that is **`expr.c:64388`,
+    `memcpy(..., 152ULL)`** -- *a folded `offsetof` used as a LENGTH,
+    baked as a literal.*
+    **AND `an_operand` IS THE SAME SHAPE AS `a_scope`**: two
+    `unsigned char` (`kind`, `state`) and then **23 bit fields**
+    (`il.c:17826`).
+  - ***AND THAT LAST STEP WAS WRONG AND IS WITHDRAWN: 152 IS 152 UNDER
+    EVERY RULE.*** I read the shape, saw `a_scope`'s shape, and
+    concluded kencc's `offsetof(an_operand, variant)` could not be 152
+    -- **without computing it.** The member after the 23 bit fields is
+    `a_name_reference name_reference`, and its alignment is **8**, so
+    `round(w, 8)` is **24** under HEAD's rule, under the sharing rule
+    and under the following rule alike; every member after it, `variant`
+    at 152 included, is therefore at gcc's offset in all three. It is
+    the `an_operand` row of `sualign-model.py` now -- three columns and
+    one answer -- and the host oracle agrees (`gcc` says
+    `name_reference` 24, `variant` **152**, `sizeof` 360, read out of a
+    compiled object rather than from a guess).
+    ***A struct with the broken shape is not a struct with a broken
+    offset***: an 8-aligned member after the group absorbs the whole
+    1-3 byte difference. *Almost-true-claim trap, for the second time
+    in this one function's history, and the first time it cost a
+    diagnosis rather than a comment.*
+  - **SO THE SECOND RULE IS CONFORMANCE WORK, NOT cpfe's FAULT, AND THE
+    WHOLE CORPUS SAYS SO IN ONE COMMAND.** EDG's sources hold exactly
+    **two** folded `offsetof` sites -- `trans_unit.h`'s pair, which the
+    sharing rule already put back to 400/416, and this one, which never
+    moved. Every other number EDG bakes is a real `sizeof` expression.
+    **And a consistent-but-different layout costs nothing on its own**:
+    pcc lays `a_scope` out and pcc reads it back. So
+    `ms_attributes` answering 8 is still unexplained and the `0x10`
+    fault needs a different line of attack.
+  - **IT IS WORTH FIXING ANYWAY, AND libap IS WHAT NAMES THE PRICE:
+    `fenv_t` DISAGREES WITH THE ASSEMBLY THAT FILLS IT.**
+    `amd64/include/ape/fenv_arch.h` puts `__opcode:11, __unused4:5`
+    after `unsigned short __cs_selector`, which leaves `w` at 18 --
+    the `follow` shape exactly. gcc answers `__data_offset` 20 and
+    `__mxcsr` **28**; under the sharing rule alone kencc answered 24
+    and **32**. **And 28 is not gcc's choice**: `arch/amd64/fenv.s` is
+    literally `FSTENV (DI)` then `STMXCSR 28(DI)`, with `fesetenv`
+    reading `LDMXCSR 27(DI)` after its `INCQ` -- *the assembly
+    hardcodes the x87 FSTENV image, which the struct is a
+    transcription of.* **Latent rather than live**: nothing in the tree
+    reads a member by name (grep: zero hits outside the header) and
+    36 >= 32, so the 32 bytes the assembly writes still fit. It bites
+    the first time any C reads `env.__mxcsr` or builds a `fenv_t` by
+    hand. *A layout rule found through a C++ front end, paid for by the
+    floating-point environment.*
+    And it matters more than one struct: **cross-compiling to the other
+    ten architectures is the next release's first item**, and a layout
+    rule that is wrong is wrong on every backend at once.
+  - **PATCHED, in the `sualign()` arm the sharing rule already uses and
+    gated on `conformalign` for the same reason.** `gbit` is the whole
+    mechanism: `cc.y`'s OBIT arm counts `lastbit` from the GROUP's
+    start, so `l->shift` is relative and only `sualign` knows the base.
+    **And the crossing test had to be redone here**, which reading the
+    grammar does not give you: `cc.y` already splits a group whose bits
+    pass `tfield->width*8`, but it tests against a container starting
+    at bit 0 of the group, and with the head shared the first container
+    has fewer bits left -- so `struct{char c[3]; unsigned a:16;}`, one
+    field of one group to the grammar, crosses the 32-bit boundary and
+    must begin at the next unit. `o` is bumped and `gbit` carried with
+    it, the carry being for the group's LATER fields since the ones
+    already placed are already right.
+  - **The model is clean before the VM sees it: 0 disagreements with
+    gcc over twelve shapes**, with `__res_state` under HEAD's rule
+    still reproducing `tmp/abi-bf-before.acid` as the control.
+    `structalign-test` section 9 is nine shapes now, the four
+    `follow` ones turned from PROBE into assertions -- *a probe is a
+    question whose answer nothing promised; once something promises
+    it, the probe is the regression test* -- and **`bf_straddle` and
+    `bf_straddle2` are the valuable half**: a patch that shares the
+    head and forgets the crossing passes `bf_after` and `bf_between`
+    and fails exactly those two. 0 failures on gcc, 47 checks.
+  - **Predictions, written down before the run.** `pcc` 0 failures and
+    `pcc -9` **30** rather than 22 (eight added, two each for
+    `bf_after`, `bf_between`, `bf_straddle`, `bf_straddle2`) -- *but
+    predict the NAMES, since the last count prediction was 21 against
+    a measured 22 and the whole error was in a stale instrument base.*
+    `edgscope-probe` 6 -> **0** with its section 2 control still
+    clean. `edgtuoff-probe` **unchanged at 408/424**: every bit-field
+    group in that chain is preceded by a pointer, so `w` is already
+    aligned and `follow` cannot move it. `__res_state` **unchanged**
+    at `unused` 365 / `sort_list` 368 / `sizeof` 448, for the same
+    reason -- `pfcode` is an `int`. **Refuted if any of those three
+    moves**, which would mean the patch reaches structs whose group
+    starts on a boundary and therefore does more than share the head.
+  - **NOT COMPILED ANYWHERE: kencc needs Plan 9's `<u.h>`/`<libc.h>`,
+    so the first build is the VM's** -- and `cd sys/src/cmd && mk
+    install` comes before the tree rebuild, as the `sualign` bit-field
+    fix already records.
+  - **THERE IS A DRIVER NOW: `rc/bin/ape/eccp`, AND `c++` IS A
+    ONE-LINE FORWARDER TO IT.** With cfront removed the name is free,
+    so `CXX=c++` works for autoconf, for GNU make's default and for
+    `sys/src/cmd/transpilers` -- **whose rules did not have to change
+    at all**, which is the whole value of having gone through a driver:
+    `$CXX -F $CXXFLAGS -o $target` means the same to both front ends,
+    and `eccp -F` removes the target on a failure for the same reason
+    cfront's arm did. *A rule written against a driver survives the
+    front end being replaced; one written against `cfront` would not
+    have.* The body lives in `eccp` because that is upstream's name and
+    what every document here cites, and because two names with one
+    implementation is the only arrangement that cannot drift -- which
+    also **retires the recorded `--help`/`-V` trap**: those were always
+    DRIVER options and there was no driver.
+    It carries `--target win64`, the
+    `--clear_flag=use_predefined_macro_file`, the four `--sys_include`
+    in order, and the `$status` and `--gen_c_file_name` disciplines
+    `cmd/c++lib` paid for; `-F` stops after the translation, for an
+    mkfile rule. **`cc` rather than `pcc`, deliberately**: one binary,
+    and the NAME chooses the object extension (`pcc.c:75`), so under
+    `cc` it is `.o` on all eleven architectures and the driver needs no
+    objtype table -- bacon's recipe paid a round for exactly that.
+    **NOT PARSE-CHECKED: there is no rc on the build host**, so the
+    first run is the VM's.
+  - **AND THE NOTE'S OWN COMMAND PARAGRAPH WAS WRONG ABOUT rc, in the
+    paragraph that tells the next person how to type it.** It said the
+    `=` needs quoting "only in an mkfile recipe". **`=` is a syntax
+    character in rc wherever it is not a leading assignment or inside
+    quotes** -- the recipe is merely where this tree met it first. A
+    bare `--sys_include=/sys/include/ape` is `token '=': syntax error`
+    in an rc script and at an rc prompt too; it needs no quoting only
+    in **bash**, which is what the recorded run used. Corrected there,
+    and `eccp` builds every one by concatenation.
+  - **AND EDG'S HEADERS ARE IN `sys/include/ape/c++` NOW, which is the
+    directory cfront vacated -- but ONE OF MY THREE OBJECTIONS TO IT
+    WAS SIMPLY WRONG.** I wrote that `apehdr-sweep` "compiles every
+    header there STANDALONE AS C, so this would turn a gating
+    instrument into a column of findings". **It does not look in
+    subdirectories at all**: the sweep is `os.listdir` over
+    `sys/include/ape` and its 149 is exactly
+    `ls sys/include/ape/*.h | wc -l`, so `c++/` has always been outside
+    it -- as it must have been, since cfront's seventeen headers sat
+    there while the sweep reported 0 findings. *One command on the
+    instrument settles what a reading of the directory cannot*, and the
+    evidence was in the number the sweep had been printing all along.
+    The other two objections were about cfront owning the directory
+    (gone) and about nothing including them (the point of
+    `--sys_include`).
+  - **The collision was real, though, and `git status` printed it.**
+    Staging EDG's set over cfront's shows `new.h` and `stdexcept.h` as
+    **M** rather than A/D -- the same two names, different content --
+    and cfront's `new.h` DECLARED `operator new` with `#pragma lib`
+    where EDG's is a shim doing `#include <new>`, **both under the
+    guard `__NEW_H`**. *The `Lock` shape and the `reject` shape in one
+    file*, and the reason the two sets could never have shared a
+    directory.
+  - **COMMITTED COPIES, not an install rule, and that is the tree's own
+    precedent rather than a new arrangement.** `sys/include/ape/X11` is
+    fifteen committed copies of `external/tk/xlib/X11`, and `tcl.h`,
+    `tk.h` and `f2c.h` are the same shape; `mount-include` binds
+    `sys/include`, so a committed header reaches the VM **through git
+    alone** -- which matters because git is the only channel to it and
+    `cmd/edg` is deliberately out of the tree's app lists. The install
+    rule and the gitignored copy I added one round earlier are both
+    gone. **The drift hazard is the `PATH_MAX` class and is named
+    rather than left**: `sys/include/ape/c++/README` carries
+    `diff -rq -x README` against the original, **empty output being the
+    pass** -- `-q` because a bare `diff -r` prints seventy lines of
+    content, and the exclusion because ours replaces upstream's.
+  - **`include_c99` IS NOT MIRRORED AND NEEDS NO MIRROR**, which is the
+    neat half: its one file is `iso646.h`, `sys/include/ape/iso646.h`
+    is ours now and is already on `eccp`'s path -- **and ours is the
+    better of the two**, since it is guarded `#ifndef __cplusplus`
+    where EDG's defines the eleven macros unconditionally. Correct in
+    both languages from one file.
+  - **THE STL STAYS WHERE IT IS, and the reason is an API rather than a
+    namespace.** `paragon_portable_stl` is 720 headers with zero system
+    includes, which makes it the best C++ corpus this tree has -- and
+    `vector::push_back` returns
+    `expected<void, portable_stl_error>` where C++ says `void`, so no
+    aliasing or rename recovers it. Installing it as if it were the
+    standard library would put something called one where
+    `#include <vector>` does not find one: *the
+    capability-present-and-not-declared bug with the sign reversed.*
+    `eccp`'s `$STLINCL` reaches it, and if it is ever installed it
+    wants `sys/include/ape/c++/portable_stl/`, which the one
+    `--sys_include` already covers.
+  - **AND `include_c99` WAS A ONE-HEADER GAP THAT WAS REAL:
+    `iso646.h` DID NOT EXIST IN APExp AT ALL.** That directory holds
+    exactly one file, so "what does it have that our headers do not"
+    answered in one command -- all of it. Written now, guarded
+    `#ifndef __cplusplus` because in C++ all eleven are KEYWORDS.
+    **The directory's NAME is the misleading half**: these are C95
+    (Normative Addendum 1), not C99, so *"which C99 features does EDG
+    need" has the answer none -- it needs a C95 header*, and cpfe never
+    reaches ours either way since `edg/include_c99` is searched first.
+    **A sweep of all 31 headers the C standards require named four more
+    absentees** -- `stdalign.h`, `threads.h` (C11), `stdbit.h`,
+    `stdckdint.h` (C23) -- in the 0.6 inventory rather than written
+    blind. `apehdr-sweep` 149 headers, 0 standalone findings,
+    together-case holding at 8.
   - **AND THE HOST CONTROL IS CLEAN, so the partition holds.** The
     same `/tmp/t.cpp` through the host `cpfe` built from the same
     commit, with the same `--target win64

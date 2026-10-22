@@ -257,6 +257,26 @@ CFLAGS= -c -C
 %.$O: $EDGSRC/%.c
 	$CC $CFLAGS $EDGSRC/$stem.c
 
+# EDG's LANGUAGE-SUPPORT HEADERS ARE COMMITTED COPIES IN
+# `sys/include/ape/c++' AND THIS RULE DOES NOT STAGE THEM, which is the
+# tree's own precedent rather than a new arrangement: `sys/include/ape/X11'
+# is fifteen committed copies of `external/tk/xlib/X11', and `tcl.h',
+# `tk.h' and `f2c.h' are the same shape.  `mount-include' BINDS the whole
+# of `sys/include', so a committed header is reachable on the VM through
+# git alone -- which matters, because git is the only channel to it and
+# `cmd/edg' is deliberately out of the tree's app lists.
+#
+# cfront used to own that directory and no longer does; see
+# `sys/include/ape/c++/README' for the provenance and for the one command
+# that checks the copies against `sys/src/external/edg/include_c++'.  The
+# duplication is the hazard the X11 and `f2c.h' copies already carry, and
+# the README names the check rather than leaving it to be rediscovered.
+#
+# `include_c99' is NOT copied and needs no equivalent: its one file is
+# `iso646.h', and `sys/include/ape/iso646.h' is ours now -- reached by
+# `eccp''s `--sys_include=/sys/include/ape' -- and is the better of the
+# two, since it is guarded `#ifndef __cplusplus' where EDG's defines the
+# eleven macros unconditionally.  In C++ they are KEYWORDS.
 install:V:
 	cp $O.out $BIN/cpfe
 

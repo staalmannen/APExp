@@ -1,17 +1,19 @@
-/* new.h — operator new/delete declarations for cfront-compiled C++ programs. */
+/*
+Part of the EDG Compiler Project, under the Apache License v2.0 with LLVM
+Exceptions.
+See https://edgcpp.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*/
+
+/*
+The new header should be included as "#include <new>".  This file is
+provided for compatibility with older programs that use "#include
+<new.h>".
+*/
 #ifndef __NEW_H
 #define __NEW_H
 
-#pragma lib "ape/libc++.a"
+#include <new>
 
-#include <stddef.h>
+#endif  /* ifndef __NEW_H */
 
-extern void* operator new(size_t);
-extern void  operator delete(void*);
-
-/* placement new — does not require libc++.a */
-inline void* operator new(size_t, void* __p) { return __p; }
-
-extern void (*set_new_handler(void(*)()))();
-
-#endif
