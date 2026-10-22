@@ -1,0 +1,76 @@
+sys/include/ape/c++ -- the C++ language-support headers.
+
+WHAT THESE ARE.  EDG's own `include_c++' set, copied verbatim from
+`sys/src/external/edg/include_c++'.  Its upstream README says exactly
+why it exists: "only those headers that require specific magic to work
+right with the EDG front end."  They are the LANGUAGE-SUPPORT set --
+<new>, <typeinfo>, <exception>, <stdexcept>, <initializer_list>,
+<compare>, <coroutine>, <source_location>, <stdfloat>, plus `cxxabi.h'
+and `edg_internal_defines' -- and a grep across all of them for
+`basic_string|vector|iostream|ostream' is EMPTY.
+
+**THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE.**  What
+works with no library at all is the subset EDG itself is written in:
+classes, templates, virtual dispatch, RAII, new/delete, plus
+`bad_alloc', `type_info' and `initializer_list' from these headers.  The
+matching ABI runtime -- operator new/delete, vtables, RTTI, static
+initialisation, pure-virtual -- is `libedg.a', built from
+`sys/src/ape/lib/edg'.  That is the libsupc++/libc++abi layer, not
+libstdc++.  See `sys/src/external/edg/NOTE'.
+
+WHY `.stdh'.  `src/cmd_line.c:23289' sets
+`include_file_suffixes = "::stdh:"' -- an empty suffix, then `stdh' --
+so cpfe resolves `#include <new>' to `new.stdh' through its own suffix
+list.  **No other compiler in the tree can read those files**, and that
+is fine here: they are only ever reached through `eccp''s
+`--sys_include=/sys/include/ape/c++'.  It is also why
+`sys/lib/tests/apehdr-sweep.py' does not report them -- that sweep is
+`os.listdir' over `sys/include/ape' and is TOP LEVEL ONLY, so this
+subdirectory has always been outside it.  (An earlier round recorded the
+opposite as a reason not to use this directory.  It was wrong about
+that, and measuring the sweep's scope is what said so.)
+
+CFRONT USED TO OWN THIS DIRECTORY.  Seventeen pre-standard headers --
+`iostream.h', `stream.h', `strstream.h', `vector.h' and the rest -- went
+when cfront was removed from the tree.  **Two names collided with this
+set and one of them collided twice**: cfront's `new.h' DECLARED
+`operator new' and carried `#pragma lib "ape/libc++.a"' where EDG's is a
+one-line shim doing `#include <new>', **and both used the include guard
+`__NEW_H'**, so whichever was found first silently erased the other.
+`stdexcept.h' was the second name.  That is the `Lock'
+duplicate-typedef shape and the `reject' shape in one file, and it is
+the reason these two sets could never have shared a directory.
+
+THE COPIES CAN DRIFT, AND THIS IS THE CHECK.  Two copies of a header
+that may disagree is the `PATH_MAX'/`limits_generic.h' class, and the
+`f2c.h' question was settled in one command by diffing the installed
+copy against the one next door.  From the repository root:
+
+	diff -rq -x README sys/include/ape/c++ sys/src/external/edg/include_c++
+
+**EMPTY OUTPUT IS THE PASS**, which is why `-q' and the exclusion are
+both there rather than a bare `diff -r': `-q' names the files that
+differ instead of printing seventy lines of their contents, and README
+is excluded because this one REPLACES upstream's rather than copying it.
+Any line at all means a re-import landed in one place and not the other.
+
+`include_c99' IS NOT MIRRORED HERE and needs no equivalent.  It holds
+one file, `iso646.h', and `sys/include/ape/iso646.h' is ours now --
+reached by `eccp''s `--sys_include=/sys/include/ape' -- and is the
+better of the two, since it is guarded `#ifndef __cplusplus' where
+EDG's defines the eleven macros unconditionally.  In C++ they are
+KEYWORDS, and `<ciso646>' has been empty since C++98.
+
+THE HEADER-ONLY STL IS **NOT** HERE, and the reason is not space.
+`sys/src/external/paragon_portable_stl' is 720 headers with zero system
+includes, which makes it the best C++ corpus this tree has -- and it is
+`namespace portable_stl', not `std', with `vector::push_back' returning
+`expected<void, portable_stl_error>' where C++ says `void'.  *A renamed
+STL serves NEW code; only a `std::' one serves a PORT*, and no aliasing
+recovers an API that differs.  Installing it here would put something
+called a standard library where `#include <vector>' does not find one --
+the capability-present-and-not-declared bug with the sign reversed.
+It stays where it is, reached by `eccp''s `$STLINCL'.  If it is ever
+installed it wants `sys/include/ape/c++/portable_stl/', since its own
+includes are spelled `portable_stl/...' and the one `--sys_include'
+above already covers that.

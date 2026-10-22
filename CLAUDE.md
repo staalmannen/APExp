@@ -780,8 +780,10 @@ gcc and 8 under kencc**. Whether that matters depends on whether
 anything strides over a `node`; field offsets stay right and what
 breaks is `sizeof` used as a stride. *The probe reports the fact and
 does not decide the consequence.*
-**`sys/lib/tests/cfrontsz-probe.py` is the instrument**, the
-`tarblock-probe` idiom generalised: it extracts `main.c`'s preamble
+**`cfrontsz-probe.py` WAS the instrument and is REMOVED with cfront**
+-- its input, cfront's generated `main.c`, is no longer tracked, so it
+could not run; the lesson below is why the paragraph stays. It was the
+`tarblock-probe` idiom generalised: it extracted `main.c`'s preamble
 (the file whose declarations are the largest superset, 47 tagged
 types), emits a probe asking `sizeof` for each beside the recorded
 number, and **runs the gcc control itself** -- 47 of 47, **0
@@ -1864,36 +1866,46 @@ norm()`, `operator delete()'s 2nd argument must be a size_t`,
 compilers reproduce is upstream's, not this tree's.* So cfront has
 stopped being a bug-finder for APExp, and the thing to stop is
 **spending rounds on it**, not the directory.
-**KEEP IT, OFF, for three reasons that are not sentiment.** (1) The
-`-9`/`-J` pair is now the only END-TO-END regression instrument for
-the layout rule this tree has: `structalign-test` measures sizes and
-offsets, while this measures a *program that behaves differently* --
-same input, one flag, `pc=0x280db8` or no fault. Nothing else
-reproduces that. (2) `cfrontsz-probe.py` reads cfront's generated C
-for its 97 recorded struct sizes, and that oracle is the generated
-files. (3) The EDG path, if it is ever taken, wants the same `c++`
-driver, the same `ns_strip`, the same `<values.h>` and the c++lib
-mkfile; deleting now and rewriting later is strictly worse than
-leaving a directory nothing builds. **`c++lib` is already commented
-out of `_OPTIONAL_APPS` and stays out; `cfront` itself stays in**,
-because building the translator is cheap and is what keeps the
-instrument alive.
-**The ONE experiment left, and it is bounded**: remove the seven
-`< 0x200000` guards and run `cmd/c++lib` by hand under each rule.
-Identical output under `-J` plus a worse crash under `-9` is a
-second, independent confirmation of the layout fix and removes seven
-lines that would MASK a recurrence of exactly the bug `-J` repaired.
-*If that comes back clean, cfront is finished as a question for this
-tree* -- what remains is a 1980s front end that cannot tell two
-overloads apart on a 64-bit target, which is a C++ problem and not a
-Plan 9 one.
+**AND IT IS GONE NOW -- THE USER REMOVED IT, AND EVERY ONE OF THE
+THREE REASONS FOR KEEPING IT HAD EXPIRED BY THEN.** The paragraph
+here used to argue (1) the `-9`/`-J` pair was the only end-to-end
+layout instrument, (2) `cfrontsz-probe.py` read cfront's generated C
+for its 97 struct sizes, and (3) the EDG path would want the same
+`c++` driver, `ns_strip`, `<values.h>` and c++lib mkfile. *Each was
+true when written and none survived the round that followed*:
+`structalign-test` now asserts both bit-field rules over nine shapes
+plus the two straddles, `edgscope-probe` and `edgtuoff-probe` measure
+EDG's own structs, and the EDG driver turned out to want **none** of
+cfront's four -- `eccp` is its own pipeline, `ns_strip` has no
+counterpart, and `<values.h>` was always needed by perl, p2c and
+Devel-PPPort rather than by cfront.
+**What went with it, swept rather than recalled**: `cmd/cfront`,
+`cmd/c++lib`, the seventeen pre-standard headers in
+`sys/include/ape/c++`, `cfrontsz-probe.py` (its input `main.c` is no
+longer tracked, so it could not run), and **two committed
+x86-64 Linux ELF binaries under `external/cfront-C4`** -- the host
+ASAN build, unstripped, in a Plan 9 tree. *Those two were the only
+tracked files left in that directory*, so a `git ls-files` is what
+found them where a `ls` would have shown forty untracked `.c` and
+hidden them.
+**And what did NOT go, deliberately: the PROSE.** `pcc.c`,
+`cmd/itclsh/mkfile`, `plan9/callmain.c`, `apeabi-probe.c`,
+`initzero-test.c` and `structalign-test.c` all still name cfront in
+comments, because each is explaining *why the code is as it is* --
+`pcc.c`'s is the reason `-J` is unconditional rather than inside the
+`if(!Aflag)` block, which is still the reason. *A comment recording
+why a decision was made does not become false when its subject is
+removed; rewriting it erases the only evidence for the decision.*
 
-**`basic' IS ENABLED NOW and `c++lib' is not** -- this paragraph used
-to say neither was, and it was stale. `sys/src/ape/cmd/mkfile:71' is
-an uncommented `basic\\', so bacon is in `_OPTIONAL_APPS' and a
-tree-wide `mk' builds it; `muon' at :81 is live too; `edg' at :70 and
-`c++lib' stays commented, and so do `go' and `clisp'; `perl' and
-`edg' are back in, each after it had actually built.
+**`_OPTIONAL_APPS' AS IT STANDS, re-read rather than recalled**: `go'
+and `clisp' are the only two commented out, and `basic', `muon',
+`perl' and `edg' are all live -- each of the last two after it had
+actually built. **`cfront' and `c++lib' are not commented out, they
+are GONE**: no entry, no directory, nothing tracked. *This paragraph
+has been stale twice now, both times by naming a state the mkfile had
+moved past* -- `grep -n 'optional' sys/src/ape/cmd/mkfile' and reading
+the list is the one command that settles it, and line numbers go stale
+faster than names, so none are quoted here any more.
 *The reason for caution is unchanged and is worth keeping beside the
 fact*: one failing entry aborts the whole tree's `mk', so anything
 newly enabled is a thing the next full rebuild can stop on, and a port
@@ -2961,15 +2973,21 @@ blamed.
     so the first build is the VM's** -- and `cd sys/src/cmd && mk
     install` comes before the tree rebuild, as the `sualign` bit-field
     fix already records.
-  - **THERE IS A DRIVER NOW: `rc/bin/ape/eccp`, and it is NOT called
-    `c++`.** That name is CFRONT's driver and is live --
-    `sys/src/cmd/transpilers` sets `CXX=c++` and its `%.c: %.cpp` rule
-    calls `c++ -F -o $target` -- so taking it would repoint those at a
-    different front end with a different runtime. `eccp` is upstream's
-    own name, which **retires the recorded `--help`/`-V` trap**: those
-    were always DRIVER options and there was no driver. *If cfront is
-    ever retired, `c++` becomes free and this is what should answer to
-    it.* It carries `--target win64`, the
+  - **THERE IS A DRIVER NOW: `rc/bin/ape/eccp`, AND `c++` IS A
+    ONE-LINE FORWARDER TO IT.** With cfront removed the name is free,
+    so `CXX=c++` works for autoconf, for GNU make's default and for
+    `sys/src/cmd/transpilers` -- **whose rules did not have to change
+    at all**, which is the whole value of having gone through a driver:
+    `$CXX -F $CXXFLAGS -o $target` means the same to both front ends,
+    and `eccp -F` removes the target on a failure for the same reason
+    cfront's arm did. *A rule written against a driver survives the
+    front end being replaced; one written against `cfront` would not
+    have.* The body lives in `eccp` because that is upstream's name and
+    what every document here cites, and because two names with one
+    implementation is the only arrangement that cannot drift -- which
+    also **retires the recorded `--help`/`-V` trap**: those were always
+    DRIVER options and there was no driver.
+    It carries `--target win64`, the
     `--clear_flag=use_predefined_macro_file`, the four `--sys_include`
     in order, and the `$status` and `--gen_c_file_name` disciplines
     `cmd/c++lib` paid for; `-F` stops after the translation, for an
@@ -2988,26 +3006,60 @@ blamed.
     in an rc script and at an rc prompt too; it needs no quoting only
     in **bash**, which is what the recorded run used. Corrected there,
     and `eccp` builds every one by concatenation.
-  - **AND EDG'S HEADERS DO NOT GO IN `sys/include/ape/c++`, which was
-    asked directly and has three measured answers.** They install to
-    **`/sys/lib/ape/edg`** (the pkgconf precedent), named by `eccp`'s
-    `$EDGINCL`. (1) **That directory is already CFRONT's** -- seventeen
-    pre-standard headers, committed, and PUBLIC with no install step at
-    all, since `mount-include` BINDS the whole of `sys/include`. Two
-    names collide, `new.h` and `stdexcept.h`, **and the two `new.h`
-    share the guard `__NEW_H`**, so whichever is found first silently
-    erases the other -- and they are not variants of one header:
-    cfront's declares `operator new` with `#pragma lib`, EDG's is a
-    shim doing `#include <new>`. *The `Lock` shape and the `reject`
-    shape in one file.* (2) **EDG's primary headers are `.stdh` and no
-    other compiler can see them**: `src/cmd_line.c:23289` is
-    `include_file_suffixes = "::stdh:"`, so `<new>` resolves to
-    `new.stdh` through cpfe's own suffix list -- and `apehdr-sweep`
-    compiles every header there STANDALONE AS C, so this would turn a
-    gating instrument into a column of findings. *The same objection
-    the 720 portable_stl headers already have recorded.* (3) Nothing
-    includes them with `<>` from outside cpfe's own list, which is the
-    test `Plan9libnet.h` was deleted for failing.
+  - **AND EDG'S HEADERS ARE IN `sys/include/ape/c++` NOW, which is the
+    directory cfront vacated -- but ONE OF MY THREE OBJECTIONS TO IT
+    WAS SIMPLY WRONG.** I wrote that `apehdr-sweep` "compiles every
+    header there STANDALONE AS C, so this would turn a gating
+    instrument into a column of findings". **It does not look in
+    subdirectories at all**: the sweep is `os.listdir` over
+    `sys/include/ape` and its 149 is exactly
+    `ls sys/include/ape/*.h | wc -l`, so `c++/` has always been outside
+    it -- as it must have been, since cfront's seventeen headers sat
+    there while the sweep reported 0 findings. *One command on the
+    instrument settles what a reading of the directory cannot*, and the
+    evidence was in the number the sweep had been printing all along.
+    The other two objections were about cfront owning the directory
+    (gone) and about nothing including them (the point of
+    `--sys_include`).
+  - **The collision was real, though, and `git status` printed it.**
+    Staging EDG's set over cfront's shows `new.h` and `stdexcept.h` as
+    **M** rather than A/D -- the same two names, different content --
+    and cfront's `new.h` DECLARED `operator new` with `#pragma lib`
+    where EDG's is a shim doing `#include <new>`, **both under the
+    guard `__NEW_H`**. *The `Lock` shape and the `reject` shape in one
+    file*, and the reason the two sets could never have shared a
+    directory.
+  - **COMMITTED COPIES, not an install rule, and that is the tree's own
+    precedent rather than a new arrangement.** `sys/include/ape/X11` is
+    fifteen committed copies of `external/tk/xlib/X11`, and `tcl.h`,
+    `tk.h` and `f2c.h` are the same shape; `mount-include` binds
+    `sys/include`, so a committed header reaches the VM **through git
+    alone** -- which matters because git is the only channel to it and
+    `cmd/edg` is deliberately out of the tree's app lists. The install
+    rule and the gitignored copy I added one round earlier are both
+    gone. **The drift hazard is the `PATH_MAX` class and is named
+    rather than left**: `sys/include/ape/c++/README` carries
+    `diff -rq -x README` against the original, **empty output being the
+    pass** -- `-q` because a bare `diff -r` prints seventy lines of
+    content, and the exclusion because ours replaces upstream's.
+  - **`include_c99` IS NOT MIRRORED AND NEEDS NO MIRROR**, which is the
+    neat half: its one file is `iso646.h`, `sys/include/ape/iso646.h`
+    is ours now and is already on `eccp`'s path -- **and ours is the
+    better of the two**, since it is guarded `#ifndef __cplusplus`
+    where EDG's defines the eleven macros unconditionally. Correct in
+    both languages from one file.
+  - **THE STL STAYS WHERE IT IS, and the reason is an API rather than a
+    namespace.** `paragon_portable_stl` is 720 headers with zero system
+    includes, which makes it the best C++ corpus this tree has -- and
+    `vector::push_back` returns
+    `expected<void, portable_stl_error>` where C++ says `void`, so no
+    aliasing or rename recovers it. Installing it as if it were the
+    standard library would put something called one where
+    `#include <vector>` does not find one: *the
+    capability-present-and-not-declared bug with the sign reversed.*
+    `eccp`'s `$STLINCL` reaches it, and if it is ever installed it
+    wants `sys/include/ape/c++/portable_stl/`, which the one
+    `--sys_include` already covers.
   - **AND `include_c99` WAS A ONE-HEADER GAP THAT WAS REAL:
     `iso646.h` DID NOT EXIST IN APExp AT ALL.** That directory holds
     exactly one file, so "what does it have that our headers do not"

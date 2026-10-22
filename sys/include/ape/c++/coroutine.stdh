@@ -1,0 +1,179 @@
+/*
+Part of the EDG Compiler Project, under the Apache License v2.0 with LLVM
+Exceptions.
+See https://edgcpp.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*/
+
+/*
+coroutine -- Include file for coroutines (N4810 17.12)
+*/
+#ifndef _COROUTINE_STDH
+#define _COROUTINE_STDH
+
+namespace std {
+  typedef decltype(nullptr) nullptr_t;
+
+  template<class R, class... ArgTypes>
+  struct coroutine_traits;
+
+  template<class Promise = void>
+  struct coroutine_handle;
+
+  constexpr bool operator==(coroutine_handle<> x,
+                            coroutine_handle<> y) noexcept = delete;
+  constexpr bool operator!=(coroutine_handle<> x,
+                            coroutine_handle<> y) noexcept = delete;
+  constexpr bool operator<(coroutine_handle<> x,
+                            coroutine_handle<> y) noexcept = delete;
+  constexpr bool operator>(coroutine_handle<> x,
+                            coroutine_handle<> y) noexcept = delete;
+  constexpr bool operator<=(coroutine_handle<> x,
+                            coroutine_handle<> y) noexcept = delete;
+  constexpr bool operator>=(coroutine_handle<> x,
+                            coroutine_handle<> y) noexcept = delete;
+
+  template<class T> struct hash;
+  template<class P> struct hash<coroutine_handle<P>>;
+
+  struct noop_coroutine_promise;
+  template<> struct coroutine_handle<noop_coroutine_promise>;
+  using noop_coroutine_handle = coroutine_handle<noop_coroutine_promise>;
+
+  noop_coroutine_handle noop_coroutine() noexcept = delete;
+
+  struct suspend_never;
+  struct suspend_always;
+
+  template <class R, class... ArgTypes>
+  struct coroutine_traits {
+    using promise_type = typename R::promise_type;
+  };
+
+  template<>
+  struct coroutine_handle<void>
+  {
+    constexpr coroutine_handle() noexcept
+    : ptr(nullptr)
+    {}
+
+    constexpr coroutine_handle(nullptr_t) noexcept
+    : ptr(nullptr)
+    {}
+
+    coroutine_handle& operator=(nullptr_t) noexcept {
+      ptr = nullptr;
+      return *this;
+    }
+
+    constexpr void* address() const noexcept { return ptr; }
+    constexpr static coroutine_handle from_address(void* addr) {
+      return *(coroutine_handle<void>*)(addr);
+    }
+
+    constexpr explicit operator bool() const noexcept {
+      return address() != nullptr;
+    }
+    bool done() const = delete;
+
+    void operator()() const = delete;
+    void resume() const = delete;
+    void destroy() const = delete;
+
+  protected:
+    void* ptr;
+  };
+
+  template<class Promise>
+  struct coroutine_handle : coroutine_handle<>
+  {
+    using coroutine_handle<>::coroutine_handle;
+
+    static coroutine_handle from_promise(Promise&) = delete;
+
+    constexpr static coroutine_handle from_address(void* addr) {
+      return *(coroutine_handle<Promise>*)(addr);
+    }
+
+    Promise& promise() const = delete;
+  };
+
+  struct noop_coroutine_promise {};
+
+  template<>
+  struct coroutine_handle<noop_coroutine_promise> : coroutine_handle<>
+  {
+    constexpr explicit operator bool() const noexcept { return true; }
+    constexpr bool done() const noexcept { return false; }
+
+    constexpr void operator()() const noexcept { return; }
+    constexpr void resume() const noexcept { return; }
+    constexpr void destroy() const noexcept { return; }
+
+    noop_coroutine_promise& promise() const noexcept = delete;
+
+    constexpr void* address() const noexcept { return ptr; }
+
+  private:
+    coroutine_handle() = delete;
+  };
+
+  struct suspend_never {
+    constexpr bool await_ready() const noexcept { return true; }
+    constexpr void await_suspend(coroutine_handle<>) const noexcept { return; }
+    constexpr void await_resume() const noexcept { return; }
+  };
+
+  struct suspend_always {
+    constexpr bool await_ready() const noexcept { return false; }
+    constexpr void await_suspend(coroutine_handle<>) const noexcept { return; }
+    constexpr void await_resume() const noexcept { return; }
+  };
+
+  template <typename T>
+  struct generator {
+    struct promise_type {
+      auto get_return_object() { return generator{}; }
+      auto initial_suspend() { return suspend_always{}; }
+      auto final_suspend() noexcept { return suspend_always{}; }
+      void unhandled_exception() {}
+      auto yield_value(T const&) { return suspend_always{}; }
+      void return_value(T const&) {}
+    };
+    ~generator() {}
+  };
+
+  template <typename T>
+  struct task {
+    struct promise_type {
+      auto get_return_object() { return task<T>{}; }
+      auto initial_suspend() { return suspend_always{}; }
+      auto final_suspend() noexcept { return suspend_always{}; }
+      void unhandled_exception() {}
+      auto yield_value(T const&) { return suspend_always{}; }
+      void return_value(T const&) {}
+    };
+    ~task() {}
+  };
+
+  template <>
+  struct task<void> {
+    struct promise_type {
+      auto get_return_object() { return task<void>{}; }
+      auto initial_suspend() { return suspend_always{}; }
+      auto final_suspend() noexcept { return suspend_always{}; }
+      void unhandled_exception() {}
+      void return_void() {}
+    };
+    ~task() {}
+  };
+}  /* namespace std */
+
+#ifdef __EDG_IMPLICIT_USING_STD
+/* Implicitly include a using directive for the STD namespace when this
+   preprocessing flag is TRUE. */
+using namespace std;
+#endif /* ifdef __EDG_IMPLICIT_USING_STD */
+
+#endif /* _COROUTINE_STDH */
+

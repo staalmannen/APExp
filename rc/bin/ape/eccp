@@ -11,15 +11,15 @@
 #   eccp -K [flags] file.cpp ...     keep the generated .eccp.c intermediates
 #   eccp -o out [flags] file.cpp ... compile, link, write to out
 #
-# WHY `eccp' AND NOT `c++'.  `rc/bin/ape/c++' is the CFRONT driver and is
-# live: `sys/src/cmd/transpilers' sets `CXX=c++' and its `%.c: %.cpp' rule
-# calls `c++ -F -o $target', and `cmd/c++lib/mkfile' drives it too.  Taking
-# the name would repoint both at a different front end with a different
-# runtime.  `eccp' is UPSTREAM's own driver name for this front end -- which
-# also retires a recorded trap: `cpfe --help' and `cpfe -V' answer
-# `invalid option', because those are the DRIVER's options and there was no
-# driver.  If cfront is ever retired the name `c++' becomes free, and this
-# script is what should then answer to it.
+# `c++' IS THIS, AND `eccp' IS WHERE IT LIVES.  `rc/bin/ape/c++' is now a
+# one-line forwarder to this script, so `CXX=c++' works for autoconf, for
+# GNU make's own default and for `sys/src/cmd/transpilers'.  The body is
+# here because `eccp' is UPSTREAM's name for this front end, which also
+# retires a recorded trap: `cpfe --help' and `cpfe -V' answer
+# `invalid option' precisely because those are the DRIVER's options, and
+# there was no driver.  **The name was CFRONT's until cfront was removed
+# from the tree**; one implementation under both names is what the
+# forwarder buys, and it is the arrangement that cannot drift.
 #
 # ---------------------------------------------------------------------------
 # FIVE THINGS IN HERE ARE LOAD-BEARING AND WERE EACH MEASURED.
@@ -44,16 +44,19 @@
 #    Suppressing it is precisely *LLP64 without the Windows macros*, which
 #    is what is wanted here.
 #
-# 3. THE FOUR `--sys_include' DIRECTORIES, IN THIS ORDER.  EDG's two first,
-#    so `<new>' reaches `include_c++/new.stdh' and `<new.h>' reaches EDG's
-#    one-line shim rather than CFRONT's header of the same name -- the two
-#    even share the include guard `__NEW_H', so order is the only thing
-#    that decides.  Then the ARCH directory before the generic one, which
-#    is APExp's own recorded search order (`/$objtype/include/ape' shadows
+# 3. THE THREE `--sys_include' DIRECTORIES, IN THIS ORDER.  The C++
+#    language-support set first (`/sys/include/ape/c++', where `<new>'
+#    resolves to `new.stdh' through cpfe's own `include_file_suffixes'),
+#    then the ARCH directory before the generic one, which is APExp's own
+#    recorded search order (`/$objtype/include/ape' shadows
 #    `/sys/include/ape').
-#    **A run with three of them is not a smaller version of a run with
-#    four**: the first VM translation omitted `/sys/include/ape', which is
-#    inert for a toy including no headers and inert for nothing else.
+#    **A run with two of them is not a smaller version of a run with
+#    three**: the first VM translation omitted `/sys/include/ape', which
+#    is inert for a toy including no headers and inert for nothing else.
+#    `include_c99' needs no entry of its own -- it held one file,
+#    `iso646.h', and `/sys/include/ape/iso646.h' is ours now and is the
+#    better of the two (guarded `#ifndef __cplusplus'; in C++ all eleven
+#    are keywords).
 #
 # 4. `cc' RATHER THAN `pcc', AND THE NAME IS THE WHOLE REASON.
 #    `sys/src/ape/9src/cc.c' is the single line
@@ -84,7 +87,7 @@
 # Environment overrides:
 #   CPFE     path to the cpfe binary      (default: cpfe)
 #   CC       path to the C compiler       (default: cc -- see note 4)
-#   EDGINCL  EDG's header directories     (default: /sys/lib/ape/edg)
+#   CXXINCL  C++ language-support headers (default: /sys/include/ape/c++)
 #   EDGLIB   EDG's C++ runtime            (default: /$objtype/lib/ape/libedg.a)
 #   STLINCL  extra C++ include root       (default: empty)
 #   EDGSTD   language level               (default: --c++14)
@@ -93,7 +96,7 @@ rfork e
 
 if(~ $CPFE '')    CPFE    = cpfe
 if(~ $CC '')      CC      = cc
-if(~ $EDGINCL '') EDGINCL = /sys/lib/ape/edg
+if(~ $CXXINCL '') CXXINCL = /sys/include/ape/c++
 if(~ $EDGLIB '')  EDGLIB  = /$objtype/lib/ape/libedg.a
 if(~ $EDGSTD '')  EDGSTD  = --c++14
 
@@ -180,27 +183,28 @@ while(! ~ $#args 0) {
 
 if(~ $#sources 0 && ~ $#cfiles 0 && ~ $#objects 0) usage
 
-# ---- the EDG include directories must exist, and say so BY NAME ----
-# A missing `include_c++' does not fail here: it fails deep inside cpfe as
+# ---- the C++ header directory must exist, and say so BY NAME ----
+# Its absence does not fail here: it fails deep inside cpfe as
 # `cannot open source file "new"', which reads like a fault in the program
 # being compiled rather than in the installation.  *Name the precondition
 # instead of letting the consequence name itself* -- four silently-failing
 # preconditions in bash's own test harness is what that rule cost.
-if(! test -d $EDGINCL^'/include_c++') {
-	echo 'eccp: no' $EDGINCL^'/include_c++' >/fd/2
-	echo '      run mk install in sys/src/ape/cmd/edg, or set $EDGINCL' >/fd/2
+# `new.stdh' rather than the directory, because an EMPTY `c++' directory
+# would pass a `test -d' and fail exactly the same way.
+if(! test -f $CXXINCL^'/new.stdh') {
+	echo 'eccp: no' $CXXINCL^'/new.stdh' >/fd/2
+	echo '      APExp is not mounted, or $CXXINCL is wrong' >/fd/2
 	exit noincl
 }
 
-sysincl = ('--sys_include='^$EDGINCL^'/include_c++' \
-	   '--sys_include='^$EDGINCL^'/include_c99')
+sysincl = ('--sys_include='^$CXXINCL)
 
-# An extra C++ include root goes AFTER EDG's own and BEFORE the C headers,
-# so a header-only library cannot shadow `<new>' and friends.  `$STLINCL'
-# is EMPTY by default: the imported
+# An extra C++ include root goes AFTER the language-support set and BEFORE
+# the C headers, so a header-only library cannot shadow `<new>' and
+# friends.  `$STLINCL' is EMPTY by default: the imported
 # `sys/src/external/paragon_portable_stl/include' is `namespace
 # portable_stl' rather than `std', so it is a corpus to translate rather
-# than a standard library to install.
+# than a standard library to install -- see `$CXXINCL/README'.
 if(! ~ $STLINCL '') \
 	sysincl = ($sysincl '--sys_include='^$STLINCL)
 

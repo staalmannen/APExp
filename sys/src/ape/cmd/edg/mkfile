@@ -257,54 +257,28 @@ CFLAGS= -c -C
 %.$O: $EDGSRC/%.c
 	$CC $CFLAGS $EDGSRC/$stem.c
 
-# EDG's TWO INCLUDE DIRECTORIES ARE INSTALLED HERE AND NOT IN
-# `sys/include/ape', AND THAT IS A DECISION WITH THREE MEASURED REASONS.
+# EDG's LANGUAGE-SUPPORT HEADERS ARE COMMITTED COPIES IN
+# `sys/include/ape/c++' AND THIS RULE DOES NOT STAGE THEM, which is the
+# tree's own precedent rather than a new arrangement: `sys/include/ape/X11'
+# is fifteen committed copies of `external/tk/xlib/X11', and `tcl.h',
+# `tk.h' and `f2c.h' are the same shape.  `mount-include' BINDS the whole
+# of `sys/include', so a committed header is reachable on the VM through
+# git alone -- which matters, because git is the only channel to it and
+# `cmd/edg' is deliberately out of the tree's app lists.
 #
-# 1. `sys/include/ape/c++' IS ALREADY TAKEN -- by CFRONT, seventeen
-#    pre-standard headers, committed and public (`mount-include' BINDS
-#    the whole of `sys/include', so there is no install step to review).
-#    Two names collide, `new.h' and `stdexcept.h', **and they share the
-#    include guard `__NEW_H' as well**, so whichever is found first wins
-#    silently and the other is erased.  cfront's `new.h' DECLARES
-#    `operator new' with `#pragma lib "ape/libc++.a"'; EDG's is a
-#    one-line shim that does `#include <new>'.  That is the `Lock'
-#    duplicate-typedef shape and the `reject' shape in one file.
+# cfront used to own that directory and no longer does; see
+# `sys/include/ape/c++/README' for the provenance and for the one command
+# that checks the copies against `sys/src/external/edg/include_c++'.  The
+# duplication is the hazard the X11 and `f2c.h' copies already carry, and
+# the README names the check rather than leaving it to be rediscovered.
 #
-# 2. EDG'S PRIMARY HEADERS ARE `.stdh' AND ARE INVISIBLE TO EVERY OTHER
-#    COMPILER.  `src/cmd_line.c:23289' sets
-#    `include_file_suffixes = "::stdh:"', so `#include <new>' resolves
-#    through cpfe's own suffix list to `new.stdh'.  Nothing else in the
-#    tree can read them, and `apehdr-sweep' compiles every header in
-#    `sys/include/ape' STANDALONE AS C -- so putting them there would
-#    turn a gating instrument into a column of findings.
-#
-# 3. NOTHING INCLUDES THEM WITH `<>' FROM OUTSIDE cpfe's own
-#    `--sys_include' list, which is the test `Plan9libnet.h' was deleted
-#    for failing.  *Install a header when a program needs to say
-#    `#include <...>' and not before.*
-#
-# `/sys/lib/ape/edg' is the pkgconf precedent (`PKG_DEFAULT_PATH' is
-# `/sys/lib/ape/pkgconfig'): reachable without the source tree, named by
-# `rc/bin/ape/eccp''s `$EDGINCL', and outside every include path that
-# anything else searches.  The copies are `.gitignore'd -- they are
-# build output, like `$objtype/bin'.
-EDGINC=$APEXPROOT/sys/src/external/edg
-EDGLIBDIR=$APEXPROOT/sys/lib/ape/edg
-
-# Copied with explicit globs rather than `dircp', which `cd's into a
-# destination that has to exist already and goes through APE tar.  The
-# tree is two levels and eighteen files; a glob that matches nothing is
-# passed through literally by rc and makes `cp' fail, so mk stops -- the
-# safe direction.  *The limit is the other one*: a file type upstream
-# adds that is neither `.h' nor `.stdh' nor `README' is missed silently,
-# and the first symptom would be cpfe not finding a header.
+# `include_c99' is NOT copied and needs no equivalent: its one file is
+# `iso646.h', and `sys/include/ape/iso646.h' is ours now -- reached by
+# `eccp''s `--sys_include=/sys/include/ape' -- and is the better of the
+# two, since it is guarded `#ifndef __cplusplus' where EDG's defines the
+# eleven macros unconditionally.  In C++ they are KEYWORDS.
 install:V:
 	cp $O.out $BIN/cpfe
-	mkdir -p $EDGLIBDIR/include_c++/experimental $EDGLIBDIR/include_c99
-	cp $EDGINC/include_c++/*.h $EDGINC/include_c++/*.stdh $EDGINC/include_c++/README $EDGLIBDIR/include_c++
-	cp $EDGINC/include_c++/experimental/*.stdh $EDGLIBDIR/include_c++/experimental
-	cp $EDGINC/include_c99/*.h $EDGLIBDIR/include_c99
 
 nuke:V:
 	rm -f $BIN/cpfe
-	rm -rf $EDGLIBDIR

@@ -1,0 +1,518 @@
+/*
+Part of the EDG Compiler Project, under the Apache License v2.0 with LLVM
+Exceptions.
+See https://edgcpp.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*/
+
+/*
+compare -- Include file for three-way comparison support
+*/
+#ifndef _COMPARE_STDH
+#define _COMPARE_STDH
+
+#if (!defined(__cplusplus) || __cplusplus < 201103L) && \
+    !(defined(_MSC_VER) && _MSC_VER >= 1900)
+ #error -- <compare> header requires C++11 mode
+#endif /* ifndef __cplusplus */
+#ifndef __EDG_CONSTEXPR_ENABLED__
+ #error -- <compare> requires constexpr support
+#endif /* ifndef __EDG_CONSTEXPR_ENABLED__ */
+#ifndef __cpp_inline_variables
+ #error -- <compare> requires inline variable support
+#endif /* ifndef __cpp_inline_variables */
+
+namespace std {
+  typedef __EDG_SIZE_TYPE__ size_t;
+
+/*
+Note: The following values have to match what is produced by the constant-
+      evaluation in the compiler.
+*/
+#define __EDG_EQ 0
+#define __EDG_NE 1
+#define __EDG_LT -1
+#define __EDG_GT 1
+#define __EDG_UN -127
+
+  using __EDG_null = decltype(nullptr);
+
+
+  struct weak_equality {
+    static const weak_equality equivalent;
+    static const weak_equality nonequivalent;
+
+    friend constexpr
+      bool operator==(weak_equality, weak_equality) noexcept = default;
+
+    friend constexpr
+      bool operator==(weak_equality __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_EQ;
+      }
+    friend constexpr
+      bool operator==(__EDG_null, weak_equality __v) noexcept {
+        return __v.__value == __EDG_EQ;
+      }
+
+    friend constexpr
+      bool operator!=(weak_equality __v, __EDG_null) noexcept {
+        return __v.__value != __EDG_EQ;
+      }
+    friend constexpr
+      bool operator!=(__EDG_null, weak_equality __v) noexcept {
+        return __v.__value != __EDG_EQ;
+      }
+
+    friend constexpr
+      weak_equality operator<=>(weak_equality __v, __EDG_null) noexcept {
+        return __v;
+      }
+    friend constexpr
+      weak_equality operator<=>(__EDG_null, weak_equality __v) noexcept {
+        return __v;
+      }
+  private:
+    signed char __value;
+    explicit constexpr weak_equality(signed char __v) noexcept :
+      __value(__v) {
+    }
+  };
+
+  inline constexpr
+    weak_equality weak_equality::equivalent(__EDG_EQ);
+  inline constexpr
+    weak_equality weak_equality::nonequivalent(__EDG_NE);
+
+
+   struct partial_ordering {
+     static const partial_ordering less;
+     static const partial_ordering equivalent;
+     static const partial_ordering greater;
+     static const partial_ordering unordered;
+
+    constexpr operator weak_equality() const noexcept {
+      return __value == 0 ? weak_equality::equivalent
+                          : weak_equality::nonequivalent;
+    }
+
+    friend constexpr
+      bool operator==(partial_ordering, partial_ordering) noexcept = default;
+
+    friend constexpr
+      bool operator==(partial_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_EQ;
+      }
+    friend constexpr
+      bool operator==(__EDG_null, partial_ordering __v) noexcept {
+        return __v.__value == __EDG_EQ;
+      }
+
+    friend constexpr
+      bool operator!=(partial_ordering __v, __EDG_null) noexcept {
+        return __v.__value != __EDG_EQ;
+      }
+    friend constexpr
+      bool operator!=(__EDG_null, partial_ordering __v) noexcept {
+        return __v.__value != __EDG_EQ;
+      }
+
+    friend constexpr
+      bool operator<(partial_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_LT;
+      }
+    friend constexpr
+      bool operator<(__EDG_null, partial_ordering __v) noexcept {
+        return __v.__value == __EDG_LT;
+      }
+    friend constexpr
+      bool operator<=(partial_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_LT || __v.__value == __EDG_EQ;
+      }
+    friend constexpr
+      bool operator<=(__EDG_null, partial_ordering __v) noexcept {
+        return __v.__value == __EDG_LT || __v.__value == __EDG_EQ;
+      }
+
+    friend constexpr
+      bool operator>(partial_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_GT;
+      }
+    friend constexpr
+      bool operator>(__EDG_null, partial_ordering __v) noexcept {
+        return __v.__value == __EDG_GT;
+      }
+    friend constexpr
+      bool operator>=(partial_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_GT || __v.__value == __EDG_EQ;
+      }
+    friend constexpr
+      bool operator>=(__EDG_null, partial_ordering __v) noexcept {
+        return __v.__value == __EDG_GT || __v.__value == __EDG_EQ;
+      }
+
+    friend constexpr
+      partial_ordering operator<=>(partial_ordering __v, __EDG_null) noexcept {
+        return __v;
+      }
+    friend constexpr
+      partial_ordering operator<=>(__EDG_null, partial_ordering __v) noexcept {
+        return __v.__value == __EDG_UN ? __v : partial_ordering(-__v.__value);
+      }
+  private:
+    signed char __value;
+    explicit constexpr partial_ordering(signed char __v) noexcept :
+      __value(__v) {
+    }
+  };
+
+  inline constexpr
+    partial_ordering partial_ordering::less(__EDG_LT);
+  inline constexpr
+    partial_ordering partial_ordering::equivalent(__EDG_EQ);
+  inline constexpr
+    partial_ordering partial_ordering::greater(__EDG_GT);
+  inline constexpr
+    partial_ordering partial_ordering::unordered(__EDG_UN);
+
+
+
+
+  struct weak_ordering {
+    static const weak_ordering less;
+    static const weak_ordering equivalent;
+    static const weak_ordering greater;
+
+    constexpr operator weak_equality() const noexcept {
+      return __value == 0 ? weak_equality::equivalent
+                          : weak_equality::nonequivalent;
+    }
+    constexpr operator partial_ordering() const noexcept {
+      return __value == 0 ? partial_ordering::equivalent :
+             __value > 0  ? partial_ordering::greater
+                          : partial_ordering::less;
+    }
+
+    friend constexpr
+      bool operator==(weak_ordering, weak_ordering) noexcept = default;
+
+    friend constexpr
+      bool operator==(weak_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_EQ;
+      }
+    friend constexpr
+      bool operator==(__EDG_null, weak_ordering __v) noexcept {
+        return __v.__value == __EDG_EQ;
+      }
+
+    friend constexpr
+      bool operator!=(weak_ordering __v, __EDG_null) noexcept {
+        return __v.__value != __EDG_EQ;
+      }
+    friend constexpr
+      bool operator!=(__EDG_null, weak_ordering __v) noexcept {
+        return __v.__value != __EDG_EQ;
+      }
+
+    friend constexpr
+      bool operator<(weak_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_LT;
+      }
+    friend constexpr
+      bool operator<(__EDG_null, weak_ordering __v) noexcept {
+        return __v.__value == __EDG_LT;
+      }
+    friend constexpr
+      bool operator<=(weak_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_LT || __v.__value == __EDG_EQ;
+      }
+    friend constexpr
+      bool operator<=(__EDG_null, weak_ordering __v) noexcept {
+        return __v.__value == __EDG_LT || __v.__value == __EDG_EQ;
+      }
+
+    friend constexpr
+      bool operator>(weak_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_GT;
+      }
+    friend constexpr
+      bool operator>(__EDG_null, weak_ordering __v) noexcept {
+        return __v.__value == __EDG_GT;
+      }
+    friend constexpr
+      bool operator>=(weak_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_GT || __v.__value == __EDG_EQ;
+      }
+    friend constexpr
+      bool operator>=(__EDG_null, weak_ordering __v) noexcept {
+        return __v.__value == __EDG_GT || __v.__value == __EDG_EQ;
+      }
+
+    friend constexpr
+      weak_ordering operator<=>(weak_ordering __v, __EDG_null) noexcept {
+        return __v;
+      }
+    friend constexpr
+      weak_ordering operator<=>(__EDG_null, weak_ordering __v) noexcept {
+        return __v.__value == __EDG_UN ? __v : weak_ordering(-__v.__value);
+      }
+  private:
+    signed char __value;
+    explicit constexpr weak_ordering(signed char __v) noexcept :
+      __value(__v) {
+    }
+  };
+
+  inline constexpr weak_ordering weak_ordering::less(__EDG_LT);
+  inline constexpr weak_ordering weak_ordering::equivalent(__EDG_EQ);
+  inline constexpr weak_ordering weak_ordering::greater(__EDG_GT);
+
+
+  struct strong_equality {
+    static const strong_equality equal;
+    static const strong_equality equivalent;
+    static const strong_equality nonequal;
+    static const strong_equality nonequivalent;
+
+    constexpr operator weak_equality() const noexcept {
+      return __value == 0 ? weak_equality::equivalent
+                          : weak_equality::nonequivalent;
+    }
+
+    friend constexpr
+      bool operator==(strong_equality, strong_equality) noexcept = default;
+
+    friend constexpr
+      bool operator==(strong_equality __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_EQ;
+      }
+    friend constexpr
+      bool operator==(__EDG_null, strong_equality __v) noexcept {
+        return __v.__value == __EDG_EQ;
+      }
+
+    friend constexpr
+      bool operator!=(strong_equality __v, __EDG_null) noexcept {
+        return __v.__value != __EDG_EQ;
+      }
+    friend constexpr
+      bool operator!=(__EDG_null, strong_equality __v) noexcept {
+        return __v.__value != __EDG_EQ;
+      }
+
+    friend constexpr
+      strong_equality operator<=>(strong_equality __v, __EDG_null) noexcept {
+        return __v;
+      }
+    friend constexpr
+      strong_equality operator<=>(__EDG_null, strong_equality __v) noexcept {
+        return __v;
+      }
+  private:
+    signed char __value;
+    explicit constexpr strong_equality(signed char __v) noexcept :
+      __value(__v) {
+    }
+  };
+
+  inline constexpr
+    strong_equality strong_equality::equal(__EDG_EQ);
+  inline constexpr
+    strong_equality strong_equality::equivalent(__EDG_EQ);
+  inline constexpr
+    strong_equality strong_equality::nonequal(__EDG_NE);
+  inline constexpr
+    strong_equality strong_equality::nonequivalent(__EDG_NE);
+
+
+  struct strong_ordering {
+    static const strong_ordering less;
+    static const strong_ordering equal;
+    static const strong_ordering equivalent;
+    static const strong_ordering greater;
+
+    constexpr operator weak_equality() const noexcept {
+      return __value == 0 ? weak_equality::equivalent
+                          : weak_equality::nonequivalent;
+    }
+    constexpr operator strong_equality() const noexcept {
+      return __value == 0 ? strong_equality::equal
+                          : strong_equality::nonequal;
+    }
+    constexpr operator partial_ordering() const noexcept {
+      return __value == 0 ? partial_ordering::equivalent :
+             __value > 0  ? partial_ordering::greater
+                          : partial_ordering::less;
+    }
+    constexpr operator weak_ordering() const noexcept {
+      return __value == 0 ? weak_ordering::equivalent :
+             __value > 0  ? weak_ordering::greater
+                          : weak_ordering::less;
+    }
+    
+    friend constexpr
+      bool operator==(strong_ordering, strong_ordering) noexcept = default;
+
+    friend constexpr
+      bool operator==(strong_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_EQ;
+      }
+    friend constexpr
+      bool operator==(__EDG_null, strong_ordering __v) noexcept {
+        return __v.__value == __EDG_EQ;
+      }
+
+    friend constexpr
+      bool operator!=(strong_ordering __v, __EDG_null) noexcept {
+        return __v.__value != __EDG_EQ;
+      }
+    friend constexpr
+      bool operator!=(__EDG_null, strong_ordering __v) noexcept {
+        return __v.__value != __EDG_EQ;
+      }
+
+    friend constexpr
+      bool operator<(strong_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_LT;
+      }
+    friend constexpr
+      bool operator<(__EDG_null, strong_ordering __v) noexcept {
+        return __v.__value == __EDG_LT;
+      }
+    friend constexpr
+      bool operator<=(strong_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_LT || __v.__value == __EDG_EQ;
+      }
+    friend constexpr
+      bool operator<=(__EDG_null, strong_ordering __v) noexcept {
+        return __v.__value == __EDG_LT || __v.__value == __EDG_EQ;
+      }
+
+    friend constexpr
+      bool operator>(strong_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_GT;
+      }
+    friend constexpr
+      bool operator>(__EDG_null, strong_ordering __v) noexcept {
+        return __v.__value == __EDG_GT;
+      }
+    friend constexpr
+      bool operator>=(strong_ordering __v, __EDG_null) noexcept {
+        return __v.__value == __EDG_GT || __v.__value == __EDG_EQ;
+      }
+    friend constexpr
+      bool operator>=(__EDG_null, strong_ordering __v) noexcept {
+        return __v.__value == __EDG_GT || __v.__value == __EDG_EQ;
+      }
+
+    friend constexpr
+      strong_ordering operator<=>(strong_ordering __v, __EDG_null) noexcept {
+        return __v;
+      }
+    friend constexpr
+      strong_ordering operator<=>(__EDG_null, strong_ordering __v) noexcept {
+        return __v.__value == __EDG_UN ? __v : strong_ordering(-__v.__value);
+      }
+  private:
+    signed char __value;
+    explicit constexpr strong_ordering(signed char __v) noexcept :
+      __value(__v) {
+    }
+  };
+
+  inline constexpr strong_ordering strong_ordering::less(__EDG_LT);
+  inline constexpr strong_ordering strong_ordering::equal(__EDG_EQ);
+  inline constexpr strong_ordering strong_ordering::equivalent(__EDG_EQ);
+  inline constexpr strong_ordering strong_ordering::greater(__EDG_GT);
+
+
+  template<typename> struct __EDG_comparison2rank {
+    static constexpr int __value = 1;
+  };
+  template<> struct __EDG_comparison2rank<weak_equality> {
+    static constexpr int __value = 2;
+  };
+  template<> struct __EDG_comparison2rank<partial_ordering> {
+    static constexpr int __value = 3;
+  };
+  template<> struct __EDG_comparison2rank<weak_ordering> {
+    static constexpr int __value = 4;
+  };
+  template<> struct __EDG_comparison2rank<strong_equality> {
+    static constexpr int __value = 5;
+  };
+  template<> struct __EDG_comparison2rank<strong_ordering> {
+    static constexpr int __value = 6;
+  };
+
+  template<int __R> struct __EDG_rank2comparison;
+  template<> struct __EDG_rank2comparison<1> {
+    using type = void;
+  };
+  template<> struct __EDG_rank2comparison<2> {
+    using type = weak_equality;
+  };
+  template<> struct __EDG_rank2comparison<3> {
+    using type = partial_ordering;
+  };
+  template<> struct __EDG_rank2comparison<4> {
+    using type = weak_ordering;
+  };
+  template<> struct __EDG_rank2comparison<5> {
+    using type = strong_equality;
+  };
+  template<> struct __EDG_rank2comparison<6> {
+    using type = strong_ordering;
+  };
+
+  template<typename... __Ts>
+  struct common_comparison_category {
+    static constexpr auto __common_rank() {
+      int __ranks[] = { __EDG_comparison2rank<__Ts>::__value... };
+      int __result = __EDG_comparison2rank<strong_ordering>::__value;
+      bool __saw_strong_equality = false;
+      for (int __r: __ranks) {
+        if (__r < __result) {
+          __result = __r;
+          if (__r == 1) break;
+        }
+        if (__r == 5) {
+          __saw_strong_equality = true;
+        }  /* if */
+      }
+      if (__saw_strong_equality && (__result == 3 || __result == 4)) {
+        __result = 2;
+      }
+      return __result;
+    }
+    using type = typename __EDG_rank2comparison<__common_rank()>::type;
+  };
+
+  template<typename... Ts> using common_comparison_category_t =
+                              typename common_comparison_category<Ts...>::type;
+
+
+  constexpr bool is_eq(partial_ordering __cmp) noexcept {
+    return __cmp == 0;
+  }
+  constexpr bool is_neq(partial_ordering __cmp) noexcept {
+    return __cmp != 0;
+  }
+  constexpr bool is_lt(partial_ordering __cmp) noexcept {
+    return __cmp < 0;
+  }
+  constexpr bool is_lteq(partial_ordering __cmp) noexcept {
+    return __cmp <= 0;
+  }
+  constexpr bool is_gt(partial_ordering __cmp) noexcept {
+    return __cmp > 0;
+  }
+  constexpr bool is_gteq(partial_ordering __cmp) noexcept {
+    return __cmp >= 0;
+  }
+
+#undef __EDG_NE
+#undef __EDG_EQ
+}  /* namespace std */
+
+#endif /* _COMPARE_STDH */
+

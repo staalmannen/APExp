@@ -39,34 +39,27 @@ sys/src/cmd2/vts/test/bin/
 # Claude Code harness artifacts
 .claude/
 
-# cfront output. `cmd/c++lib/mkfile' generates every .c from the matching
-# .cpp under external/cfront-C4/lib, and its own CLEANFILES says "*.c".
-# All 40 were once COMMITTED AT ZERO BYTES, so a fresh checkout compiled
-# 40 empty translation units into libc++.a and the build reported success
-# -- a check that cannot fail.
+# cfront's leftovers. CFRONT IS REMOVED FROM THE TREE -- `cmd/cfront',
+# `cmd/c++lib' and `cfrontsz-probe' are gone, and `external/cfront-C4'
+# holds nothing tracked. This line stays because a checkout that ever
+# built c++lib still has the 40 generated `.c' on disk, untracked: they
+# were once COMMITTED AT ZERO BYTES, so a fresh checkout compiled 40
+# empty translation units into `libc++.a' and the build reported success
+# -- a check that cannot fail. Keeping the line costs nothing and means
+# `git status' in such a checkout is readable.
 sys/src/ape/cmd/c++lib/*.c
 
-# cfrontsz-probe's two generated files were ignored here and that was
-# wrong: git IS the only channel to the VM, and the probe exists to be
-# run under pcc there. An ignored generated file is a file the VM never
-# sees, which is exactly what happened -- `pcc ... cfrontsz-probe.c'
-# answered `Can't open input file'. They are committed now; regenerate
-# and re-commit when cfront's main.c changes.  (Not the same shape as
-# the 40 zero-byte c++lib files above: those were an INPUT to mk, which
-# therefore never regenerated them. These two are in nobody's OFILES.)
+# THE RULE cfrontsz-probe PAID FOR, kept because the probe is gone and
+# the rule is not: git IS the only channel to the VM, so an ignored
+# GENERATED file is a file the VM never sees -- `pcc ... cfrontsz-probe.c'
+# answered `Can't open input file' for exactly that reason. A generated
+# file that something on the VM must READ gets committed. (Distinct from
+# the c++lib case above, where the generated files were an INPUT to mk,
+# which therefore never regenerated them.)
 
 # cpfe/eccp template-instantiation request files (EDG prelink).
 # Written beside the cwd by every cpfe run, VM and host alike.
 *.ti
-
-# EDG's two include directories, COPIED here by `sys/src/ape/cmd/edg''s
-# `install:V:' from `sys/src/external/edg'. Build output, like
-# `$objtype/bin' -- the originals are committed one directory up, and
-# this is the only place `cpfe'/`eccp' can reach them, since
-# `mount-include' binds `sys/lib' and does NOT bind `sys/src'.
-# NOT the ignored-generated-file trap above: the VM reads the ORIGINALS
-# through git and its own `mk install' makes these.
-sys/lib/ape/edg/
 
 # eccp's intermediate C, one per translated .cpp (kept only with -K).
 *.eccp.c

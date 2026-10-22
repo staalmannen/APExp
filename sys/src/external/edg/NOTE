@@ -728,12 +728,16 @@ HISTORY RATHER THAN THE RECIPE.  `eccp t.cpp' does the whole pipeline
 the target flags, the four `--sys_include' directories in order, and
 the `$status' and `--gen_c_file_name' disciplines `cmd/c++lib' paid for.
 `eccp -F' stops after the translation, which is what an mkfile rule
-wants.  **It is NOT called `c++'**: that name is CFRONT's driver and is
-live, since `sys/src/cmd/transpilers' sets `CXX=c++' and its
-`%.c: %.cpp' rule calls `c++ -F -o $target'.  `eccp' is upstream's own
-name for this front end, which also explains the `--help'/`-V'
-paragraph above -- those were always DRIVER options and there was no
-driver.
+wants.  **`c++' IS A ONE-LINE FORWARDER TO IT**, cfront having been
+removed from the tree, so `CXX=c++' works for autoconf, for GNU make's
+own default and for `sys/src/cmd/transpilers' -- **whose rules did not
+have to change at all**: `$CXX -F $CXXFLAGS -o $target' means the same
+thing to both front ends.  *A rule written against a driver survives
+the front end being replaced.*  The body lives under upstream's name
+because that is what every document here cites, and because two names
+with one implementation is the only arrangement that cannot drift --
+which also explains the `--help'/`-V' paragraph above: those were
+always DRIVER options and there was no driver.
 
 AND THE PARAGRAPH BELOW WAS WRONG ABOUT rc, which matters because it is
 the paragraph telling the next person how to type the command.  **`='
@@ -777,48 +781,67 @@ LANGUAGE-SUPPORT set -- <new>, <typeinfo>, <exception>, <stdexcept>,
 of them for `basic_string|vector|iostream|ostream' is EMPTY.
 `include_c99' holds one file, `iso646.h'.
 
-WHERE THE TWO DIRECTORIES ARE INSTALLED, AND WHY NOT IN
-`sys/include/ape/c++'.  Asked directly, and the answer is three
-measured facts rather than a preference.  `cmd/edg/mkfile''s
-`install:V:' copies them to **`/sys/lib/ape/edg'**, which is the
-pkgconf precedent (`PKG_DEFAULT_PATH' is `/sys/lib/ape/pkgconfig'), and
-`eccp''s `$EDGINCL' is what names it.
+WHERE `include_c++' IS INSTALLED: **`sys/include/ape/c++'**, as
+committed copies, which is the directory CFRONT vacated when it was
+removed from the tree.  `eccp''s `$CXXINCL' names it and
+`sys/include/ape/c++/README' carries the provenance, the `.stdh'
+mechanism and the drift check.  Three things about that are worth
+keeping here, and one of them is a correction.
 
-  1. `sys/include/ape/c++' IS ALREADY CFRONT'S -- seventeen
-     pre-standard headers, committed, and PUBLIC with no install step
-     at all, since `mount-include' BINDS the whole of `sys/include'.
-     Two names collide (`new.h', `stdexcept.h') **and the two `new.h'
-     share the include guard `__NEW_H'**, so whichever is found first
-     silently erases the other.  They are not variants of one header:
-     cfront's DECLARES `operator new' and carries
-     `#pragma lib "ape/libc++.a"'; EDG's is a one-line shim that does
-     `#include <new>'.  *That is the `Lock' duplicate-typedef shape and
-     the `reject' shape in one file*, and it is why the search ORDER in
-     `eccp' puts EDG's directory first.
+  1. COMMITTED COPIES RATHER THAN AN INSTALL RULE, which is the tree's
+     own precedent and not a new arrangement: `sys/include/ape/X11' is
+     fifteen committed copies of `external/tk/xlib/X11', and `tcl.h',
+     `tk.h' and `f2c.h' are the same shape.  `mount-include' BINDS the
+     whole of `sys/include', so a committed header reaches the VM
+     through git alone -- which matters, because git is the only
+     channel to it and `cmd/edg' is deliberately out of the tree's app
+     lists.  An earlier round staged them into `/sys/lib/ape/edg' with
+     an `install:V:' and a `.gitignore' line; both are gone.
 
-  2. EDG'S PRIMARY HEADERS ARE `.stdh' AND NO OTHER COMPILER CAN SEE
-     THEM.  `src/cmd_line.c:23289' is
-     `include_file_suffixes = "::stdh:"' -- an empty suffix, then
-     `stdh' -- so `#include <new>' resolves through cpfe's own suffix
-     list to `new.stdh'.  Nothing else in the tree reads that, and
-     **`apehdr-sweep' compiles every header in `sys/include/ape'
-     STANDALONE AS C**, so installing them there would turn a gating
-     instrument into a column of findings.  (The same objection the
-     720 portable_stl headers already have recorded against them.)
+  2. ***AND ONE OBJECTION I RAISED AGAINST THIS DIRECTORY WAS SIMPLY
+     WRONG.***  I wrote that `apehdr-sweep' "compiles every header in
+     `sys/include/ape' STANDALONE AS C, so installing them there would
+     turn a gating instrument into a column of findings".  **It does
+     not look in subdirectories at all** -- the sweep is `os.listdir'
+     and its 149 is exactly `ls sys/include/ape/*.h | wc -l', so
+     `c++/' has always been outside it.  It must have been: cfront's
+     seventeen headers sat there while the sweep reported 0 findings,
+     so the number it had been printing all along was the refutation.
+     *One command on the instrument settles what a reading of the
+     directory cannot.*
 
-  3. NOTHING INCLUDES THEM WITH `<>' FROM OUTSIDE cpfe's own
-     `--sys_include' list -- which is the test `Plan9libnet.h' was
-     deleted for failing.  *Install a header when a program needs to
-     say `#include <...>' and not before.*
+  3. THE COLLISION WAS REAL, and `git status' printed it.  Staging
+     EDG's set over cfront's shows `new.h' and `stdexcept.h' as
+     MODIFIED rather than added-and-deleted -- the same two names,
+     different content -- and cfront's `new.h' DECLARED `operator new'
+     with `#pragma lib "ape/libc++.a"' where EDG's is a one-line shim
+     doing `#include <new>', **both under the guard `__NEW_H'**.  *The
+     `Lock' duplicate-typedef shape and the `reject' shape in one
+     file*, and the reason the two sets could never have shared a
+     directory.
 
-If a public C++ include tree is ever wanted it needs its own
-subdirectory and a decision about cfront's, not a merge into it.
+THE DRIFT CHECK IS NAMED RATHER THAN LEFT TO BE REDISCOVERED.  Two
+copies of a header that can disagree is the
+`PATH_MAX'/`limits_generic.h' class, and the `f2c.h' question was
+settled in one command by diffing the installed copy against the one
+next door.  From the repository root:
+
+	diff -rq -x README sys/include/ape/c++ sys/src/external/edg/include_c++
+
+**Empty output is the pass.**  `-q' because a bare `diff -r' prints
+seventy lines of content, and README is excluded because ours replaces
+upstream's.
 
 AND `include_c99' IS A ONE-HEADER GAP THAT WAS REAL: `iso646.h' DID NOT
 EXIST IN APExp AT ALL.  Asking "what in that directory do the APExp
 headers not already cover" answered in one command -- all of it, and it
 is one file.  `sys/include/ape/iso646.h' is written now, guarded
 `#ifndef __cplusplus' because in C++ all eleven are KEYWORDS.
+**So `include_c99' IS NOT MIRRORED AND NEEDS NO MIRROR**, and that is
+the neat half: ours is on `eccp''s path already (through
+`--sys_include=/sys/include/ape') and is the BETTER of the two, since
+EDG's defines the macros unconditionally.  One file, correct in both
+languages.
 **The directory's NAME is misleading and that is the useful half**:
 these macros are C95 (Normative Addendum 1), not C99 -- so "which C99
 features does EDG need" has the answer *none; it needs a C95 header*.

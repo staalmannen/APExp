@@ -21,15 +21,25 @@
 #    whatever the command then does -- that is how forty zero-byte
 #    `.c' files came to be committed and compiled into an empty
 #    `libc++.a' while the build reported success. `-o $target' is the
-#    fix: the driver's -F arm only `cp's once cfront has RETURNED, so
-#    a failure leaves no target and mk stops where the fault is.
+#    fix: the driver only writes the target once the translator has
+#    RETURNED, so a failure leaves no target and mk stops where the
+#    fault is.
 #
-#    And `cfront' is the wrong PROGRAM. cfront is one stage of three
-#    -- `pcc -E' -> `ns_strip' -> `cfront' -- and handed a `.cpp'
-#    directly it sees unpreprocessed source. `rc/bin/ape/c++' is the
-#    driver, it accepts .cpp/.cxx/.cc/.C alike, and `-F' is its
-#    translate-only mode. `cmd/c++lib/mkfile' has used it correctly
-#    since that round; this file did not.
+#    And naming the TRANSLATOR was the other half: a translator is one
+#    stage of several and handed a `.cpp' directly it sees the wrong
+#    input. `$CXX' is the DRIVER, which accepts .cpp/.cxx/.cc/.C
+#    alike, and `-F' is its translate-only mode.
+#
+#    **THE FRONT END BEHIND `c++' IS EDG NOW, NOT CFRONT**, which was
+#    removed from the tree: `rc/bin/ape/c++' is a one-line forwarder to
+#    `rc/bin/ape/eccp', whose pipeline is `cpfe' -> `cc -c' -> a link
+#    against `libedg.a'.  **These rules did not have to change for
+#    that**, and that is the whole value of having gone through the
+#    driver: `$CXX -F $CXXFLAGS -o $target' means the same thing to
+#    both, and `eccp -F' removes the target on a failure for the same
+#    reason the arm above does.  *A rule written against a driver
+#    survives the front end being replaced; one written against
+#    `cfront' would not have.*
 #
 # 2. `%.c: %.m' with `$OBJC $stem.m' was wrong TWICE OVER, and the
 #    driver script is what says so rather than any guess.
