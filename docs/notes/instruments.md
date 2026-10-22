@@ -303,3 +303,42 @@ upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
 Beyond that, testing is still mostly ad-hoc — compile a program under
 APExp and see whether it builds and runs.
+
+
+---
+
+## `rdev-test.c`
+
+Came from `cmp` printing nothing for two files that differ at byte 17,
+while Plan 9's own `cmp` one window over answered correctly.
+
+**It transcribes `diffutils/src/system.c`'s `same_file()` verbatim
+rather than describing it.** The whole question is what *that* function
+answers about two files on this system; a paraphrase would be a
+different test, and a test of a paraphrase would have passed.
+
+- **Section 0 is the control and a second measurement at once.** Two
+  ordinary files must have different `st_ino` — POSIX requires it, and
+  if it fails nothing below means anything, since `same_file` would be
+  answering on the dev+ino arm before reaching the one under test. It
+  also prints `sizeof(ino_t)` and both inodes, which is where APE's
+  **16-bit `ino_t`** shows.
+- **Section 1** asserts that two distinct character devices are not one
+  file. It finds them rather than naming a pair, since the names differ
+  between systems, and SKIPS rather than failing if fewer than two
+  exist — *a section that cannot run must say so rather than pass*.
+- **Section 2 is a PROBE**: the exact question `cmp` asks about its own
+  stdout. It asserts nothing, because the right answer depends on where
+  stdout goes — on a terminal it must be "no", and redirected to a file
+  the question is moot, since cmp's test requires stdout to be a char
+  device. *That dependence is why it is a probe and not a check.*
+
+0 failures on gcc. **The control fires**: the old behaviour replicated
+beside it (st_rdev constant) gives **exactly 1**, section 1, with
+section 0 still passing — which is what says the instrument isolates the
+right arm of `same_file` rather than merely noticing something is wrong.
+
+`_rdevmark()` is the version marker, the eighth use of the idiom and the
+one it matters most for: *the bug it guards against is one whose entire
+symptom is that nothing is printed*, so a test silently measuring a
+stale libap would be indistinguishable from a pass.

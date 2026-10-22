@@ -3155,3 +3155,114 @@ parent waiting for ever on a rendezvous with a process that did not
 exist; and `ioctl(FIONREAD)` stored `*(long*)arg` where every caller
 passes an `int *`, writing eight bytes and smashing four of the
 caller's frame.
+
+
+---
+
+## `st_rdev` was 0 for every file, and it made `cmp` silent
+
+```
+  bash-5.3$ cmp bacon.bac.c src/bacon.bac.c
+  bash-5.3$ ls -l bacon.bac.c
+  -rw-r--r-- 1 glenda glenda 529640 Sun 22 19:10 bacon.bac.c
+  bash-5.3$ ls -l src/bacon.bac.c
+  -rw-rw-r-- 1 glenda glenda 531079 Sun  4 03:05 src/bacon.bac.c
+
+  term% cmp bacon.bac.c src/bacon.bac.c
+  bacon.bac.c src/bacon.bac.c differ: char 17
+```
+
+**Two files of different sizes that differ at byte 17, and APE's `cmp`
+said nothing.** Plan 9's own `cmp`, one window over, answered. *A
+comparison program that cannot report a difference is the purest form of
+a check that cannot fail* -- and this tree runs `cmp` in its own
+recorded instructions, so every one of those had been silently passing.
+
+### The chain, and every link was read rather than guessed
+
+1. `_dirtostat` set **`s->st_rdev = 0;`** for every file, unconditionally.
+2. gnulib's `same_file` (`diffutils/src/system.c:26`) is dev+ino, and
+   then a SECOND arm: *"Two character special files describe the same
+   device if st_rdev is the same ... They have the same contents, so
+   treat them as the same."* **With st_rdev a constant, that arm says
+   yes to every pair of char specials.**
+3. `cmp.c:336` asks whether its own stdout is `/dev/null`, so it can
+   skip the work of describing a difference nobody will read:
+   `fstat(STDOUT) && S_ISCHR(outstat) && stat("/dev/null") &&
+   same_file(&outstat, &nullstat)` -> `comparison_type = type_no_stdout`.
+4. Under a terminal stdout is `/dev/cons`. `_dirtostat` gives it
+   `S_IFCHR` (`FD_ISTTY`, or `d->type != 'M'`), and `/dev/null` is a
+   char special by the same line. Both rdev 0, so step 2 returns true.
+5. **cmp concluded it was writing to the bit bucket and compared the two
+   files in total silence.**
+
+*The exit status was still right, which is what made it survive: nothing
+in the failure is visible unless someone reads `$?` or runs the native
+`cmp` beside it.*
+
+**`diff` has a second victim at `diff.c:1300`**: inside a recursive
+diff, `if (file[0].stat.st_rdev == file[1].stat.st_rdev) return
+EXIT_SUCCESS;` for two non-regular files -- so `diff -r` would call
+every pair of device files identical without reading either.
+
+### The value is not invented
+
+Plan 9 has no device numbers, and *"do not invent semantics"* is the
+rule that stops this becoming a fabrication. But st_rdev's actual
+contract -- **shared by every name that reaches one device, different
+for any two distinct ones** -- is exactly what a qid is: a bind gives
+two paths one qid, and `/dev/cons` and `/dev/null` have different ones.
+So `st_rdev = d->qid.path` for the char and block cases, 0 otherwise,
+since POSIX leaves it unspecified for everything else. On this system
+two char specials are the same device **if and only if they are the same
+file**, and that is a true sentence about Plan 9 rather than a
+convenient one.
+
+**`rdev-test.c` is the instrument**, and it transcribes `same_file()`
+verbatim rather than describing it -- *the whole question is what THAT
+function answers, and a paraphrase would be a different test*. 0
+failures on gcc; the old behaviour replicated beside it gives **exactly
+1**, section 1, with section 0's dev+ino control still passing, which is
+what says the instrument isolates the right arm. `_rdevmark()` is the
+version marker, the eighth use of the idiom and the one it matters most
+for, since the bug it guards against is one whose entire symptom is that
+nothing is printed.
+
+## And section 0 measured a second bug: `ino_t` is 16 bits
+
+`sys/include/ape/sys/types.h:16-17`:
+
+```c
+	typedef	unsigned short	ino_t;
+	typedef	unsigned short	dev_t;
+```
+
+**One definition each, and `struct stat` uses them for `st_dev`,
+`st_ino` and `st_rdev`.** A Plan 9 qid path is 64 bits and
+`_dirtostat` assigns `s->st_ino = d->qid.path`, so **st_ino is that
+path truncated to sixteen bits** and two unrelated files are "the same
+file" to every POSIX program once a server holds more than 65536 of
+them.
+
+***THE APExp TREE IS 64799 FILES.*** 64723 tracked, 64799 on disk,
+against a 65536 pigeonhole -- so this is not a theoretical bound being
+quoted at a hypothetical filesystem. *The repository is 1.1% short of
+guaranteeing a collision inside itself*, and any file server holding it
+plus anything else is already past.
+
+**What reads dev+ino**: `same_file` in diffutils (so `cmp` and `diff`
+refuse to compare a file with itself -- and would wrongly refuse a
+collided pair), `find`'s loop detection, `du`'s hard-link accounting,
+`fts`, `tar`'s hard links, and **this library's own
+`_sock_listenpid.c`**, which was keyed on dev/ino precisely because a
+descriptor NUMBER is retired by `dup2()` -- and whose recorded failure
+was a stale entry SIGKILLing the wrong process.
+
+**RECORDED, NOT FIXED, and the reason is the cost rather than doubt
+about the finding.** Widening either typedef moves every field after it
+in `struct stat`, which is an ABI change: every binary in the tree has
+to be relinked, so it needs a `mk distclean` and it needs to go in a
+release where that is already mandatory. It is one line of
+`sys/include/ape/sys/types.h` plus that rebuild. **Section 0 of
+`rdev-test` prints both widths and both inodes**, so a run says which
+world it is in instead of leaving it to be assumed.

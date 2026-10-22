@@ -2601,18 +2601,62 @@ Two things had to be true and both were checked rather than hoped:
   machines take the same branch every time. The twelfth hit is the
   string `"OS$"` inside a runtime error message, not the host.
 
-So the two generators should agree to the byte, and **a difference would
-be a real disagreement between shell BaCon and the bacon kencc compiled
-rather than a platform artefact** -- which is what makes `cmp` worth
-running and its answer worth believing.
+### It was run, and the recommendation was wrong in BOTH halves
 
 ```
+	bash-5.3$ cmp bacon.bac.c src/bacon.bac.c
+	bash-5.3$                                    <- nothing
+	term%   cmp bacon.bac.c src/bacon.bac.c
+	bacon.bac.c src/bacon.bac.c differ: char 17
+```
+
+**Wrong half one: `cmp` itself was broken on this machine.** APE's
+`cmp` printed nothing for two files that plainly differ, because
+`st_rdev` was 0 for every file and that made cmp believe its own stdout
+was `/dev/null`. The full chain is in `docs/notes/libap.md`; it is
+fixed. *The instrument prescribed here was a check that could not fail,
+and prescribing it is what found that out.*
+
+**Wrong half two, and it is the one that matters for bacon: THIS WAS
+NEVER A FIXPOINT TEST.** `src/bacon.bac.c` was produced by
+**`bacon.sh`**, which is not the compiled bacon in another form -- it
+is a **second, independent implementation of BaCon written in bash**.
+Comparing its output with the compiled converter's compares two
+programs, not two generations of one, and byte-identical agreement
+between them was never the expected outcome. The sizes say so plainly:
+529640 against 531079, 1439 bytes apart.
+
+**Byte 17 is the two implementations naming themselves**, and it is
+exactly where the first difference has to be:
+
+```
+  bacon.bac:8328   "/* Created with BaCon "       & g_VERSION$ ...
+  bacon.sh:8560    "/* Created with Shell BaCon " & $g_VERSION ...
+```
+
+`/* Created with ` is sixteen characters. Byte 17 is `B` in one file and
+`S` in the other. *A diagnosis that reproduces the byte offset exactly
+is a measurement rather than a resemblance*, and here it also says the
+difference is the banner rather than the translation.
+
+### The real fixpoint test, which costs the same and asks the right thing
+
+Both sides produced by the COMPILED bacon on the same machine, so the
+only thing varying is which generation wrote it:
+
+```
+	bacon   -p -n -q bacon.bac && mv bacon.bac.c /tmp/gen1.c
 	./bacon -p -n -q bacon.bac
-	cmp bacon.bac.c src/bacon.bac.c
+	cmp /tmp/gen1.c bacon.bac.c          # or Plan 9's cmp
 ```
 
-`-n` is kept beside `-p` only to skip a compile nobody needs here; it
-changes nothing about what is generated.
+Identical is the expectation and **would be self-hosting proven at the
+source level**, where the equal binary sizes only imply it. `-n` skips
+a compile nobody needs; it changes nothing about what is generated.
+
+*Comparing against `src/bacon.bac.c` is still worth one look, but as a
+question about how far the two implementations have drifted -- not as a
+pass/fail.*
 
 ### The one-word trap, recorded because it was avoided rather than hit
 

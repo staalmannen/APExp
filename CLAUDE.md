@@ -230,7 +230,9 @@ an APE build never reaches kencc's own C23 keywords.
 `dup-fdinfo-test`, `rmdir-test`, `copyfile-test`, `deeppath-test`,
 `bufexec-test`, `mkstemp-test`, `printfmod-test`, `umask-test`,
 `dupbuf-test`, `dotdir-test`, `getcwd-test`, `progname-test`,
-`select-test`, `cxaatexit-test`, `stdio-test`.
+`select-test`, `cxaatexit-test`, `rdev-test` (two different files must
+be distinguishable — it transcribes diffutils' `same_file()` verbatim,
+because the question is what THAT function answers), `stdio-test`.
 **`strerror-test.c` must be linked against `libgnu.a`** or it passes
 against a broken tree and proves nothing; the command is in the file.
 
@@ -238,9 +240,10 @@ against a broken tree and proves nothing; the command is in the file.
 so a test built from a fresh pull can run days-old library code and say
 nothing. `_sock_listenmark`, `_execmark`, `_ttymark`, `_getcwdmark`,
 `_printfmark`, `_dupmark`, `_dotdirmark`, `_tempmark`, `_fdinfomark`,
-`_umaskmark`, `_bufmark` each make the test **fail to LINK** against a
-libap predating its fix. The idiom has paid seven times; bump one when a
-file changes in a way a test must see.
+`_umaskmark`, `_bufmark`, `_rdevmark` each make the test **fail to
+LINK** against a libap predating its fix. The idiom has paid eight
+times; bump one when a file changes in a way a test must see — and it
+matters most where the bug's whole symptom is that nothing is printed.
 
 **Host cross-checks** (not Plan 9 tests — they run on the build host):
 `tz-xcheck`, `ctype-xcheck`, `strtod-xcheck`, `strtof-xcheck`,
@@ -402,8 +405,18 @@ built by hand has not been measured in that position*.
   COMMAND constant, so the only thing left varying is the C. **A
   comparison is not worthless or valuable in itself; it depends on what
   else is held constant.**
-  One command short of proof, and **the command is `./bacon -p -n -q
-  bacon.bac` then `cmp bacon.bac.c src/bacon.bac.c`** — bacon DELETES
+  One command short of proof, and **it is the comparison between two
+  GENERATIONS, not against the committed C**: `src/bacon.bac.c` came
+  from `bacon.sh`, a *second, independent implementation of BaCon
+  written in bash*, so agreement with it was never the expected
+  outcome — the first difference is at byte 17, exactly where
+  `/* Created with BaCon ` and `/* Created with Shell BaCon ` diverge.
+  The test that asks the right thing is `bacon -p -n -q bacon.bac`,
+  keep that `.c`, then `./bacon -p -n -q bacon.bac` and compare the
+  two: both from the compiled converter, so only the generation
+  varies. **And compare with Plan 9's `cmp` or check `$?`** — see the
+  `st_rdev` item below for why APE's was silent.
+  Getting the file out at all needs a flag, because bacon DELETES
   the C it generated (`bacon.bac:8294` puts it on the temp list,
   `:10509` removes it), and the flags do not do what their names
   suggest: **`-n` alone converts and then throws the conversion away**,
@@ -968,7 +981,11 @@ killing every GNU program in the tree; `isblank('\t')` and the bash
 allocation storm; `getcwd(NULL,n)`; `mktemp`'s 26 names; `printf`'s
 `%td`/`%jd`/`%hhd`/`%F`; fifteen missing `strftime` conversions; 40 wrong
 `strerror` entries; `dup`/`dup2`/`F_DUPFD` on a buffered descriptor;
-`.`/`..` in `readdir`; collating symbols in `regcomp`; `umask`; itcl's
+`.`/`..` in `readdir`; collating symbols in `regcomp`; `umask`;
+**`st_rdev` being 0 for every file, which made APE's `cmp` compare two
+different files in SILENCE** (it believed its own stdout was
+`/dev/null`) and made `diff -r` call every pair of special files
+identical; itcl's
 four `sfbug`s; kencc's `false` keyword, the `L`-suffix width cap, the
 wide case label, the compound-literal zero fill, and both bit-field
 rules with the static initialiser underneath them.
@@ -982,6 +999,21 @@ the public headers is sockets, locks and `termios`** — `sockaddr_in`
 `DIR`, `jmp_buf` or `fd_set`, which the flag's own warning had named and
 the acid diff refuted. *The feared cost and the measured cost were
 different sizes, and only the probe could have said so.*
+
+**`ino_t` AND `dev_t` ARE 16 BITS, measured and NOT fixed.**
+`sys/include/ape/sys/types.h:16-17` makes both `unsigned short`, and
+`_dirtostat` assigns `st_ino = d->qid.path` — a 64-bit qid truncated to
+sixteen bits, so two unrelated files are "the same file" to every POSIX
+program once a server holds more than 65536. ***The APExp tree is 64799
+files***, 1.1% short of guaranteeing a collision inside itself. What
+reads dev+ino: `same_file` in diffutils, `find`'s loop detection, `du`'s
+hard links, `fts`, `tar`, and **libap's own `_sock_listenpid.c`**, keyed
+on dev/ino precisely because a descriptor number is retired by `dup2()`.
+*Not fixed because of the cost rather than doubt*: widening either
+typedef moves every field after it in `struct stat`, so every binary
+needs relinking — one line plus a mandatory `mk distclean`, which is
+exactly what this release already requires. `rdev-test` section 0 prints
+both widths and both inodes.
 
 **Smaller open items**: `strtol`/`strtoul` have the same
 one-limit-for-both-signs shape as `strtoll` had, so `strtol(LONG_MIN)`
