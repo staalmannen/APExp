@@ -1,0 +1,827 @@
+// ***************************************************************************
+// * Copyright (c) 2024-2025 Paragon Software Group
+// *
+// * Project="Paragon Portable STL" File="map_lookup.cpp"
+// * 
+// * This program and the accompanying materials are made available under the
+// * terms of the MIT License which is available at
+// * https://opensource.org/licenses/MIT.
+// * 
+// * SPDX-License-Identifier: MIT
+// ***************************************************************************
+#include <gtest/gtest.h>
+
+#include <portable_stl/map/map.h>
+
+#include "../common/test_allocator.h"
+
+using t_map_value_type = ::portable_stl::tuple<std::int32_t const, double>;
+
+using t_allocator2 = test_allocator_helper::test_allocator<t_map_value_type>;
+
+// using t_compare = test_common_helper::test_less<std::int32_t>;
+
+using t_map = ::portable_stl::map<std::int32_t, double>;
+
+//       iterator find(const key_type& k);
+// const_iterator find(const key_type& k) const;
+TEST(map, find) {
+  static_cast<void>(test_info_);
+
+  t_map_value_type arr[] = {t_map_value_type(5, 5),
+                            t_map_value_type(6, 6),
+                            t_map_value_type(7, 7),
+                            t_map_value_type(8, 8),
+                            t_map_value_type(9, 9),
+                            t_map_value_type(10, 10),
+                            t_map_value_type(11, 11),
+                            t_map_value_type(12, 12)};
+
+  {
+    t_map mp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+    auto result = mp.find(5);
+    ASSERT_EQ(mp.begin(), result);
+
+    result = mp.find(6);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 1), result);
+
+    result = mp.find(7);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 2), result);
+
+    result = mp.find(8);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 3), result);
+
+    result = mp.find(9);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 4), result);
+
+    result = mp.find(10);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 5), result);
+
+    result = mp.find(11);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 6), result);
+
+    result = mp.find(12);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 7), result);
+
+    result = mp.find(4);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 8), result);
+  }
+
+  // const
+  {
+    t_map const mp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+    auto result = mp.find(5);
+    ASSERT_EQ(mp.begin(), result);
+    ASSERT_TRUE((std::is_same<typename t_map::const_iterator, decltype(result)>{}));
+
+    result = mp.find(6);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 1), result);
+
+    result = mp.find(7);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 2), result);
+
+    result = mp.find(8);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 3), result);
+
+    result = mp.find(9);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 4), result);
+
+    result = mp.find(10);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 5), result);
+
+    result = mp.find(11);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 6), result);
+
+    result = mp.find(12);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 7), result);
+
+    result = mp.find(4);
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 8), result);
+  }
+}
+
+namespace test_map_helper {
+struct FAT_key {
+  std::int32_t m_int;
+  std::int32_t m_data[1000]; // heavy part
+};
+
+struct Light_key {
+  std::int32_t m_int;
+};
+
+// for use by comparator
+
+static bool operator<(FAT_key const &fk, Light_key const &lk) {
+  return fk.m_int < lk.m_int;
+}
+static bool operator<(Light_key const &lk, FAT_key const &fk) {
+  return lk.m_int < fk.m_int;
+}
+static bool operator<(FAT_key const &fk1, FAT_key const &fk2) {
+  return fk1.m_int < fk2.m_int;
+}
+
+} // namespace test_map_helper
+
+//       iterator find(const key_type& k);
+// const_iterator find(const key_type& k) const;
+TEST(map, find_transparent) {
+  static_cast<void>(test_info_);
+
+  /**
+   * @brief Map value alias.
+   */
+  using t_map_FAT_value_type = ::portable_stl::tuple<test_map_helper::FAT_key, std::int32_t>;
+
+  /**
+   * @brief Map alias.
+   */
+  using t_mapFAT = ::portable_stl::map<test_map_helper::FAT_key, std::int32_t, ::portable_stl::less<>>;
+
+  t_map_FAT_value_type arr[] = {t_map_FAT_value_type({5, {}}, 1),
+                                t_map_FAT_value_type({6, {}}, 6),
+                                t_map_FAT_value_type({7, {}}, 7),
+                                t_map_FAT_value_type({8, {}}, 8),
+                                t_map_FAT_value_type({9, {}}, 9),
+                                t_map_FAT_value_type({10, {}}, 10),
+                                t_map_FAT_value_type({11, {}}, 11),
+                                t_map_FAT_value_type({12, {}}, 12)};
+
+  {
+    t_mapFAT mp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+    test_map_helper::Light_key const lkey{8};
+
+    auto result = mp.find(lkey);
+    EXPECT_EQ(::portable_stl::next(mp.begin(), 3), result);
+  }
+
+  // constant
+  {
+    t_mapFAT const mp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+    test_map_helper::Light_key const lkey{9};
+
+    auto result = mp.find(lkey);
+    EXPECT_EQ(::portable_stl::next(mp.begin(), 4), result);
+  }
+}
+
+// size_type count(const key_type& k) const;
+TEST(map, count) {
+  static_cast<void>(test_info_);
+
+  t_map_value_type arr[] = {t_map_value_type(5, 5),
+                            t_map_value_type(6, 6),
+                            t_map_value_type(7, 7),
+                            t_map_value_type(8, 8),
+                            t_map_value_type(9, 9),
+                            t_map_value_type(10, 10),
+                            t_map_value_type(11, 11),
+                            t_map_value_type(12, 12)};
+
+  t_map const mp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+  /**
+   * @brief Key alias.
+   */
+  using t_key_type = typename t_map::key_type;
+
+  for (std::int32_t i{0}; i < 5; ++i) {
+    auto result = mp.count(t_key_type(i));
+    ASSERT_EQ(0, result);
+  }
+
+  for (std::int32_t i{5}; i < 13; ++i) {
+    auto result = mp.count(t_key_type(i));
+    ASSERT_EQ(1, result);
+  }
+}
+
+namespace test_map_helper {
+class compare_pair_trans final {
+public:
+  bool operator()(::portable_stl::tuple<std::int32_t, std::int32_t> const &lhs,
+                  ::portable_stl::tuple<std::int32_t, std::int32_t> const &rhs) const {
+    return lhs < rhs;
+  }
+
+  bool operator()(::portable_stl::tuple<std::int32_t, std::int32_t> const &lhs, std::int32_t rhs) const {
+    return ::portable_stl::get<0>(lhs) < rhs;
+  }
+
+  bool operator()(std::int32_t lhs, ::portable_stl::tuple<std::int32_t, std::int32_t> const &rhs) const {
+    return lhs < ::portable_stl::get<0>(rhs);
+  }
+
+  using is_transparent = void;
+};
+} // namespace test_map_helper
+
+// size_type count(const key_type& k) const;
+TEST(map, count_transparent) {
+  static_cast<void>(test_info_);
+
+  ::portable_stl::map<::portable_stl::tuple<std::int32_t, std::int32_t>, std::int32_t, test_map_helper::compare_pair_trans> mp({
+    {{2, 1}, 1},
+    {{1, 2}, 2}, // hit
+    {{1, 3}, 3}, // hit
+    {{1, 4}, 4}, // hit
+    {{2, 2}, 5}
+  });
+
+  ASSERT_EQ(3, mp.count(1));
+}
+
+namespace test_map_helper {
+template<class t_map, class t_map_value_pair, class t_bad, class... t_pairs>
+void test_map_contains(t_bad bad, t_pairs... args) {
+  t_map            mp;
+  t_map_value_pair pairs[] = {args...};
+
+  for (auto &p : pairs) {
+    mp.insert(p);
+  }
+
+  for (auto &p : pairs) {
+    ASSERT_TRUE(mp.contains(::portable_stl::get<0>(p)));
+  }
+
+  ASSERT_FALSE(mp.contains(bad));
+}
+
+struct complex_value {
+  int    a = 1;
+  double b = 1;
+  char   c = 1;
+};
+} // namespace test_map_helper
+
+// bool contains(const key_type& x) const;
+TEST(map, contains) {
+  static_cast<void>(test_info_);
+
+  {
+    test_map_helper::test_map_contains<::portable_stl::map<char, std::int32_t>,
+                                        ::portable_stl::tuple<char, std::int32_t>>('e',
+                                                                                   ::portable_stl::make_tuple('a', 10),
+                                                                                   ::portable_stl::make_tuple('b', 11),
+                                                                                   ::portable_stl::make_tuple('c', 12),
+                                                                                   ::portable_stl::make_tuple('d', 13));
+
+    test_map_helper::test_map_contains<::portable_stl::map<char, char>, ::portable_stl::tuple<char, char>>(
+      'e',
+      ::portable_stl::make_tuple('a', 'a'),
+      ::portable_stl::make_tuple('b', 'a'),
+      ::portable_stl::make_tuple('c', 'a'),
+      ::portable_stl::make_tuple('d', 'b'));
+
+    test_map_helper::test_map_contains<::portable_stl::map<std::int32_t, test_map_helper::complex_value>,
+                                        ::portable_stl::tuple<std::int32_t, test_map_helper::complex_value>>(
+      -1,
+      ::portable_stl::make_tuple(1, test_map_helper::complex_value{}),
+      ::portable_stl::make_tuple(2, test_map_helper::complex_value{}),
+      ::portable_stl::make_tuple(3, test_map_helper::complex_value{}),
+      ::portable_stl::make_tuple(4, test_map_helper::complex_value{}));
+  }
+}
+
+// bool contains(const key_type& x) const;
+TEST(map, contains_transparent) {
+  static_cast<void>(test_info_);
+
+  ::portable_stl::map<::portable_stl::tuple<std::int32_t, std::int32_t>, std::int32_t, test_map_helper::compare_pair_trans> mp({
+    {{2, 1}, 1},
+    {{1, 2}, 2}, // hit
+    {{1, 3}, 3}, // hit
+    {{1, 4}, 4}, // hit
+    {{2, 2}, 5}
+  });
+
+  ASSERT_TRUE(mp.contains(1));
+}
+
+//       iterator lower_bound(const key_type& k);
+// const_iterator lower_bound(const key_type& k) const;
+TEST(map, lower_bound) {
+  static_cast<void>(test_info_);
+
+  t_map_value_type arr[] = {t_map_value_type(5, 5),
+                            t_map_value_type(7, 6),
+                            t_map_value_type(9, 7),
+                            t_map_value_type(11, 8),
+                            t_map_value_type(13, 9),
+                            t_map_value_type(15, 10),
+                            t_map_value_type(17, 11),
+                            t_map_value_type(19, 12)};
+
+  {
+    t_map mp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+    auto result = mp.lower_bound(5);
+    ASSERT_EQ(result, mp.begin());
+
+    result = mp.lower_bound(7);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin()));
+
+    result = mp.lower_bound(9);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.lower_bound(11);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.lower_bound(13);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.lower_bound(15);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.lower_bound(17);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.lower_bound(19);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.lower_bound(4);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 0));
+
+    result = mp.lower_bound(6);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 1));
+
+    result = mp.lower_bound(8);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.lower_bound(10);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.lower_bound(12);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.lower_bound(14);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.lower_bound(16);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.lower_bound(18);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.lower_bound(20);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 8));
+  }
+  {
+    t_map const mp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+    auto result = mp.lower_bound(5);
+    ASSERT_EQ(result, mp.begin());
+
+    result = mp.lower_bound(7);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin()));
+
+    result = mp.lower_bound(9);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.lower_bound(11);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.lower_bound(13);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.lower_bound(15);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.lower_bound(17);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.lower_bound(19);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.lower_bound(4);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 0));
+
+    result = mp.lower_bound(6);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 1));
+
+    result = mp.lower_bound(8);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.lower_bound(10);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.lower_bound(12);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.lower_bound(14);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.lower_bound(16);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.lower_bound(18);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.lower_bound(20);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 8));
+  }
+}
+
+//       iterator lower_bound(const key_type& k);
+// const_iterator lower_bound(const key_type& k) const;
+TEST(map, lower_bound_transparent) {
+  static_cast<void>(test_info_);
+
+  {
+    ::portable_stl::map<::portable_stl::tuple<std::int32_t, std::int32_t>, std::int32_t, test_map_helper::compare_pair_trans> mp({
+      {{2, 1}, 1},
+      {{1, 2}, 2}, // hit
+      {{1, 3}, 3}, // hit
+      {{1, 4}, 4}, // hit
+      {{2, 2}, 5}
+    });
+
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 0), mp.lower_bound(1)) << ::portable_stl::get<1>(*mp.lower_bound(1));
+    ASSERT_EQ(mp.end(), mp.lower_bound(6));
+  }
+
+  // constant
+  {
+    ::portable_stl::map<::portable_stl::tuple<std::int32_t, std::int32_t>, std::int32_t, test_map_helper::compare_pair_trans> const
+      mp({
+        {{2, 1}, 1},
+        {{1, 2}, 2}, // hit
+        {{1, 3}, 3}, // hit
+        {{1, 4}, 4}, // hit
+        {{2, 2}, 5}
+    });
+
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 0), mp.lower_bound(1)) << ::portable_stl::get<1>(*mp.lower_bound(1));
+    ASSERT_EQ(mp.end(), mp.lower_bound(6));
+  }
+}
+
+//       iterator upper_bound(const key_type& k);
+// const_iterator upper_bound(const key_type& k) const;
+TEST(map, upper_bound) {
+  static_cast<void>(test_info_);
+
+  t_map_value_type arr[] = {t_map_value_type(5, 5),
+                            t_map_value_type(7, 6),
+                            t_map_value_type(9, 7),
+                            t_map_value_type(11, 8),
+                            t_map_value_type(13, 9),
+                            t_map_value_type(15, 10),
+                            t_map_value_type(17, 11),
+                            t_map_value_type(19, 12)};
+  {
+    t_map mp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+    auto result = mp.upper_bound(5);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 1));
+
+    result = mp.upper_bound(7);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.upper_bound(9);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.upper_bound(11);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.upper_bound(13);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.upper_bound(15);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.upper_bound(17);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.upper_bound(19);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 8));
+
+    result = mp.upper_bound(4);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 0));
+
+    result = mp.upper_bound(6);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 1));
+
+    result = mp.upper_bound(8);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.upper_bound(10);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.upper_bound(12);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.upper_bound(14);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.upper_bound(16);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.upper_bound(18);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.upper_bound(20);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 8));
+  }
+
+  // constant
+  {
+    t_map const mp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+    auto result = mp.upper_bound(5);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 1));
+
+    result = mp.upper_bound(7);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.upper_bound(9);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.upper_bound(11);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.upper_bound(13);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.upper_bound(15);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.upper_bound(17);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.upper_bound(19);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 8));
+
+    result = mp.upper_bound(4);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 0));
+
+    result = mp.upper_bound(6);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 1));
+
+    result = mp.upper_bound(8);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.upper_bound(10);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.upper_bound(12);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.upper_bound(14);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.upper_bound(16);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.upper_bound(18);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.upper_bound(20);
+    ASSERT_EQ(result, ::portable_stl::next(mp.begin(), 8));
+  }
+}
+
+//       iterator upper_bound(const key_type& k);
+// const_iterator upper_bound(const key_type& k) const;
+TEST(map, upper_bound_transparent) {
+  static_cast<void>(test_info_);
+
+  {
+    ::portable_stl::map<::portable_stl::tuple<std::int32_t, std::int32_t>, std::int32_t, test_map_helper::compare_pair_trans> mp({
+      {{2, 1}, 1},
+      {{1, 2}, 2}, // hit
+      {{1, 3}, 3}, // hit
+      {{1, 4}, 4}, // hit
+      {{2, 2}, 5}
+    });
+
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 3), mp.upper_bound(1)) << ::portable_stl::get<1>(*mp.upper_bound(1));
+    ASSERT_EQ(mp.end(), mp.upper_bound(6));
+  }
+
+  // constant
+  {
+    ::portable_stl::map<::portable_stl::tuple<std::int32_t, std::int32_t>, std::int32_t, test_map_helper::compare_pair_trans> const
+      mp({
+        {{2, 1}, 1},
+        {{1, 2}, 2}, // hit
+        {{1, 3}, 3}, // hit
+        {{1, 4}, 4}, // hit
+        {{2, 2}, 5}
+    });
+
+    ASSERT_EQ(::portable_stl::next(mp.begin(), 3), mp.upper_bound(1)) << ::portable_stl::get<1>(*mp.upper_bound(1));
+    ASSERT_EQ(mp.end(), mp.upper_bound(6));
+  }
+}
+
+// pair<iterator,iterator>             equal_range(const key_type& k);
+// pair<const_iterator,const_iterator> equal_range(const key_type& k) const;
+TEST(map, equal_range) {
+  static_cast<void>(test_info_);
+
+  t_map_value_type arr[] = {t_map_value_type(5, 5),
+                            t_map_value_type(7, 6),
+                            t_map_value_type(9, 7),
+                            t_map_value_type(11, 8),
+                            t_map_value_type(13, 9),
+                            t_map_value_type(15, 10),
+                            t_map_value_type(17, 11),
+                            t_map_value_type(19, 12)};
+  {
+    t_map mp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+    auto result = mp.equal_range(5);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 0));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 1));
+
+    result = mp.equal_range(7);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 1));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.equal_range(9);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 2));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.equal_range(11);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 3));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.equal_range(13);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 4));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.equal_range(15);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 5));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.equal_range(17);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 6));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.equal_range(19);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 7));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 8));
+
+    result = mp.equal_range(4);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 0));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 0));
+
+    result = mp.equal_range(6);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 1));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 1));
+
+    result = mp.equal_range(8);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 2));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.equal_range(10);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 3));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.equal_range(12);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 4));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.equal_range(14);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 5));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.equal_range(16);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 6));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.equal_range(18);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 7));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.equal_range(20);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 8));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 8));
+  }
+
+  // constant
+  {
+    t_map const mp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+    auto result = mp.equal_range(5);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 0));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 1));
+
+    result = mp.equal_range(7);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 1));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.equal_range(9);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 2));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.equal_range(11);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 3));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.equal_range(13);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 4));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.equal_range(15);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 5));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.equal_range(17);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 6));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.equal_range(19);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 7));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 8));
+
+    result = mp.equal_range(4);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 0));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 0));
+
+    result = mp.equal_range(6);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 1));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 1));
+
+    result = mp.equal_range(8);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 2));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 2));
+
+    result = mp.equal_range(10);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 3));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 3));
+
+    result = mp.equal_range(12);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 4));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 4));
+
+    result = mp.equal_range(14);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 5));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 5));
+
+    result = mp.equal_range(16);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 6));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 6));
+
+    result = mp.equal_range(18);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 7));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 7));
+
+    result = mp.equal_range(20);
+    ASSERT_EQ(::portable_stl::get<0>(result), ::portable_stl::next(mp.begin(), 8));
+    ASSERT_EQ(::portable_stl::get<1>(result), ::portable_stl::next(mp.begin(), 8));
+  }
+}
+
+// template<typename K> pair<iterator,iterator>             equal_range(const K& x);
+// template<typename K> pair<const_iterator,const_iterator> equal_range(const K& x) const;
+TEST(map, equal_range_transparent) {
+  static_cast<void>(test_info_);
+
+  {
+    ::portable_stl::map<::portable_stl::tuple<std::int32_t, std::int32_t>, std::int32_t, test_map_helper::compare_pair_trans> mp({
+      {{2, 1}, 1},
+      {{1, 2}, 2}, // hit
+      {{1, 3}, 3}, // hit
+      {{1, 4}, 4}, // hit
+      {{2, 2}, 5}
+    });
+
+    auto        result = mp.equal_range(1);
+    std::size_t nels{0};
+
+    for (auto it = ::portable_stl::get<0>(result); it != ::portable_stl::get<1>(result); it++) {
+      ASSERT_EQ(1, ::portable_stl::get<0>(::portable_stl::get<0>(*it)));
+      ++nels;
+    }
+
+    ASSERT_EQ(3, nels);
+  }
+
+  {
+    ::portable_stl::map<::portable_stl::tuple<std::int32_t, std::int32_t>, std::int32_t, test_map_helper::compare_pair_trans> const mp({
+      {{2, 1}, 1},
+      {{1, 2}, 2}, // hit
+      {{1, 3}, 3}, // hit
+      {{1, 4}, 4}, // hit
+      {{2, 2}, 5}
+    });
+
+    auto        result = mp.equal_range(1);
+    std::size_t nels{0};
+
+    for (auto it = ::portable_stl::get<0>(result); it != ::portable_stl::get<1>(result); it++) {
+      ASSERT_EQ(1, ::portable_stl::get<0>(::portable_stl::get<0>(*it)));
+      ++nels;
+    }
+
+    ASSERT_EQ(3, nels);
+  }
+}

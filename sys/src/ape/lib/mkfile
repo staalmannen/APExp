@@ -18,8 +18,6 @@ _OPTIONAL_LIBS=\
 	curses\
 	dwarf\
 	dwarfp\
-# edg is EDG's C++ front-end runtime (libedg.a), and it is LIVE now -- \
-# lib before cmd, because cmd/edg's link line names this archive. \
 	edg\
 	fortran\
 	lua\
