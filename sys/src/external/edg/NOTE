@@ -722,9 +722,31 @@ default --sys_include list.  cpfe has no standard include path of its
 own -- it searches exactly what it is given -- so there is nothing to
 suppress.
 
+THERE IS A DRIVER NOW AND IT IS `rc/bin/ape/eccp', SO THIS COMMAND IS
+HISTORY RATHER THAN THE RECIPE.  `eccp t.cpp' does the whole pipeline
+-- cpfe, then `cc -c', then the link against `libedg.a' -- and carries
+the target flags, the four `--sys_include' directories in order, and
+the `$status' and `--gen_c_file_name' disciplines `cmd/c++lib' paid for.
+`eccp -F' stops after the translation, which is what an mkfile rule
+wants.  **It is NOT called `c++'**: that name is CFRONT's driver and is
+live, since `sys/src/cmd/transpilers' sets `CXX=c++' and its
+`%.c: %.cpp' rule calls `c++ -F -o $target'.  `eccp' is upstream's own
+name for this front end, which also explains the `--help'/`-V'
+paragraph above -- those were always DRIVER options and there was no
+driver.
+
+AND THE PARAGRAPH BELOW WAS WRONG ABOUT rc, which matters because it is
+the paragraph telling the next person how to type the command.  **`='
+is a syntax character in rc wherever it is not a leading assignment or
+inside quotes** -- an mkfile recipe is simply where this tree met it
+first (`-D_main=__edg_main', and `awk -v name=$name' before that).  In
+an rc SCRIPT or at an rc PROMPT a bare `--sys_include=/sys/include/ape'
+is `token '=': syntax error' just the same.  It needs no quoting only
+in BASH, which is what the run below used.  `eccp' builds every one of
+them by concatenation (`'--sys_include='^$d'), and that is why.
+
 THE FIRST TRANSLATION ON 9front, as a command (from bash inside
-apexp-sh; the `=' needs no quoting there, only in an mkfile recipe,
-where rc parses it):
+apexp-sh, where the `=' needs no quoting -- see the correction above):
 
 	cpfe --c++14 --no_exceptions --no_rtti \
 	     --sys_include=<edg>/include_c++ \
@@ -754,6 +776,59 @@ LANGUAGE-SUPPORT set -- <new>, <typeinfo>, <exception>, <stdexcept>,
 <stdfloat>, plus cxxabi.h and edg_internal_defines.  A grep across all
 of them for `basic_string|vector|iostream|ostream' is EMPTY.
 `include_c99' holds one file, `iso646.h'.
+
+WHERE THE TWO DIRECTORIES ARE INSTALLED, AND WHY NOT IN
+`sys/include/ape/c++'.  Asked directly, and the answer is three
+measured facts rather than a preference.  `cmd/edg/mkfile''s
+`install:V:' copies them to **`/sys/lib/ape/edg'**, which is the
+pkgconf precedent (`PKG_DEFAULT_PATH' is `/sys/lib/ape/pkgconfig'), and
+`eccp''s `$EDGINCL' is what names it.
+
+  1. `sys/include/ape/c++' IS ALREADY CFRONT'S -- seventeen
+     pre-standard headers, committed, and PUBLIC with no install step
+     at all, since `mount-include' BINDS the whole of `sys/include'.
+     Two names collide (`new.h', `stdexcept.h') **and the two `new.h'
+     share the include guard `__NEW_H'**, so whichever is found first
+     silently erases the other.  They are not variants of one header:
+     cfront's DECLARES `operator new' and carries
+     `#pragma lib "ape/libc++.a"'; EDG's is a one-line shim that does
+     `#include <new>'.  *That is the `Lock' duplicate-typedef shape and
+     the `reject' shape in one file*, and it is why the search ORDER in
+     `eccp' puts EDG's directory first.
+
+  2. EDG'S PRIMARY HEADERS ARE `.stdh' AND NO OTHER COMPILER CAN SEE
+     THEM.  `src/cmd_line.c:23289' is
+     `include_file_suffixes = "::stdh:"' -- an empty suffix, then
+     `stdh' -- so `#include <new>' resolves through cpfe's own suffix
+     list to `new.stdh'.  Nothing else in the tree reads that, and
+     **`apehdr-sweep' compiles every header in `sys/include/ape'
+     STANDALONE AS C**, so installing them there would turn a gating
+     instrument into a column of findings.  (The same objection the
+     720 portable_stl headers already have recorded against them.)
+
+  3. NOTHING INCLUDES THEM WITH `<>' FROM OUTSIDE cpfe's own
+     `--sys_include' list -- which is the test `Plan9libnet.h' was
+     deleted for failing.  *Install a header when a program needs to
+     say `#include <...>' and not before.*
+
+If a public C++ include tree is ever wanted it needs its own
+subdirectory and a decision about cfront's, not a merge into it.
+
+AND `include_c99' IS A ONE-HEADER GAP THAT WAS REAL: `iso646.h' DID NOT
+EXIST IN APExp AT ALL.  Asking "what in that directory do the APExp
+headers not already cover" answered in one command -- all of it, and it
+is one file.  `sys/include/ape/iso646.h' is written now, guarded
+`#ifndef __cplusplus' because in C++ all eleven are KEYWORDS.
+**The directory's NAME is misleading and that is the useful half**:
+these macros are C95 (Normative Addendum 1), not C99 -- so "which C99
+features does EDG need" has the answer *none; it needs a C95 header*.
+cpfe never reaches ours either way, since `edg/include_c99' is searched
+first, so this is for the C side of the tree rather than for EDG.
+**A sweep of all 31 headers the C standards require then named four
+more absentees** -- `stdalign.h' (C11), `threads.h' (C11),
+`stdbit.h' and `stdckdint.h' (C23) -- recorded in
+`docs/releases/0.6.md' rather than written blind: `threads.h' is a real
+library question and the other three are compiler-coupled.
 
 `lib_src' (51 files, 7191 lines) is the matching RUNTIME: the operator
 new/delete families, vtables, RTTI, static initialisation,

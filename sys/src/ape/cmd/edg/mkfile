@@ -257,8 +257,54 @@ CFLAGS= -c -C
 %.$O: $EDGSRC/%.c
 	$CC $CFLAGS $EDGSRC/$stem.c
 
+# EDG's TWO INCLUDE DIRECTORIES ARE INSTALLED HERE AND NOT IN
+# `sys/include/ape', AND THAT IS A DECISION WITH THREE MEASURED REASONS.
+#
+# 1. `sys/include/ape/c++' IS ALREADY TAKEN -- by CFRONT, seventeen
+#    pre-standard headers, committed and public (`mount-include' BINDS
+#    the whole of `sys/include', so there is no install step to review).
+#    Two names collide, `new.h' and `stdexcept.h', **and they share the
+#    include guard `__NEW_H' as well**, so whichever is found first wins
+#    silently and the other is erased.  cfront's `new.h' DECLARES
+#    `operator new' with `#pragma lib "ape/libc++.a"'; EDG's is a
+#    one-line shim that does `#include <new>'.  That is the `Lock'
+#    duplicate-typedef shape and the `reject' shape in one file.
+#
+# 2. EDG'S PRIMARY HEADERS ARE `.stdh' AND ARE INVISIBLE TO EVERY OTHER
+#    COMPILER.  `src/cmd_line.c:23289' sets
+#    `include_file_suffixes = "::stdh:"', so `#include <new>' resolves
+#    through cpfe's own suffix list to `new.stdh'.  Nothing else in the
+#    tree can read them, and `apehdr-sweep' compiles every header in
+#    `sys/include/ape' STANDALONE AS C -- so putting them there would
+#    turn a gating instrument into a column of findings.
+#
+# 3. NOTHING INCLUDES THEM WITH `<>' FROM OUTSIDE cpfe's own
+#    `--sys_include' list, which is the test `Plan9libnet.h' was deleted
+#    for failing.  *Install a header when a program needs to say
+#    `#include <...>' and not before.*
+#
+# `/sys/lib/ape/edg' is the pkgconf precedent (`PKG_DEFAULT_PATH' is
+# `/sys/lib/ape/pkgconfig'): reachable without the source tree, named by
+# `rc/bin/ape/eccp''s `$EDGINCL', and outside every include path that
+# anything else searches.  The copies are `.gitignore'd -- they are
+# build output, like `$objtype/bin'.
+EDGINC=$APEXPROOT/sys/src/external/edg
+EDGLIBDIR=$APEXPROOT/sys/lib/ape/edg
+
+# Copied with explicit globs rather than `dircp', which `cd's into a
+# destination that has to exist already and goes through APE tar.  The
+# tree is two levels and eighteen files; a glob that matches nothing is
+# passed through literally by rc and makes `cp' fail, so mk stops -- the
+# safe direction.  *The limit is the other one*: a file type upstream
+# adds that is neither `.h' nor `.stdh' nor `README' is missed silently,
+# and the first symptom would be cpfe not finding a header.
 install:V:
 	cp $O.out $BIN/cpfe
+	mkdir -p $EDGLIBDIR/include_c++/experimental $EDGLIBDIR/include_c99
+	cp $EDGINC/include_c++/*.h $EDGINC/include_c++/*.stdh $EDGINC/include_c++/README $EDGLIBDIR/include_c++
+	cp $EDGINC/include_c++/experimental/*.stdh $EDGLIBDIR/include_c++/experimental
+	cp $EDGINC/include_c99/*.h $EDGLIBDIR/include_c99
 
 nuke:V:
 	rm -f $BIN/cpfe
+	rm -rf $EDGLIBDIR

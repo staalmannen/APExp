@@ -2961,6 +2961,67 @@ blamed.
     so the first build is the VM's** -- and `cd sys/src/cmd && mk
     install` comes before the tree rebuild, as the `sualign` bit-field
     fix already records.
+  - **THERE IS A DRIVER NOW: `rc/bin/ape/eccp`, and it is NOT called
+    `c++`.** That name is CFRONT's driver and is live --
+    `sys/src/cmd/transpilers` sets `CXX=c++` and its `%.c: %.cpp` rule
+    calls `c++ -F -o $target` -- so taking it would repoint those at a
+    different front end with a different runtime. `eccp` is upstream's
+    own name, which **retires the recorded `--help`/`-V` trap**: those
+    were always DRIVER options and there was no driver. *If cfront is
+    ever retired, `c++` becomes free and this is what should answer to
+    it.* It carries `--target win64`, the
+    `--clear_flag=use_predefined_macro_file`, the four `--sys_include`
+    in order, and the `$status` and `--gen_c_file_name` disciplines
+    `cmd/c++lib` paid for; `-F` stops after the translation, for an
+    mkfile rule. **`cc` rather than `pcc`, deliberately**: one binary,
+    and the NAME chooses the object extension (`pcc.c:75`), so under
+    `cc` it is `.o` on all eleven architectures and the driver needs no
+    objtype table -- bacon's recipe paid a round for exactly that.
+    **NOT PARSE-CHECKED: there is no rc on the build host**, so the
+    first run is the VM's.
+  - **AND THE NOTE'S OWN COMMAND PARAGRAPH WAS WRONG ABOUT rc, in the
+    paragraph that tells the next person how to type it.** It said the
+    `=` needs quoting "only in an mkfile recipe". **`=` is a syntax
+    character in rc wherever it is not a leading assignment or inside
+    quotes** -- the recipe is merely where this tree met it first. A
+    bare `--sys_include=/sys/include/ape` is `token '=': syntax error`
+    in an rc script and at an rc prompt too; it needs no quoting only
+    in **bash**, which is what the recorded run used. Corrected there,
+    and `eccp` builds every one by concatenation.
+  - **AND EDG'S HEADERS DO NOT GO IN `sys/include/ape/c++`, which was
+    asked directly and has three measured answers.** They install to
+    **`/sys/lib/ape/edg`** (the pkgconf precedent), named by `eccp`'s
+    `$EDGINCL`. (1) **That directory is already CFRONT's** -- seventeen
+    pre-standard headers, committed, and PUBLIC with no install step at
+    all, since `mount-include` BINDS the whole of `sys/include`. Two
+    names collide, `new.h` and `stdexcept.h`, **and the two `new.h`
+    share the guard `__NEW_H`**, so whichever is found first silently
+    erases the other -- and they are not variants of one header:
+    cfront's declares `operator new` with `#pragma lib`, EDG's is a
+    shim doing `#include <new>`. *The `Lock` shape and the `reject`
+    shape in one file.* (2) **EDG's primary headers are `.stdh` and no
+    other compiler can see them**: `src/cmd_line.c:23289` is
+    `include_file_suffixes = "::stdh:"`, so `<new>` resolves to
+    `new.stdh` through cpfe's own suffix list -- and `apehdr-sweep`
+    compiles every header there STANDALONE AS C, so this would turn a
+    gating instrument into a column of findings. *The same objection
+    the 720 portable_stl headers already have recorded.* (3) Nothing
+    includes them with `<>` from outside cpfe's own list, which is the
+    test `Plan9libnet.h` was deleted for failing.
+  - **AND `include_c99` WAS A ONE-HEADER GAP THAT WAS REAL:
+    `iso646.h` DID NOT EXIST IN APExp AT ALL.** That directory holds
+    exactly one file, so "what does it have that our headers do not"
+    answered in one command -- all of it. Written now, guarded
+    `#ifndef __cplusplus` because in C++ all eleven are KEYWORDS.
+    **The directory's NAME is the misleading half**: these are C95
+    (Normative Addendum 1), not C99, so *"which C99 features does EDG
+    need" has the answer none -- it needs a C95 header*, and cpfe never
+    reaches ours either way since `edg/include_c99` is searched first.
+    **A sweep of all 31 headers the C standards require named four more
+    absentees** -- `stdalign.h`, `threads.h` (C11), `stdbit.h`,
+    `stdckdint.h` (C23) -- in the 0.6 inventory rather than written
+    blind. `apehdr-sweep` 149 headers, 0 standalone findings,
+    together-case holding at 8.
   - **AND THE HOST CONTROL IS CLEAN, so the partition holds.** The
     same `/tmp/t.cpp` through the host `cpfe` built from the same
     commit, with the same `--target win64

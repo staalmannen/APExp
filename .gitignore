@@ -58,3 +58,15 @@ sys/src/ape/cmd/c++lib/*.c
 # cpfe/eccp template-instantiation request files (EDG prelink).
 # Written beside the cwd by every cpfe run, VM and host alike.
 *.ti
+
+# EDG's two include directories, COPIED here by `sys/src/ape/cmd/edg''s
+# `install:V:' from `sys/src/external/edg'. Build output, like
+# `$objtype/bin' -- the originals are committed one directory up, and
+# this is the only place `cpfe'/`eccp' can reach them, since
+# `mount-include' binds `sys/lib' and does NOT bind `sys/src'.
+# NOT the ignored-generated-file trap above: the VM reads the ORIGINALS
+# through git and its own `mk install' makes these.
+sys/lib/ape/edg/
+
+# eccp's intermediate C, one per translated .cpp (kept only with -K).
+*.eccp.c

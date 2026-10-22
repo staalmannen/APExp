@@ -1,0 +1,292 @@
+#!/bin/rc
+# eccp — Plan9/APExp C++ compiler driver for EDG's C-generating front end
+#
+# Runs the pipeline:
+#   cpfe (C++ -> C)  ->  cc -c  ->  [link against libedg.a]
+#
+# Usage:
+#   eccp [flags] file.cpp ...        compile and link
+#   eccp -c [flags] file.cpp ...     compile to .o, do not link
+#   eccp -F [flags] file.cpp         cpfe only: write the generated C
+#   eccp -K [flags] file.cpp ...     keep the generated .eccp.c intermediates
+#   eccp -o out [flags] file.cpp ... compile, link, write to out
+#
+# WHY `eccp' AND NOT `c++'.  `rc/bin/ape/c++' is the CFRONT driver and is
+# live: `sys/src/cmd/transpilers' sets `CXX=c++' and its `%.c: %.cpp' rule
+# calls `c++ -F -o $target', and `cmd/c++lib/mkfile' drives it too.  Taking
+# the name would repoint both at a different front end with a different
+# runtime.  `eccp' is UPSTREAM's own driver name for this front end -- which
+# also retires a recorded trap: `cpfe --help' and `cpfe -V' answer
+# `invalid option', because those are the DRIVER's options and there was no
+# driver.  If cfront is ever retired the name `c++' becomes free, and this
+# script is what should then answer to it.
+#
+# ---------------------------------------------------------------------------
+# FIVE THINGS IN HERE ARE LOAD-BEARING AND WERE EACH MEASURED.
+#
+# 1. `--target win64' IS NOT OPTIONAL.  cpfe is multi-target
+#    (`src/target.c:6525' holds eight configurations) and
+#    `src/fe_init.c:49180' defaults the index to 0, which is
+#    `set_legacy_target_config' -- built from the UNSUFFIXED `TARG_*'
+#    macros, i.e. the values the HOST that translated `target.c' had.
+#    Without this flag cpfe refuses its own configuration:
+#    `check_target_config: must use SoftFloat library', from
+#    `target.c:10642' when `targ_ldbl_mant_dig == 64'.  win64 is EDG's
+#    LLP64 configuration and is kencc's model exactly -- including
+#    `targ_setjmp_func "setjmp"', which is the symbol the first link
+#    reported undefined.  It is a BRIDGE: the end state is entry 0
+#    carrying kencc's values, and then this flag goes.
+#
+# 2. `--clear_flag=use_predefined_macro_file' GOES WITH IT, and is not a
+#    workaround.  With the target set, cpfe next wants
+#    `lib_win64/predefined_macros.txt', which is where a real win64 build's
+#    `_WIN32' and `_MSC_VER' come from and which we ship for no target.
+#    Suppressing it is precisely *LLP64 without the Windows macros*, which
+#    is what is wanted here.
+#
+# 3. THE FOUR `--sys_include' DIRECTORIES, IN THIS ORDER.  EDG's two first,
+#    so `<new>' reaches `include_c++/new.stdh' and `<new.h>' reaches EDG's
+#    one-line shim rather than CFRONT's header of the same name -- the two
+#    even share the include guard `__NEW_H', so order is the only thing
+#    that decides.  Then the ARCH directory before the generic one, which
+#    is APExp's own recorded search order (`/$objtype/include/ape' shadows
+#    `/sys/include/ape').
+#    **A run with three of them is not a smaller version of a run with
+#    four**: the first VM translation omitted `/sys/include/ape', which is
+#    inert for a toy including no headers and inert for nothing else.
+#
+# 4. `cc' RATHER THAN `pcc', AND THE NAME IS THE WHOLE REASON.
+#    `sys/src/ape/9src/cc.c' is the single line
+#    `#include "../../cmd/pcc.c"', and `pcc.c:75' is
+#    `objext = (strcmp(prog,"cc")==0) ? "o" : ot->o' -- **one binary, and
+#    the name it is invoked under chooses the object extension.**  Under
+#    `cc' it is `.o' on every architecture, so this driver needs no
+#    objtype-to-suffix table and the object names it computes are right
+#    on all eleven.  bacon's recipe paid a round for exactly this.
+#
+# 5. EVERY `--opt=value' IS QUOTED OR BUILT BY CONCATENATION.  In rc `='
+#    is a SYNTAX CHARACTER, legal only as an assignment at the start of a
+#    command or inside quotes -- so a bare `--sys_include=/sys/include/ape'
+#    is `token '=': syntax error', not an argument.  That is this tree's
+#    `awk -v name=$name' rule, and `sys/src/external/edg/NOTE' said it bit
+#    only in an mkfile recipe; it bites in an rc script just the same, and
+#    the NOTE is corrected.  `'--sys_include='^$d' is the idiom
+#    (`rc/bin/fdwatch' and `rc/bin/bash-runtests' already use it).
+#
+# EXCEPTIONS AND RTTI ARE OFF BY DEFAULT, deliberately.  EDG itself is
+# built `-fno-exceptions -fno-rtti', so that is the only configuration this
+# port has ever exercised, and `lib_src''s setjmp-based EH has never been
+# run.  `-fexceptions' and `-frtti' turn them on and are the honest way to
+# find out.  *A default that matches what has been measured is not the same
+# as a default that matches what the compiler can do*, and this one says
+# which it is.
+#
+# Environment overrides:
+#   CPFE     path to the cpfe binary      (default: cpfe)
+#   CC       path to the C compiler       (default: cc -- see note 4)
+#   EDGINCL  EDG's header directories     (default: /sys/lib/ape/edg)
+#   EDGLIB   EDG's C++ runtime            (default: /$objtype/lib/ape/libedg.a)
+#   STLINCL  extra C++ include root       (default: empty)
+#   EDGSTD   language level               (default: --c++14)
+
+rfork e
+
+if(~ $CPFE '')    CPFE    = cpfe
+if(~ $CC '')      CC      = cc
+if(~ $EDGINCL '') EDGINCL = /sys/lib/ape/edg
+if(~ $EDGLIB '')  EDGLIB  = /$objtype/lib/ape/libedg.a
+if(~ $EDGSTD '')  EDGSTD  = --c++14
+
+fn usage {
+	echo 'usage: eccp [-cFvK] [-o out] [-I dir] [-D sym] [-U sym]' \
+	     '[-l lib] [-L dir] [-fexceptions] [-frtti] file.cpp ...' >/fd/2
+	exit usage
+}
+
+# ---- parse arguments ----
+cflag    = ''	# -c: compile only, skip the link
+fflag    = ''	# -F: cpfe only, write the generated C
+vflag    = ''	# -v: echo each command
+kflag    = ''	# -K: keep the generated .eccp.c files
+ehflag   = ''	# -fexceptions
+rttiflag = ''	# -frtti
+outfile  = ''
+
+iflags  = ()	# -I... -D... -U..., handed to BOTH cpfe and cc
+lflags  = ()	# -l... -L..., linker only
+ccopts  = ()	# -g -O etc, cc only
+xxopts  = ()	# --anything else, passed through to cpfe verbatim
+sources = ()	# .cpp .cxx .cc .C
+cfiles  = ()	# .c, compiled with cc directly
+objects = ()	# .o .a
+
+args = $*
+while(! ~ $#args 0) {
+	a = $args(1)
+	args = $args(2-)
+	switch($a) {
+	case -c
+		cflag = 1
+	case -F
+		fflag = 1
+	case -v
+		vflag = 1
+	case -K
+		kflag = 1
+	case -fexceptions
+		ehflag = 1
+	case -frtti
+		rttiflag = 1
+	case -fno-exceptions
+		ehflag = ''
+	case -fno-rtti
+		rttiflag = ''
+	case -o
+		if(~ $#args 0) usage
+		outfile = $args(1)
+		args = $args(2-)
+	case -I -D -U
+		if(~ $#args 0) usage
+		iflags = ($iflags $a^$args(1))
+		args = $args(2-)
+	case -l -L
+		if(~ $#args 0) usage
+		lflags = ($lflags $a^$args(1))
+		args = $args(2-)
+	case -I* -D* -U*
+		iflags = ($iflags $a)
+	case -l* -L*
+		lflags = ($lflags $a)
+	case -o*
+		outfile = `{echo $a | sed 's/^-o//'}
+	case -g -O -O0 -O1 -O2 -O3 -Os -w -Fw -FV -A -B
+		ccopts = ($ccopts $a)
+	case --*
+		# anything else beginning `--' is cpfe's own and is passed
+		# through.  A `=' in one has to be quoted by the CALLER, for
+		# the reason in note 5 -- rc cannot see one otherwise.
+		xxopts = ($xxopts $a)
+	case *.cpp *.cxx *.cc *.C
+		sources = ($sources $a)
+	case *.c
+		cfiles = ($cfiles $a)
+	case *.o *.a
+		objects = ($objects $a)
+	case *
+		echo 'eccp: unrecognised argument:' $a >/fd/2
+		usage
+	}
+}
+
+if(~ $#sources 0 && ~ $#cfiles 0 && ~ $#objects 0) usage
+
+# ---- the EDG include directories must exist, and say so BY NAME ----
+# A missing `include_c++' does not fail here: it fails deep inside cpfe as
+# `cannot open source file "new"', which reads like a fault in the program
+# being compiled rather than in the installation.  *Name the precondition
+# instead of letting the consequence name itself* -- four silently-failing
+# preconditions in bash's own test harness is what that rule cost.
+if(! test -d $EDGINCL^'/include_c++') {
+	echo 'eccp: no' $EDGINCL^'/include_c++' >/fd/2
+	echo '      run mk install in sys/src/ape/cmd/edg, or set $EDGINCL' >/fd/2
+	exit noincl
+}
+
+sysincl = ('--sys_include='^$EDGINCL^'/include_c++' \
+	   '--sys_include='^$EDGINCL^'/include_c99')
+
+# An extra C++ include root goes AFTER EDG's own and BEFORE the C headers,
+# so a header-only library cannot shadow `<new>' and friends.  `$STLINCL'
+# is EMPTY by default: the imported
+# `sys/src/external/paragon_portable_stl/include' is `namespace
+# portable_stl' rather than `std', so it is a corpus to translate rather
+# than a standard library to install.
+if(! ~ $STLINCL '') \
+	sysincl = ($sysincl '--sys_include='^$STLINCL)
+
+sysincl = ($sysincl '--sys_include=/'^$objtype^'/include/ape' \
+	            '--sys_include=/sys/include/ape')
+
+ehopts = ()
+if(~ $ehflag '')   ehopts = ($ehopts --no_exceptions)
+if(~ $rttiflag '') ehopts = ($ehopts --no_rtti)
+
+cpfeopts = ($EDGSTD $ehopts --target win64 \
+	    '--clear_flag=use_predefined_macro_file' \
+	    $sysincl $iflags $xxopts)
+
+# ---- running a stage ----
+# `$status' IS CLOBBERED BY THE VERY NEXT COMMAND, which cost `cmd/c++lib'
+# forty zero-byte translation units and a build that reported success:
+# every failure arm there read `if(! ~ $status ''){ cleanup; exit $status }'
+# and `cleanup' succeeded first, so `exit' saw the empty string.  Capture
+# into `st' before doing anything else, always.
+st = ''
+generated = ()
+
+fn die {
+	echo 'eccp: FAILED at' $1 'on' $2 '--' $st >/fd/2
+	if(~ $kflag '' && ! ~ $#generated 0) rm -f $generated
+	exit eccpfail
+}
+
+fn run {
+	if(! ~ $vflag '') echo $* >/fd/2
+	$*
+}
+
+# ---- stage 1: cpfe, C++ -> C ----
+# `--gen_c_file_name' rather than a redirection, for the OTHER half of the
+# c++lib bug: a shell redirection CREATES the target whatever the command
+# then does, so `mk' sees a recipe that succeeded and marches on.  cpfe
+# writes the file itself and leaves none behind on a failure.
+objs = ()
+for(s in $sources) {
+	stem = `{echo $s | sed 's/\.\(cpp\|cxx\|cc\|C\)$//'}
+	gen = $stem^'.eccp.c'
+	if(! ~ $fflag '' && ! ~ $outfile '') gen = $outfile
+	run $CPFE $cpfeopts '--gen_c_file_name='^$gen $s
+	st = $status
+	generated = ($generated $gen)
+	if(! ~ $st '') die cpfe $s
+	if(~ $fflag '') {
+		run $CC -c $ccopts $iflags $gen
+		st = $status
+		if(! ~ $st '') die $CC $gen
+		objs = ($objs `{basename $gen .c}^'.o')
+	}
+}
+
+# -F stops here: the generated C IS the product, so it is kept whatever
+# -K says.
+if(! ~ $fflag '') exit 0
+
+# ---- stage 2: any plain .c the caller handed us ----
+for(c in $cfiles) {
+	run $CC -c $ccopts $iflags $c
+	st = $status
+	if(! ~ $st '') die $CC $c
+	objs = ($objs `{basename $c .c}^'.o')
+}
+
+if(~ $kflag '' && ! ~ $#generated 0) rm -f $generated
+
+if(! ~ $cflag '') exit 0
+
+# ---- stage 3: link ----
+# `$EDGLIB' is named explicitly and LAST: EDG's runtime holds the operator
+# new/delete families, the vtable and RTTI helpers and the static-init
+# machinery, and a kencc static link resolves archives in the order
+# recorded, so it has to come after everything that can reference it.
+# libap arrives after it from `pcc''s own `#pragma lib' handling.
+#
+# **THE STATIC-INIT GAP IS OPEN**: nothing calls `_Z12__call_ctorsv', so a
+# translated program's static constructors do not run.  `lib_src/main.c'
+# defines the helper and is compiled with `-D_main=__edg_main' because
+# `_main' is `6l''s default entry point.  See `sys/src/external/edg/NOTE'.
+out = $outfile
+if(~ $out '') out = a.out
+run $CC -o $out $objs $objects $lflags $EDGLIB
+st = $status
+if(! ~ $st '') die link $out
+exit 0
