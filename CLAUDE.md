@@ -1968,6 +1968,23 @@ blamed.
   a native mkfile for it answers "does kencc build clisp"; the memory
   image is a second half, since CLISP compiles its own Lisp sources
   with the interpreter it has just built.* Not started.
+  **AND THE RE-RUN CONFIRMS THE READING WHILE CLEARING THE CONSTRUCT,
+  which is what makes this a DEFERRAL rather than an open bug.**
+  `configure` now reaches `checking whether the C compiler works...
+  no`, with `5: Bad file descriptor` on hundreds of lines around it and
+  `configure: error: C compiler cannot create executables` at the end
+  -- *the verdict of a configure that could not write its own log, and
+  not a statement about `pcc`*. **`execfd-test.sh` is 0 failures across
+  all eleven sections on 9front**, sections 8, 9 and 10 included: a
+  child that forks AND execs, the shell **re-execing itself** (which is
+  autoconf's own first act), and fd 5 held across 300 forks with
+  `first bad write: 0`. *So the fd mechanism is cleared and what is
+  left is scale inside a 300-Makefile build* -- which makes the
+  autoconf route harder to diagnose, not easier, and is the argument
+  for the hand-answered `config.h` rather than against it.
+  **OUT OF THE DEFAULT BUILD FOR 0.6 and documented in the release
+  notes as such**, with go. *The user's call, and the right one: it is
+  its own release.*
 - **perl, OPEN -- AND THE NEXT RUN NARROWED IT RATHER THAN MOVING IT.** `miniperl` links and then faults running
   `writemain("perlmain.c")`: `suicide: sys: trap: fault write
   addr=0x3000000f0 pc=0x22e50f`. **`0x3000000f0` is high half 3, low
@@ -2352,6 +2369,16 @@ blamed.
       cpfe EMITS references to it in the C it generates.
       `cxaatexit-test.c` is the instrument and runs on both machines
       unchanged, 0 failures on gcc.
+      **CONFIRMED ON 9front: 0 failures, every section** -- including
+      4a/4b (the entry removed BEFORE it is called, re-entry seeing an
+      empty list) and 5a/5b (per-`__dso_handle` matching), which are
+      the two the ABI specifies and which a plain descending `for` loop
+      fails. `__dso_handle` non-null says both sources linked.
+      **The FIRST run of it did not link**, and both halves were real:
+      the command omitted the extra source AND the file's own 9front
+      line omitted `dso_handle.c`, having been copied from the gcc line
+      and inherited its single source. *The asymmetry is the file's own
+      finding and the header now says so.*
   - **AND THEN cpfe LINKED AND CRASHED ON EVERY RUN -- `fault read
     addr=0x2 pc=0x2` -- AND THE FAULTING ADDRESS IS `argc`.**
     `lib_src/main.c` defines `void _main(void)`, EDG's static-init
@@ -2742,8 +2769,105 @@ blamed.
     asserted*, because it is a different rule from the one the patch
     promised: a bit field FOLLOWING an ordinary member opens a fresh
     container here. Nothing has measured what it costs.
-  - Then: `cd sys/src/cmd && mk install`, the after-dump, `mk
-    distclean`, and cpfe.
+  - **THE AFTER-DUMP IS IN AND THE PREDICTION HELD TO THE DIGIT, WITH
+    NOTHING LEFT OVER.** `__res_state` `unused` 368 -> **365**,
+    `sort_list` 372 -> **368**, `sizeof` 456 -> **448**;
+    `_abi_bf_shares` 8 -> **4** with `c` 4 -> 1; `_abi_bf_split` 8 ->
+    **4** with `C` 4 -> 1. **Five names, and the refutation condition
+    was "any name beyond those"** -- `_abi_bf_aligned` and
+    `_abi_bf_trailing` are ABSENT from the diff, i.e. identical under
+    both compilers, which is the half a shares-only check could not
+    have told apart. *Every number was written down before the run.*
+    The public surface's whole cost is one struct.
+  - **AND cpfe GETS MUCH FURTHER: `0x68` IS GONE.** With the rebuilt
+    compiler the same `--target win64` command faults at
+    **`addr=0x10 pc=0x861d21`** -- a different address AND a different
+    pc -- and the stack says how much further: `finish_function_body_`
+    `processing` -> `prune_needed_flag_il_walk` ->
+    `walk_tree_and_set_needed` -> `mark_as_needed_basic` ->
+    `set_routine_definition_needed`. The old fault was in
+    `predeclare_entities`, **before the source was read at all**; this
+    one is at the end of a function body, in IL pruning. *So cpfe
+    parsed the whole translation unit and built IL for it* -- which is
+    the `offsetof` fix confirmed behaviourally, and the thing a
+    completed build could not say.
+  - **`lstk()` CALIBRATED ITSELF, which is the half to read first.**
+    The dump prints the SAME value at several widths: `0x1d6d010`
+    beside `0x1d6d01000`, `0x1c82ec0` beside `0x1c82ec000`,
+    `0x7ffffffde200` beside `0x7ffffffde20000` beside
+    `0x1007ffffffde200`. **Three spellings of one value is the
+    artefact, not three values** -- acid reading eight bytes for a
+    narrower slot, the `cfront` lesson for the third time. *So the
+    `__T101...` temporaries are unreadable here and the ARGUMENTS are
+    the readable part*, which is the opposite of the cfront round and
+    is true for a locatable reason: these are named parameters whose
+    mangled names match the declaration.
+  - **THE RECURSION IS SOUND FOR SEVEN FRAMES AND THEN IS NOT.**
+    `prune_needed_flag_il_walk(entry_ptr=0x1c7efa8, entry_kind=0xb)`
+    -> ... -> `walk_tree_and_set_needed(entry_ptr=0x1d7eb80,
+    entry_kind=0x19)`, every pointer a real heap address -- and that
+    frame then calls ITSELF with **`(entry_ptr=0x8,
+    entry_kind=0x45)`**. A child pointer and kind read out of the node
+    came back as 8 and 69.
+    ***I CALLED 0x45 GARBAGE AND IT IS NOT: IT IS `iek_ms_attribute`,
+    AND THE CALL IS CORRECT.*** I counted commas in a 100-line window
+    of the generated enum, got "about 61", and concluded 69 was
+    outside it. **`an_il_entry_kind` has 114 enumerators**, and worse,
+    *the count was the wrong question*: the enum has `#if`-guarded
+    members (`MICROSOFT_EXTENSIONS_ALLOWED` and more), so **its
+    numbering depends on the macro configuration** -- decode against
+    `src/il_def.h` and you get a different answer from the corpus that
+    actually runs. Against `src/il.c`'s own config-resolved enum:
+    0x0b is `iek_routine`, 0x19 is `iek_scope`, 0x45 is
+    **`iek_ms_attribute`**, and the first two match their frames
+    exactly. *A WINDOW onto an enum is not the enum, and a header's enum is
+    not the generated one.*
+    **AND THE SECOND WRONG STEP WAS READING THE LINE NUMBERS IN THE
+    WRONG FILE.** `walk_tree_and_set_needed` is **40 lines** in
+    `src/il_walk.c` (527-567), so `:2678` and `:3034` are not in it --
+    its body is `src/walk_entry.h`, **4457 lines**, included with the
+    routine name as a macro. *The `#line` directives follow the
+    INCLUDED body, not the file that names the function.*
+    **SO THE CALL IS EXACTLY RIGHT AND THE VALUE IS NOT.**
+    `walk_entry.h:3032`, inside `case iek_scope:`, is literally
+    `walk_list(eptr->ms_attributes, an_ms_attribute_ptr,
+    iek_ms_attribute)` -- so the walker was reading `a_scope`'s LAST
+    member, and the kind it passed is that line's own constant.
+    **`eptr->ms_attributes` answered 8.**
+  - **AND `a_scope` IS THE SHAPE OF THE SECOND, STILL-OPEN RULE.**
+    `il.c:13799` gives its prefix as three pointers, an `int32_t`
+    `number`, an **`unsigned char kind`**, and THEN seven
+    `unsigned int :1` -- *a bit-field group FOLLOWING ordinary
+    members*, which is the case `structalign-test` section 9 reports
+    as a probe and says of: "nothing has measured what it costs".
+    **`sys/lib/tests/edgscope-probe.c` measures it**, in EDG's real
+    prefix rather than a toy, and its **section 2 is the control**:
+    the same shape with the `unsigned char` removed, so the bit field
+    is first -- the case `edgtuoff-probe` already measured as agreeing
+    once the container is shared. *If the control disagrees too, the
+    finding is not about the following rule at all.* gcc: 0
+    disagreements, so the reduction reproduces the known answer.
+    **WHAT IT WILL AND WILL NOT SHOW, written down before the run.**
+    A disagreement says every member of `a_scope` after the bit-field
+    group sits where EDG, gcc and the generated C do not expect.
+    **It does NOT on its own prove that is the fault** -- kencc
+    computes every offset from the same declaration, so a
+    different-but-consistent layout costs nothing until something
+    BAKES an offset in. *That mechanism is the one already measured
+    here*, the folded `offsetof`, and the next question is whether any
+    folded constant names a scope member. Predicted: `after` at 40 and
+    `sizeof` 48 against the host's 32 and 40.
+  - **AND THE HOST CONTROL IS CLEAN, so the partition holds.** The
+    same `/tmp/t.cpp` through the host `cpfe` built from the same
+    commit, with the same `--target win64
+    --clear_flag=use_predefined_macro_file` and four `--sys_include`:
+    **exit 0, 3793 bytes of correct C** -- vtables, Itanium mangling,
+    `struct D { struct B __b_1B; }`. So the toy is innocent and EDG is
+    innocent, and this is the kencc/libap side -- *the cfront
+    partition for the third time.* *(The VM command carried three
+    `--sys_include`, not four: `/sys/include/ape` was missing. Inert
+    for a toy that includes no headers, and not inert for anything
+    else.)*
 
   - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
     the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
@@ -3110,6 +3234,34 @@ blamed.
   one of them in this mkfile rather than in go: the `bool` keyword, the
   missing `-c`, the Makefile escaping. *That is what a port that has
   never run looks like from outside.*
+  **AND THE FOURTH IS STRUCTURAL RATHER THAN ONE MORE LINE:
+  `plan9.c:13 Could not find include file <libc.h>`.** `cmd/dist`
+  compiles **all three** portability files and lets `-DPLAN9` pick one,
+  so `plan9.c` is live -- 764 lines of native Plan 9 on `<u.h>` and
+  `<libc.h>` -- under a compiler that has neither. **The portable arm
+  is already written and already satisfied**: `unix.c` is 843 lines of
+  POSIX behind `#ifndef WIN32 / #ifndef PLAN9`, and all nine of its
+  includes exist in this tree (`unistd.h`, `dirent.h`, `sys/stat.h`,
+  `sys/wait.h`, `sys/param.h`, `sys/utsname.h`, `fcntl.h`, `setjmp.h`,
+  `signal.h` -- checked, not assumed). *It is simply switched off.*
+  **THE MACRO IS DOING TWO UNRELATED JOBS AND ONLY ONE OF THEM IS
+  WRONG.** At COMPILE time `-DPLAN9` chooses the portability file; at
+  RUN time `build.c` compares `gohostos` against `"plan9"` in six
+  places, including `:968` where dist EMITS `-DPLAN9` for the stage-2
+  toolchain. *Which C we build dist from* and *which OS dist is
+  building for* are different claims, and the port conflates them --
+  which is why dropping the flag is not free. `unix.c:670` is a
+  **compile-time `#elif` chain** ending in `fatal("unknown operating
+  system")` with no plan9 arm, so the change is one `#elif` giving
+  `gohostos = "plan9"` plus a new `-D` in place of `-DPLAN9`, declared
+  by the build the way `-DHAVE_C_BOOL` already is. *(Keying it on
+  `uname()` would not work either: libap answers sysname `Plan9` and
+  that chain never reads it.)*
+  **Building under `sys/src/cmd` with native `6c` is the other option
+  and buys nothing**: it would make stage 1 compile, and dist's whole
+  job is to drive stage 2, which is a separate question from where
+  dist itself lives. **NOT STARTED, and out of the default build for
+  0.6.**
 
 **Ports built but never exercised**, which is a different and cheaper
 item -- *a port that builds and has never run is not a port*:
@@ -3457,6 +3609,15 @@ Two more under `docs/`, which are surveys rather than history:
 compared file by file against musl's `src/`) and
 `compiler-improvements.md` (the state of the Plan 9 C compilers and what
 is still open). `docs/releases/` holds the release notes.
+
+**`docs/releases/0.6.md` carries the OPEN-BUG INVENTORY**, and it is the
+one place the recorded-not-fixed items are gathered rather than scattered
+through this file at the point each was found. Its *Known limitations* is
+sorted into platform limits (not bugs and not fixable here), compiler,
+libap, headers, and the ports deliberately out of the default build --
+each entry saying what it costs and **whether it has been measured**,
+because that distinction is the point of the list. Add to it in the same
+round a thing is recorded here.
 
 **When a round finishes, the finding goes in the topic file and only the
 one-line consequence comes back here.** That is what keeps this file from

@@ -54,3 +54,7 @@ sys/src/ape/cmd/c++lib/*.c
 # and re-commit when cfront's main.c changes.  (Not the same shape as
 # the 40 zero-byte c++lib files above: those were an INPUT to mk, which
 # therefore never regenerated them. These two are in nobody's OFILES.)
+
+# cpfe/eccp template-instantiation request files (EDG prelink).
+# Written beside the cwd by every cpfe run, VM and host alike.
+*.ti
