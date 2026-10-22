@@ -302,14 +302,24 @@ reporting 16 lines of which 11 are fine.
 clisp's `configure` printed `line NNNN: 5: Bad file descriptor` on
 hundreds of lines, and **autoconf keeps `config.log` on fd 5**, so the
 run's closing `C compiler cannot create executables` is downstream of a
-lost descriptor rather than a statement about pcc. Seven sections
+lost descriptor rather than a statement about pcc. Sections 1-7
 separate a low fd from fd 5, append from truncate, a reopened NUMBER, a
 high fd (bash's `move_to_high_fd` territory), `<>` and a child writing
 the parent's descriptor; **section 0 is the control**, an ordinary
 `> file`, so an all-fail run names the filesystem instead. *Section 5 is
 `redir.tests:83` verbatim*, the `exec 6<>` hunk CLAUDE.md records as
 having moved for an unidentified reason -- so this asks one question
-where there were two. 0 failures on glibc.
+where there were two.
+**ALL EIGHT CAME BACK 0 ON 9front, so the CONSTRUCT IS CLEARED and
+three sections were added for the axes that run could not cover.**
+8 is a child that forks AND EXECS (where `/env/_fdinfo` has to carry
+the descriptor, and where one arrived poisoned before); 9 is the shell
+**re-execing ITSELF**, which is literally configure's first act
+(`exec $CONFIG_SHELL "$as_myself"`); 10 holds fd 5 across 300 forks and
+**reports the iteration it first fails at**, because every other
+section runs in a shell that has just started while configure's failure
+arrives thousands of lines in, immediately after the kernel's
+100/200-descriptor warning. 0 failures on glibc, 11 sections.
 **`mkrecipe-probe/mkfile` is a PROBE and is a whole mk DIRECTORY**,
 which it has to be: the question is what `mk` hands `rc`, so the
 instrument is an mkfile rather than a program. `mk -k all` in it runs
@@ -323,6 +333,11 @@ must work -- `external/perl/plan9/mkfile:88` is one and perl builds)
 and **case 5 has a known answer** (`cmd/tar/mkfile:126` echoes a
 literal `#ifndef` and tar's header comes out right), so a failure there
 says the probe is measuring something other than rc.
+**IT ANSWERED IN ONE RUN: 1, 2, 3, 5 and 6 pass and CASE 4 FAILS** --
+`} if not {` on one line, `token if: syntax error`. *Comments in
+recipes are not the hazard; the brace-if-not is*, and the control
+(case 1) and the known answer (case 5) both held, which is what makes
+the one failure readable.
 **`initzero-test.c` asks whether a compound literal ZEROES the members
 its initialiser list leaves out** -- muon's crash, `*sb = (struct
 tstr){.flags=..,.buf=..,.cap=..}` with `.len` omitted and then used as
@@ -382,8 +397,9 @@ UNKNOWN column (978 under `external/`) reported rather than counted --
 read each hit, since `U32 arena_size` is in it and cannot share a
 4-byte tail.
 `structalign-test.c` measures `pcc -J`, conforming struct layout, and
-**needs three runs** -- gcc, then `pcc -DPLAN9` WITHOUT `-J` (which
-must fail **21** checks), then with it. *The middle run is the
+**needs three runs** -- gcc, then `pcc -9 -DPLAN9`, the control, which
+must FAIL (**22** of its 40 checks, measured), then plain `pcc`, which
+must pass. *The middle run is the
 control*: a pass under `-J` alone cannot distinguish a working flag
 from a compiler that never had the bug. **Section 9 carries the four
 bit-field shapes, and the two that must NOT move are the valuable
@@ -1875,7 +1891,8 @@ Plan 9 one.
 to say neither was, and it was stale. `sys/src/ape/cmd/mkfile:71' is
 an uncommented `basic\\', so bacon is in `_OPTIONAL_APPS' and a
 tree-wide `mk' builds it; `muon' at :81 is live too; `edg' at :70 and
-`c++lib' stay commented, and so now do `go', `clisp' and `perl'.
+`c++lib' stays commented, and so do `go' and `clisp'; `perl' and
+`edg' are back in, each after it had actually built.
 *The reason for caution is unchanged and is worth keeping beside the
 fact*: one failing entry aborts the whole tree's `mk', so anything
 newly enabled is a thing the next full rebuild can stop on, and a port
@@ -1918,9 +1935,31 @@ blamed.
   *`sh: warning: process exceeds 100/200 file descriptors` sits two
   lines above the first one*, which is bash's `move_to_high_fd` and has
   already been measured harmless once -- so it is a neighbour, not yet
-  a cause. **`sys/lib/tests/execfd-test.sh` asks it in seven sections**
-  and section 5 is `run-redir`'s own `exec 6<>` line, so the recorded
-  unexplained hunk and this are one question now.
+  a cause. **`sys/lib/tests/execfd-test.sh` asks it**, and section 5 is
+  `run-redir`'s own `exec 6<>` line, so the recorded unexplained hunk
+  and this were one question.
+  **MEASURED: 0 FAILURES, ALL EIGHT SECTIONS, ON 9front.** `exec 5>`,
+  `exec 5>>`, the reopened number, `exec 200>`, `exec 6<>` and a
+  subshell writing the parent's descriptor all work. **So the
+  CONSTRUCT is not the bug** -- and `redir.tests:83` is cleared with
+  it, which answers the recorded "if it comes back it is flaky" in the
+  good direction rather than leaving a third story.
+  *That makes the clisp question sharper rather than closing it*, and
+  the difference is what the test did NOT reproduce: **every section
+  ran in a shell that had just started.** configure's failure arrives
+  thousands of lines in, it forks hundreds of children, and -- the
+  thing a reading of the construct cannot reach -- **autoconf's own
+  first act is `exec $CONFIG_SHELL "$as_myself"`, replacing its own
+  process image while `exec 5>>config.log` is meant to stay open
+  across it.** `/env/_fdinfo` is the only thing that carries
+  per-descriptor state over an APE exec, and *a descriptor has already
+  arrived poisoned through exactly that file once in this tree*.
+  Sections 8, 9 and 10 ask those three (fork+exec, self re-exec,
+  scale) and 10 reports the ITERATION it first fails at, since "it
+  broke at 140" and "it never worked" are different findings. Also
+  worth noting from the same screen: **the fd warnings fired and every
+  section still passed**, which is the third independent confirmation
+  that they are noise.
   **AND THE PLAN IS TO STOP RUNNING configure AT ALL**, which is the
   user's call and matches what this tree already does for perl and
   bash: a hand-answered `config.h` plus an mkfile, rather than an
@@ -1979,6 +2018,30 @@ blamed.
   same `pc`*, and that would move the bit-field change itself into
   frame, where `structalign-test`'s three runs and the `apeabi-probe`
   acid diff -- both still unrun -- are what price it.
+  **CONFIRMED: THE WHOLE TREE BUILT WITHOUT INTERRUPTION AND perl
+  WORKS.** With the clean reaching every directory, `miniperl` writes
+  `perlmain.c`, perl links and runs. *The prediction was written down
+  before the run and the refutation condition did not fire*, so
+  reading (a) stands and reading (b) is out: **the `sualign()`
+  bit-field change is not implicated**.
+  **AND THAT IS THE FIRST BEHAVIOURAL EVIDENCE THE BIT-FIELD CHANGE
+  HAS, which is worth more than the absence of a crash.** perl's
+  `struct op` is the shape that moves -- `sizeof(OP)` 40 -> 32 -- so a
+  perl built entirely under the new rule, running its own module
+  loader and generating its own `perlmain.c`, is a program exercising
+  the moved struct rather than merely linking against it. *Weak, and
+  weak is what a layout change can get from a build*: every symbol
+  resolves either way, so this says the tree is SELF-CONSISTENT and
+  nothing more. `structalign-test`'s three runs and the `apeabi-probe`
+  acid diff still price the change BY NAME and are still unrun -- they
+  are no longer blocking anything, and the `-9` count of **21** and
+  the `__res_state` numbers (`unused` 368 -> 365, `sort_list` 372 ->
+  368, `sizeof` 456 -> 448) are still the written-down predictions
+  waiting for a run.
+  **`perl` is LIVE in `_OPTIONAL_APPS` again**, which means the next
+  tree-wide `mk` is the first that builds it IN THAT POSITION -- the
+  recorded caution, since a package built by hand has not been
+  measured there.
 
 - **edg, AND IT IS THE ONE GOOD NEWS OF THE ROUND**: `lib/edg` and
   `cmd/edg` both build and `cpfe` runs. **No functional test yet**, so
@@ -1986,6 +2049,17 @@ blamed.
   that would say anything is a translation whose output `pcc -c`
   accepts, and `--target win64` with the `0x68` fault is where that
   stopped.
+  **BUILT TWICE NOW, so it is LIVE**: `edg` in `cmd/mkfile`'s
+  transpilers and `edg` in `lib/mkfile`'s `_OPTIONAL_LIBS` -- *lib
+  before cmd, because `cmd/edg`'s link line names `libedg.a` and the
+  tree walks lib first.* It was out under the "by hand first" rule and
+  has now been built by hand twice; that rule is satisfied, not
+  waived.
+- **AND THE TREE BUILDS WITHOUT INTERRUPTION.** That is the first
+  complete run since the compound-literal and bit-field work, and the
+  thing it settles is the one a build can settle: nothing in the tree
+  fails to compile or link under the new layout rule. **go and clisp
+  are the only two still out.**
 
 ## What is open, as a list
 
@@ -2637,6 +2711,37 @@ blamed.
     `-9` must fail **21** rather than 14. **Refutation conditions**:
     `bf_aligned` or `bf_trailing` moving, any fourth name in the acid
     diff, or a `-9` count that is not 21.
+  - **BOTH RUNS ARE IN: 0 under `pcc`, 22 under `pcc -9`** -- and the
+    count is not 21, so that condition fired. **It is fully
+    attributed**: 40 checks, failing 4/3/4/3/2/1 in sections 1-6, 0 in
+    section 8 and **5 in section 9**, which is 22 exactly.
+    ***THE COUNT WAS A PREDICTION ABOUT THE INSTRUMENT RATHER THAN
+    ABOUT THE COMPILER.*** 14 was measured against a version of
+    `structalign-test.c` that has since gained section 8, gained
+    section 9 and had section 4 "GROW UP", so sections 1-6 alone now
+    answer 17 where they once answered 14; I added my guess at section
+    9's movers to a stale base and was wrong in both terms at once.
+    *Predict the NAMES, not the total* -- which is this file's own
+    "compare per name, never by total" arriving for a prediction
+    instead of for a suite diff, and the per-name condition is the one
+    that mattered.
+  - **AND THE SUBSTANTIVE REFUTATION DID NOT FIRE, which is the
+    result.** `bf_aligned` is 8 with `c` at 4 and `bf_trailing` is 16
+    **under BOTH rules** -- the two shapes that already agree with gcc
+    are untouched, so the patch changed the sharing rule and nothing
+    else. `bf_shares` 8 -> **4** with `c` at 1, `bf_split` 8 -> **4**
+    with `c` at 1 (so the container is shared across base types now
+    too, where kencc used to close it), `bf_overflow` 16 -> **12**
+    with `c` at 8 unmoved. Section 8 passes in both runs, as recorded.
+  - **A SECOND RULE IS STILL OPEN AND THE PROBE LINES SAY SO.** Under
+    `-J`, `struct{char; unsigned:1; char;}` is off(d) 5 / size 8 where
+    gcc says **2 and 4**, and `struct{unsigned:1; char; unsigned:1;
+    char;}` is off(y) 5 / size 8 where gcc says **3 and 4**. (Under
+    `-9` the same two are 8/16 and 12/16, so the change moved both
+    toward gcc without reaching it.) *Reported as a PROBE rather than
+    asserted*, because it is a different rule from the one the patch
+    promised: a bit field FOLLOWING an ordinary member opens a fresh
+    container here. Nothing has measured what it costs.
   - Then: `cd sys/src/cmd && mk install`, the after-dump, `mk
     distclean`, and cpfe.
 
@@ -2675,6 +2780,93 @@ blamed.
     **a provenance paragraph saying which lines are measured and
     which are only recalled or searched** are in the NOTE. *Nothing
     started; none of it blocks anything already working.*
+    **AND A FIFTH CANDIDATE WAS MEASURED RATHER THAN RECALLED --
+    Paragon's `paragon_portable_stl`, MIT, header-only.** It is the
+    first one whose properties were read out of the source instead of
+    from memory, and on the technical axes it is better than anything
+    on the list above:
+    - **ZERO `#include <...>` in all 720 headers.** No host C++
+      standard library, no C library headers -- the property that
+      disqualifies libc++ and uClibc++ here, satisfied by
+      construction rather than by porting.
+    - **C++14** (`CMakeLists.txt`'s `CXX_STANDARD 14`), well inside
+      what EDG's own self-translation already exercises.
+    - **Exception-free is a real mode, not a flag that stops
+      throwing**: parallel `exception/` and `noexception/` trees and
+      an `expected<T, portable_stl_error>` error channel. *That
+      matters more here than anywhere else*, since EDG's EH is
+      setjmp-based with its own regions and `lib_src`'s EH has never
+      been exercised.
+    - **Every `__builtin_*` sits behind `__has_builtin` with a pure
+      C++ `generic/` fallback** -- 19 builtins, every one guarded --
+      so a compiler with none of them still compiles.
+    - The type-trait intrinsics it uses unguarded
+      (`__is_trivially_copyable`, `__is_constructible`,
+      `__underlying_type`, `__is_class`, `__is_polymorphic`,
+      `__is_aggregate`, ...) are **the ones already checked present
+      in cpfe's table** in the paragraph above. *Two directions, one
+      answer.*
+    **AND IT IS STILL DISQUALIFIED FOR THE JOB, ON THE AXIS THIS
+    FILE ALREADY NAMES, TWICE OVER.** `namespace portable_stl`, 1283
+    occurrences, not `std` -- *a renamed STL serves NEW code; only a
+    `std::` one serves a PORT.* **And a rename would not even be
+    enough**, which is the stronger half and is the measurement
+    rather than the rule: `vector::push_back` returns
+    `::portable_stl::expected<void, ::portable_stl::portable_stl_error>`
+    where C++ says `void`, so the API differs from the standard's and
+    no aliasing recovers it. Coverage is partial too -- string,
+    string_view, vector, list, forward_list, map, set, array,
+    variant, tuple, function, memory, ranges, algorithm, and **no
+    iostreams, locale, regex, threads, deque or unordered
+    containers**.
+    **SO IT IS THE WRONG ANSWER TO THAT QUESTION AND A GOOD ANSWER TO
+    A DIFFERENT ONE: a CONFORMANCE CORPUS for cpfe.** 720 headers of
+    heavy template metaprogramming that need no C++ library, no
+    exceptions and no runtime support, translated by cpfe and
+    compiled by pcc, is a far better measurement of "does this port
+    work on real C++" than the toy the NOTE prescribes -- and it
+    costs a translation run rather than a port. **And the corpus has
+    NO libap SURFACE AT ALL** -- zero system includes -- so a failure
+    is cpfe's or kencc's and cannot be libap's. *That partition is
+    worth as much as the coverage*: every earlier C++ question here
+    has had both halves live at once.
+    **THE SUITE IS BIGGER THAN "a number of tests", AND ITS SHAPE IS
+    MEASURED**: 110 `.cpp`, **1253 `TEST(`** plus 16 `TEST_F`, and
+    **15,897 assertions** -- almost entirely `ASSERT_EQ/TRUE/FALSE`
+    and `EXPECT_EQ/TRUE/FALSE` (14,606 of the 15,897), with a short
+    tail of `GT/LT/LE/GE/NE`. **What is NOT a plain comparison is
+    small and nameable**: 18 `ASSERT_THAT` (gmock matchers), 16
+    `TEST_F` fixtures, 22 throw-related, and **19 of the 110 files
+    pull the host's `<vector>`/`<list>`/`<algorithm>`** and have to
+    be left out. So a gtest SHIM of about ten macros reaches ~92% of
+    it -- a behavioural C++ suite this target has never had. *As
+    shipped it is not free*: 131 files include `<gtest/gtest.h>`, and
+    gtest itself wants a real `std::`, which is the thing that does
+    not exist here.
+    **AND THE 22 THROW ASSERTIONS ARE THE VALUABLE TAIL RATHER THAN
+    THE AWKWARD ONE**: `ASSERT_THROW`/`ASSERT_NO_THROW`/
+    `ASSERT_ANY_THROW` are the only exercise of EDG's setjmp-based EH
+    this tree could get, and `lib_src`'s EH has never been run.
+    ***THE SHIM MUST NOT REGISTER TESTS WITH STATIC CONSTRUCTORS, and
+    naming that now is worth a round***: gtest's `TEST()` builds its
+    registry from static initialisers, and **nothing calls
+    `_Z12__call_ctorsv`** -- the static-init gap recorded above, open
+    and unfixed. A suite registered that way would report zero tests
+    and read exactly like a translation bug. Generate an explicit
+    table of test functions from the `TEST(` names instead, or fix
+    static init first and let the suite be what confirms it.
+    **AND THE 720 HEADERS DO NOT BELONG IN `sys/include/ape`** -- the
+    import under `sys/src/external` is the whole of it, reached with an
+    `-I` from whatever translates it, exactly as Tcl's own build reaches
+    `-I$TCLSRC/generic`. Three reasons, each already a rule here: a
+    public APE header's blast radius is **every package in the tree**
+    (`reject` cost a build over one name); `apehdr-sweep` compiles every
+    header in that directory **standalone as C**, so 720 C++-only files
+    would turn a gating instrument into 720 findings; and **nothing in
+    the tree includes them**, which is the test `Plan9libnet.h` was
+    deleted for failing. *Install a header when a program needs to say
+    `#include <...>` and not before* -- and if a C++ program here ever
+    does, it wants its own subdirectory, not the top level.
   - **AND THE RUNTIME ADDS NOTHING libap ALREADY PROVIDES, checked
     rather than assumed.** `lib_src` holds `exit.c`, `main.c`,
     `error.c` and `memzero.c`, which is the shape that cost this tree
@@ -2848,8 +3040,9 @@ blamed.
   `vts` it renders, which is one of the three things vts was for.
   **It is LIVE in `_OPTIONAL_APPS`, not commented out** -- this file
   said otherwise and was stale; so is `basic`, which is live too.
-  Off now: `edg`, `c++lib`, and **`go`, `clisp` and `perl`**, the three
-  the first rebuild after the compiler work stopped on.
+  Off now: **`c++lib`, `go` and `clisp`**. `perl` and `edg` went back
+  in once each had built: perl after a COMPLETE clean, edg after two
+  by-hand builds.
   **What is NOT measured is muon doing any WORK**: printing a usage
   exercises argument handling and one `tstr`. *A port that builds and
   prints its usage is not a port either* -- `muon setup` on a real
@@ -2954,7 +3147,17 @@ item -- *a port that builds and has never run is not a port*:
   SIDES**, so this cost no VM round: `-U__LP64__ -U_LP64` reproduces
   kencc's configuration exactly. Fixed: `C_word` 8, 0 failures.
   Shipped: `C_SIXTY_FOUR NOT defined`, `C_word` 4, pointer 8, 1
-  failure, exit 1. *Not yet measured on the VM.*
+  failure, exit 1.
+  **AND THE VM RAN THE CONTROL RATHER THAN THE TEST, which is the
+  file's own design working.** Built bare -- without chicken's own
+  `-DC_SIXTY_FOUR -DC_LLP` -- it answers `C_SIXTY_FOUR NOT defined`,
+  `model LLP64`, `C_word` 4, pointer 8, **1 failure**: exactly the
+  shipped configuration the header says must fail. *A probe built
+  without the package's flags measures a different header*, which is
+  `tarblock-probe`'s rule, and here that is the documented control
+  rather than a fault. **Both mkfiles do pass the two flags** (`cmd`
+  :75, `lib` :79), so the port itself is fixed; the flagged run is
+  what remains.
   Recorded not patched: `chicken.h:813-815` define `C_WORD_MIN`/
   `C_WORD_MAX`/`C_UWORD_MAX` as the LONG limits with no `C_LLP` arm,
   so they would be 32-bit limits for a 64-bit word -- **defined and
@@ -3044,7 +3247,18 @@ item -- *a port that builds and has never run is not a port*:
   change in the LEXER and the SWITCH TABLE: nothing downstream of
   either produces a link error, so a completed build is a precondition
   rather than a measurement. `longconst-test` and `switchcase-test`
-  are what measure them, and neither has run on the VM yet.
+  are what measure them.
+  **BOTH ARE IN AND BOTH ARE 0.** `longconst-test` prints `long` 4 and
+  `long long` 8 -- so sections 1 and 2 are asking the question they
+  exist for rather than passing because nothing overflowed, which is
+  what the host run could not do -- and `0x0200000000000000L` survives,
+  `0x8000000000000000UL` survives, the switch label decodes to `0xc2`,
+  and **section 3's control holds**: `0x80000000L` stays long-sized and
+  positive. `switchcase-test` is 0 with **section 2 naming every arm**
+  -- the four wide labels 0x0e/0x1e/0x3e/0x4e reach arms 3-6 rather
+  than `default`, which is the SILENT half, and 3a's wide label
+  truncates to 1 and is selected by 1. *Both compiler fixes are
+  measured now rather than inferred from a build that completed.*
 - **bacon** (BASIC) -- **IT CONVERTS BASIC TO C ON APExp NOW**, 605
   lines in 0.854s for `bacongui-tk.bac`. What stopped the compile was
   not bacon: **pkg-config has never worked in this tree.**
@@ -3102,6 +3316,13 @@ item -- *a port that builds and has never run is not a port*:
   alone, **1 -- 6c alone**. *Without 6c a half-fix and a whole one
   print the same thing.* **So the VM count becomes 3, and the third is
   newly MEASURED rather than newly broken.**
+  **CONFIRMED ON THE VM: 3 failures, and they are 1b, 2a and 6c by
+  name.** The prediction named the count and all three names before the
+  run and every one matched; everything else -- FOR, WHILE, strings,
+  arrays, both other FUNCTION returns -- passes. *That is the 32-bit
+  `long` invariant measured through a language whose only integer type
+  is that `long`*, and the recipe this file records (`-q -c cc`) is
+  what ran.
   **AND THE RECIPE THIS FILE RECORDED WAS WRONG IN BOTH HALVES, which
   the first VM run said in one screen.**
   - **`-c cc`, not `-c pcc`.** bacon writes a `Makefile.bacon` naming
@@ -3538,15 +3759,27 @@ in the topic file.
   explained the fix**, plus one leading assignment rc allows. mk hands a
   recipe to rc verbatim, so every tab-indented `#` line is rc source.
   *Writing the rule down inside the recipe is what broke the recipe.*
-  **WHICH CONSTRUCT IT IS IS NOT SETTLED, and saying so matters**: rc
-  ought to treat `#` as a comment, the tree has working precedents for
-  both a plain recipe comment (`external/perl/plan9/mkfile:88`) and a
-  `#` inside a quoted argument (`cmd/tar/mkfile:126`), and *there is no
-  rc on the build host*, so every reading of its lexer here is a
-  recollection. `sys/lib/tests/mkrecipe-probe` is one `mk -k` run that
-  names it. Until then both clisp mkfiles carry **no comments inside
-  any recipe at all** -- the prose is at column 0, where mk eats it --
-  and that is the conservative form under every hypothesis.
+  **MEASURED NOW, AND THE COMMENTS WERE INNOCENT: THE CONSTRUCT IS
+  `} if not {` ON ONE LINE.** `mk -k all` in
+  `sys/lib/tests/mkrecipe-probe` answers `ok 1`, `ok 2`, `ok 3`,
+  **case 4 `token if: syntax error`**, `ok 5`, `ok 6` -- so a plain
+  recipe comment is fine, *a comment holding a bare `=` is fine*, and
+  one holding backquotes and apostrophes is fine. rc wants a command
+  separator after the closing brace; `}` followed on the same line by
+  `if not` is not one, and the fix is a newline.
+  ***SO MY DIAGNOSIS OF `mkfile.rebuild` WAS WRONG AND THE FIX WAS
+  RIGHT BY ACCIDENT.*** I read `*eval*:13: token '=': syntax error`,
+  found the only `=` left inside a COMMENT, and concluded that mk hands
+  comments to rc as source -- then rewrote BOTH clisp mkfiles to remove
+  every recipe comment *and* to put `if not` on its own line. The
+  second edit is what fixed them. *Two changes in one commit and the
+  wrong one got the credit*, which is the plainest form of the rule
+  this file already carries about experiments that isolate nothing.
+  **The sweep is clean**: `} if not` on one line now appears nowhere in
+  the tree but inside the probe itself and inside a comment describing
+  it. The clisp mkfiles' comment-free recipes can be relaxed whenever
+  anyone wants; they cost nothing and are no longer required by
+  anything measured.
 
 **Testing**
 

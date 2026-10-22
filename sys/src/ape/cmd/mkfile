@@ -53,13 +53,14 @@ _OPTIONAL_APPS=\
 	tar\
 	pax\
 # languages \
-# go and clisp are OUT, and `by hand first' is the rule they are out \
-# under -- the one `edg' already records: one failing entry aborts the \
-# whole tree's mk, and a port that has only ever been built by hand \
-# has not been measured in this position. Both now get FURTHER than \
-# they ever have (go past a.h's `bool' and the missing -c, clisp past \
-# two rc parse errors), so the next thing either reports is newly \
-# MEASURED rather than newly broken -- but it will still be a stop. \
+# go and clisp are the two still OUT, and `by hand first' is the rule \
+# they are out under: one failing entry aborts the whole tree's mk, and \
+# a port that has only ever been built by hand has not been measured in \
+# this position. Both now get FURTHER than they ever have (go past \
+# a.h's `bool', the missing -c and the Makefile backslashes in \
+# -DGOROOT_FINAL; clisp past two rc parse errors and into configure), \
+# so the next thing either reports is newly MEASURED rather than newly \
+# broken -- but it will still be a stop. \
 # Build them with `cd sys/src/ape/cmd/<dir> && mk install'. \
 #	go\
 	lua\
