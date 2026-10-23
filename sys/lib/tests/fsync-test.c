@@ -31,6 +31,29 @@
  * **a function that cannot fail is its own kind of lie**, so a closed
  * descriptor must still be EBADF.
  *
+ * ***NO OUTPUT IS NOT A PASS, AND THIS FILE IS BUILT SO THAT IT CANNOT
+ * HAPPEN QUIETLY.*** The first run of this test on 9front printed
+ * **nothing at all** -- no header, no PASS, no failure count -- and the
+ * prompt came straight back. *A fault, a kill and a clean finish all
+ * just give the shell prompt back*, which is this tree's own rule, and
+ * a silent instrument is the one failure mode that reads as success.
+ * Three things make it speak now:
+ *
+ *   - `setvbuf(stdout, NULL, _IOLBF, 0)' BEFORE anything else.  If
+ *     stdout is fully buffered -- and **`/dev/cons' answers `S_ISREG'
+ *     on this system, with `FD_ISTTY' unset**, which `devreg-probe'
+ *     measured -- then a process that dies before exit loses every
+ *     line it ever printed.
+ *   - a first line that is printed and flushed before any work, so
+ *     "nothing at all" and "stopped at the first call" are different
+ *     outputs rather than the same one.
+ *   - `_syncmark()', which makes the link FAIL against a libap
+ *     predating the fix.  *That one is why a silent run has to be
+ *     chased rather than shrugged at*: if the library is old, this
+ *     will not link, and a run that printed nothing has to be told
+ *     apart from a build that never happened.  `echo $?' after it, or
+ *     run `pcc' on its own and look at the diagnostic.
+ *
  * Build:
  *   gcc -o fsync-test fsync-test.c && ./fsync-test      # host, 0
  *   pcc -o fsync-test fsync-test.c && ./fsync-test      # 9front
@@ -69,6 +92,15 @@ main(void)
 	char nm[] = "/tmp/fsynctestXXXXXX";
 	char buf[16];
 	int fd, bad, r;
+
+	/*
+	 * Before anything else. See the header: a fully buffered stdout
+	 * loses the whole run if the process dies, and /dev/cons here
+	 * does not answer isatty().
+	 */
+	setvbuf(stdout, NULL, _IOLBF, 0);
+	printf("fsync-test: starting\n");
+	fflush(stdout);
 
 	printf("fsync-test: does fsync() answer `nothing to do' or\n");
 	printf("`I failed'?  The second deleted every file xz wrote.\n\n");

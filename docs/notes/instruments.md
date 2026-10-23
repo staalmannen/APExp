@@ -448,3 +448,39 @@ then removes the destination, with `opt_synchronous` on by default.
 0 on gcc; the control, a one-line `sed` putting the replaced
 `errno = EINVAL; return -1` back, reports 1. `_syncmark()` is the
 version marker, the eleventh use.
+
+### fsync-test's first run printed nothing, and that is a finding
+
+`pcc -o fsync-test fsync-test.c && ./fsync-test` on 9front produced
+**no output at all** -- no header, no PASS, no failure count, no
+diagnostic -- and the prompt came back. **That is not a pass**, and it
+is the failure mode this file's own rule names: *a fault, a kill and a
+clean finish all just give the shell prompt back.*
+
+What settled the direction was a line in the same screenshot rather
+than anything about the test: `unxz /tmp/t.xz` still answered
+`Synchronizing the file failed: Invalid argument` and `cat /tmp/t`
+still said no such file. **So that build did not contain the fix**, and
+this tree already carries the reason twice over -- `mk install`
+rebuilds `libap.a` without relinking binaries already built against it,
+so `xz` keeps the old `fsync` until something forces the relink, and a
+`pcc`-built test links fresh against whatever libap is installed.
+
+Three changes so that it can never be ambiguous again, and each one is
+a different reading:
+
+- **`setvbuf(stdout, NULL, _IOLBF, 0)` as the first statement.** A
+  fully buffered stdout loses every line a process printed if it dies
+  before exit -- and `devreg-probe` had just measured `/dev/cons`
+  answering `S_ISREG` with `FD_ISTTY` unset, so "stdout is a terminal,
+  therefore line buffered" is not safe to assume here.
+- **A first line printed and flushed before any work**, so "nothing
+  ran" and "stopped at the first call" stop being the same output.
+- **`_syncmark()` was already there**, and it is what makes the silence
+  worth chasing rather than shrugging at: against an old libap this
+  cannot link. So a silent run has to be told apart from a build that
+  never happened -- `echo $?`, or `pcc` on its own.
+
+*`pthread-test` had the first two from the start, for the same reason
+written down before the fact. `fsync-test` did not, and the round it
+cost is the argument for making it the default.*
