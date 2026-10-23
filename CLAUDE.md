@@ -364,11 +364,20 @@ tree has never touched. **`OREGPAIR` and the whole 64-bit code
 generator `8c/cgen64.c` are 8c's ALONE** (6c needs none; a vlong is one
 amd64 register), *so the 386 backend's 64-bit path is exactly the part
 of kencc every build here has been unable to reach* — expect that shape
-from the rest of this item rather than a one-off. **WHOSE BUG IT IS IS
-NOT KNOWN AND IS THE FIRST THING TO SETTLE**: `8c -FTVw
-/sys/src/cmd/ar.c` in a plain `term%` window with no `apexp-sh` uses
-STOCK 8c — same message means upstream's, a clean compile means ours
-and `git log sys/src/cmd/cc/` is the thirteen-commit bisect.
+from the rest of this item rather than a one-off. ***IT IS OURS AND IT IS MEASURED***: stock `8c` from a
+plain `term%` window compiles that same `ar.c` and leaves an `ar.8`,
+and all of `/sys/src` cross compiles to 386 on the host.
+***BUT `git bisect` CANNOT REACH IT, and the earlier claim here that
+thirteen `cc/` commits were the bisect list was WRONG***: this
+repository's ROOT COMMIT already carries `isbool`, `vlasizevar`,
+`alignas_req`, `_Generic` and VLA, so the import is APExp's compilers
+well advanced, not 9front's — *a bisect would run to the root and
+report "always broken", a wrong answer shaped like a result.* **The
+instrument is `diff -r /sys/src/cmd/cc $home/APExp/sys/src/cmd/cc`
+on the VM**, plus ONE build that halves the search: APExp's `8c/` needs
+names only APExp's `cc.h` defines, so stock-cc + APExp-8c will not
+compile, but **APExp `cc/` + STOCK `8c/`** will — if that fails the
+fault is in the shared front end, if it passes it is in `8c/`.
 `regpair-probe` narrows the construct afterwards and is **native
 `8c`/`8l`**, the second such file after `truefalse-test`; its result is
 whether it COMPILES.

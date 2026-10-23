@@ -28,31 +28,43 @@
  * 64-bit path is precisely the part of kencc that every build this tree
  * has ever done was unable to reach.***
  *
- * ***THE QUESTION THIS CANNOT ANSWER BY ITSELF IS WHOSE BUG IT IS, AND
- * THAT IS THE FIRST THING TO SETTLE.*** Two explanations fit equally
- * well so far:
+ * ***IT IS OURS, AND THAT IS MEASURED.***  Stock `8c' -- run from a
+ * plain `term%' window where /bin is 9front's own -- compiles this very
+ * `ar.c' and leaves an `ar.8' behind, and the whole of /sys/src cross
+ * compiles to 386 on the host.  APExp's `8c' fails on the same file.
+ * *The input is identical, so the difference is the compiler.*
  *
- *   - APExp broke it.  The shared front end is `sys/src/cmd/cc/', and
- *     CLAUDE.md's own warning is that a change there reaches all ten
- *     backends.  There are thirteen such commits, almost all about -J,
- *     bit-fields and C23 constants -- *none obviously on the vlong
- *     assignment path*, which is an argument and not a measurement.
- *   - It was already broken.  These compilers were imported, and 386
- *     may have been carrying this before APExp existed.
+ * ***AND `git bisect' CANNOT REACH IT, WHICH IS WORTH SAYING BECAUSE
+ * THE OPPOSITE WAS SAID FIRST.***  The thirteen commits under
+ * `sys/src/cmd/cc/' are NOT the delta from stock: **this repository's
+ * root commit already contains `isbool', `vlasizevar', `alignas_req',
+ * `_Generic' and VLA**, so the import is APExp's compilers at an
+ * advanced state and not 9front's.  Every kencc patch older than the
+ * repository is invisible to the history and is just as likely to be
+ * the cause.
  *
- * **ONE COMMAND SEPARATES THEM, and it needs this file only as a
- * convenience.**  In a PLAIN 9front window -- `term%', with no
- * `apexp-sh' and no `mount-include' run in it, so that `8c' is the
- * system's own --
+ * **SO THE INSTRUMENT IS A SOURCE DIFF AGAINST THE RUNNING SYSTEM
+ * rather than the git log**, and it can only be taken on the VM:
  *
- *	8c -FTVw /sys/src/cmd/ar.c
+ *	diff -r /sys/src/cmd/cc $home/APExp/sys/src/cmd/cc
+ *	diff -r /sys/src/cmd/8c $home/APExp/sys/src/cmd/8c
  *
- * *The same message from stock 8c means it is upstream's and not ours*,
- * and the next step is 8c rather than a bisect.  *A clean compile means
- * it is ours*, and `git log --oneline sys/src/cmd/cc/' is the list to
- * bisect -- thirteen commits.  **Run it before reading anything below**:
- * every section here is about WHICH construct, and which construct does
- * not matter until whose bug is known.
+ * **AND ONE BUILD SPLITS THE SEARCH IN HALF.**  APExp's `8c/' uses
+ * names only APExp's `cc.h' defines -- `conformalign', `talign',
+ * `dupokall' -- so stock-cc with APExp-8c will not compile; but the
+ * other pairing will, because stock `8c/' asks for nothing new.  Build
+ * `8c' from **APExp's `cc/' and STOCK `8c/'**, and compile `ar.c':
+ *
+ *   it FAILS  -> the fault is in the shared front end, `cc/'.
+ *   it PASSES -> the fault is in `8c/' itself, which would be a
+ *                surprise worth having, since the only changes this
+ *                repository made there are -J's and -C's and both sit
+ *                behind flags this compile does not pass.
+ *
+ * *One build, and whichever way it goes the search halves.*  **Run it
+ * before reading anything below**: every section here is about WHICH
+ * construct, and which construct does not matter until the half is
+ * known.
  *
  * Build, and the build IS the test:
  *

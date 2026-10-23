@@ -526,3 +526,39 @@ APExp's. The same message means upstream's; a clean compile means ours,
 and `git log --oneline sys/src/cmd/cc/` is a thirteen-commit bisect.
 *An instrument that would be read before the question it answers is
 worth a paragraph telling the reader not to.*
+
+### The A/B fired, and it also refuted the bisect plan
+
+**Stock `8c` compiles `ar.c` and APExp's does not**, with the same
+input file, and the whole of `/sys/src` cross compiles to 386 on the
+host. So the fault is the compiler, and it is ours.
+
+***And then the next step as written was wrong.*** The probe's header
+said to bisect `git log --oneline sys/src/cmd/cc/` -- thirteen
+commits -- and that cannot work: **this repository's root commit
+already contains `isbool`, `vlasizevar`, `alignas_req`, `_Generic` and
+VLA**, so the import is APExp's compilers at an advanced state and not
+9front's. Every kencc patch older than the repository is invisible to
+the history.
+
+*A bisect would have run to the root and reported "it was always
+broken"* -- which is a wrong answer wearing the shape of a result, and
+the most expensive kind, because each step is a compiler rebuild on the
+VM. **The git history is not the delta from stock, and nothing in this
+tree had ever needed it to be until a second compiler existed to
+compare against.**
+
+So the instrument is a source diff against the running system,
+`diff -r /sys/src/cmd/cc $home/APExp/sys/src/cmd/cc`, which only the VM
+can take -- and which is trustworthy now in a way it was not a month
+ago, since `st_rdev` is what stopped `diff` calling two different files
+identical.
+
+**And one build halves the search before any reading.** APExp's `8c/`
+references names only APExp's `cc.h` defines (`conformalign`, `talign`,
+`dupokall`), so stock-`cc` with APExp-`8c` will not compile; the other
+pairing will, because stock `8c/` asks for nothing new. Build `8c` from
+APExp's `cc/` and stock `8c/`: a failure puts the fault in the shared
+front end, a pass puts it in `8c/` -- and the latter would be a surprise
+worth having, since the only changes this repository made there are
+`-J`'s and `-C`'s and both are behind flags that compile does not pass.
