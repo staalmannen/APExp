@@ -621,3 +621,65 @@ fault; this file says which construct; *only the two together say the
 construct is a regression rather than something kencc never had.* And
 if stock 8c also fails on case 1, then case 1 differs from `ar.c:586`
 in some way that matters and the reduction is not yet faithful.
+
+### Stock 8c compiles the probe: it is a regression, with a three-line repro
+
+```
+term% cd APExp/sys/lib/tests
+term% 8c regpair-probe.c
+term% lc regpair-probe*
+regpair-probe.6  regpair-probe.8  regpair-probe.c
+regpair-probe.7  regpair-probe.9  regpair-probe.k
+```
+
+A `regpair-probe.8` where APExp's own `8c` produced a diagnostic.
+**Both halves of the A/B now agree**: stock compiles `ar.c` and the
+probe, APExp's fails on both, same inputs. *So the probe is a faithful
+reduction and the thing to look for is a change that breaks
+`d->offset = s->size` on a 32-bit target and nothing else.*
+
+**That is the whole value of a reduction**, and it is worth saying what
+it bought: the search went from "something in a compiler, against a
+946-line `ar.c`" to three lines, two structs and one statement, with
+eleven neighbouring constructs that all compile and bound it on every
+side.
+
+The prediction for cases 7 to 11 is written down **in
+`docs/releases/0.7.md` and deliberately not in the probe's header**,
+because editing that header is what moved the measured line numbers
+last time. *An instrument's results table and the speculation about the
+next run do not belong in the same file.*
+
+### Prediction A refuted: the discriminator is that the two structs DIFFER
+
+```
+bash-5.3$ 8c regpair-probe.c
+regpair-probe.c:181 bad in naddr: REGPAIR
+regpair-probe.c:181 bad in naddr: REGPAIR
+```
+
+181 is case 1 and nothing else is named, so **cases 7 to 11 all
+compile.** Written down before the run: **A** -- two register pairs
+live at once, i.e. the allocator -- predicted **case 7 would fail**.
+**It compiles.** Case 7 is `d->offset = e->offset` through two `Dst *`:
+two indirections, two base pointers, one pair. *Register pressure is
+identical to case 1.* A is dead.
+
+**B holds: the two structs being DIFFERENT TYPES is the whole
+discriminator.** `Dst *` to `Dst *` is fine; `Dst *` to `Src *` is not.
+That is a far smaller target than "the 64-bit path", and it moves the
+search from the register allocator to the type machinery in the shared
+front end -- which is where this tree's patches actually are.
+
+**`tcopy` was the first guess and reading ruled it out rather than a
+run**: it is untouched here, and returns `t` unchanged for a scalar
+whose link has not moved, so `Dst.offset` and `Src.size` are the *same*
+`types[TVLONG]`. The member types are identical; only the enclosing
+ones differ. *A hypothesis that can be killed by opening the function
+should be killed that way.*
+
+**And the original reduction had a fault worth naming**: `Src` differs
+from `Dst` in THREE ways at once -- no self-pointer, eight bytes
+shorter, differently named member. A case that varies three things
+cannot say which one matters, which is the same defect as a test with
+no control. Cases 12 to 14 hold two constant at a time.

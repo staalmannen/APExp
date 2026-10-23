@@ -440,7 +440,36 @@ naddr(Node *n, Adr *a)
 	default:
 	bad:
 		diag(n, "bad in naddr: %O %D", n->op, a);
-//prtree(n, "naddr");
+		/*
+		 * AND PRINT THE TREE, which upstream left commented out one
+		 * line below this for as long as the file has existed.
+		 *
+		 * `bad in naddr: REGPAIR' names the victim and not the
+		 * cause: it says a 64-bit value arrived somewhere that can
+		 * only take an address, and says nothing about WHICH
+		 * expression or how it got there.  `objtype=386 mk install'
+		 * stopped on exactly that message and the next four rounds
+		 * went into reducing `ar.c' to three lines by hand --
+		 * `d->offset = s->size', two structs of DIFFERENT type --
+		 * when the compiler could have printed the shape itself.
+		 *
+		 * It is unconditional rather than behind a debug letter,
+		 * and that is deliberate twice over.  **This arm only runs
+		 * when the compile has already failed**, so there is no
+		 * output to spam and nothing downstream to disturb; and a
+		 * new debug letter is the trap this tree has already fallen
+		 * into once, since `ARGBEGIN's default arm swallows any
+		 * unknown letter and turns a flag that does nothing into a
+		 * flag that silently does something else (see `-J' not
+		 * being `-P', in `cc/lex.c').
+		 *
+		 * Only 8c, because only 8c reports this: 5c and qc answer
+		 * `bad vlong in gmove' from a different site, and 1c and 2c
+		 * answer `GOK in gopcode' from a third.  *Three faults,
+		 * three messages, and this is the one with a reduction
+		 * attached.*
+		 */
+		prtree(n, "naddr");
 		break;
 
 	case OREGISTER:

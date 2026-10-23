@@ -389,12 +389,79 @@ broken" is a summary and not a diagnosis, and this item is at least
 three pieces of work.* **8c's result is the sharpest: case 1 and
 nothing else** — not the parameter, the return, the widening,
 `d->offset = d->offset + 1` or the vararg — so its 64-bit support
-broadly works and exactly one shape, `ar.c:586`'s, does not. Cases
-7-11 split that shape; **if case 8 (the same work in two statements)
-compiles where case 1 does not, it is the register allocator holding
-two pairs live, not the front end.** Still missing: **stock `8c` on
-that file**, which is what would make it a regression rather than
-something kencc never had.
+broadly works and exactly one shape, `ar.c:586`'s, does not. ***AND THE PREDICTION WAS REFUTED, WHICH NARROWED IT FURTHER.*** A
+said case 7 (`d->offset = e->offset`, two `Dst *`) would fail —
+register pressure identical to case 1 — and **case 7 compiles**, as do
+8, 9, 10 and 11; only 181, case 1, is named. ***So the discriminator
+is that the two structs are DIFFERENT TYPES***: `Dst *` to `Dst *` is
+fine, `Dst *` to `Src *` is not. That points at the type machinery in
+the shared front end rather than at the allocator. **`tcopy` is ruled
+out by reading**: untouched here, and it returns `t` unchanged for a
+scalar, so both members are the same `types[TVLONG]` — the member
+types are identical and only the enclosing ones differ. Cases 12-14
+split `Src`'s three differences from `Dst` (no self-pointer, 8 bytes
+shorter, differently named member), and the prediction for them is in
+`docs/releases/0.7.md`. **STOCK `8c` COMPILES THE PROBE TOO**, so both halves agree — stock
+compiles `ar.c` and the probe, APExp's fails on both — and ***it is a
+REGRESSION with a three-line reproduction***. What to look for is a
+change that breaks `d->offset = s->size` on a 32-bit target and
+nothing else. **The full delta is `diff -r /sys/src/cmd/cc
+$home/APExp/sys/src/cmd/cc` on the VM and nothing else can supply it**
+— ***and when it arrived it refuted the word "regression".*** `Spec`
+(`typedef struct Spec Spec`, used by `garbt`, `simpleg`, `simplec`,
+`simplet`) exists in `/sys/src/cmd/cc` and **nowhere in APExp's
+`cc.h`**, so **APExp's compilers are forked from an OLDER 9front** and
+much of that 3768-line diff is *9front moving forward*, not our
+patches. So "stock compiles it, ours does not" establishes only that
+the two differ: the cause may equally be **an upstream fix our base
+lacks**. *Separating those needs 9front's own history, which neither
+the diff nor this repository has* — and that is the SECOND attribution
+error in the same direction, after the git log was taken for the delta
+from stock. **Read any `diff -r` against `/sys/src` as two forks, not
+as a patch set.**
+The 8c diff is short and was read in full: `OALLOCA` (VLA),
+**`nodrat` → `regsalloc` at four sites** (one of them `cgen.c`'s
+`case ODOT`, the `.`/`->` path) with the `nrathole` growth deleted, and
+the `true` → `cond` rename, which is ours. `cc/sub.c` has complex
+widths, `ptrsignonly`, and the `Spec` signature difference. **Nothing
+on the path from one `vlong` member to another.**
+***SO THE INSTRUMENT IS THE COMPILER ITSELF***: `8c/txt.c`'s `naddr`
+has carried a commented-out `prtree(n, "naddr")` one line under the
+diagnostic forever, and **it is uncommented now**. `bad in naddr:
+REGPAIR` names the victim; the tree names the cause. *Four rounds went
+into reducing `ar.c` by hand when the compiler could have printed the
+shape.* Unconditional, not behind a debug letter: the arm only runs
+when the compile has already failed, and a new letter is the trap
+`ARGBEGIN`'s default arm already set once (`-J` not being `-P`).
+**The fix is the same work whether the hunk is ours or 9front's.**
+***AND UPSTREAM'S OWN HISTORY SETTLES THE ATTRIBUTION.***
+`git://git.9front.org` is unreachable from the build host but
+**`https://github.com/9front/9front` is**, and a blobless sparse clone
+of `cc`/`8c` answers what no `diff -r` could. The `nodrat` →
+`regsalloc` change is **`ed3c7d491`, cinap_lenrek, 2025-12-27,
+"?c: eliminate .rathole for arm, arm64, 386, arm-thumb and mips"** —
+***upstream's, and APExp HAS it***: APExp's `8c` is identical to
+upstream HEAD there. So "stock 8c compiles it" means **"9front from
+before December 2025 compiles it"**, not "an unmodified compiler does".
+**APExp's kencc base is now DATED**: it has `3ea08ad83` (2025-12-28,
+dynamic regions — we changed only 300 → 600) and lacks `a68335214`
+(2026-06-10, `Spec`), so the fork point is between those.
+**APExp's whole 8c delta from upstream HEAD** is `OALLOCA` (VLA), the
+`true` → `cond` rename, complex/VLA in `txt.c`, `-J` in `swt.c`
+(gated), and `maxregion` 300 → 600 — *and `cgen64.c` differs by the
+rename ALONE, so we carry `f4c733880` ("use hint for register pair")
+untouched.*
+**AND THE INSTALLED TREE IS A MIX OF VINTAGES**: their
+`/sys/src/cmd/cc/cc.h` has `Spec` (June 2026) while their
+`/sys/src/cmd/8c/cgen.c` has `nodrat` (removed Dec 2025), and upstream
+never reverted — *no single checkout can be in that state*. **So
+"stock" in that A/B is not a known vintage**, which is the argument for
+the test rather than for more reading: **build upstream HEAD's `8c`
+unmodified and run the probe.** Fails → upstream's bug, with a
+three-line reproduction for a 9front report; passes → one of our five,
+of which only `maxregion` and `CLOCAL` are neither gated nor inert.
+The prediction for cases 7-11 is written down in `docs/releases/0.7.md`
+before the run, with its refutation condition.
 ***AND IT DEMONSTRATED A REPORTING TRAP ON ITSELF***: a compile-time
 result can only name a LINE, so it rots when the file is edited above
 it. The new cases were appended BELOW the old ones for exactly that

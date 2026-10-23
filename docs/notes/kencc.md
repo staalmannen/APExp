@@ -1466,3 +1466,269 @@ command settles it and none has been run:
 until that second command is run the honest statement is: the rule is
 confirmed by name in every shape that was visible, and the total is off
 by one for a reason nobody has looked at.
+
+## The 386 vlong failure, and two attribution errors on the way
+
+`objtype=386 mk install` stopped at `ar.c:586 bad in naddr: REGPAIR` --
+`as->offset = ap->size;`, both members `vlong`. `OREGPAIR` and the
+whole 64-bit code generator `8c/cgen64.c` are 8c's alone, because a
+vlong is a single amd64 register and 6c needs no such file, **so the
+386 backend's 64-bit path is exactly the part of kencc every build in
+this tree has been unable to reach.**
+
+`regpair-probe.c` reduces it to three lines and bounds it on every
+side. Measured, all ten backends: **every 64-bit one compiles it and
+every 32-bit one fails**, and *they are not one bug* -- 5c and qc fail
+on returning a vlong, 8c compiles that and fails on one shape alone,
+1c and 2c fail on everything. **8c's shape is
+`d->offset = s->size` with the two structs of DIFFERENT type**;
+`d->offset = e->offset` through two `Dst *` compiles, which killed the
+register-pressure hypothesis outright.
+
+### Two attribution errors, both in the same direction
+
+**First**: the thirteen commits under `sys/src/cmd/cc/` were offered as
+a bisect list. They are not the delta from stock -- **this
+repository's root commit already contains `isbool`, `vlasizevar`,
+`alignas_req`, `_Generic` and VLA**, so the import is APExp's compilers
+well advanced. A bisect would have run to the root and reported "always
+broken", which is a wrong answer wearing the shape of a result.
+
+**Second**: `diff -r /sys/src/cmd/cc $home/APExp/sys/src/cmd/cc` was
+then offered as the delta. It is not that either. `Spec` -- the
+declaration-specifier struct that `garbt`, `simpleg`, `simplec` and
+`simplet` take -- is in `/sys/src/cmd/cc` and **nowhere in APExp's
+`cc.h`**, so **APExp forked from an older 9front** and much of the 3768
+lines is upstream moving forward.
+
+***So "stock compiles it, ours does not" does not say we broke it.***
+It says the two compilers differ, and the cause may equally be an
+upstream fix our base lacks. **Read any `diff -r` against `/sys/src` as
+two forks rather than as a patch set.**
+
+### What the 8c diff actually contains
+
+Short enough to read in full:
+
+- `OALLOCA`, a new `cgen` case -- VLA support.
+- **`nodrat` → `regsalloc` at four sites**, plus the deletion of
+  `if(nn == nodrat) if(w > nrathole) nrathole = w;`. One of the four is
+  `cgen.c`'s `case ODOT`, which is the `.`/`->` path. *Which fork made
+  that change the diff cannot say.*
+- `true` → `cond`/`vcond` throughout, which is ours: `true` is a
+  keyword now.
+
+`cc/sub.c` adds complex widths, `ptrsignonly` for `-Wpointer-sign`, and
+carries the `Spec`/`long` difference. **Nothing on the path from one
+`vlong` member to another**, which is why the next step stopped being a
+reading.
+
+### The instrument that makes attribution unnecessary
+
+`8c/txt.c`'s `naddr` has carried `//prtree(n, "naddr");` one line under
+its diagnostic for as long as the file has existed. **It is
+uncommented.**
+
+`bad in naddr: REGPAIR` names the victim and not the cause: it says a
+64-bit value reached somewhere that can only take an address, and
+nothing about which expression or how. *Four rounds went into reducing
+`ar.c` to three lines by hand when the compiler could have printed the
+shape itself.*
+
+Unconditional rather than behind a debug letter, for two reasons: the
+arm runs **only when the compile has already failed**, so there is
+nothing to spam; and a new debug letter is the trap this tree fell into
+once already, `ARGBEGIN`'s default arm swallowing any unknown letter --
+which is why `-J` is not `-P`. Only 8c, because only 8c reports this
+message: 5c and qc answer `bad vlong in gmove` from a different site,
+1c and 2c `GOK in gopcode` from a third.
+
+**And the fix is the same work whichever fork the hunk came from**,
+which is the point of reaching for the shape instead of the blame.
+
+### Upstream's history settles it: the rathole change is 9front's, not ours
+
+`git://git.9front.org` is unreachable from the build host, but
+`https://github.com/9front/9front` is, and a blobless sparse clone of
+`sys/src/cmd/cc` and `sys/src/cmd/8c` answers every attribution
+question the `diff -r` could not.
+
+**The `nodrat` → `regsalloc` change is upstream's:**
+
+```
+ed3c7d491  2025-12-27  cinap_lenrek
+    ?c: eliminate .rathole for arm, arm64, 386, arm-thumb and mips
+```
+
+It deletes `nodrat`, `nrathole` and `symrathole` from `gc.h`, `txt.c`
+and `swt.c`, and replaces four `sugen(l, nodrat, ...)` sites with
+`regsalloc`. **APExp has it.** `diff -r` between upstream HEAD's `8c`
+and APExp's shows no such hunk -- the two are identical there.
+
+So the user's installed `/sys/src/cmd/8c` is what lacks it, and ***the
+"stock 8c compiles it" measurement means "9front from before December
+2025 compiles it"***, not "an unmodified compiler compiles it".
+
+### APExp's kencc base is datable, and now dated
+
+- It **has** `3ea08ad83` (2025-12-28, *"?c: grow regions dynamically"*):
+  `reg.c` carries the `allocn`/`maxregion += 128` loop. We changed only
+  the initial constant, 300 -> 600.
+- It **lacks** `a68335214` (2026-06-10, *"cc: untangle class and type
+  specifiers"*), which is where `struct Spec` comes from.
+
+**So the fork point is between 2025-12-28 and 2026-06-10**, and the
+`Spec`/`long` signatures in `sub.c` are upstream moving on, exactly as
+suspected.
+
+### What APExp's 8c actually adds to upstream HEAD
+
+The whole list, from `diff -r` against the real upstream:
+
+- `cgen.c`: `OALLOCA` (VLA) and the `true` -> `cond` rename.
+- `cgen64.c`: the rename only. **So we have `f4c733880` (2025-09-23,
+  *"c: use hint for register pair"*) untouched** -- which matters,
+  since it is the most recent upstream work on REGPAIR itself.
+- `txt.c`: complex (`typecmplx`, `iscmplx`), the VLA epilogue, `CLOCAL`
+  added to one class test, and the `prtree` above.
+- `swt.c`: `-J`, gated on `conformalign`.
+- `reg.c`: `maxregion` 300 -> 600.
+
+*Nothing there is on the path from one `vlong` member to another*, and
+four of the five are gated, cosmetic or additive.
+
+### The inconsistency in the diffed tree, and its cause
+
+The tree the `diff -r` was taken from had `struct Spec` (2026-06-10)
+in `cc/cc.h` **and** `nodrat` (removed 2025-12-27) in `8c/cgen.c`.
+Upstream has `Spec`, has no `nodrat`, and never reverted, so **no
+single 9front checkout can be in that state.**
+
+**The cause is known and it is not kencc's**: that machine is the
+development VM, and *its `sysupdate` is broken*. It is used because
+GitHub authentication works on it, and normally that costs nothing
+because nothing here touches the underlying system -- but a `diff -r`
+against `/sys/src` is precisely a thing that does.
+
+***SO THE 3768-LINE `cc.diff` AND THE 434-LINE `8c.diff` ARE VOID AS
+STATEMENTS ABOUT STOCK.*** They compared APExp against a tree that is
+part 2025 and part 2026. *Nothing was wrong with taking them; what was
+wrong was reading them as a patch set*, which is the same error in a
+third costume. The clone of real upstream replaces them and is what
+every attribution above rests on.
+
+**THE COMPILER MEASUREMENTS ARE ON A DIFFERENT AND CLEAN MACHINE**, and
+they stand: a second VM on completely clean source is where stock `8c`
+compiled `ar.c` and `regpair-probe.c`, and where all of `/sys/src`
+cross compiled to 386. It can download but not push, which is why the
+diffs came from the other one.
+
+### So the live question is one grep wide
+
+**What vintage is the clean VM?** Its `8c` is the one that compiles the
+probe, and whether it has `ed3c7d491` decides everything:
+
+```
+grep -c nodrat /sys/src/cmd/8c/cgen.c     # 0 = has the rathole change
+grep -c Spec /sys/src/cmd/cc/cc.h         # 0 = predates 2026-06-10
+```
+
+- **`nodrat` count 0** -- the clean VM is post-December-2025 and agrees
+  with APExp on that hunk. ***Then the rathole change is exonerated and
+  the fault is in one of APExp's five deltas***, of which only
+  `maxregion` 300 -> 600 and the `CLOCAL` class test are neither gated
+  nor inert.
+- **nonzero** -- the clean VM predates it, and `ed3c7d491` or something
+  after it is still the suspect.
+
+*Two greps bracket that compiler's vintage exactly the way the clone
+bracketed APExp's, and the second one is not redundant: it says whether
+the bracket is the same one.*
+
+### The decisive test
+
+**Build upstream 9front HEAD's `8c`, unmodified, and run it on
+`regpair-probe.c`** -- and the clean VM can do this without any GitHub
+credential, since `git/clone https://github.com/9front/9front` only
+needs to download.
+
+- **It fails** -> the bug is upstream's, in or after `ed3c7d491`, and
+  APExp merely has it. That is a 9front bug report with a three-line
+  reproduction attached, and we can carry a local fix meanwhile.
+- **It passes** -> the fault is in one of the five deltas above, and
+  `reg.c`'s `maxregion` and `txt.c`'s `CLOCAL` are the two that are
+  neither gated nor obviously inert.
+
+Either way the `prtree` in `naddr` prints the shape on the failing
+side, so the next round has the tree and not just the message.
+
+### The clean VM is current 9front, and that exonerates upstream
+
+```
+bash-5.3$ grep -c nodrat /sys/src/cmd/8c/cgen.c
+0
+bash-5.3$ grep -c Spec /sys/src/cmd/cc/cc.h
+8
+```
+
+`nodrat` gone and `Spec` present, so that machine is **after
+2026-06-10** -- current 9front, and it carries `ed3c7d491`. **Its `8c`
+compiles `ar.c` and `regpair-probe.c`.**
+
+***So the rathole change is exonerated and this is not a 9front bug.***
+Upstream HEAD works, APExp does not, and APExp's `8c` IS upstream HEAD
+plus five things. **The fault is in our delta.**
+
+### Which half: 8c or cc?
+
+**There is no missing upstream `8c` work** -- `diff -r` against the
+real upstream found only our five. **Every upstream change we lack is
+in `cc/`**: `b43ec1215` (2026-04-11, *fix the fix of taking address of
+incompletely defined types*), `9932a824a` (2026-03-02), `a68335214`
+(2026-06-10, `Spec`).
+
+So the fault is in **our five 8c changes**, or in **`cc/`** -- ours or
+the upstream ones we lack.
+
+**Reading rules the five out, one at a time:**
+
+- `OALLOCA` is a new `case` in `cgen`; unreachable without a VLA.
+- `true` -> `cond` is a rename.
+- `swt.c`'s hunks are gated on `conformalign`, and this compile passes
+  no `-J`.
+- `txt.c`'s `iscmplx` addition is a third disjunct beside
+  `typesu`/`typev`; **the vlong arm is untouched**.
+- `typecmplx = typesuv` is read only by `pgen.c`, and only for RETURN
+  values -- and **case 2 returns a vlong and compiles**.
+- The two `CLOCAL` additions: one lists globals for `AGLOBL`, the other
+  is inside `naddr`'s **`case ONAME`** -- and our node reaches
+  `default: bad:` as an `OREGPAIR`, so it never gets there.
+- `reg.c`'s `maxregion` 300 -> 600 is the initial size of an array that
+  `3ea08ad83` made **grow dynamically**, so it cannot change
+  correctness.
+
+***Prediction, written before the run: the fault is in `cc/`, and the
+split build below FAILS.*** What refutes it: that build compiling the
+probe, which would put the fault in one of the five above and make the
+reading wrong seven times over.
+
+### The split build, and the one line it needs
+
+Build `8c` from **APExp's `cc/` and upstream's `8c/`**. That pairing
+compiles where the reverse does not, because upstream's `8c` references
+none of `conformalign`, `talign` or `dupokall`.
+
+***But it needs one line added, or it faults and the fault gets read as
+a result.*** APExp's `cc/pgen.c` reads `typecmplx[...]`, and the only
+thing that ever sets it is **APExp's own `8c/txt.c ginit()**:
+
+```c
+	typecmplx = typesuv;
+```
+
+Upstream's `ginit` does not, so `typecmplx` would be nil and `pgen.c:36`
+would dereference it on the first function with a return value. Add
+that one line to upstream's `txt.c` for the test.
+
+*A test that crashes for a reason unrelated to the question is worse
+than no test, and this one would have crashed in the first function.*
