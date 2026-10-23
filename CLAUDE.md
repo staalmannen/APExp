@@ -406,7 +406,34 @@ compiles `ar.c` and the probe, APExp's fails on both — and ***it is a
 REGRESSION with a three-line reproduction***. What to look for is a
 change that breaks `d->offset = s->size` on a 32-bit target and
 nothing else. **The full delta is `diff -r /sys/src/cmd/cc
-$home/APExp/sys/src/cmd/cc` on the VM and nothing else can supply it.**
+$home/APExp/sys/src/cmd/cc` on the VM and nothing else can supply it**
+— ***and when it arrived it refuted the word "regression".*** `Spec`
+(`typedef struct Spec Spec`, used by `garbt`, `simpleg`, `simplec`,
+`simplet`) exists in `/sys/src/cmd/cc` and **nowhere in APExp's
+`cc.h`**, so **APExp's compilers are forked from an OLDER 9front** and
+much of that 3768-line diff is *9front moving forward*, not our
+patches. So "stock compiles it, ours does not" establishes only that
+the two differ: the cause may equally be **an upstream fix our base
+lacks**. *Separating those needs 9front's own history, which neither
+the diff nor this repository has* — and that is the SECOND attribution
+error in the same direction, after the git log was taken for the delta
+from stock. **Read any `diff -r` against `/sys/src` as two forks, not
+as a patch set.**
+The 8c diff is short and was read in full: `OALLOCA` (VLA),
+**`nodrat` → `regsalloc` at four sites** (one of them `cgen.c`'s
+`case ODOT`, the `.`/`->` path) with the `nrathole` growth deleted, and
+the `true` → `cond` rename, which is ours. `cc/sub.c` has complex
+widths, `ptrsignonly`, and the `Spec` signature difference. **Nothing
+on the path from one `vlong` member to another.**
+***SO THE INSTRUMENT IS THE COMPILER ITSELF***: `8c/txt.c`'s `naddr`
+has carried a commented-out `prtree(n, "naddr")` one line under the
+diagnostic forever, and **it is uncommented now**. `bad in naddr:
+REGPAIR` names the victim; the tree names the cause. *Four rounds went
+into reducing `ar.c` by hand when the compiler could have printed the
+shape.* Unconditional, not behind a debug letter: the arm only runs
+when the compile has already failed, and a new letter is the trap
+`ARGBEGIN`'s default arm already set once (`-J` not being `-P`).
+**The fix is the same work whether the hunk is ours or 9front's.**
 The prediction for cases 7-11 is written down in `docs/releases/0.7.md`
 before the run, with its refutation condition.
 ***AND IT DEMONSTRATED A REPORTING TRAP ON ITSELF***: a compile-time

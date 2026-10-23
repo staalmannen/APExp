@@ -1466,3 +1466,82 @@ command settles it and none has been run:
 until that second command is run the honest statement is: the rule is
 confirmed by name in every shape that was visible, and the total is off
 by one for a reason nobody has looked at.
+
+## The 386 vlong failure, and two attribution errors on the way
+
+`objtype=386 mk install` stopped at `ar.c:586 bad in naddr: REGPAIR` --
+`as->offset = ap->size;`, both members `vlong`. `OREGPAIR` and the
+whole 64-bit code generator `8c/cgen64.c` are 8c's alone, because a
+vlong is a single amd64 register and 6c needs no such file, **so the
+386 backend's 64-bit path is exactly the part of kencc every build in
+this tree has been unable to reach.**
+
+`regpair-probe.c` reduces it to three lines and bounds it on every
+side. Measured, all ten backends: **every 64-bit one compiles it and
+every 32-bit one fails**, and *they are not one bug* -- 5c and qc fail
+on returning a vlong, 8c compiles that and fails on one shape alone,
+1c and 2c fail on everything. **8c's shape is
+`d->offset = s->size` with the two structs of DIFFERENT type**;
+`d->offset = e->offset` through two `Dst *` compiles, which killed the
+register-pressure hypothesis outright.
+
+### Two attribution errors, both in the same direction
+
+**First**: the thirteen commits under `sys/src/cmd/cc/` were offered as
+a bisect list. They are not the delta from stock -- **this
+repository's root commit already contains `isbool`, `vlasizevar`,
+`alignas_req`, `_Generic` and VLA**, so the import is APExp's compilers
+well advanced. A bisect would have run to the root and reported "always
+broken", which is a wrong answer wearing the shape of a result.
+
+**Second**: `diff -r /sys/src/cmd/cc $home/APExp/sys/src/cmd/cc` was
+then offered as the delta. It is not that either. `Spec` -- the
+declaration-specifier struct that `garbt`, `simpleg`, `simplec` and
+`simplet` take -- is in `/sys/src/cmd/cc` and **nowhere in APExp's
+`cc.h`**, so **APExp forked from an older 9front** and much of the 3768
+lines is upstream moving forward.
+
+***So "stock compiles it, ours does not" does not say we broke it.***
+It says the two compilers differ, and the cause may equally be an
+upstream fix our base lacks. **Read any `diff -r` against `/sys/src` as
+two forks rather than as a patch set.**
+
+### What the 8c diff actually contains
+
+Short enough to read in full:
+
+- `OALLOCA`, a new `cgen` case -- VLA support.
+- **`nodrat` → `regsalloc` at four sites**, plus the deletion of
+  `if(nn == nodrat) if(w > nrathole) nrathole = w;`. One of the four is
+  `cgen.c`'s `case ODOT`, which is the `.`/`->` path. *Which fork made
+  that change the diff cannot say.*
+- `true` → `cond`/`vcond` throughout, which is ours: `true` is a
+  keyword now.
+
+`cc/sub.c` adds complex widths, `ptrsignonly` for `-Wpointer-sign`, and
+carries the `Spec`/`long` difference. **Nothing on the path from one
+`vlong` member to another**, which is why the next step stopped being a
+reading.
+
+### The instrument that makes attribution unnecessary
+
+`8c/txt.c`'s `naddr` has carried `//prtree(n, "naddr");` one line under
+its diagnostic for as long as the file has existed. **It is
+uncommented.**
+
+`bad in naddr: REGPAIR` names the victim and not the cause: it says a
+64-bit value reached somewhere that can only take an address, and
+nothing about which expression or how. *Four rounds went into reducing
+`ar.c` to three lines by hand when the compiler could have printed the
+shape itself.*
+
+Unconditional rather than behind a debug letter, for two reasons: the
+arm runs **only when the compile has already failed**, so there is
+nothing to spam; and a new debug letter is the trap this tree fell into
+once already, `ARGBEGIN`'s default arm swallowing any unknown letter --
+which is why `-J` is not `-P`. Only 8c, because only 8c reports this
+message: 5c and qc answer `bad vlong in gmove` from a different site,
+1c and 2c `GOK in gopcode` from a third.
+
+**And the fix is the same work whichever fork the hunk came from**,
+which is the point of reaching for the shape instead of the blame.
