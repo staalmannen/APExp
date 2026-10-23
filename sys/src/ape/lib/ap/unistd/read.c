@@ -37,8 +37,8 @@
  * A file at end of file reported "try again later" for ever, because
  * later never comes for a file that has already ended.
  */
-static int
-isregular(int d)
+int
+_isregular(int d)
 {
 	struct stat st;
 	Fdinfo *f;
@@ -110,7 +110,7 @@ pread(int d, void *buf, size_t nbytes, off_t offset)
 	 * _readbuf below waits for the copy process rather than giving up
 	 * on it. That wait always ends: a file cannot fail to arrive.
 	 */
-	if(noblock && isregular(d))
+	if(noblock && _isregular(d))
 		noblock = 0;
 	if(noblock || isbuf){
 		if(f->flags&FD_BUFFEREDX) {

@@ -131,8 +131,19 @@ main(void)
 		pfd[0].events = POLLIN | POLLOUT;
 		pfd[0].revents = 0;
 		n = poll(pfd, 1, 1000);
-		eq("both events reported on the one entry",
-		    (pfd[0].revents & (POLLIN|POLLOUT)) == (POLLIN|POLLOUT), 1);
+		/*
+		 * Print the bits before asserting on them. Deducing WHICH
+		 * one was missing from a bare `0 want 1' cost a round
+		 * trip to the other machine once; a failure should name
+		 * itself.
+		 */
+		printf("     revents: POLLIN %d  POLLOUT %d   poll -> %d\n",
+		    (pfd[0].revents & POLLIN) != 0,
+		    (pfd[0].revents & POLLOUT) != 0, n);
+		eq("POLLIN reported on a regular file",
+		    (pfd[0].revents & POLLIN) != 0, 1);
+		eq("POLLOUT reported on a regular file",
+		    (pfd[0].revents & POLLOUT) != 0, 1);
 		eq("poll returns 1, not 2", n, 1);
 		close(rf);
 		unlink(nm);

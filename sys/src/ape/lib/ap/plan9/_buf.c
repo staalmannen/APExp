@@ -534,7 +534,7 @@ waitfresh(fd_set *fresh, int nfds)
 int
 select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeout)
 {
-	int n, i, t, slots, fd, err, nfresh;
+	int n, i, t, slots, fd, err, nfresh, nreg;
 	fd_set fresh;
 	long long tms;
 	Fdinfo *f;
@@ -586,6 +586,7 @@ select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeo
 	/* make sure all requested rfds and efds are buffered */
 	FD_ZERO(&fresh);
 	nfresh = 0;
+	nreg = 0;
 	if(nfds >= OPEN_MAX)
 		nfds = OPEN_MAX;
 	for(i = 0; i < nfds; i++)
@@ -597,6 +598,39 @@ select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeo
 						"flags", f->flags);
 				errno = EBADF;
 				return -1;
+			}
+			/*
+			 * A REGULAR FILE IS ALWAYS READY TO READ, and POSIX
+			 * says so without qualification -- at end of file
+			 * too, where the read that returns 0 is itself the
+			 * answer. It cannot block, so there is nothing for
+			 * a copy process to wait for.
+			 *
+			 * BUFFERING ONE WAS WORSE THAN POINTLESS.  The
+			 * readiness loop below walks `mux->bufs' and
+			 * answers from `b->n' and `b->eof', which are both
+			 * zero until the copy process's first read
+			 * COMPLETES -- so a regular file came back NOT
+			 * READABLE, with its bit cleared, for as long as
+			 * that took. `poll-test' section 1 measured it:
+			 * a file opened read-write, asked for POLLIN and
+			 * POLLOUT, answered POLLOUT alone.
+			 *
+			 * This is the same rule read() already follows for
+			 * the same reason, which is why `_isregular' is
+			 * shared rather than written twice: *O_NONBLOCK
+			 * does nothing to a regular file*, and neither
+			 * does watching one.
+			 *
+			 * An exceptional condition is likewise impossible
+			 * on one, so efds is cleared rather than reported.
+			 */
+			if(_isregular(i)){
+				if(efds && FD_ISSET(i, efds))
+					FD_CLR(i, efds);
+				if(rfds && FD_ISSET(i, rfds))
+					nreg++;
+				continue;
 			}
 			if((f->flags&FD_BUFFERED) == 0){
 				if(_startbuf(i) != 0){
@@ -661,7 +695,7 @@ select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeo
 		waitfresh(&fresh, nfds);
 
 	/* check wfds;  for now, we'll say they are all ready */
-	n = 0;
+	n = nreg;		/* the regular files counted above */
 	if(wfds && FD_ANYSET(wfds)){
 		for(i = 0; i<nfds; i++)
 			if(FD_ISSET(i, wfds)) {

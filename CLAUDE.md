@@ -465,6 +465,19 @@ built by hand has not been measured in that position*.
   light CPU is a wait, a pinned core is a loop*. A spin either shows one
   syscall repeating, which names it, or shows none, which says compute
   loop and sends the next step to `acid` and `stk()`.
+  **AND `select()` DID NOT REPORT A REGULAR FILE READABLE** — found by
+  `poll-test` on the rebuilt tree, 1 failure: a file opened read-write
+  answered `POLLOUT` alone. select buffers every requested read fd
+  through a copy process, a regular file included, and answers from
+  `b->n`/`b->eof`, which are zero until that process's first read
+  completes — so the bit was cleared. POSIX says a regular file is
+  always ready, at EOF too; it cannot block, so there was nothing to
+  wait for. `_isregular()` is shared out of `read.c`, the same rule
+  read() already follows. ***A LIVE CANDIDATE FOR xz's HANG and not
+  claimed as it***: xz polls a redirected (regular) stdin for POLLIN,
+  and a "not readable" answer sends `io_wait` round a loop with no
+  sleep in it. *Run xz once after the next rebuild before writing the
+  limitation down* — the fix may have removed it.
   **Found on the way and fixed, though NOT claimed as the cause**:
   `poll()` had three POSIX violations, two of which can spin a caller —
   it returned `select`'s count of BITS rather than of pollfd ENTRIES,
