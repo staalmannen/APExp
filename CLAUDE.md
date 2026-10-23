@@ -292,6 +292,9 @@ deliberate break; `bitinit-model` is the only one with an EXTERNAL oracle
 the compiler itself), `edgtuoff-probe`, `edgscope-probe`, `tarhdr-probe`,
 `tarblock-probe` (**must be built with tar's own `-I` flags**),
 `chickenword-probe`, `vtparse-probe`, `vtlayout-probe`,
+`regpair-probe` (**native `8c`, and its result is whether it
+COMPILES** — which 64-bit construct makes 8c say `bad in naddr:
+REGPAIR`; settle the stock-vs-APExp A/B in its header first),
 `devreg-probe` (**no host form and `pcc` only** — which files APE calls
 regular and whether `select()` then reports them readable; the subject
 is what *rio* serves, so run it in a rio window with no wish running,
@@ -353,6 +356,31 @@ so the next should be found by a build rather than guessed.*
 **And a recipe that runs a binary it just built cannot cross-compile** —
 `cmd/perl/mkfile:86` (`./miniperl`) and `cmd/muon/mkfile:192`
 (`./embedder`) are the two outside `mk test`.
+***`objtype=386 mk install` NOW GETS PAST `mount-include` AND STOPS IN
+`sys/src/cmd`***: `8c -FTVw ar.c` answers `ar.c:586 bad in naddr:
+REGPAIR`. That line is `as->offset = ap->size;` and **both members are
+`vlong`** — a plain 64-bit member-to-member assignment, in a file this
+tree has never touched. **`OREGPAIR` and the whole 64-bit code
+generator `8c/cgen64.c` are 8c's ALONE** (6c needs none; a vlong is one
+amd64 register), *so the 386 backend's 64-bit path is exactly the part
+of kencc every build here has been unable to reach* — expect that shape
+from the rest of this item rather than a one-off. ***IT IS OURS AND IT IS MEASURED***: stock `8c` from a
+plain `term%` window compiles that same `ar.c` and leaves an `ar.8`,
+and all of `/sys/src` cross compiles to 386 on the host.
+***BUT `git bisect` CANNOT REACH IT, and the earlier claim here that
+thirteen `cc/` commits were the bisect list was WRONG***: this
+repository's ROOT COMMIT already carries `isbool`, `vlasizevar`,
+`alignas_req`, `_Generic` and VLA, so the import is APExp's compilers
+well advanced, not 9front's — *a bisect would run to the root and
+report "always broken", a wrong answer shaped like a result.* **The
+instrument is `diff -r /sys/src/cmd/cc $home/APExp/sys/src/cmd/cc`
+on the VM**, plus ONE build that halves the search: APExp's `8c/` needs
+names only APExp's `cc.h` defines, so stock-cc + APExp-8c will not
+compile, but **APExp `cc/` + STOCK `8c/`** will — if that fails the
+fault is in the shared front end, if it passes it is in `8c/`.
+`regpair-probe` narrows the construct afterwards and is **native
+`8c`/`8l`**, the second such file after `truefalse-test`; its result is
+whether it COMPILES.
 
 **portable_stl: both questions are answered and both answers are no.**
 Its `CMakeLists.txt` has **no `install()` rule and no `configure_file`**

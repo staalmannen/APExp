@@ -484,3 +484,81 @@ a different reading:
 *`pthread-test` had the first two from the start, for the same reason
 written down before the fact. `fsync-test` did not, and the round it
 cost is the argument for making it the default.*
+
+## `regpair-probe.c`
+
+**The second NATIVE file in this directory**, after `truefalse-test.c`,
+and for a related reason: the question is about a *backend*, so it has
+to be asked of that backend directly. `8c`/`8l`, not `pcc`. To ask it
+of 386 from an amd64 machine, that is `8c` either way -- 8c is the 386
+compiler and it runs on the host.
+
+***Its result is whether it COMPILES, not what it prints.*** If it
+links it prints its own sums, so that the code cannot be dismissed as
+dead, but the measurement is the compile.
+
+**Where it came from.** `objtype=386 mk install`, the first cross build
+this tree has attempted, stopped on the fourth command with `ar.c:586
+bad in naddr: REGPAIR` -- `as->offset = ap->size;`, both members
+`vlong`. A plain 64-bit member-to-member assignment, in a file with one
+commit in this repo.
+
+**Why no previous build could have found it**: `OREGPAIR` appears in
+`8c/` and `cc/pswt.c` and nowhere else, and `8c/cgen64.c` -- the entire
+64-bit code generator -- is 8c's alone, because a vlong is a single
+amd64 register and 6c needs no such file. *The 386 backend's 64-bit
+path is precisely the part of kencc every build here has been unable to
+reach.*
+
+**Six cases, each in its own function so a diagnostic names a line and
+therefore a construct**: ar.c's exact shape (two pointers, member to
+member), the same between locals, a 32-bit widening into a 64-bit
+member, a 64-bit member read with no 64-bit destination, the
+single-pointer shape, and a 64-bit member passed as an argument. The
+split between "store" and "load" is the one that pays first: if case 1
+fails and case 4 passes, the store side is where to look.
+
+***BUT THE HEADER SENDS THE READER AWAY FIRST***, and that is the point
+of it. Which construct breaks does not matter until it is known whose
+bug it is, and one command settles that: `8c -FTVw /sys/src/cmd/ar.c`
+in a plain `term%` window, where `8c` is 9front's own rather than
+APExp's. The same message means upstream's; a clean compile means ours,
+and `git log --oneline sys/src/cmd/cc/` is a thirteen-commit bisect.
+*An instrument that would be read before the question it answers is
+worth a paragraph telling the reader not to.*
+
+### The A/B fired, and it also refuted the bisect plan
+
+**Stock `8c` compiles `ar.c` and APExp's does not**, with the same
+input file, and the whole of `/sys/src` cross compiles to 386 on the
+host. So the fault is the compiler, and it is ours.
+
+***And then the next step as written was wrong.*** The probe's header
+said to bisect `git log --oneline sys/src/cmd/cc/` -- thirteen
+commits -- and that cannot work: **this repository's root commit
+already contains `isbool`, `vlasizevar`, `alignas_req`, `_Generic` and
+VLA**, so the import is APExp's compilers at an advanced state and not
+9front's. Every kencc patch older than the repository is invisible to
+the history.
+
+*A bisect would have run to the root and reported "it was always
+broken"* -- which is a wrong answer wearing the shape of a result, and
+the most expensive kind, because each step is a compiler rebuild on the
+VM. **The git history is not the delta from stock, and nothing in this
+tree had ever needed it to be until a second compiler existed to
+compare against.**
+
+So the instrument is a source diff against the running system,
+`diff -r /sys/src/cmd/cc $home/APExp/sys/src/cmd/cc`, which only the VM
+can take -- and which is trustworthy now in a way it was not a month
+ago, since `st_rdev` is what stopped `diff` calling two different files
+identical.
+
+**And one build halves the search before any reading.** APExp's `8c/`
+references names only APExp's `cc.h` defines (`conformalign`, `talign`,
+`dupokall`), so stock-`cc` with APExp-`8c` will not compile; the other
+pairing will, because stock `8c/` asks for nothing new. Build `8c` from
+APExp's `cc/` and stock `8c/`: a failure puts the fault in the shared
+front end, a pass puts it in `8c/` -- and the latter would be a surprise
+worth having, since the only changes this repository made there are
+`-J`'s and `-C`'s and both are behind flags that compile does not pass.
