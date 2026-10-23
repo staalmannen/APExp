@@ -480,7 +480,21 @@ built by hand has not been measured in that position*.
   and libap already held the right answer in a second place that
   disagreed (`plan9/__p9_syscall.c:594`, "Plan9 writes are
   synchronous; no-op is correct"). Fixed; `fsync-test` 0 on gcc, 1 on
-  the replaced line. **Not yet measured on the VM.**
+  the replaced line.
+  ***AND THE FIRST ATTEMPT TO MEASURE IT MEASURED NOTHING.***
+  `fsync-test` printed **nothing at all** — no header, no count — and
+  in the SAME run `unxz /tmp/t.xz` still said `Synchronizing the file
+  failed` and still deleted the output. *A fault, a kill and a clean
+  finish all give the prompt back*, so "no output" is not a pass; and
+  the `unxz` line says the build did not contain the fix, which is
+  this tree's own rule twice over — **`mk install` rebuilds `libap.a`
+  without relinking binaries already built against it**, so `xz` keeps
+  the old `fsync` until something forces the relink. The test now sets
+  line buffering and prints `fsync-test: starting` before any work, so
+  silence and a first-call crash are different outputs. **`/dev/cons`
+  answering `S_ISREG` with `FD_ISTTY` unset makes a fully buffered
+  stdout a live explanation for the silence**, which is why the
+  `setvbuf` is the first statement.
   **WHAT IS LEFT IS TWO DECODE FAILURES, AND NEITHER IS SEPARATED**:
   `unxz xz_sample_file_1MB.xz` says `Compressed data is corrupt` and
   `unlz4 sample.txt.lz4` says `Error 26 : LZ4F frame decoding could
@@ -1069,7 +1083,11 @@ allocation storm; `getcwd(NULL,n)`; `mktemp`'s 26 names; `printf`'s
 different files in SILENCE** (it believed its own stdout was
 `/dev/null`) and made `diff -r` call every pair of special files
 identical; **16-bit `ino_t`/`dev_t`**, against a tree of 64799 files;
-itcl's
+**`pthread_create` never running the thread it created** — the child
+waited on a rendezvous the parent never answered, which was both
+archiver hangs; **`fsync` answering FAILURE, so `xz` deleted every file
+it wrote**; `poll()`'s three POSIX violations and `select()` on a
+regular file; itcl's
 four `sfbug`s; kencc's `false` keyword, the `L`-suffix width cap, the
 wide case label, the compound-literal zero fill, and both bit-field
 rules with the static initialiser underneath them.
