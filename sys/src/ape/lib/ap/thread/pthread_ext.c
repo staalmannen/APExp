@@ -7,10 +7,24 @@
 /*
  * pthread_attr_* stubs for APExp
  *
- * pthread_create() in APExp currently returns EINVAL if attr != NULL.
- * These stubs allow code that initialises and destroys attributes to
- * compile and link. The attr is always treated as default (detached=0,
- * stacksize=default) since we have no real thread scheduler.
+ * The attr is always treated as default (detached=0, stacksize=default)
+ * since we have no real thread scheduler.
+ *
+ * THIS COMMENT USED TO SAY "pthread_create() in APExp currently returns
+ * EINVAL if attr != NULL.  These stubs allow code that initialises and
+ * destroys attributes to compile and link."  It was accurate, and it
+ * described a trap rather than a design: `thread/cond_timedwait.c' was
+ * then written to USE one of these stubs, so **pthread_cond_timedwait
+ * returned EAGAIN without ever waiting, on every call** -- and a caller
+ * that loops on it, which is what xz's `wait_for_work' is, becomes a
+ * busy-wait made of `clock_gettime' syscalls.  `pthread_create' accepts
+ * the attr now and says at length why.
+ *
+ * *A stub that lets a program LINK is not a stub that lets it RUN*, and
+ * the distance between those two was measured here in a pinned system
+ * load.  **detachstate is still not honoured** -- it is a no-op, not a
+ * feature -- and that is recorded in `docs/releases/0.6.md' rather than
+ * left to be discovered the same way.
  */
 
 int
