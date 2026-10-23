@@ -3399,3 +3399,45 @@ rather than a failure, and the test says so instead of pretending.
   syscall repeating -- which names it outright -- or shows none, which
   says it is a compute loop and sends the next step to `acid` and
   `stk()`. Both have paid here before.
+
+### And `select()` did not report a regular file readable
+
+**`poll-test` section 1 on the rebuilt tree: 1 failure.** A regular file
+opened read-write, asked for `POLLIN|POLLOUT`, answered **`POLLOUT`
+alone** -- `poll` returned 1, so `revents` was nonzero but not both.
+
+The write side is right by accident: `select()`'s comment is literally
+*"check wfds; for now, we'll say they are all ready"*. The read side is
+not. **`select()` buffers every requested read descriptor through a copy
+process, a regular file included**, and the readiness loop then answers
+from `b->n` and `b->eof` -- both zero until that copy process's first
+read COMPLETES. So the bit was CLEARED and the file reported not
+readable, for as long as that took.
+
+**POSIX says a regular file is always ready to read, without
+qualification** -- at end of file too, where the read returning 0 is
+itself the answer. It cannot block, so there is nothing for a copy
+process to wait for, and buffering one was worse than pointless.
+`_isregular()` is shared out of `read.c` rather than written twice,
+because this is the same rule read() already follows for the same
+reason: *O_NONBLOCK does nothing to a regular file, and neither does
+watching one.* An exceptional condition is likewise impossible on one,
+so `efds` is cleared rather than reported.
+
+**It is a live candidate for xz's hang and is NOT claimed as it.** xz
+sets `O_NONBLOCK` on a redirected stdin -- a regular file -- and polls
+it for `POLLIN`; a select that answers "not readable" sends `io_wait`
+round a loop whose fall-through has no sleep in it. *That is a
+prediction with an outcome attached*: if the hang survives this, the
+select answer was not the cause and the next step is `ratrace` on the
+spinning process, which separates a repeating syscall from a compute
+loop in one run.
+
+**The test says which bit now.** It printed only `0 want 1`, and
+deducing *which* of POLLIN and POLLOUT was missing cost a round trip to
+the other machine. It prints both bits and the return value before
+asserting on them -- *a failure should name itself*.
+
+**NOT COMPILED ANYWHERE**: `_buf.c` is Plan 9's, so the first build of
+this is the VM's, the same weaker position every `cc/` change ships
+from.

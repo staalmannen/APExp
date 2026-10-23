@@ -140,6 +140,15 @@ typedef struct Fdinfo{
 #define FD_REGCHECKED	0x40
 #define FD_ISREG	0x80
 
+/*
+ * Is this descriptor a regular file?  Cached in the two flag bits
+ * above, so it costs one fstat per descriptor and nothing after.
+ * read() has used it since the O_NONBLOCK-on-a-regular-file fix;
+ * select() needs the same answer for the same reason, so it is shared
+ * rather than written twice.
+ */
+extern int _isregular(int);
+
 #define MAXSIG SIGPROF
 
 extern Fdinfo	_fdinfo[];
