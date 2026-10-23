@@ -230,7 +230,10 @@ an APE build never reaches kencc's own C23 keywords.
 `dup-fdinfo-test`, `rmdir-test`, `copyfile-test`, `deeppath-test`,
 `bufexec-test`, `mkstemp-test`, `printfmod-test`, `umask-test`,
 `dupbuf-test`, `dotdir-test`, `getcwd-test`, `progname-test`,
-`select-test`, `cxaatexit-test`, `rdev-test` (two different files must
+`select-test`, `cxaatexit-test`, `poll-test` (the count is
+of pollfd ENTRIES, a negative fd is ignored, a closed one is POLLNVAL —
+the two rules whose absence makes a `while(poll())` caller SPIN),
+`rdev-test` (two different files must
 be distinguishable — it transcribes diffutils' `same_file()` verbatim,
 because the question is what THAT function answers), `stdio-test`.
 **`strerror-test.c` must be linked against `libgnu.a`** or it passes
@@ -442,28 +445,34 @@ built by hand has not been measured in that position*.
   `bacon-test.bac` remains 3 failures, all three the 32-bit-`long`
   invariant arriving through a language whose only integer type is that
   `long`.
-- **the archivers** — FIRST RUN IN, AND IT IS A SPLIT. `unarj` lists a
-  1MB archive correctly; `unlz4` decodes; **`unxz` and `xzcat` both
-  answer `Compressed data is corrupt`** on a downloaded sample. Not yet
-  tried: unrar, unace, zstd, clzip.
-  ***"Corrupt" HAS TWO EXPLANATIONS and the sample was downloaded***, so
-  the question is the one the tar round already answered for tar: *can
-  it read something IT WROTE?* `xz` and `lz4` are both in their
-  packages' `TARG`, so the round trip costs one line and needs no
-  external file:
-
-      xz -c <f >/tmp/t.xz && unxz -c </tmp/t.xz >/tmp/t.out
-      # then compare f with /tmp/t.out -- Plan 9's `cmp', or sizes,
-      # until libap is rebuilt and APE's cmp can speak again
-
-  **Round trip clean means the decoder is fine and the sample is
-  suspect**; round trip broken means it is ours, and `-J` retired the
-  struct-padding failure mode that would have been the first guess.
-  **`xzdec` is a THIRD opinion in the same package** — a separate
-  minimal decoder — so `xzdec` agreeing with `unxz` on the sample
-  separates "this build's decoder" from "this file".
-  *`unlz4` printing `Decoding file sample.txt` is not yet a pass
-  either*: it says it started, not that the bytes came out right.
+- **the archivers** — **`xz` AND `lz4` BOTH HANG, AND THEY ARE TWO BUGS
+  UNTIL SOMETHING SAYS OTHERWISE.** `unarj` lists a 1MB archive
+  correctly. `unlz4` froze and left an **empty** output — *its earlier
+  `Decoding file sample.txt` was never a pass: it says the program
+  started, not that the bytes came out right*. And **`xz` hangs
+  COMPRESSING seven bytes** (`xz -c <sample.txt` where the file holds
+  the word `sample`), at high load — so the downloaded-sample
+  explanation is dead and the fault is ours either way. Not tried:
+  unrar, unace, zstd, clzip.
+  ***ONE GREP SAYS THEY SHARE NO MECHANISM***: `lz4` uses neither
+  `poll` nor `select` nor `O_NONBLOCK`, where xz sets `O_NONBLOCK` on a
+  redirected stdin and polls it. *Reading two failures reported
+  together as one story has cost this tree a round before.*
+  **`pcc -9` is NOT available as an A/B**: one package rebuilt under
+  the old layout rule against a `-J` libap is the silent ABI split, so
+  it cannot separate "`-J` broke it" from "it never worked".
+  **The instrument is `ratrace`, and the `ps` STATE first** — *constant
+  light CPU is a wait, a pinned core is a loop*. A spin either shows one
+  syscall repeating, which names it, or shows none, which says compute
+  loop and sends the next step to `acid` and `stk()`.
+  **Found on the way and fixed, though NOT claimed as the cause**:
+  `poll()` had three POSIX violations, two of which can spin a caller —
+  it returned `select`'s count of BITS rather than of pollfd ENTRIES,
+  and it skipped a negative fd when building the sets but not when
+  reading them. `xz`'s `io_wait()` is a `while(true)` whose
+  fall-through has no sleep in it, so a positive return with the
+  watched entry unmarked is a busy-wait exactly. `poll-test` 0 on gcc,
+  **4 on the replaced code**; `docs/notes/libap.md` has the rest.
 - **itcl** — done. 10 failures, all upstream or Tcl 9's, two settled at
   source, none ours.
 

@@ -3328,3 +3328,74 @@ printed through a narrow conversion. Four hits in the whole tree, none
 of them built -- `readline/examples/rlfe`, `bash/examples/loadables`,
 and two `(int)sizeof` probes inside perl's `Configure`, which APExp does
 not run.
+
+
+---
+
+## poll(): three POSIX rules, and two of them can spin a caller
+
+**Found while reading why `xz` hangs, and they are wrong whether or not
+they are xz's hang.**
+
+1. **THE RETURN VALUE IS A COUNT OF ENTRIES, NOT OF BITS.** POSIX:
+   *"poll() shall return the number of pollfd structures that have
+   selected events (nonzero revents)"*. This returned `select()`'s
+   value, which counts BITS ACROSS THREE `fd_set`s -- so one descriptor
+   ready for both reading and writing counted **twice**, and poll could
+   report a number larger than the number of entries it had marked.
+2. **A NEGATIVE fd WAS SKIPPED WHEN BUILDING THE SETS AND NOT WHEN
+   READING THEM.** The first loop has `if(p->fd < 0) continue;`; the
+   second went straight to `FD_ISSET(p->fd, &rfds)` -- out of bounds,
+   and whatever it found became a `revents` the caller believed. *The
+   asymmetry between two loops over the same array is the whole bug.*
+3. **POLLNVAL did not exist**, so one closed descriptor failed the whole
+   call with EBADF where POSIX marks that entry and answers the others.
+
+### Why 1 and 2 are spins rather than wrong answers
+
+`xz/file_io.c`'s `io_wait()` is, in full, `while(true){ ret =
+poll(pfd,2,timeout); if(user_abort) ...; if(ret==-1) ...; if(ret==0)
+return TIMEOUT; if(pfd[0].revents) return MORE; }` -- **nothing in the
+fall-through path**: no sleep, no progress. Any poll that returns a
+positive number without setting `pfd[0].revents` turns it into a
+busy-wait, which is exactly the reported *high load and frozen*. Both
+defects produce that shape, and xz passes `user_abort_pipe[0]` as
+`pfd[1]`, which is **-1 whenever that pipe was not created**.
+
+***THIS IS NOT CLAIMED AS xz's BUG.*** The rules are wrong on their own
+evidence; whether xz stops hanging is a separate measurement and the
+only one that settles it. **And `lz4` hangs too while using neither
+`poll` nor `select` nor `O_NONBLOCK`** -- one grep, and it says the two
+failures share no mechanism at this level, so there are at least two
+faults and this is at most one of them. *Reading them as one story would
+have cost a round.*
+
+**`poll-test.c`**: 15 checks, 0 on gcc; the replaced code beside it
+reports **4**, and section 1 is the one that matters -- `poll returns 1,
+not 2` answers **2**, a positive return with a single entry marked.
+**Section 1 had to be rewritten to be reachable at all**: it used a
+PIPE, whose read end is readable and not writable, so the bit-count
+defect could not arise and the check could not fail. A regular file
+opened read-write is ready for both, which is what exposes it.
+*Defect 2 is deliberately absent from that control*: `FD_ISSET(-1, ...)`
+is undefined behaviour, so replicating it on the host risks a crash
+rather than a failure, and the test says so instead of pretending.
+
+### What is still open on the archivers
+
+- **`xz` hangs COMPRESSING seven bytes.** The downloaded sample is
+  exonerated -- a file holding the word `sample` cannot be a corrupt
+  archive -- so the fault is ours either way.
+- **`lz4` froze decoding and left an EMPTY output.** Its earlier
+  `Decoding file sample.txt` was not a pass: *it says the program
+  started, not that the bytes came out right*, which is why that line
+  was recorded as "not yet a pass" rather than as success.
+- **Neither has been confirmed fixed, and `pcc -9` is NOT available as
+  an A/B here**: rebuilding one package under the old layout rule
+  against a `-J` libap is the silent ABI split this tree has a rule
+  about, so that cannot separate "`-J` broke it" from "it never worked".
+- **The instrument is `ratrace`**, and `ps` STATE first: *constant light
+  CPU is a wait, a pinned core is a loop*. A spin either shows one
+  syscall repeating -- which names it outright -- or shows none, which
+  says it is a compute loop and sends the next step to `acid` and
+  `stk()`. Both have paid here before.
