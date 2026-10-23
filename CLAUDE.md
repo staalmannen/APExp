@@ -389,10 +389,19 @@ broken" is a summary and not a diagnosis, and this item is at least
 three pieces of work.* **8c's result is the sharpest: case 1 and
 nothing else** — not the parameter, the return, the widening,
 `d->offset = d->offset + 1` or the vararg — so its 64-bit support
-broadly works and exactly one shape, `ar.c:586`'s, does not. Cases
-7-11 split that shape; **if case 8 (the same work in two statements)
-compiles where case 1 does not, it is the register allocator holding
-two pairs live, not the front end.** **STOCK `8c` COMPILES THE PROBE TOO**, so both halves agree — stock
+broadly works and exactly one shape, `ar.c:586`'s, does not. ***AND THE PREDICTION WAS REFUTED, WHICH NARROWED IT FURTHER.*** A
+said case 7 (`d->offset = e->offset`, two `Dst *`) would fail —
+register pressure identical to case 1 — and **case 7 compiles**, as do
+8, 9, 10 and 11; only 181, case 1, is named. ***So the discriminator
+is that the two structs are DIFFERENT TYPES***: `Dst *` to `Dst *` is
+fine, `Dst *` to `Src *` is not. That points at the type machinery in
+the shared front end rather than at the allocator. **`tcopy` is ruled
+out by reading**: untouched here, and it returns `t` unchanged for a
+scalar, so both members are the same `types[TVLONG]` — the member
+types are identical and only the enclosing ones differ. Cases 12-14
+split `Src`'s three differences from `Dst` (no self-pointer, 8 bytes
+shorter, differently named member), and the prediction for them is in
+`docs/releases/0.7.md`. **STOCK `8c` COMPILES THE PROBE TOO**, so both halves agree — stock
 compiles `ar.c` and the probe, APExp's fails on both — and ***it is a
 REGRESSION with a three-line reproduction***. What to look for is a
 change that breaks `d->offset = s->size` on a 32-bit target and

@@ -294,6 +294,71 @@ case11(Dst *d)
 	d->offset = gsrc;
 }
 
+/*
+ * CASES 12 TO 14, APPENDED BELOW case11 AND ABOVE main for the same
+ * reason as before: everything above stays where it was, and case 1 is
+ * still on the line the run named.
+ *
+ * They exist because the FIRST prediction was refuted.  A said case 7
+ * would fail -- two register pairs live at once -- and case 7 compiles.
+ * B held: the discriminator is that the two structs are DIFFERENT
+ * TYPES, since `d->offset = e->offset' through two `Dst *' is fine and
+ * `d->offset = s->size' through a `Dst *' and a `Src *' is not.
+ *
+ * So what is it about Src that Dst is not?  Three things at once, and
+ * these separate them:
+ *
+ *	Src has no self-pointer      Dst ends with `Dst *next'
+ *	Src is 8 bytes shorter       (so a different t->width)
+ *	Src's member is `size'       Dst's is `offset'
+ */
+
+typedef struct Twin Twin;
+typedef struct Plain Plain;
+
+/* Twin is Dst's layout EXACTLY, under another tag: self-referential,
+ * same width, same member name. If case 12 fails, the mere difference
+ * of TAG is enough and nothing about layout matters. */
+struct Twin
+{
+	char	*name;
+	int	type;
+	int	len;
+	vlong	offset;
+	Twin	*next;
+};
+
+/* Plain is Src's layout with Dst's member NAME: not self-referential,
+ * 8 bytes shorter, member called `offset'. Between 12 and 13 the name
+ * is held constant, so a difference between them is layout. */
+struct Plain
+{
+	char	*name;
+	int	type;
+	int	len;
+	vlong	offset;
+};
+
+void
+case12(Dst *d, Twin *w)
+{
+	d->offset = w->offset;
+}
+
+void
+case13(Dst *d, Plain *p)
+{
+	d->offset = p->offset;
+}
+
+/* 14: case 1 BACKWARDS. If one direction fails and the other does not,
+ * the fault is in the store or the load and not in the pair of types. */
+void
+case14(Dst *d, Src *s)
+{
+	s->size = d->offset;
+}
+
 void
 main(void)
 {
@@ -339,6 +404,19 @@ main(void)
 	print("case10 %lld\n", gdst);
 	case11(&d);
 	print("case11 %lld\n", d.offset);
+	{
+		Twin w;
+		Plain pl;
+
+		w.offset = 11;
+		pl.offset = 12;
+		case12(&d, &w);
+		print("case12 %lld\n", d.offset);
+		case13(&d, &pl);
+		print("case13 %lld\n", d.offset);
+	}
+	case14(&d, &s);
+	print("case14 %lld\n", s.size);
 
 	print("regpair-probe: it COMPILED, which is the whole result\n");
 	exits(0);

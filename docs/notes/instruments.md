@@ -649,3 +649,37 @@ The prediction for cases 7 to 11 is written down **in
 because editing that header is what moved the measured line numbers
 last time. *An instrument's results table and the speculation about the
 next run do not belong in the same file.*
+
+### Prediction A refuted: the discriminator is that the two structs DIFFER
+
+```
+bash-5.3$ 8c regpair-probe.c
+regpair-probe.c:181 bad in naddr: REGPAIR
+regpair-probe.c:181 bad in naddr: REGPAIR
+```
+
+181 is case 1 and nothing else is named, so **cases 7 to 11 all
+compile.** Written down before the run: **A** -- two register pairs
+live at once, i.e. the allocator -- predicted **case 7 would fail**.
+**It compiles.** Case 7 is `d->offset = e->offset` through two `Dst *`:
+two indirections, two base pointers, one pair. *Register pressure is
+identical to case 1.* A is dead.
+
+**B holds: the two structs being DIFFERENT TYPES is the whole
+discriminator.** `Dst *` to `Dst *` is fine; `Dst *` to `Src *` is not.
+That is a far smaller target than "the 64-bit path", and it moves the
+search from the register allocator to the type machinery in the shared
+front end -- which is where this tree's patches actually are.
+
+**`tcopy` was the first guess and reading ruled it out rather than a
+run**: it is untouched here, and returns `t` unchanged for a scalar
+whose link has not moved, so `Dst.offset` and `Src.size` are the *same*
+`types[TVLONG]`. The member types are identical; only the enclosing
+ones differ. *A hypothesis that can be killed by opening the function
+should be killed that way.*
+
+**And the original reduction had a fault worth naming**: `Src` differs
+from `Dst` in THREE ways at once -- no self-pointer, eight bytes
+shorter, differently named member. A case that varies three things
+cannot say which one matters, which is the same defect as a test with
+no control. Cases 12 to 14 hold two constant at a time.
