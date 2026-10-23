@@ -3266,3 +3266,65 @@ release where that is already mandatory. It is one line of
 `sys/include/ape/sys/types.h` plus that rebuild. **Section 0 of
 `rdev-test` prints both widths and both inodes**, so a run says which
 world it is in instead of leaving it to be assumed.
+
+### Widened, and what followed it
+
+**`ino_t` and `dev_t` are `unsigned long long` now**, and `struct stat`
+goes **88 bytes to 104** -- every field after `st_ino` moves, so this is
+an ABI change and wants the `mk distclean` that 0.6 already required
+for `-J`.
+
+***WIDENING A TYPEDEF ONLY REACHES THE COPIES DECLARED WITH IT***, which
+is the half that would have been missed:
+
+- **`include/priv.h`'s `Rock` held `unsigned long dev, inode`** -- 32
+  bits on kencc -- so it truncated a qid independently of whatever
+  `<sys/types.h>` said, and would have gone on truncating afterwards.
+  `dev_t`/`ino_t` now. `_sock_listenpid.c` was already written with the
+  typedefs and needed nothing.
+- **`plan9/acidlib`'s `stat` aggregate was ALREADY STALE, and by a long
+  way**: `sizeofstat = 28`, no `st_rdev` at all, a 32-bit `st_size` at
+  12 and three 32-bit times -- a `struct stat` from several ABIs ago.
+  *`acid` has been printing the wrong fields of every struct stat it was
+  asked about, quietly, for as long as anyone has been asking*, and a
+  debugger's own struct description is exactly the place nobody checks.
+  **The replacement is not hand-computed**: `pcc -c -a` emits acid for
+  every struct a translation unit lays out -- it is what `mkone`'s
+  `%.acid` rule runs -- and `tmp/abi-bf-after.acid` is a committed dump
+  from the VM, so the offsets and the format letters came from the
+  COMPILER and were only adjusted for the two widened typedefs. (`'W'`
+  64-bit unsigned, `'V'` 64-bit signed, `'D'` 32-bit signed, `'u'`/`'d'`
+  16-bit -- read off that dump rather than recalled. `size_t iov_len` is
+  `'W'`, which is what pins it.)
+  **The three times are spelled as their `tv_sec`** rather than as a
+  `timespec`, because this acidlib defines no such aggregate and a
+  reference to one it has not got would break the file for every APE
+  program.
+  ***AND THE EXPLANATION IS NOT IN THE FILE, DELIBERATELY.*** No acid
+  file anywhere in this tree carries a comment, `cc/acid.c` never emits
+  one, and `acid` itself is not vendored here, so there is no way to
+  check the syntax short of running it. *A comment whose syntax is
+  unverified, in a file read by every debugging session, is the
+  `<termios.h>` glob again* -- the explanation lives here instead.
+
+### Two things the widening FIXES rather than costs
+
+- **`<sys/sysmacros.h>`** is musl's and its `major`/`minor`/`makedev`
+  already assume a 64-bit `dev_t` -- `(x)>>31>>1`, `<<32` -- so they
+  have been nonsense for a 16-bit one since the day they were imported,
+  and become correct without being touched.
+- **perl's hand-maintained `config.h` already declared the truth**:
+  `ST_DEV_SIZE 8`, `ST_INO_SIZE 8`, both `_SIGN 1`. *A third
+  hand-maintained capability file disagreeing with the library, and the
+  first one where the file was right* -- bash's got the same class wrong
+  in both directions. **The mismatch was harmless rather than silently
+  wrong**, and saying which matters: those symbols steer perl's choice
+  of representation for the value, not the offset it reads from, so perl
+  got the correct two bytes and merely over-provisioned for them. What
+  perl did share with everything else was the collisions.
+
+**The sweep for the opposite hazard came back clean**: a widened field
+printed through a narrow conversion. Four hits in the whole tree, none
+of them built -- `readline/examples/rlfe`, `bash/examples/loadables`,
+and two `(int)sizeof` probes inside perl's `Configure`, which APExp does
+not run.

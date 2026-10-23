@@ -122,19 +122,22 @@ fd_set(addr) {
 	mem(addr, "3X");
 };
 
-sizeofstat = 28;
+sizeofstat = 104;
 aggr stat
 {
-	'u' 0 st_dev;
-	'u' 2 st_ino;
-	'u' 4 st_mode;
-	'd' 6 st_nlink;
-	'd' 8 st_uid;
-	'd' 10 st_gid;
-	'D' 12 st_size;
-	'D' 16 st_atime;
-	'D' 20 st_mtime;
-	'D' 24 st_ctime;
+	'W' 0 st_dev;
+	'W' 8 st_ino;
+	'u' 16 st_mode;
+	'd' 18 st_nlink;
+	'd' 20 st_uid;
+	'd' 22 st_gid;
+	'W' 24 st_rdev;
+	'V' 32 st_size;
+	'V' 40 st_atime;
+	'V' 56 st_mtime;
+	'V' 72 st_ctime;
+	'D' 88 st_blksize;
+	'V' 96 st_blocks;
 };
 
 defn
@@ -146,6 +149,7 @@ stat(addr) {
 	print("	st_nlink	", addr.st_nlink, "\n");
 	print("	st_uid	", addr.st_uid, "\n");
 	print("	st_gid	", addr.st_gid, "\n");
+	print("	st_rdev	", addr.st_rdev, "\n");
 	print("	st_size	", addr.st_size, "\n");
 	print("	st_atime	", addr.st_atime, "\n");
 	print("	st_mtime	", addr.st_mtime, "\n");

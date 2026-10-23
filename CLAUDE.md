@@ -365,13 +365,17 @@ built by hand has not been measured in that position*.
   back end does honour the mode and **C++ with templates is a working
   pipeline on this machine** — which is the first thing in this port
   that is a capability rather than a stage.
-  **WHAT THE RUN DOES NOT SHOW is whether the program COMPUTED
-  anything**, and that is one command away rather than a doubt to carry:
-  `./a.out` printed nothing, so if `/tmp/t.cpp` was meant to print, the
-  silence is the next finding and the static-init gap below is the first
-  suspect; if it was only ever a link exercise, silence is correct.
-  *A program that links and runs is not a program that works* — read
-  `/tmp/t.cpp` and `echo $status` before calling this closed.
+  **THE SILENCE IS CORRECT AND THE TOY RETURNS ITS ANSWER INSTEAD.**
+  `/tmp/t.cpp` is a virtual base with an override, a destructor, a
+  template, and `int main(){ D d; B *p = &d; return p->f() + twice(3); }`
+  — no `printf` anywhere, so nothing should print. **But it is not inert
+  either: it returns `2 + 6`, and `echo $?` is the measurement.**
+  ***8 means virtual dispatch AND the template both work at run time***
+  — `p->f()` reaching `D::f()` for 2, `twice(3)` for 6. **7 means the
+  vtable resolved to the BASE** (`B::f()` returning 1) with the template
+  fine, which is a different bug in a different place. *A program that
+  links and runs is not a program that works*, and here one command
+  separates three outcomes rather than two.
   **Its cost is named rather than feared**: internal linkage gives each object
   its own copy, so a template's static data member or a static local
   inside a template function stops being one object shared across the
@@ -438,9 +442,28 @@ built by hand has not been measured in that position*.
   `bacon-test.bac` remains 3 failures, all three the 32-bit-`long`
   invariant arriving through a language whose only integer type is that
   `long`.
-- **the archivers** — bzip2, xz, unrar, unace, unarj, clzip. `-J` retires
-  the padding hunt, so this is a CHECK rather than a hunt, and the way to
-  do it is to run each one on a real archive.
+- **the archivers** — FIRST RUN IN, AND IT IS A SPLIT. `unarj` lists a
+  1MB archive correctly; `unlz4` decodes; **`unxz` and `xzcat` both
+  answer `Compressed data is corrupt`** on a downloaded sample. Not yet
+  tried: unrar, unace, zstd, clzip.
+  ***"Corrupt" HAS TWO EXPLANATIONS and the sample was downloaded***, so
+  the question is the one the tar round already answered for tar: *can
+  it read something IT WROTE?* `xz` and `lz4` are both in their
+  packages' `TARG`, so the round trip costs one line and needs no
+  external file:
+
+      xz -c <f >/tmp/t.xz && unxz -c </tmp/t.xz >/tmp/t.out
+      # then compare f with /tmp/t.out -- Plan 9's `cmp', or sizes,
+      # until libap is rebuilt and APE's cmp can speak again
+
+  **Round trip clean means the decoder is fine and the sample is
+  suspect**; round trip broken means it is ours, and `-J` retired the
+  struct-padding failure mode that would have been the first guess.
+  **`xzdec` is a THIRD opinion in the same package** — a separate
+  minimal decoder — so `xzdec` agreeing with `unxz` on the sample
+  separates "this build's decoder" from "this file".
+  *`unlz4` printing `Decoding file sample.txt` is not yet a pass
+  either*: it says it started, not that the bytes came out right.
 - **itcl** — done. 10 failures, all upstream or Tcl 9's, two settled at
   source, none ours.
 
@@ -985,7 +1008,8 @@ allocation storm; `getcwd(NULL,n)`; `mktemp`'s 26 names; `printf`'s
 **`st_rdev` being 0 for every file, which made APE's `cmp` compare two
 different files in SILENCE** (it believed its own stdout was
 `/dev/null`) and made `diff -r` call every pair of special files
-identical; itcl's
+identical; **16-bit `ino_t`/`dev_t`**, against a tree of 64799 files;
+itcl's
 four `sfbug`s; kencc's `false` keyword, the `L`-suffix width cap, the
 wide case label, the compound-literal zero fill, and both bit-field
 rules with the static initialiser underneath them.
@@ -1000,20 +1024,27 @@ the public headers is sockets, locks and `termios`** — `sockaddr_in`
 the acid diff refuted. *The feared cost and the measured cost were
 different sizes, and only the probe could have said so.*
 
-**`ino_t` AND `dev_t` ARE 16 BITS, measured and NOT fixed.**
-`sys/include/ape/sys/types.h:16-17` makes both `unsigned short`, and
-`_dirtostat` assigns `st_ino = d->qid.path` — a 64-bit qid truncated to
-sixteen bits, so two unrelated files are "the same file" to every POSIX
-program once a server holds more than 65536. ***The APExp tree is 64799
-files***, 1.1% short of guaranteeing a collision inside itself. What
-reads dev+ino: `same_file` in diffutils, `find`'s loop detection, `du`'s
-hard links, `fts`, `tar`, and **libap's own `_sock_listenpid.c`**, keyed
-on dev/ino precisely because a descriptor number is retired by `dup2()`.
-*Not fixed because of the cost rather than doubt*: widening either
-typedef moves every field after it in `struct stat`, so every binary
-needs relinking — one line plus a mandatory `mk distclean`, which is
-exactly what this release already requires. `rdev-test` section 0 prints
-both widths and both inodes.
+**`ino_t` AND `dev_t` ARE 64 BITS NOW, and `struct stat` is 104 bytes
+where it was 88** — so this release carries a SECOND ABI change beside
+`-J`, and `mk distclean` before `mk install` covers both. They were
+`unsigned short`, and `_dirtostat` assigns `st_ino = d->qid.path`: a
+64-bit qid truncated to sixteen bits, so two unrelated files were "the
+same file" to anything keyed on dev+ino once a server held more than
+65536. ***The APExp tree is 64799 files***, about one percent short of
+guaranteeing a collision inside itself.
+***Widening a typedef only reaches the copies DECLARED with it***:
+`include/priv.h`'s `Rock` held `unsigned long dev, inode` — 32 bits
+here — and would have gone on truncating. `acidlib`'s `stat` aggregate
+was **already stale by several ABIs** (28 bytes, no `st_rdev`) and is
+regenerated from the compiler's own `pcc -c -a` output rather than by
+hand; it carries no comment explaining that, because **no acid file in
+this tree has ever had one** and the syntax cannot be checked here —
+the `<termios.h>` glob rule. The reasoning is in `docs/notes/libap.md`.
+*Two things it fixes rather than costs*: musl's `<sys/sysmacros.h>`
+already assumed a 64-bit `dev_t` and becomes correct untouched, and
+perl's hand-maintained `config.h` already declared `ST_INO_SIZE 8` —
+the first hand-maintained capability file in this tree that was right
+while the library was not.
 
 **Smaller open items**: `strtol`/`strtoul` have the same
 one-limit-for-both-signs shape as `strtoll` had, so `strtol(LONG_MIN)`

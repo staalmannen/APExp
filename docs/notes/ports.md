@@ -2701,3 +2701,38 @@ plausible, meaningless result. *A measurement of a build that does not
 contain the change measures nothing*, and nowhere in this tree are two
 builds as easy to confuse as here: one word apart, the same name, and
 both on the path.
+
+
+---
+
+## unrar, and what EDG does and does not unlock
+
+**The last pure-C unrar is 2.71**, which is what this tree vendors;
+every later one is C++. With `c++` now translating, compiling and
+linking, a newer unrar looks reachable -- and the deciding question is
+narrow enough to answer before anyone starts.
+
+***THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE.*** The
+reachable subset is the one EDG itself is written in: classes,
+templates, virtual dispatch, RAII, `new`/`delete`, plus
+`bad_alloc`/`type_info`/`initializer_list`. So the criterion is not
+"is it C++" but **how much `std::` it uses**:
+
+- unrar historically carried its own `Array<>` template, its own
+  wide-string helpers and its own allocator, and leaned on the C library
+  for the rest -- which is exactly the shape that works here.
+- Later versions reach for `std::vector` and friends in places.
+
+**So the check is one grep on a candidate tarball, not an attempt**:
+count `std::` and `#include <` of the standard C++ headers. A version
+that uses none is a port; a version that uses `std::vector` needs a
+`std::` implementation this tree has decided twice it has not got --
+`paragon_portable_stl` is the best corpus available and is disqualified
+as a LIBRARY, because its namespace is `portable_stl` and
+`vector::push_back` returns `expected<...>`, so no aliasing recovers the
+API.
+
+**And the static-constructor gap applies**: nothing calls EDG's
+`__call_ctors`, so a translated program's file-scope constructors do not
+run. unrar has tables that may be built that way. *That is a second,
+independent criterion and it is cheaper to check than to debug.*
