@@ -385,3 +385,43 @@ from the prompt for the first second.
 
 **It has not been run yet.** The mechanism above is argued from source,
 and this file's own tally for that is about one in eight.
+
+## `pthread-test.c`
+
+**The first instrument in this tree that can HANG, and so the first
+that arms an alarm.** `SIGALRM` turns a freeze into a named failure:
+the handler prints which section was running and what call it was about
+to make, then exits 99. Every section flushes a marker *before* the
+call, in file order, so the last line printed names the statement that
+did not return. *A frozen test and a failing one are identical from the
+prompt* -- this file's own rule -- and the alarm is what separates
+them.
+
+**Where it came from.** xz's hang, after two rounds spent on poll(),
+select() and O_NONBLOCK, all three of which xz does use and none of
+which was the fault. `ps` plus two `acid` stacks named it in one run:
+xz is multithreaded, and libap's `pthread_create` had three bugs --
+a child rendezvous with no partner, an unwritten `*t`, and an `attr !=
+NULL` rejection that `pthread_cond_timedwait` tripped over on every
+call. `docs/notes/libap.md` has the stacks.
+
+**Five sections, and the split matters**: 0-2 ask whether a thread ever
+*runs*, 3-4 whether `pthread_cond_timedwait` ever *waits*. They are two
+bugs that look like one hang -- fixing the spin alone gives a program
+that waits patiently for work nobody will do, and fixing the handshake
+alone gives one that does the work at 100% of a core.
+
+- **Section 0 is the control**: the bare claim that `pthread_create`
+  creates a thread. It returns early if that fails, since nothing below
+  would mean anything.
+- **Section 4 does the arithmetic the reader would**: ten 100ms waits
+  must take about a second. The instant-return bug makes them take
+  none, and the loop containing them is what pinned the system figure.
+
+**The control fires.** A `-D` rename substitutes a `pthread_cond_timedwait`
+returning EAGAIN at once -- the replaced behaviour exactly -- and the
+test reports **3 failures**, with `returned 11 (EAGAIN) after 0 ms` and
+`ten 100ms waits took 0 ms`. *xz's spin, reproduced on the build host
+in one compile.* 0 failures on glibc.
+
+`_pthreadmark()` is the version marker, the tenth use of the idiom.

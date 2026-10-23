@@ -230,7 +230,10 @@ an APE build never reaches kencc's own C23 keywords.
 `dup-fdinfo-test`, `rmdir-test`, `copyfile-test`, `deeppath-test`,
 `bufexec-test`, `mkstemp-test`, `printfmod-test`, `umask-test`,
 `dupbuf-test`, `dotdir-test`, `getcwd-test`, `progname-test`,
-`select-test`, `cxaatexit-test`, `poll-test` (the count is
+`select-test`, `cxaatexit-test`, `pthread-test` (**the one test here
+that can HANG, so the only one that arms a `SIGALRM`** — a thread must
+reach its start routine and `pthread_cond_timedwait` must actually
+wait; the two are different bugs and the sections are split so), `poll-test` (the count is
 of pollfd ENTRIES, a negative fd is ignored, a closed one is POLLNVAL —
 the two rules whose absence makes a `while(poll())` caller SPIN),
 `rdev-test` (two different files must
@@ -243,9 +246,9 @@ against a broken tree and proves nothing; the command is in the file.
 so a test built from a fresh pull can run days-old library code and say
 nothing. `_sock_listenmark`, `_execmark`, `_ttymark`, `_getcwdmark`,
 `_printfmark`, `_dupmark`, `_dotdirmark`, `_tempmark`, `_fdinfomark`,
-`_umaskmark`, `_bufmark`, `_rdevmark`, `_selregmark` each make the test
-**fail to LINK** against a libap predating its fix. The idiom has paid
-nine times; bump one when a file changes in a way a test must see — and
+`_umaskmark`, `_bufmark`, `_rdevmark`, `_selregmark`, `_pthreadmark`
+each make the test **fail to LINK** against a libap predating its fix.
+The idiom has paid ten times; bump one when a file changes in a way a test must see — and
 it matters most where the bug's whole symptom is that nothing is
 printed.
 
@@ -451,58 +454,46 @@ built by hand has not been measured in that position*.
   `bacon-test.bac` remains 3 failures, all three the 32-bit-`long`
   invariant arriving through a language whose only integer type is that
   `long`.
-- **the archivers** — **`xz` AND `lz4` BOTH HANG, AND THEY ARE TWO BUGS
-  UNTIL SOMETHING SAYS OTHERWISE.** `unarj` lists a 1MB archive
-  correctly. `unlz4` froze and left an **empty** output — *its earlier
-  `Decoding file sample.txt` was never a pass: it says the program
-  started, not that the bytes came out right*. And **`xz` hangs
-  COMPRESSING seven bytes** (`xz -c <sample.txt` where the file holds
-  the word `sample`), at high load — so the downloaded-sample
-  explanation is dead and the fault is ours either way. Not tried:
-  unrar, unace, zstd, clzip.
-  ***ONE GREP SAYS THEY SHARE NO MECHANISM***: `lz4` uses neither
-  `poll` nor `select` nor `O_NONBLOCK`, where xz sets `O_NONBLOCK` on a
-  redirected stdin and polls it. *Reading two failures reported
-  together as one story has cost this tree a round before.*
+- **the archivers** — **xz's HANG IS NAMED, AND IT WAS `pthread_create`.**
+  Two rounds went to `poll`, `select` and `O_NONBLOCK` — xz uses all
+  three and none was the fault. `ps` first, then two `acid` stacks,
+  settled it in one run: **xz is MULTITHREADED**
+  (`liblzma/common/stream_encoder_mt.c`), and libap's pthread layer had
+  **three** bugs. (1) The child half of `pthread_create` did
+  `_RENDEZVOUS(tag, 0)` and **the parent never answered** — that was
+  the only `_RENDEZVOUS` in the whole thread directory — so *every
+  thread ever created blocked before reaching its start routine while
+  its creator was told it had succeeded*. (2) `*t` was never written.
+  (3) `attr != NULL` returned EINVAL and **libap's own
+  `pthread_cond_timedwait` always passes one**, so it returned EAGAIN
+  *without ever waiting*; `wait_for_work` is a loop, so each turn cost
+  a `clock_gettime` → `_PREAD`. ***That is a spin made of syscalls,
+  which is exactly why `s` was pinned and `l` was not*** — the two
+  figures were the diagnosis and had been read correctly a round
+  before the cause was found. `pthread-test` (**the first test here
+  that can hang, so the first that arms an alarm**) is 0 on gcc and
+  **3 on the replaced code**, reproducing the spin on the build host.
+  **Fixed, NOT yet measured against xz.**
+  ***AND THE "THEY SHARE NO MECHANISM" CLAIM IS WITHDRAWN.*** This
+  entry used to say, in capitals, that `lz4` uses neither `poll` nor
+  `select` nor `O_NONBLOCK`. True, and the wrong question: **`lz4` has
+  `programs/threadpool.c`, its mkfile compiles with
+  `-DLZ4IO_MULTITHREAD`, and `threadpool.$O` is in the link.** Both go
+  through `pthread_create`, and a worker that never starts is exactly
+  "froze and left an EMPTY output". *A grep that finds nothing has
+  ruled out what you grepped for and nothing else.* **Prediction with
+  its refutation attached: if lz4 still hangs after this rebuild they
+  are two bugs after all.** `zstd` is in the same position untested
+  (`lib/common/pool.c`); `unarj` lists a 1MB archive correctly; unrar,
+  unace and clzip untried.
   **`pcc -9` is NOT available as an A/B**: one package rebuilt under
   the old layout rule against a `-J` libap is the silent ABI split, so
   it cannot separate "`-J` broke it" from "it never worked".
-  **The instrument is `ratrace`, and the `ps` STATE first** — *constant
-  light CPU is a wait, a pinned core is a loop*. A spin either shows one
-  syscall repeating, which names it, or shows none, which says compute
-  loop and sends the next step to `acid` and `stk()`.
-  **AND `select()` DID NOT REPORT A REGULAR FILE READABLE** — found by
-  `poll-test` on the rebuilt tree, 1 failure: a file opened read-write
-  answered `POLLOUT` alone. select buffers every requested read fd
-  through a copy process, a regular file included, and answers from
-  `b->n`/`b->eof`, which are zero until that process's first read
-  completes — so the bit was cleared. POSIX says a regular file is
-  always ready, at EOF too; it cannot block, so there was nothing to
-  wait for. That fix was offered as a live candidate for xz's hang,
-  with a refutation condition written down first — **and the condition
-  FIRED**: xz still hangs on the rebuilt tree. *So the select answer
-  was not xz's cause*, and the new datum is the shape of the load —
-  `l` lower than before but **`s` pinned at the maximum**, which by the
-  rule two lines up is a SYSCALL LOOP and sends the next step to
-  `ratrace` rather than to `acid`.
-  ***AND THAT FIX BROKE wish***, which is the cost of the round: its
-  predicate was `_isregular()`, i.e. `S_ISREG`, and on Plan 9 that is
-  `_dirtostat`'s FALLBACK for "reached through a 9P mount" rather than
-  a fact — so rio's `/dev/mouse` is "regular", select reported it
-  readable without buffering it, and Tk's `PollP9Events` read it and
-  blocked. `_selregular()` narrows it by LENGTH (a device file reports
-  0; an empty regular file takes the old buffered path, whose bug is a
-  RACE and not a wrong answer). **Believed fixed, NOT measured**;
-  `devreg-probe` settles it in one run. *Two questions wore one
-  function's name because they agree on Unix.*
-  **Found on the way and fixed, though NOT claimed as the cause**:
-  `poll()` had three POSIX violations, two of which can spin a caller —
-  it returned `select`'s count of BITS rather than of pollfd ENTRIES,
-  and it skipped a negative fd when building the sets but not when
-  reading them. `xz`'s `io_wait()` is a `while(true)` whose
-  fall-through has no sleep in it, so a positive return with the
-  watched entry unmarked is a busy-wait exactly. `poll-test` 0 on gcc,
-  **4 on the replaced code**; `docs/notes/libap.md` has the rest.
+  **`ratrace -c "cmd args >file"` DOES NOT RUN THE COMMAND** — it
+  execs the whole string as one argv[0] and answers `file does not
+  exist: '/bin/xz -c <sample.txt >'`. A run that reports "cannot
+  reproduce" from that line has measured nothing; `ps` and `acid` on
+  the pid are what worked.
 - **itcl** — done. 10 failures, all upstream or Tcl 9's, two settled at
   source, none ours.
 
@@ -1012,18 +1003,26 @@ lists are BY NAME in `docs/notes/tcl-suite.md` with the extraction
 command; the log is `tmp/tcl-all.out`. *That a change of this size moved
 exactly one test is the result the re-run existed to get.*
 
-**Tk's suite**: the last clean run was 97 files, `Total 10027 Passed
-8925 Skipped 924 Failed 177`. **IT DOES NOT RUN TODAY**: the rebuild
-above left a **white window frozen on `bell.test`**, the first file of
-the 97, and the cause is libap's and not Tk's. `select()`'s new
-regular-file arm reports readable *without buffering*, `_dirtostat`
+**Tk's suite**: 97 files, `Total 10027 Passed 8926 Skipped 924 Failed
+177`, marker, exit 0 — **restored, and `Failed` is identical to the
+pre-regression run.** It had been a white window frozen on `bell.test`,
+the first of the 97, and the cause was libap's: `select()`'s new
+regular-file arm reported readable *without buffering*, `_dirtostat`
 calls rio's `/dev/mouse` regular (every file reached through a 9P mount
 is), and `PollP9Events` polls it with a zero timeout and then does a
-**blocking read** — so the first poll of the first window never
-returned and nothing was ever drawn. `_selregular` narrows the
-predicate by LENGTH; **believed fixed, NOT yet measured**, and
-`devreg-probe` is the one-run instrument. The 177's own share is
-`focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
+**blocking read**, so the first poll of the first window never returned.
+`_selregular` narrows the predicate by LENGTH and **`devreg-probe`
+confirmed the whole mechanism**: `/dev/mouse` and `/dev/cons` come back
+`REG size 0 / not ready` while `/dev/winname` and `/dev/snarf`, also
+`REG size 0`, come back READABLE — the copy process answering
+truthfully for the two that have data and the two that block. The 177's
+own share is `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and
+`visual-3.1`.
+***AND `/dev/cons` ANSWERED `REG`, NOT `chr`***, so `FD_ISTTY` is not
+set on a freshly opened one. Not a bug on its own, but it means GNU
+grep's "am I writing to the file I am reading" check (`SAME_INODE`
+against stdout) now actually RUNS against the terminal instead of being
+skipped as a non-regular file. Recorded, not measured.
 
 **bash's suite**: `PASS 49 / REAL 36 / WARNONLY 1` of 86 files, from 0
 passing. ~950 of the 1015 remaining differing lines are platform limits —

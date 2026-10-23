@@ -3512,3 +3512,120 @@ here, and this one has not been measured yet.*
 believed to restore wish and is unproven; the `poll()` entry-count,
 negative-fd and `POLLNVAL` fixes beside it are independent of all of
 this and were confirmed on the VM at 0 failures.
+
+## thread/: xz's hang was pthread_create, and it was three bugs
+
+**Two acid stacks named in one run what two rounds of reading poll(),
+select() and O_NONBLOCK had not.** The instrument was `ps` first, as
+this file's own rule says -- *constant light CPU is a wait, a pinned
+core is a loop* -- and the `ps` line was the unusual half:
+
+```
+glenda  79206  0:18  0:34  364K  Ready    xz
+glenda  79207  0:00  0:00  364K  Rendez   xz
+```
+
+**Two processes, and the SYSTEM figure is the larger one.** Then
+`acid`:
+
+```
+79207:  _RENDEZVOUS <- pthread_create+0x63 <- mythread_create
+                   <- initialize_new_thread <- get_thread
+                   <- stream_encode_in <- lzma_code <- main
+79206:  _PREAD <- _NSEC <- nsec <- clock_gettime
+               <- pthread_cond_timedwait+0x40 <- mythread_cond_timedwait
+               <- wait_for_work <- stream_encode_mt <- main
+```
+
+***xz IS MULTITHREADED*** (`liblzma/common/stream_encoder_mt.c`), which
+is the fact the whole investigation had been missing. Nothing about
+poll or O_NONBLOCK was ever relevant.
+
+### The three bugs
+
+**1. The child's rendezvous had no partner.** `pthread_create` ended:
+
+```c
+	case 0:
+		_RENDEZVOUS(tag, (void *) 0);
+		p = f(arg);
+		pthread_exit(p);
+	}
+	return 0;
+```
+
+-- and `grep -n _RENDEZVOUS thread/*.c` finds **that one call and no
+other**. The parent fell straight through to `return 0` and never
+answered. So **every thread this function ever created blocked before
+reaching its start routine, while its creator was told the call had
+succeeded.** That is 79207: xz's first worker, parked in the handshake
+at 0:00 of CPU, while xz waited for work nobody was going to do.
+
+*The handshake is not decoration, and that is how its missing half is
+identified rather than guessed.* `pthread_exit` does
+`_pthreadget(pthread_self())` and **asserts** the result is non-null;
+`pthread_join` looks the thread up the same way. So the parent must put
+the child's pid in the `Thread` record before the child runs any of its
+own code, and `_pthreadsetpid` already existed for exactly that **with
+no callers anywhere**. A function nobody calls, next to a rendezvous
+nobody answers, is one unfinished edit.
+
+**2. `*t` was never written.** The out parameter was unused, so every
+caller handed whatever was on its stack to `pthread_join`.
+
+**3. `attr != NULL` returned EINVAL, and libap itself always passes
+one.** `thread/cond_timedwait.c:107` does `pthread_attr_init`,
+`pthread_attr_setdetachstate(PTHREAD_CREATE_DETACHED)` and then
+`pthread_create(&tid, &attr, ...)` -- rejected out of hand. So
+**`pthread_cond_timedwait` returned EAGAIN without ever waiting, on
+every call, for its whole existence.** `wait_for_work` is a loop; an
+instant return makes it a busy one; each turn costs a `clock_gettime`,
+which on Plan 9 is a `_PREAD`. **A spin made of syscalls -- which is
+exactly why `s` was pinned and `l` was not.** The two figures were the
+diagnosis and they were read correctly a round before the cause was
+found.
+
+***AND `pthread_ext.c` SAID SO IN A COMMENT.*** "pthread_create() in
+APExp currently returns EINVAL if attr != NULL. These stubs allow code
+that initialises and destroys attributes to compile and link." That was
+accurate when written, and then a second libap file was written against
+the stubs. *A stub that lets a program LINK is not a stub that lets it
+RUN*, and the distance between the two was measured here in a pinned
+system load. It is the capability-present-and-not-declared family
+wearing its other face: **declared and not present.**
+
+### What is fixed and what is not
+
+The parent now calls `_pthreadsetpid`, writes `*t`, and answers the
+rendezvous; the attr is accepted. **Every attribute remains a no-op and
+`detachstate` in particular is NOT honoured** -- a detached thread
+still leaves a `Waitmsg` for somebody to collect. *Rejecting the attr
+never made detachstate work, it only made the call fail*, so this
+trades a loud wrong answer for a quiet incomplete one, and the
+incompleteness is in the release notes rather than implied.
+
+`RFMEM` shares data and bss, which is where `privileges[]` lives, so
+both ends see the same record and the same tag. **The stack is not
+shared** -- `dupseg()` gives `SG_STACK` a new segment whatever RFMEM
+says -- so the parent returning through the frame does not disturb the
+child sitting in it. That is also why 79207's stack showed its
+creator's frames.
+
+### THE CLAIM THAT lz4 AND xz SHARE NO MECHANISM IS WITHDRAWN
+
+CLAUDE.md carried, in capitals, *"ONE GREP SAYS THEY SHARE NO
+MECHANISM: lz4 uses neither poll nor select nor O_NONBLOCK"*. That grep
+was true and it answered the wrong question -- it ruled out three named
+mechanisms and was read as ruling out all of them. **`lz4` has
+`programs/threadpool.c`, `cmd/lz4/mkfile` compiles everything with
+`-DLZ4IO_MULTITHREAD`, and `threadpool.$O` is in the link.** So both
+archivers go through `pthread_create`, and a worker that never reaches
+its start routine is precisely "froze and left an EMPTY output".
+
+**A prediction with its refutation attached, written before the run:**
+if lz4 still hangs after this rebuild, they are two bugs after all and
+this paragraph is wrong. `zstd` is in the same position untested
+(`lib/common/pool.c`).
+
+*The rule this cost a round to restate: a grep that finds nothing has
+ruled out what you grepped for and nothing else.*
