@@ -359,6 +359,63 @@ case14(Dst *d, Src *s)
 	s->size = d->offset;
 }
 
+/*
+ * CASE 15, and it is ONE VARIABLE, which 12 to 14 were not.
+ *
+ * ***BOTH HYPOTHESES ARE NOW DEAD.*** A (two register pairs live at
+ * once) died on case 7.  B (the two structs being different TYPES)
+ * died on **case 14**: `s->size = d->offset' is the SAME pair of types
+ * as case 1, merely reversed, and it compiles.
+ *
+ * And 12, 13 and 14 each varied THREE things from case 1 -- tag,
+ * layout and member name -- which is the very fault named one
+ * paragraph above them.  *Writing the rule down did not stop me
+ * repeating it.*  What they do establish, between them and cases 4, 6,
+ * 10 and 11, is how narrow this is:
+ *
+ *	d->offset = s->size      case 1   FAILS
+ *	s->size   = d->offset    case 14  passes  (same two types!)
+ *	gdst      = s->size      case 10  passes  (same source!)
+ *	d->offset = gsrc         case 11  passes  (same dest!)
+ *	d->offset = p->offset    case 13  passes  (Src's LAYOUT)
+ *	return s->size           case 4   passes
+ *
+ * So `Src.size' loads fine, `Dst.offset' stores fine, and only the two
+ * together fail -- while `Plain.offset', which has `Src''s layout,
+ * stores into `Dst.offset' happily.
+ *
+ * `Plain' differs from `Src' in exactly three ways: the member is
+ * called `offset' rather than `size', the tag is different, and it is
+ * declared at the BOTTOM of this file rather than the top.  **Case 15
+ * holds two of those and moves one**: `Named' is `Plain' with the
+ * member renamed `size'.
+ *
+ *   it FAILS  -> the member NAME is the trigger.  Strange enough to
+ *                be worth knowing, and it would point at `dotsearch'
+ *                and the Sym rather than at anything about types.
+ *   it PASSES -> the name is innocent, and what is left is `Src'
+ *                itself: its tag, or its position at the top of the
+ *                file.  Separating THOSE needs a struct declared early,
+ *                which moves line 181, so it is deliberately not in
+ *                this round.
+ */
+
+typedef struct Named Named;
+
+struct Named
+{
+	char	*name;
+	int	type;
+	int	len;
+	vlong	size;
+};
+
+void
+case15(Dst *d, Named *q)
+{
+	d->offset = q->size;
+}
+
 void
 main(void)
 {
@@ -417,6 +474,13 @@ main(void)
 	}
 	case14(&d, &s);
 	print("case14 %lld\n", s.size);
+	{
+		Named q;
+
+		q.size = 15;
+		case15(&d, &q);
+		print("case15 %lld\n", d.offset);
+	}
 
 	print("regpair-probe: it COMPILED, which is the whole result\n");
 	exits(0);

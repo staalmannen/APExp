@@ -1732,3 +1732,34 @@ that one line to upstream's `txt.c` for the test.
 
 *A test that crashes for a reason unrelated to the question is worse
 than no test, and this one would have crashed in the first function.*
+
+### A free control for the `ieeedtof` -0.0 fix
+
+`mk` in `sys/src/cmd` with the **host's** compilers answers
+
+```
+6l -o ki.6 run.6 mem.6 ... float.6
+farith: double fp to single fp overflow
+ctime: double fp to single fp overflow
+```
+
+and **inside `apexp-sh` the same directory builds.** `sys/src/cmd/ki`
+is byte-identical to upstream, so the input is not the variable: the
+linker is.
+
+***That is the bug APExp's own `6l/obj.c` fix repairs, observed from
+the other side.*** Its comment says exactly this:
+
+> Testing `h == 0` alone missed `-0.0`, whose `h` is `0x80000000`: it
+> went on to compute an exponent of -1022 and reported "double fp to
+> single fp overflow".
+
+**And it is the control that fix never had.** This file's own rule is
+that *a build which DOES contain a change cannot tell you the change
+was needed* -- a green run looks the same for a necessary fix and an
+unnecessary one. Here the unpatched compiler was run by accident, on
+stock input, and failed in the predicted words. *Nothing had to be
+replicated or reverted to get it.*
+
+Not a bug for us, and nothing to do: recorded because a confirmation
+that arrives free is worth the two minutes of writing it down.
