@@ -378,9 +378,30 @@ on the VM**, plus ONE build that halves the search: APExp's `8c/` needs
 names only APExp's `cc.h` defines, so stock-cc + APExp-8c will not
 compile, but **APExp `cc/` + STOCK `8c/`** will — if that fails the
 fault is in the shared front end, if it passes it is in `8c/`.
-`regpair-probe` narrows the construct afterwards and is **native
-`8c`/`8l`**, the second such file after `truefalse-test`; its result is
-whether it COMPILES.
+`regpair-probe` is **native `8c`/`8l`**, the second such file after
+`truefalse-test`, and its result is whether it COMPILES. Its first run
+covered ALL TEN backends and **the split is by WORD SIZE**: 6c, 7c, 9c
+and kc compile it, 8c/5c/qc/1c/2c do not. ***But they are NOT one
+bug*** — 5c and qc fail on RETURNING a vlong, which 8c compiles; 8c
+fails on case 1, which they compile; 1c and 2c fail on everything,
+which reads as no vlong support at all. *So "the 32-bit backends are
+broken" is a summary and not a diagnosis, and this item is at least
+three pieces of work.* **8c's result is the sharpest: case 1 and
+nothing else** — not the parameter, the return, the widening,
+`d->offset = d->offset + 1` or the vararg — so its 64-bit support
+broadly works and exactly one shape, `ar.c:586`'s, does not. Cases
+7-11 split that shape; **if case 8 (the same work in two statements)
+compiles where case 1 does not, it is the register allocator holding
+two pairs live, not the front end.** Still missing: **stock `8c` on
+that file**, which is what would make it a regression rather than
+something kencc never had.
+***AND IT DEMONSTRATED A REPORTING TRAP ON ITSELF***: a compile-time
+result can only name a LINE, so it rots when the file is edited above
+it. The new cases were appended BELOW the old ones for exactly that
+reason and the results table in the HEADER then pushed every measured
+line down 48 anyway. *Appending to the code is not enough when the
+prose is at the top* — key such a table on the case, give both line
+numbers, and re-key rather than renumber.
 
 **portable_stl: both questions are answered and both answers are no.**
 Its `CMakeLists.txt` has **no `install()` rule and no `configure_file`**

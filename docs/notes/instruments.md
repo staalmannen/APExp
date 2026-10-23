@@ -562,3 +562,62 @@ APExp's `cc/` and stock `8c/`: a failure puts the fault in the shared
 front end, a pass puts it in `8c/` -- and the latter would be a surprise
 worth having, since the only changes this repository made there are
 `-J`'s and `-C`'s and both are behind flags that compile does not pass.
+
+### The ten-backend run: the split is by WORD SIZE, and it is three bugs
+
+`regpair-probe.c` compiled by every kencc backend APExp ships:
+
+```
+6c amd64   COMPILES     7c arm64   COMPILES
+9c power64 COMPILES     kc sparc64 COMPILES
+
+8c 386     case 1
+5c arm     case 2's parameter, case 2's return
+qc power   case 2's return
+1c 68000   cases 1,2,3,4,5,6 -- and `too many errors'
+2c 68020   the same set
+```
+
+**Every 64-bit backend passes and every 32-bit backend fails**, which
+is what a path only a register PAIR can reach looks like -- and it says
+the four that pass prove nothing about the four that fail.
+
+***They are not one bug.*** 5c and qc fail on RETURNING a vlong, which
+8c compiles. 8c fails on case 1, which 5c and qc compile. 1c and 2c
+fail on everything, which reads as no vlong support rather than a
+defect in it. *So "the 32-bit backends are broken" is a summary, not a
+diagnosis*, and the cross-compilation item is at least three pieces of
+work rather than one.
+
+**8c's result is the sharpest thing in the run: case 1 and nothing
+else.** Not the parameter, not the return, not the 32-to-64 widening,
+not `d->offset = d->offset + 1`, not the vararg. Its 64-bit support is
+broadly working and exactly one shape is not -- *the shape `ar.c:586`
+uses*. Cases 7 to 11 were added to split that shape along its three
+seams (how many indirections, whether the two structs share a TYPE, and
+whether load and store are one expression). **If case 8 -- the same
+work in two statements through a local -- compiles where case 1 does
+not, the fault is holding two register pairs live at once, which is the
+register allocator rather than the shared front end.**
+
+#### And the file demonstrated a reporting trap on itself
+
+**A compile-time result can only name a LINE, so it rots the moment the
+file is edited above it.** Cases 7 to 11 were appended *below* case6
+for exactly that reason -- and then writing the results table into the
+header pushed every measured line down 48 anyway. *Appending to the
+code is not enough when the prose is at the top.*
+
+The table is keyed on CASE now, with both the run's line numbers and
+the current ones, and the header says to re-key rather than renumber.
+It is the same family as the stale-log rule already in CLAUDE.md:
+*anything measured from outside the file in front of you should say
+where it came from*, and a line number is measured from outside.
+
+#### Still missing
+
+**Stock `8c` on this file.** The `ar.c` A/B says APExp's compiler is at
+fault; this file says which construct; *only the two together say the
+construct is a regression rather than something kencc never had.* And
+if stock 8c also fails on case 1, then case 1 differs from `ar.c:586`
+in some way that matters and the reduction is not yet faithful.
