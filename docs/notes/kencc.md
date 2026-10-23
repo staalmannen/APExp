@@ -1597,22 +1597,60 @@ The whole list, from `diff -r` against the real upstream:
 *Nothing there is on the path from one `vlong` member to another*, and
 four of the five are gated, cosmetic or additive.
 
-### An inconsistency in the installed tree, worth the user's attention
+### The inconsistency in the diffed tree, and its cause
 
-Their `/sys/src/cmd/cc/cc.h` **has** `struct Spec` (2026-06-10) while
-their `/sys/src/cmd/8c/cgen.c` **has** `nodrat` (removed 2025-12-27).
-Upstream HEAD has `Spec` and no `nodrat`, and never reverted the
-rathole commit. **No single 9front checkout can be in that state**, so
-that tree is a mix of vintages -- and separately, whatever built their
-`/386/bin/8c` is a third question again.
+The tree the `diff -r` was taken from had `struct Spec` (2026-06-10)
+in `cc/cc.h` **and** `nodrat` (removed 2025-12-27) in `8c/cgen.c`.
+Upstream has `Spec`, has no `nodrat`, and never reverted, so **no
+single 9front checkout can be in that state.**
 
-*Which is the argument for the test below rather than for more
-reading*: it removes every question about what "stock" was.
+**The cause is known and it is not kencc's**: that machine is the
+development VM, and *its `sysupdate` is broken*. It is used because
+GitHub authentication works on it, and normally that costs nothing
+because nothing here touches the underlying system -- but a `diff -r`
+against `/sys/src` is precisely a thing that does.
+
+***SO THE 3768-LINE `cc.diff` AND THE 434-LINE `8c.diff` ARE VOID AS
+STATEMENTS ABOUT STOCK.*** They compared APExp against a tree that is
+part 2025 and part 2026. *Nothing was wrong with taking them; what was
+wrong was reading them as a patch set*, which is the same error in a
+third costume. The clone of real upstream replaces them and is what
+every attribution above rests on.
+
+**THE COMPILER MEASUREMENTS ARE ON A DIFFERENT AND CLEAN MACHINE**, and
+they stand: a second VM on completely clean source is where stock `8c`
+compiled `ar.c` and `regpair-probe.c`, and where all of `/sys/src`
+cross compiled to 386. It can download but not push, which is why the
+diffs came from the other one.
+
+### So the live question is one grep wide
+
+**What vintage is the clean VM?** Its `8c` is the one that compiles the
+probe, and whether it has `ed3c7d491` decides everything:
+
+```
+grep -c nodrat /sys/src/cmd/8c/cgen.c     # 0 = has the rathole change
+grep -c Spec /sys/src/cmd/cc/cc.h         # 0 = predates 2026-06-10
+```
+
+- **`nodrat` count 0** -- the clean VM is post-December-2025 and agrees
+  with APExp on that hunk. ***Then the rathole change is exonerated and
+  the fault is in one of APExp's five deltas***, of which only
+  `maxregion` 300 -> 600 and the `CLOCAL` class test are neither gated
+  nor inert.
+- **nonzero** -- the clean VM predates it, and `ed3c7d491` or something
+  after it is still the suspect.
+
+*Two greps bracket that compiler's vintage exactly the way the clone
+bracketed APExp's, and the second one is not redundant: it says whether
+the bracket is the same one.*
 
 ### The decisive test
 
 **Build upstream 9front HEAD's `8c`, unmodified, and run it on
-`regpair-probe.c`.**
+`regpair-probe.c`** -- and the clean VM can do this without any GitHub
+credential, since `git/clone https://github.com/9front/9front` only
+needs to download.
 
 - **It fails** -> the bug is upstream's, in or after `ed3c7d491`, and
   APExp merely has it. That is a 9front bug report with a three-line
