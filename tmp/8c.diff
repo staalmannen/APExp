@@ -1,0 +1,434 @@
+Only in /usr/glenda/APExp/sys/src/cmd/8c: 6.out
+Only in /usr/glenda/APExp/sys/src/cmd/8c: 8c_vla.6
+Only in /usr/glenda/APExp/sys/src/cmd/8c: 8c_vla.c
+Only in /usr/glenda/APExp/sys/src/cmd/8c: cgen.6
+diff -r /sys/src/cmd/8c/cgen.c /usr/glenda/APExp/sys/src/cmd/8c/cgen.c
+98a99,125
+> 	case OALLOCA:
+> 		/*
+> 		 * VLA stack allocation: subtract rounded-up size from SP,
+> 		 * store new SP in nn.
+> 		 *
+> 		 *   MOVL  size, tmp
+> 		 *   ADDL  $3, tmp
+> 		 *   ANDL  $-4, tmp
+> 		 *   SUBL  tmp, SP
+> 		 *   MOVL  SP, nn
+> 		 */
+> 		{
+> 			Node nsize;
+> 			regalloc(&nsize, l, Z);
+> 			cgen(l, &nsize);
+> 			gins(AADDL, nodconst(3), &nsize);
+> 			gins(AANDL, nodconst(-4), &nsize);
+> 			nodreg(&nod, &nsize, D_SP);
+> 			gins(ASUBL, &nsize, &nod);
+> 			regfree(&nsize);
+> 			if(nn != Z) {
+> 				nodreg(&nod, n, D_SP);
+> 				gmove(&nod, nn);
+> 			}
+> 		}
+> 		goto done;
+> 
+1026c1053,1054
+< 		sugen(l, nodrat, l->type->width);
+---
+> 		regsalloc(&nod, l);
+> 		sugen(l, &nod, l->type->width);
+1029,1030d1056
+< 		warn(n, "non-interruptable temporary");
+< 		nod = *nodrat;
+1206c1232
+< bcgen(Node *n, int true)
+---
+> bcgen(Node *n, int cond)
+1212c1238
+< 		boolgen(n, true, Z);
+---
+> 		boolgen(n, cond, Z);
+1216c1242
+< boolgen(Node *n, int true, Node *nn)
+---
+> boolgen(Node *n, int cond, Node *nn)
+1234c1260
+< 			testv(n, true);
+---
+> 			testv(n, cond);
+1238c1264
+< 		if(true)
+---
+> 		if(cond)
+1264c1290
+< 		if(!true)
+---
+> 		if(!cond)
+1276c1302
+< 		boolgen(r, true, nn);
+---
+> 		boolgen(r, cond, nn);
+1280c1306
+< 		boolgen(l, !true, nn);
+---
+> 		boolgen(l, !cond, nn);
+1286c1312
+< 		bcgen(r->left, true);
+---
+> 		bcgen(r->left, cond);
+1291c1317
+< 		bcgen(r->right, !true);
+---
+> 		bcgen(r->right, !cond);
+1300c1326
+< 		if(!true)
+---
+> 		if(!cond)
+1304c1330
+< 		bcgen(l, true);
+---
+> 		bcgen(l, cond);
+1306c1332
+< 		bcgen(r, !true);
+---
+> 		bcgen(r, !cond);
+1314c1340
+< 		if(!true)
+---
+> 		if(!cond)
+1318c1344
+< 		bcgen(l, !true);
+---
+> 		bcgen(l, !cond);
+1320c1346
+< 		bcgen(r, !true);
+---
+> 		bcgen(r, !cond);
+1339c1365
+< 			if(!true)
+---
+> 			if(!cond)
+1344c1370
+< 		if(true)
+---
+> 		if(cond)
+1354c1380
+< 			boolgen(&nod, true, nn);
+---
+> 			boolgen(&nod, cond, nn);
+1446,1448d1471
+< 	if(nn == nodrat)
+< 		if(w > nrathole)
+< 			nrathole = w;
+1494c1517,1518
+< 		sugen(l, nodrat, l->type->width);
+---
+> 		regsalloc(&nod1, l);
+> 		sugen(l, &nod1, l->type->width);
+1497,1498d1520
+< 		warn(n, "non-interruptable temporary");
+< 		nod1 = *nodrat;
+1591,1594c1613,1616
+< 		sugen(n->right, nodrat, w);
+< 		warn(n, "non-interruptable temporary");
+< 		sugen(nodrat, n->left, w);
+< 		sugen(nodrat, nn, w);
+---
+> 		regsalloc(&nod0, n->right);
+> 		sugen(n->right, &nod0, w);
+> 		sugen(&nod0, n->left, w);
+> 		sugen(&nod0, nn, w);
+1599c1621,1622
+< 			sugen(n, nodrat, w);
+---
+> 			regsalloc(&nod0, n);
+> 			sugen(n, &nod0, w);
+Only in /usr/glenda/APExp/sys/src/cmd/8c: cgen64.6
+diff -r /sys/src/cmd/8c/cgen64.c /usr/glenda/APExp/sys/src/cmd/8c/cgen64.c
+414c414
+<  * 	JNE	true
+---
+>  * 	JNE	cond
+416c416
+<  * 	JNE	true
+---
+>  * 	JNE	cond
+420c420
+<  * true:
+---
+>  * cond:
+1190c1190
+< biggen(Node *l, Node *r, Node *t, int true, uchar code[][VLEN], uchar *a)
+---
+> biggen(Node *l, Node *r, Node *t, int cond, uchar code[][VLEN], uchar *a)
+1435c1435
+< 				g = true;
+---
+> 				g = cond;
+1439c1439
+< 				g = !true;
+---
+> 				g = !cond;
+1567c1567
+< 	int li, ri, lri, dr, si, m, op, sh, cmp, true;
+---
+> 	int li, ri, lri, dr, si, m, op, sh, cmp, vcond;
+2096c2096
+< 		true = 1;
+---
+> 		vcond = 1;
+2101c2101
+< 			true = 0;
+---
+> 			vcond = 0;
+2108c2108
+< 			true = 0;
+---
+> 			vcond = 0;
+2115c2115
+< 			true = 0;
+---
+> 			vcond = 0;
+2122c2122
+< 			true = 0;
+---
+> 			vcond = 0;
+2129c2129
+< 			true = 0;
+---
+> 			vcond = 0;
+2141c2141
+< 			biggen(l, r, Z, true, optab[T0i], args);
+---
+> 			biggen(l, r, Z, vcond, optab[T0i], args);
+2150c2150
+< 				biggen(l, r, Z, true, optab[T0i], args);
+---
+> 				biggen(l, r, Z, vcond, optab[T0i], args);
+2157c2157
+< 				biggen(l, r, Z, true, optab[T0i], args);
+---
+> 				biggen(l, r, Z, vcond, optab[T0i], args);
+2172c2172
+< 			biggen(l, r, Z, true, optab[Tii], args);
+---
+> 			biggen(l, r, Z, vcond, optab[Tii], args);
+2619c2619
+< testv(Node *n, int true)
+---
+> testv(Node *n, int cond)
+2626c2626
+< 		b->op = true ? ONE : OEQ;
+---
+> 		b->op = cond ? ONE : OEQ;
+2639c2639
+< 		biggen(n, Z, Z, true, testi, nil);
+---
+> 		biggen(n, Z, Z, cond, testi, nil);
+2650c2650
+< 			biggen(n, Z, Z, true, testi, nil);
+---
+> 			biggen(n, Z, Z, cond, testi, nil);
+2657c2657
+< 			biggen(nn, Z, Z, true, testi, nil);
+---
+> 			biggen(nn, Z, Z, cond, testi, nil);
+Only in /usr/glenda/APExp/sys/src/cmd/8c: div.6
+Only in /usr/glenda/APExp/sys/src/cmd/8c: enam.6
+diff -r /sys/src/cmd/8c/gc.h /usr/glenda/APExp/sys/src/cmd/8c/gc.h
+125d124
+< #define	NRGN	600
+146d144
+< EXTERN	Node*	nodrat;
+149d146
+< EXTERN	long	nrathole;
+157d153
+< EXTERN	Sym*	symrathole;
+176,178d171
+< EXTERN	Rgn	region[NRGN];
+< EXTERN	Rgn*	rgp;
+< EXTERN	int	nregion;
+Only in /usr/glenda/APExp/sys/src/cmd/8c: list.6
+Only in /usr/glenda/APExp/sys/src/cmd/8c: machcap.6
+diff -r /sys/src/cmd/8c/mkfile /usr/glenda/APExp/sys/src/cmd/8c/mkfile
+2c2
+< 
+---
+> APEXPROOT=../../../..
+4a5
+> 	8c_vla.$O\
+28c29
+< </sys/src/cmd/mkone
+---
+> <$APEXPROOT/sys/src/cmd/mkone
+Only in /usr/glenda/APExp/sys/src/cmd/8c: mul.6
+Only in /usr/glenda/APExp/sys/src/cmd/8c: peep.6
+Only in /usr/glenda/APExp/sys/src/cmd/8c: pgen.6
+Only in /usr/glenda/APExp/sys/src/cmd/8c: pswt.6
+Only in /usr/glenda/APExp/sys/src/cmd/8c: reg.6
+diff -r /sys/src/cmd/8c/reg.c /usr/glenda/APExp/sys/src/cmd/8c/reg.c
+35a36,38
+> 	static int maxregion;
+> 	static Rgn *region;
+> 	Rgn *rgp;
+38c41
+< 	int i, z;
+---
+> 	int i, z, nregion;
+436d438
+< 	rgp = region;
+437a440,443
+> 	if(region == nil){
+> 		maxregion = 600;
+> 		region = alloc(maxregion * sizeof(Rgn));
+> 	}
+462a469
+> 			rgp = &region[nregion];
+478,480c485,487
+< 			if(nregion >= NRGN) {
+< 				warn(Z, "too many regions");
+< 				goto brk;
+---
+> 			if(nregion >= maxregion) {
+> 				region = allocn(region, maxregion * sizeof(Rgn), 128*sizeof(Rgn));
+> 				maxregion += 128;
+482d488
+< 			rgp++;
+485d490
+< brk:
+Only in /usr/glenda/APExp/sys/src/cmd/8c: sgen.6
+Only in /usr/glenda/APExp/sys/src/cmd/8c: swt.6
+diff -r /sys/src/cmd/8c/swt.c /usr/glenda/APExp/sys/src/cmd/8c/swt.c
+353c353
+< 	if(debug['T'] && t == D_EXTERN && s->sig != SIGDONE && s->type != types[TENUM] && s != symrathole){
+---
+> 	if(debug['T'] && t == D_EXTERN && s->sig != SIGDONE && s->type != types[TENUM]){
+461a462,464
+> 		/* -P: conforming layout; see sys/src/cmd/cc/dcl.c sualign() */
+> 		if(conformalign && t->talign > 0)
+> 			w = t->talign;
+471a475,477
+> 		/* -P: conforming layout; see sys/src/cmd/cc/dcl.c sualign() */
+> 		if(conformalign && typesu[v->etype] && v->talign > 0)
+> 			w = v->talign;
+Only in /usr/glenda/APExp/sys/src/cmd/8c: txt.6
+diff -r /sys/src/cmd/8c/txt.c /usr/glenda/APExp/sys/src/cmd/8c/txt.c
+7d6
+< 	Type *t;
+16d14
+< 	nrathole = 0;
+25a24
+> 	typecmplx = typesuv;
+67,79d65
+< 	t = typ(TARRAY, types[TCHAR]);
+< 	symrathole = slookup(".rathole");
+< 	symrathole->class = CGLOBL;
+< 	symrathole->type = t;
+< 
+< 	nodrat = new(ONAME, Z, Z);
+< 	nodrat->sym = symrathole;
+< 	nodrat->type = types[TIND];
+< 	nodrat->etype = TVOID;
+< 	nodrat->class = CGLOBL;
+< 	complex(nodrat);
+< 	nodrat->type = t;
+< 
+103a90,91
+> 	if(vlanest > 0)
+> 		gvla_epilogue();
+110d97
+< 	symrathole->type->width = nrathole;
+117c104
+< 		if(s->class != CGLOBL && s->class != CSTATIC)
+---
+> 		if(s->class != CGLOBL && s->class != CSTATIC && s->class != CLOCAL)
+202c189
+< 	if(typesu[n->type->etype] || typev[n->type->etype]) {
+---
+> 	if(typesu[n->type->etype] || typev[n->type->etype] || iscmplx(n->type->etype)) {
+334c321
+< 			regalloc(n->left, &regnode, Z);
+---
+> 			regalloc(n->left, &regnode, o);
+409c396
+< /* not reached 
+---
+> /* not reached
+516c503
+< 		if(n->class == CSTATIC)
+---
+> 		if(n->class == CSTATIC || n->class == CLOCAL)
+1385c1372,1383
+< 	if(s->class == CSTATIC)
+---
+> 	/*
+> 	 * -C: COMDAT. `from.scale' is the flags field for ATEXT and
+> 	 * AGLOBL on this target -- `8l/obj.c' tests `p->from.scale &
+> 	 * DUPOK' in both cases -- so one OR covers functions and data.
+> 	 * ADATA is untouched in effect: every ADATA caller in swt.c
+> 	 * overwrites `from.scale' with the datum's WIDTH straight after
+> 	 * this call, which is the whole reason the bit can be set here
+> 	 * unconditionally. See cc/cc.h.
+> 	 */
+> 	if(dupokall)
+> 		p->from.scale |= DUPOK;
+> 	if(s->class == CSTATIC || s->class == CLOCAL)
+1423,1424c1421,1422
+< 	-1,		/*[TXXX]*/	
+< 	SZ_CHAR,	/*[TCHAR]*/	
+---
+> 	-1,		/*[TXXX]*/
+> 	SZ_CHAR,	/*[TCHAR]*/
+1448c1446
+< 	BCHAR|BUCHAR,			/*[TUCHAR]*/	
+---
+> 	BCHAR|BUCHAR,			/*[TUCHAR]*/
+1451c1449
+< 	BINT|BUINT|BLONG|BULONG|BIND,	/*[TINT]*/		
+---
+> 	BINT|BUINT|BLONG|BULONG|BIND,	/*[TINT]*/
+1466a1465,1509
+> 
+> /*
+>  * VLA frame management for i386.
+>  *
+>  * gvla_prologue – called at function entry when vlanest > 0:
+>  *   pushl %ebp
+>  *   movl  %esp, %ebp
+>  *
+>  * gvla_epilogue – called before every RET when vlanest > 0:
+>  *   movl  %ebp, %esp
+>  *   popl  %ebp
+>  *
+>  * gret – wrapper for gbranch(ORETURN) that inserts the epilogue first.
+>  */
+> void
+> gvla_prologue(void)
+> {
+> 	Node nbp, nsp;
+> 
+> 	nodreg(&nbp, &regnode, D_BP);
+> 	nodreg(&nsp, &regnode, D_SP);
+> 	reg[D_BP]++;
+> 	gins(APUSHL, &nbp, Z);
+> 	gmove(&nsp, &nbp);
+> }
+> 
+> void
+> gvla_epilogue(void)
+> {
+> 	Node nbp, nsp;
+> 
+> 	nodreg(&nbp, &regnode, D_BP);
+> 	nodreg(&nsp, &regnode, D_SP);
+> 	gmove(&nbp, &nsp);
+> 	gins(APOPL, &nbp, Z);
+> 	reg[D_BP]--;
+> }
+> 
+> void
+> gret(void)
+> {
+> 	if(vlanest > 0)
+> 		gvla_epilogue();
+> 	gbranch(ORETURN);
+> }

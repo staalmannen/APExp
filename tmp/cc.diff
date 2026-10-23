@@ -1,0 +1,3768 @@
+Only in /usr/glenda/APExp/sys/src/cmd/cc: acid.6
+Only in /usr/glenda/APExp/sys/src/cmd/cc: bits.6
+Only in /usr/glenda/APExp/sys/src/cmd/cc: c11_c23
+diff -r /sys/src/cmd/cc/c99 /usr/glenda/APExp/sys/src/cmd/cc/c99
+5a6,9
+> Current status:
+> Apart from goto restrictions for VLA is C99 support pretty much done.
+> 
+> 
+7,10d10
+< 9, 19. Hexdecimal floating point constants.
+< 11. _Complex, _Imaginary, _Bool
+< 14. Variable arrays in parameter lists.
+< 33. Variable-length arrays
+12,14c12
+< 18. Notation for universal characters \uXXXX
+< 25. Division and mod truncate toward zero.
+< 26. _Bool, float _Complex, double _Complex, long double _Complex
+---
+> 
+16a15
+> 11. _Complex, _Imaginary, _Bool [in APExp, works, claude.ai help]
+17a17
+> 9, 19. Hexdecimal floating point constants. [in APExp, works, claude.ai help]
+19a20
+> 14. Variable arrays in parameter lists. [in APExp, testing, claude.ai help]
+20a22,24
+> 17b. Named initializers for static/const aggregates at file scope
+>      (works for auto aggregates, see item 24)          [in APExp, works, claude.ai help]
+> 18. Notation for universal characters \uXXXX  [in APExp, testing, claude.ai help]
+21a26,27
+> 25. Division and mod truncate toward zero. [in APExp, testing, claude.ai help]
+> 26. _Bool, float _Complex, double _Complex, long double _Complex [in APExp, testing, claude.ai help]
+22a29
+> 33. Variable-length arrays [in APExp, testing, claude.ai help]
+Only in /usr/glenda/APExp/sys/src/cmd/cc: cc.a6
+diff -r /sys/src/cmd/cc/cc.h /usr/glenda/APExp/sys/src/cmd/cc/cc.h
+20d19
+< typedef	struct	Spec	Spec;
+31d29
+< #define	NINCLUDE	64
+43,48d40
+< struct	Spec
+< {
+< 	ulong type;
+< 	ulong class;
+< };
+< 
+135a128,132
+> 	char	vla;		/* 1 = variable-length array */
+> 	char	isbool;		/* declared bool/_Bool; see typebool */
+> 	Node*	vlasizevar;	/* hidden auto holding runtime byte count (VLA only) */
+> 	short	alignas_req;	/* _Alignas() override; 0 = use type's natural alignment */
+> 	short	talign;		/* struct/union natural alignment; 0 = not computed. See -P. */
+280a278,280
+> 	OTYPEOF,	/* typeof(expr) / typeof(type) — C23/GCC extension */
+> 	OTYPEOF_UNQUAL,	/* typeof_unqual(expr) — C23 extension */
+> 	OALIGNOF,	/* _Alignof(type) / __alignof__(type) — C11/GCC */
+300a301,303
+> 	OALLOCA,	/* VLA: runtime stack allocation */
+> 	OVLAVAR,	/* VLA: unspecified dimension [*] in prototype */
+> 
+328c331,344
+< 	TUNSIGNED = NTYPE,
+---
+> 	/* C99 complex number types */
+> 	TCFLOAT		= NTYPE,	/* float _Complex  (2 floats,  8 bytes) */
+> 	TCDOUBLE,			/* double _Complex (2 doubles, 16 bytes) */
+> 	NCTYPE,				/* total type codes including complex */
+> 
+> 	TAUTO	= NTYPE,
+> 	TEXTERN,
+> 	TSTATIC,
+> 	TTYPEDEF,
+> 	TTYPESTR,
+> 	TREGISTER,
+> 	TCONSTNT,
+> 	TVOLATILE,
+> 	TUNSIGNED,
+329a346
+> 	TNORET,
+333,344d349
+< 	CGXXX = 0,
+< 	CGAUTO,
+< 	CGEXTERN,
+< 	CGSTATIC,
+< 	CGTYPEDEF,
+< 	CGTYPESTR,
+< 	CGREGISTER,
+< 	CGCONSTNT,
+< 	CGVOLATILE,
+< 	CGNORET,
+< 	NCGTYPE,
+< 
+394a400,401
+> 	BCONSTNT	= 1L<<TCONSTNT,
+> 	BVOLATILE	= 1L<<TVOLATILE,
+397,406c404,410
+< 
+< 	BAUTO		= 1L<<CGAUTO,
+< 	BEXTERN		= 1L<<CGEXTERN,
+< 	BSTATIC		= 1L<<CGSTATIC,
+< 	BTYPEDEF	= 1L<<CGTYPEDEF,
+< 	BTYPESTR	= 1L<<CGTYPESTR,
+< 	BREGISTER	= 1L<<CGREGISTER,
+< 	BCONSTNT	= 1L<<CGCONSTNT,
+< 	BVOLATILE	= 1L<<CGVOLATILE,
+< 	BNORET		= 1L<<CGNORET,
+---
+> 	BAUTO		= 1L<<TAUTO,
+> 	BEXTERN		= 1L<<TEXTERN,
+> 	BSTATIC		= 1L<<TSTATIC,
+> 	BTYPEDEF	= 1L<<TTYPEDEF,
+> 	BTYPESTR	= 1L<<TTYPESTR,
+> 	BREGISTER	= 1L<<TREGISTER,
+> 	BNORET		= 1L<<TNORET,
+446c450
+< EXTERN	char*	include[NINCLUDE];
+---
+> EXTERN	char*	include[20];
+479c483,497
+< EXTERN	Type*	types[NTYPE];
+---
+> EXTERN	Type*	types[NCTYPE];		/* extended to hold TCFLOAT, TCDOUBLE */
+> /*
+>  * bool/_Bool. Its representation is unsigned char -- there is no TBOOL
+>  * etype -- but it carries the isbool mark so that com.c can tell it
+>  * from a plain unsigned char and give conversions to it the semantics
+>  * C99 6.3.1.2 requires: a comparison against zero, not a truncation.
+>  *
+>  * The mark is a field rather than the identity of this one Type,
+>  * because a type is copied whenever it is used: copytyp() is a struct
+>  * copy, and dcl.c copies a parameter's type to chain it into a
+>  * prototype and copies again for const/volatile. Pointer identity
+>  * therefore survives a cast and a return, but not a declaration or a
+>  * parameter -- which is exactly the set of cases that used to fail.
+>  */
+> EXTERN	Type*	typebool;
+484a503,584
+> /*
+>  * -J: lay structs out the way every other C compiler does -- tail
+>  * padding to the struct's OWN alignment rather than always 8, and a
+>  * nested struct member aligned to ITS own alignment rather than
+>  * always 8. Off by default, because the 9front ABI is the other rule
+>  * and everything native is already built to it.
+>  *
+>  * **It is NOT `-P', which the recorded plan named.** Every backend's
+>  * peep.c uses `debug['P']' for peephole tracing and reg.c reads it to
+>  * disable register allocation, so -P would have changed code
+>  * generation while claiming to change layout. *A flag one letter from
+>  * another flag is checked, not recalled* -- and the plan had argued
+>  * from `ARGBEGIN's default arm takes any unknown letter', which is
+>  * true and did not make P unknown. A named global rather than a
+>  * debug letter so the next reader cannot repeat it.
+>  *
+>  * **IT IS NOT A PER-PACKAGE FLAG, and that is the opposite of how it
+>  * is natural to reach for it.** -J changes the layout of EVERY struct
+>  * the translation unit sees, including the ones in <stdio.h> and
+>  * <sys/stat.h>. Build one package with it against a libap built
+>  * without it and the two disagree about `FILE', `struct stat' and
+>  * `DIR' -- silently, with no link error, because the symbols all
+>  * resolve. The unit it is safe over is a whole self-consistent world:
+>  * all of APE, after `mk distclean', or nothing.
+>  *
+>  * For a handful of on-disk structs in one package, `#pragma pack
+>  * on'/`off' is still the right tool and costs no rebuild -- that is
+>  * what tar.h carries, and tar is the reason this flag exists.
+>  */
+> EXTERN	int	conformalign;
+> 
+> /*
+>  * -C: MARK EVERY TEXT AND GLOBL IN THIS TRANSLATION UNIT `DUPOK',
+>  * so the linker keeps the first definition of a symbol and silently
+>  * discards later ones.  That is COMDAT -- what C++ calls vague
+>  * linkage and what every other toolchain spells
+>  * `__attribute__((weak))' or a .section .gnu.linkonce.
+>  *
+>  * **THE LINKER ALREADY DOES ALL OF THIS AND NOTHING COULD ASK IT.**
+>  * `6l/obj.c:996' is `if(p->from.scale & DUPOK){ skip = 1; goto
+>  * casdef; }' on a duplicate ATEXT, and `6l/asm.c:548' uses
+>  * `sym->dupok' to suppress `multiple initialization' for duplicate
+>  * DATA.  `DUPOK' is `(1<<1)' in eight `*.out.h'.  The one missing
+>  * piece was a way for C to set the bit: `gpseudo()' wrote
+>  * `p->from.scale = (profileflg ? 0 : NOPROF)' and nothing ever OR'd
+>  * anything into it.  *The sixth time this tree has found a working
+>  * implementation of the thing it could not do sitting next to the
+>  * thing that could not do it.*
+>  *
+>  * WHY IT EXISTS: EDG's generated C.  A C++ front end lowered to C
+>  * emits inline members, template instantiations, vtables and typeinfo
+>  * into EVERY translation unit that uses them, because C has no way to
+>  * say "one of these, any of them".  Across `sys/src/external/edg/src'
+>  * that is **3,124 symbols defined in more than one of 75 objects and
+>  * 6,410 surplus definitions** -- `edg::skip_typerefs' alone is
+>  * emitted 41 times -- and `6l' answered `redefinition:' until it hit
+>  * `too many errors'.  EDG knows exactly which symbols these are and
+>  * already has a way to say so (it emits 26,712
+>  * `__attribute__((__weak__))' when its target is gcc); kencc had
+>  * nowhere to put the answer.
+>  *
+>  * IT IS PER TRANSLATION UNIT AND BLUNT, which is the honest
+>  * description.  It does not mark the vague-linkage entities, it marks
+>  * EVERYTHING, so two genuinely different functions with one name
+>  * become first-wins instead of a diagnostic.  That is safe for
+>  * generated C where every duplicate is the same entity by
+>  * construction, and it is not safe as a default -- so nothing in the
+>  * tree passes it but `sys/src/ape/cmd/edg'.  The precise version is
+>  * to teach `cc' `__attribute__((__weak__))' and set the bit per
+>  * symbol; this is the version that needs no re-translation.
+>  *
+>  * SEVEN TARGETS HONOUR IT, AND THE OTHER FOUR SAY SO RATHER THAN GO
+>  * QUIET.  `5l', `6l', `7l', `8l', `kl', `ql' and `vl' read `dupok';
+>  * **`9l' DECLARES THE FIELD IN `l.h' AND NEVER READS IT** -- a
+>  * pre-existing oversight found by this change and recorded, not fixed
+>  * -- and `1l'/`2l' have no such field at all.  On those four the
+>  * backend's `gpseudo()' diagnoses instead of setting a bit the linker
+>  * will ignore, because a flag that silently does nothing produces a
+>  * link failure that looks like something else entirely.
+>  */
+> EXTERN	int	dupokall;
+> EXTERN	int	alignasval;	/* pending _Alignas() requirement; 0 = none */
+491a592,593
+> EXTERN	int	vlanest;	/* depth of VLA scopes in current function */
+> EXTERN	long	vlaseq;		/* counter for unique _vla<N> hidden variable names */
+494,495c596
+< extern	char	*cnames[], *qtnames[], *qcnames[];
+< extern	char	*bnames[];
+---
+> extern	char	*cnames[], *qnames[], *bnames[];
+522c623,634
+< EXTERN	char*	typecmplx;
+---
+> EXTERN	char*	typecmplx;		/* points into typesuv; covers TCFLOAT/TCDOUBLE too */
+> EXTERN	char	typecmplxv[NCTYPE];	/* separate predicate: only TCFLOAT and TCDOUBLE */
+> 
+> #define	iscmplx(et)	((et) == TCFLOAT || (et) == TCDOUBLE)
+> 
+> /* C99 _Complex support — cmplx.c */
+> Type*	cplxbase(int);		/* TCFLOAT->types[TFLOAT], TCDOUBLE->types[TDOUBLE] */
+> Type*	mkcplxtype(int);	/* given real or complex etype, return complex type */
+> Node*	cplxre(Node*);		/* lvalue node for real component */
+> Node*	cplxim(Node*);		/* lvalue node for imaginary component */
+> Node*	cplxcast(Node*, Type*);	/* promote real node to complex, or recast */
+> void	cplxarith(Node*);	/* expand complex arithmetic node in-place */
+587a700
+> Node*	compoundlit(Type*, Node*);
+607a721
+> int	ptrsignonly(Type*, Type*);
+670,673c784,787
+< int	simpleg(Spec);
+< Type*	garbt(Type*, Spec);
+< int	simplec(Spec);
+< Type*	simplet(Spec);
+---
+> int	simpleg(long);
+> Type*	garbt(Type*, long);
+> int	simplec(long);
+> Type*	simplet(long);
+686a801,802
+> int	fpnegzero(double);
+> double	fpnegzeroval(void);
+689c805
+< Spec	typebitor(Spec, Spec);
+---
+> long	typebitor(long, long);
+742a859,862
+> void	gvlalloc(Type*, Node*);	/* emit runtime stack alloc for a VLA */
+> void	gvla_prologue(void);	/* save frame pointer before first VLA */
+> void	gvla_epilogue(void);	/* restore SP from frame pointer */
+> void	gret(void);		/* emit RET, restoring VLA frame first */
+768c888
+< #pragma	varargck	type	"Q"	Spec
+---
+> #pragma	varargck	type	"Q"	long
+diff -r /sys/src/cmd/cc/cc.y /usr/glenda/APExp/sys/src/cmd/cc/cc.y
+2a3,5
+> static Node *generic_select(Node*, Node*);
+> static int dcl_ind_depth(Node*);
+> static Type *auto_deduct_type(Node*, Node*);
+24a28
+> 	long	lval;
+27d30
+< 	Spec	spec;
+30,31c33,34
+< %type	<spec>	gctname gcname cname gname tname
+< %type	<spec>	gctnlist gcnlist zgnlist
+---
+> %type	<lval>	gctname gcname cname gname tname
+> %type	<lval>	gctnlist gcnlist zgnlist
+38c41
+< %type	<node>	adlist edecor tag qual qlist
+---
+> %type	<node>	adlist autoadlist autoxdecor edecor tag qual qlist
+40a44
+> %type	<node>	generic_assoc_list generic_assoc
+67c71,77
+< %token	LRESTRICT LINLINE LNORET
+---
+> %token	LRESTRICT LINLINE LNORET LDOTDOTDOT LCOMPLEX LIMAGINARY LCOMPLEXF LCOMPLEXD
+> %token	LTYPEOF LTYPEOF_UNQUAL
+> %token	LBOOL
+> %token	LNULLPTR LSTATICASSERT
+> %token	LALIGNOF
+> %token	LALIGNAS
+> %token	LGENERIC
+70a81,94
+> |	prog LSTATICASSERT '(' expr ',' LSTRING ')' ';'
+> 	{
+> 		/* C11 _Static_assert at file scope */
+> 		complex($4);
+> 		if($4->op == OCONST && !$4->vconst)
+> 			diag($4, "_Static_assert failed: %s", $6.s);
+> 	}
+> |	prog LSTATICASSERT '(' expr ')' ';'
+> 	{
+> 		/* C23 _Static_assert without message at file scope */
+> 		complex($4);
+> 		if($4->op == OCONST && !$4->vconst)
+> 			diag($4, "_Static_assert failed");
+> 	}
+161a186,190
+> |	LAUTO autoadlist ';'
+> 	{
+> 		/* C23 auto type deduction: LAUTO without explicit type specifier */
+> 		$$ = $2;
+> 	}
+191a221,345
+>  * C23 auto type deduction declarator list.
+>  * Entered when LAUTO appears without an accompanying type specifier.
+>  * The variable type is deduced from the initializer expression.
+>  * Backward compat: auto x; (no init) declares an int, as in C89.
+>  */
+> /*
+>  * C23 auto type deduction: the FIRST declarator, and LNAME-rooted.
+>  *
+>  * THIS EXISTS BECAUSE `auto size_t x;' DID NOT COMPILE, which is
+>  * ordinary C89 and also ordinary C23. `autoadlist' used to begin with
+>  * `xdecor', and `xdecor -> xdecor2 -> tag -> ltag -> LNAME | LTYPE',
+>  * so after LAUTO the parser could SHIFT a typedef name as the
+>  * variable being declared. That collided with `cname: LAUTO', the
+>  * storage-class reduction, and **yacc resolves shift/reduce in favour
+>  * of SHIFT** -- so `auto size_t x;' took the deduction path, read
+>  * `size_t' as the NAME, and died on the next token:
+>  *
+>  *	array_new_aligned.c:25 syntax error, last name: __T41392176
+>  *
+>  * EDG's generated C writes `auto <type> <name>;' for every local --
+>  * **116,079 of them across 103 of its 133 files** -- so one
+>  * shift/reduce conflict blocked essentially the whole port.
+>  *
+>  * `-std=' WOULD NOT HAVE FIXED THIS, and that is the finding rather
+>  * than the fix. The conflict is resolved when yacc BUILDS THE TABLE,
+>  * so no runtime flag has a say; and there is no dialect disagreement
+>  * to arbitrate, because C23 kept `auto' as a storage-class specifier
+>  * and its type inference applies only where `auto' is the SOLE type
+>  * specifier. **Both standards want the same answer here.**
+>  *
+>  * The grammar can decide on its own, because `size_t' is LTYPE and
+>  * `x' is LNAME -- different tokens. Rooting the first declarator at
+>  * LNAME removes LTYPE from the shift set, so that lookahead reduces
+>  * to the storage class, which is what both dialects ask for.
+>  *
+>  * `*' still shifts, and that is CORRECT rather than left over:
+>  * `auto *p = &x;' is C23 deduction, while `auto *p;' as a storage
+>  * class would need implicit int, gone since C99. Arrays and
+>  * functions are absent deliberately -- C23 does not deduce them.
+>  */
+> autoxdecor:
+> 	LNAME
+> 	{
+> 		$$ = new(ONAME, Z, Z);
+> 		$$->sym = $1;
+> 		$$->type = $1->type;
+> 		$$->etype = TVOID;
+> 		if($$->type != T)
+> 			$$->etype = $$->type->etype;
+> 		$$->xoffset = $1->offset;
+> 		$$->class = $1->class;
+> 	}
+> |	'*' zgnlist autoxdecor
+> 	{
+> 		$$ = new(OIND, $3, Z);
+> 		$$->garb = simpleg($2);
+> 	}
+> 
+> autoadlist:
+> 	autoxdecor
+> 	{
+> 		/* auto x; — C89 compat: declare as int, no initializer */
+> 		dodecl(adecl, CAUTO, types[TINT], $1);
+> 		$$ = Z;
+> 	}
+> |	autoxdecor '=' init
+> 	{
+> 		/* auto x = expr; — C23 type deduction */
+> 		Node *initn = $3, *decl;
+> 		Type *t;
+> 		long w;
+> 
+> 		if(initn == Z || initn->op == OINIT) {
+> 			diag(Z, "auto: cannot deduce type from braced initializer");
+> 			t = types[TINT];
+> 		} else {
+> 			complex(initn);
+> 			t = auto_deduct_type(initn, $1);
+> 		}
+> 		decl = dodecl(adecl, CAUTO, t, $1);
+> 		if(decl == Z) {
+> 			$$ = Z;
+> 		} else {
+> 			w = decl->sym->type->width;
+> 			$$ = doinit(decl->sym, decl->type, 0L, $3);
+> 			$$ = contig(decl->sym, $$, w);
+> 		}
+> 	}
+> |	autoadlist ',' xdecor
+> 	{
+> 		/* auto x = e, y; — continuation: bare declarator → int */
+> 		dodecl(adecl, CAUTO, types[TINT], $3);
+> 		$$ = $1;
+> 	}
+> |	autoadlist ',' xdecor '=' init
+> 	{
+> 		/* auto x = e1, y = e2; — multiple deductions */
+> 		Node *initn = $5, *decl, *rhs;
+> 		Type *t;
+> 		long w;
+> 
+> 		if(initn == Z || initn->op == OINIT) {
+> 			diag(Z, "auto: cannot deduce type from braced initializer");
+> 			t = types[TINT];
+> 		} else {
+> 			complex(initn);
+> 			t = auto_deduct_type(initn, $3);
+> 		}
+> 		decl = dodecl(adecl, CAUTO, t, $3);
+> 		rhs = Z;
+> 		if(decl != Z) {
+> 			w = decl->sym->type->width;
+> 			rhs = doinit(decl->sym, decl->type, 0L, $5);
+> 			rhs = contig(decl->sym, rhs, w);
+> 		}
+> 		$$ = $1;
+> 		if(rhs != Z) {
+> 			if($1 != Z)
+> 				$$ = new(OLIST, $1, rhs);
+> 			else
+> 				$$ = rhs;
+> 		}
+> 	}
+> 
+> /*
+217a372,385
+> |	edecl LSTATICASSERT '(' expr ',' LSTRING ')' ';'
+> 	{
+> 		/* C11 _Static_assert inside struct/union body */
+> 		complex($4);
+> 		if($4->op == OCONST && !$4->vconst)
+> 			diag($4, "_Static_assert failed: %s", $6.s);
+> 	}
+> |	edecl LSTATICASSERT '(' expr ')' ';'
+> 	{
+> 		/* C23 _Static_assert without message inside struct/union body */
+> 		complex($4);
+> 		if($4->op == OCONST && !$4->vconst)
+> 			diag($4, "_Static_assert failed");
+> 	}
+305c473
+< 		$$ = new(OARRAY, $2, Z);
+---
+> 		$$ = new(OARRAY, Z, $2);
+311a480,488
+> |	qual '.' ltag
+> 	{
+> 		$$ = new(OELEM, $1, Z);
+> 		$$->sym = $3;
+> 	}
+> |	qual '[' lexpr ']'
+> 	{
+> 		$$ = new(OARRAY, $1, $3);
+> 	}
+356c533
+< |	'.' '.' '.'
+---
+> |	LDOTDOTDOT
+386a564,579
+> |	slist LSTATICASSERT '(' expr ',' LSTRING ')' ';'
+> 	{
+> 		/* C11 _Static_assert at function scope */
+> 		complex($4);
+> 		if($4->op == OCONST && !$4->vconst)
+> 			diag($4, "_Static_assert failed: %s", $6.s);
+> 		$$ = $1;
+> 	}
+> |	slist LSTATICASSERT '(' expr ')' ';'
+> 	{
+> 		/* C23 _Static_assert without message */
+> 		complex($4);
+> 		if($4->op == OCONST && !$4->vconst)
+> 			diag($4, "_Static_assert failed");
+> 		$$ = $1;
+> 	}
+396c589,593
+< 	LCASE expr ':'
+---
+> 	LCASE expr LDOTDOTDOT expr ':'	/* extension */
+> 	{
+> 		$$ = new(OCASE, $2, $4);
+> 	}
+> |	LCASE expr ':'
+425a623,627
+> |	LAUTO autoadlist
+> 	{
+> 		/* C23 auto type deduction in for-loop initializer */
+> 		$$ = $2;
+> 	}
+671c873
+< |	'(' tlist abdecor ')' '{' ilist '}'	/* extension */
+---
+> |	'(' tlist abdecor ')' '{' ilist '}'
+673c875,877
+< 		$$ = new(OSTRUCT, $6, Z);
+---
+> 		/* C99 compound literal (§6.5.2.5).
+> 		 * dodecl resolves tlist+abdecor into lastdcl as usual;
+> 		 * compoundlit() allocates a hidden auto and calls doinit(). */
+675c879,885
+< 		$$->type = lastdcl;
+---
+> 		$$ = compoundlit(lastdcl, new(OINIT, invert($6), Z));
+> 	}
+> |	'(' tlist abdecor ')' '{' ilist ',' '}'
+> 	{
+> 		/* trailing-comma variant */
+> 		dodecl(NODECL, CXXX, $2, $3);
+> 		$$ = compoundlit(lastdcl, new(OINIT, invert($6), Z));
+719a930,945
+> |	LALIGNOF uexpr
+> 	{
+> 		/* _Alignof(expr): alignment of the expression's type */
+> 		$$ = new(OALIGNOF, $2, Z);
+> 	}
+> |	LTYPEOF '(' cexpr ')'
+> 	{
+> 		/* typeof(expr): produce a node carrying the expression's type.
+> 		 * tcom() will resolve it; used with sizeof(typeof(x)) etc. */
+> 		$$ = new(OTYPEOF, $3, Z);
+> 	}
+> |	LTYPEOF_UNQUAL '(' cexpr ')'
+> 	{
+> 		/* typeof_unqual(expr): produce a node for later type resolution. */
+> 		$$ = new(OTYPEOF_UNQUAL, $3, Z);
+> 	}
+725a952,959
+> |	LNULLPTR
+> 	{
+> 		/* C23 nullptr: null pointer constant of type void* */
+> 		$$ = new(OCONST, Z, Z);
+> 		$$->type = types[TIND];
+> 		$$->vconst = 0;
+> 		$$->cstring = "nullptr";
+> 	}
+737a972,994
+> |	LALIGNOF '(' tlist abdecor ')'
+> 	{
+> 		/* _Alignof(type-name): alignment requirement of type */
+> 		$$ = new(OALIGNOF, Z, Z);
+> 		dodecl(NODECL, CXXX, $3, $4);
+> 		$$->type = lastdcl;
+> 	}
+> |	LGENERIC '(' expr ',' generic_assoc_list ')'
+> 	{
+> 		/*
+> 		 * C11 _Generic: resolve at compile time.
+> 		 * complex() the controlling expr to get its type,
+> 		 * apply lvalue conversion, then walk the association
+> 		 * list to find the matching branch.
+> 		 */
+> 		complex($3);
+> 		$$ = generic_select($3, $5);
+> 		if($$ == Z) {
+> 			diag($3, "_Generic: no matching association for type %T",
+> 			     $3->type);
+> 			$$ = $3;
+> 		}
+> 	}
+949c1206
+< 		if($2.type)
+---
+> 		if($2 & ~BCLASS & ~BGARB)
+957a1215,1236
+> |	tname LCOMPLEXD
+> 	{
+> 		/* e.g. double _Complex after "double" reduced to tname */
+> 		$$.t = types[TCDOUBLE];
+> 		$$.c = CXXX;
+> 	}
+> |	tname LCOMPLEXF
+> 	{
+> 		$$.t = types[TCFLOAT];
+> 		$$.c = CXXX;
+> 	}
+> |	tname gctnlist LCOMPLEXD
+> 	{
+> 		/* e.g. long double _Complex: tname=long, gctnlist=double, LCOMPLEXD */
+> 		$$.t = types[TCDOUBLE];
+> 		$$.c = simplec($2);
+> 	}
+> |	tname gctnlist LCOMPLEXF
+> 	{
+> 		$$.t = types[TCFLOAT];
+> 		$$.c = simplec($2);
+> 	}
+962c1241
+< 		$$.t = garbt($$.t, typebitor($1, $3));
+---
+> 		$$.t = garbt($$.t, $1|$3);
+973,974c1252,1273
+< 		$$.c = simplec(typebitor($1, $3));
+< 		$$.t = garbt($$.t, typebitor($1, $3));
+---
+> 		$$.c = simplec($1|$3);
+> 		$$.t = garbt($$.t, $1|$3);
+> 	}
+> |	gcnlist tname gctnlist LCOMPLEXD
+> 	{
+> 		$$.t = types[TCDOUBLE];
+> 		$$.c = simplec($1|$3);
+> 	}
+> |	gcnlist tname gctnlist LCOMPLEXF
+> 	{
+> 		$$.t = types[TCFLOAT];
+> 		$$.c = simplec($1|$3);
+> 	}
+> |	gcnlist tname LCOMPLEXD
+> 	{
+> 		$$.t = types[TCDOUBLE];
+> 		$$.c = simplec($1);
+> 	}
+> |	gcnlist tname LCOMPLEXF
+> 	{
+> 		$$.t = types[TCFLOAT];
+> 		$$.c = simplec($1);
+993c1292,1304
+< 	LSTRUCT ltag
+---
+> 	/*
+> 	 * bool/_Bool. In "complex" rather than "tname" because that rule
+> 	 * yields a bit in a type mask, and the mask has no spare bit --
+> 	 * BNORET is already 1<<31 in a 32-bit long. "complex" hands back
+> 	 * a Type* directly, which is what typebool needs to be: unsigned
+> 	 * char's representation under a distinct identity, so com.c can
+> 	 * give conversions to it C99 6.3.1.2's meaning.
+> 	 */
+> 	LBOOL
+> 	{
+> 		$$ = typebool;
+> 	}
+> |	LSTRUCT ltag
+1047c1358
+< 		if($$->link == T)
+---
+> 		if($$->link == T) {
+1048a1360,1361
+> 			$$->garb |= GINCOMPLETE;
+> 		}
+1063c1376
+< 		if($$->link != T)
+---
+> 		if($$->link != T && !($$->garb & GINCOMPLETE))
+1064a1378
+> 		$$->garb &= ~GINCOMPLETE;
+1084a1399,1492
+> |	LCOMPLEX
+> 	{
+> 		/* bare _Complex defaults to _Complex double */
+> 		$$ = types[TCDOUBLE];
+> 	}
+> |	LCOMPLEX LDOUBLE
+> 	{
+> 		$$ = types[TCDOUBLE];
+> 	}
+> |	LCOMPLEX LFLOAT
+> 	{
+> 		$$ = types[TCFLOAT];
+> 	}
+> |	LCOMPLEX LINT
+> 	{
+> 		/* _Complex int -> _Complex double */
+> 		$$ = types[TCDOUBLE];
+> 	}
+> |	LCOMPLEXF
+> 	{
+> 		/* float _Complex, combined by lexer */
+> 		$$ = types[TCFLOAT];
+> 	}
+> |	LCOMPLEXD
+> 	{
+> 		/* double _Complex, long _Complex, long double _Complex, combined by lexer */
+> 		$$ = types[TCDOUBLE];
+> 	}
+> |	LDOUBLE LCOMPLEXD
+> 	{
+> 		/* double _Complex where lasttok combined after parser read LDOUBLE */
+> 		$$ = types[TCDOUBLE];
+> 	}
+> |	LFLOAT LCOMPLEXF
+> 	{
+> 		/* float _Complex where lasttok combined after parser read LFLOAT */
+> 		$$ = types[TCFLOAT];
+> 	}
+> |	LFLOAT LCOMPLEXD
+> 	{
+> 		/* float _Complex falling back to double complex */
+> 		$$ = types[TCDOUBLE];
+> 	}
+> |	LLONG LCOMPLEXD
+> 	{
+> 		/* long _Complex or long double _Complex */
+> 		$$ = types[TCDOUBLE];
+> 	}
+> |	LIMAGINARY
+> 	{
+> 		$$ = types[TCDOUBLE];
+> 	}
+> |	LIMAGINARY LDOUBLE
+> 	{
+> 		$$ = types[TCDOUBLE];
+> 	}
+> |	LIMAGINARY LFLOAT
+> 	{
+> 		$$ = types[TCFLOAT];
+> 	}
+> |	LTYPEOF '(' cexpr ')'
+> 	{
+> 		/* typeof(expr) as type specifier: __typeof__(x) y;
+> 		 * Evaluate the expression for its type, discard the value. */
+> 		complex($3);
+> 		$$ = $3->type != T ? $3->type : types[TINT];
+> 	}
+> |	LTYPEOF_UNQUAL '(' cexpr ')'
+> 	{
+> 		/* typeof_unqual(expr): strip const/volatile from top-level type. */
+> 		complex($3);
+> 		$$ = $3->type != T ? $3->type : types[TINT];
+> 		if($$->garb & (GCONSTNT|GVOLATILE)) {
+> 			$$ = copytyp($$);
+> 			$$->garb &= ~(GCONSTNT|GVOLATILE);
+> 		}
+> 	}
+> |	LTYPEOF '(' tlist abdecor ')'
+> 	{
+> 		/* typeof(type) as type specifier: __typeof__(int (*)(void)) fp;
+> 		 * dodecl resolves tlist+abdecor into lastdcl. */
+> 		dodecl(NODECL, CXXX, $3, $4);
+> 		$$ = lastdcl;
+> 	}
+> |	LTYPEOF_UNQUAL '(' tlist abdecor ')'
+> 	{
+> 		/* typeof_unqual(type): strip const/volatile. */
+> 		dodecl(NODECL, CXXX, $3, $4);
+> 		$$ = lastdcl;
+> 		if($$->garb & (GCONSTNT|GVOLATILE)) {
+> 			$$ = copytyp($$);
+> 			$$->garb &= ~(GCONSTNT|GVOLATILE);
+> 		}
+> 	}
+1095c1503
+< 		$$ = (Spec){0, 0};
+---
+> 		$$ = 0;
+1131,1139c1539,1547
+< 	LCHAR { $$ = (Spec){BCHAR, 0}; }
+< |	LSHORT { $$ = (Spec){BSHORT, 0}; }
+< |	LINT { $$ = (Spec){BINT, 0}; }
+< |	LLONG { $$ = (Spec){BLONG, 0}; }
+< |	LSIGNED { $$ = (Spec){BSIGNED, 0}; }
+< |	LUNSIGNED { $$ = (Spec){BUNSIGNED, 0}; }
+< |	LFLOAT { $$ = (Spec){BFLOAT, 0}; }
+< |	LDOUBLE { $$ = (Spec){BDOUBLE, 0}; }
+< |	LVOID { $$ = (Spec){BVOID, 0}; }
+---
+> 	LCHAR { $$ = BCHAR; }
+> |	LSHORT { $$ = BSHORT; }
+> |	LINT { $$ = BINT; }
+> |	LLONG { $$ = BLONG; }
+> |	LSIGNED { $$ = BSIGNED; }
+> |	LUNSIGNED { $$ = BUNSIGNED; }
+> |	LFLOAT { $$ = BFLOAT; }
+> |	LDOUBLE { $$ = BDOUBLE; }
+> |	LVOID { $$ = BVOID; }
+1142,1148c1550,1556
+< 	LAUTO { $$ = (Spec){0, BAUTO}; }
+< |	LSTATIC { $$ = (Spec){0, BSTATIC}; }
+< |	LEXTERN { $$ = (Spec){0, BEXTERN}; }
+< |	LTYPEDEF { $$ = (Spec){0, BTYPEDEF}; }
+< |	LTYPESTR { $$ = (Spec){0, BTYPESTR}; }
+< |	LREGISTER { $$ = (Spec){0, BREGISTER}; }
+< |	LINLINE { $$ = (Spec){0, 0}; }
+---
+> 	LAUTO { $$ = BAUTO; }
+> |	LSTATIC { $$ = BSTATIC; }
+> |	LEXTERN { $$ = BEXTERN; }
+> |	LTYPEDEF { $$ = BTYPEDEF; }
+> |	LTYPESTR { $$ = BTYPESTR; }
+> |	LREGISTER { $$ = BREGISTER; }
+> |	LINLINE { $$ = 0; }
+1151,1154c1559,1585
+< 	LCONSTNT { $$ = (Spec){0, BCONSTNT}; }
+< |	LVOLATILE { $$ = (Spec){0, BVOLATILE}; }
+< |	LRESTRICT { $$ = (Spec){0, 0}; }
+< |	LNORET { $$ = (Spec){0, BNORET}; }
+---
+> 	LCONSTNT { $$ = BCONSTNT; }
+> |	LVOLATILE { $$ = BVOLATILE; }
+> |	LRESTRICT { $$ = 0; }
+> |	LNORET { $$ = BNORET; }
+> |	LALIGNAS '(' cexpr ')'
+> 	{
+> 		/* _Alignas(constant-expression) */
+> 		complex($3);
+> 		if($3->op != OCONST)
+> 			diag($3, "_Alignas: not a constant expression");
+> 		else {
+> 			long a = $3->vconst;
+> 			if(a <= 0 || (a & (a-1)) != 0)
+> 				diag($3, "_Alignas: argument must be a positive power of 2");
+> 			else
+> 				alignasval = a;
+> 		}
+> 		$$ = 0;
+> 	}
+> |	LALIGNAS '(' tlist abdecor ')'
+> 	{
+> 		/* _Alignas(type-name): same alignment as the given type */
+> 		dodecl(NODECL, CXXX, $3, $4);
+> 		/* align(1, T, Ael1) is the Alignof formula from com.c OALIGNOF */
+> 		alignasval = align(1, lastdcl, Ael1);
+> 		$$ = 0;
+> 	}
+1185a1617,1664
+> /*
+>  * C11 §6.5.1.1 _Generic selection expression.
+>  *
+>  * _Generic(ctrl, type1: val1, ..., default: valn)
+>  *
+>  * The controlling expression is evaluated for its type only (like sizeof).
+>  * The matching association's value is the result; others are discarded.
+>  * We build the association list as OLIST of OCAST nodes:
+>  *   OCAST->type  = association type (T = null for default:)
+>  *   OCAST->left  = value expression
+>  *
+>  * The grammar action calls generic_select() to walk the list and
+>  * return the selected value node.  Non-selected nodes never reach tcom().
+>  */
+> generic_assoc_list:
+> 	generic_assoc
+> |	generic_assoc_list ',' generic_assoc
+> 	{
+> 		$$ = new(OLIST, $1, $3);
+> 	}
+> 
+> generic_assoc:
+> 	tlist abdecor ':' expr
+> 	{
+> 		/*
+> 		 * type-name : expression association.
+> 		 * Pack as OCAST: type in ->type, value in ->left.
+> 		 */
+> 		Node *assoc;
+> 		dodecl(NODECL, CXXX, $1, $2);
+> 		assoc = new(OCAST, $4, Z);
+> 		assoc->type = lastdcl;
+> 		$$ = assoc;
+> 	}
+> |	LDEFAULT ':' expr
+> 	{
+> 		/*
+> 		 * default : expression association.
+> 		 * type T (null) signals "default".
+> 		 */
+> 		Node *assoc;
+> 		assoc = new(OCAST, $3, Z);
+> 		assoc->type = T;
+> 		$$ = assoc;
+> 	}
+> 
+> 
+> 
+1186a1666,1807
+> 
+> /*
+>  * generic_select: walk the _Generic association list and return the
+>  * value expression whose type matches the controlling expression's type.
+>  *
+>  * Association list is an OLIST tree of OCAST nodes:
+>  *   assoc->type  = type-name (T = default)
+>  *   assoc->left  = value expression
+>  *
+>  * Type matching follows C11 §6.5.1.1p2:
+>  *   - Qualified and unqualified versions of a type are compatible
+>  *     (garb qualifiers are stripped before comparison).
+>  *   - Array types decay to pointer types (lvalue conversion).
+>  *   - Function types decay to pointer-to-function.
+>  *   - At most one non-default association may match (we pick first).
+>  */
+> static Type*
+> generic_ctrl_type(Type *t)
+> {
+> 	if(t == T)
+> 		return T;
+> 	/* array decay */
+> 	if(t->etype == TARRAY)
+> 		return typ(TIND, t->link);
+> 	/* function decay */
+> 	if(t->etype == TFUNC)
+> 		return typ(TIND, t);
+> 	/* strip qualifiers for matching */
+> 	if(t->garb & (GCONSTNT|GVOLATILE)) {
+> 		Type *u = copytyp(t);
+> 		u->garb &= ~(GCONSTNT|GVOLATILE);
+> 		return u;
+> 	}
+> 	return t;
+> }
+> 
+> static Node*
+> generic_select(Node *ctrl, Node *list)
+> {
+> 	Node *assoc, *deflt, *p;
+> 	Type *ct;
+> 
+> 	if(ctrl == Z || ctrl->type == T)
+> 		return Z;
+> 
+> 	ct = generic_ctrl_type(ctrl->type);
+> 	deflt = Z;
+> 
+> 	/* Walk OLIST tree (left-folded by the grammar) */
+> 	p = list;
+> 	for(;;) {
+> 		if(p == Z)
+> 			break;
+> 		if(p->op == OLIST) {
+> 			assoc = p->right;
+> 			p = p->left;
+> 		} else {
+> 			assoc = p;
+> 			p = Z;
+> 		}
+> 		if(assoc == Z || assoc->op != OCAST)
+> 			continue;
+> 		if(assoc->type == T) {
+> 			/* default association */
+> 			deflt = assoc->left;
+> 			continue;
+> 		}
+> 		if(sametype(ct, assoc->type))
+> 			return assoc->left;
+> 		/* Also match with qualifiers stripped from assoc type */
+> 		if(assoc->type->garb & (GCONSTNT|GVOLATILE)) {
+> 			Type *u = copytyp(assoc->type);
+> 			u->garb &= ~(GCONSTNT|GVOLATILE);
+> 			if(sametype(ct, u))
+> 				return assoc->left;
+> 		}
+> 	}
+> 	return deflt;
+> }
+> 
+> /*
+>  * dcl_ind_depth — count OIND (pointer declarator) levels in a declarator tree.
+>  *
+>  * Used by auto_deduct_type() to compensate for the TIND wrapping that
+>  * dodecl() will apply: if the declarator is "*p", dodecl wraps the base
+>  * type in one TIND, so we must strip one TIND from the initializer type.
+>  */
+> static int
+> dcl_ind_depth(Node *n)
+> {
+> 	int d = 0;
+> 	while(n != Z && n->op == OIND) {
+> 		d++;
+> 		n = n->left;
+> 	}
+> 	return d;
+> }
+> 
+> /*
+>  * auto_deduct_type — compute the base type to pass to dodecl() for
+>  * C23 auto type deduction (§6.7.10.2).
+>  *
+>  * initn  — initializer expression, already passed through complex()
+>  * xdcor  — the declarator tree (e.g., ONAME, or OIND over ONAME for "*p")
+>  *
+>  * The declarator may have N OIND levels; dodecl() will wrap the base type
+>  * with N TIND layers.  We strip N TIND layers from the initializer type so
+>  * the reconstructed type matches the initializer.
+>  *
+>  * Example: auto *p = ptr;  (ptr : int*)
+>  *   dcl_ind_depth(*p) = 1
+>  *   strip 1 TIND from int* → int
+>  *   dodecl wraps int with * → int*  ✓
+>  *
+>  * Top-level const/volatile qualifiers are stripped per C23 §6.7.10.2.
+>  */
+> static Type*
+> auto_deduct_type(Node *initn, Node *xdcor)
+> {
+> 	Type *t;
+> 	int depth, i;
+> 
+> 	t = (initn->type != T) ? initn->type : types[TINT];
+> 	/* array decay: T[] → T* (in case complex() left an array type) */
+> 	if(t->etype == TARRAY)
+> 		t = typ(TIND, t->link);
+> 	/* strip top-level const/volatile per C23 §6.7.10.2 */
+> 	if(t->garb & (GCONSTNT|GVOLATILE)) {
+> 		t = copytyp(t);
+> 		t->garb &= ~(GCONSTNT|GVOLATILE);
+> 	}
+> 	/* strip TIND layers to match the declarator's pointer depth */
+> 	depth = dcl_ind_depth(xdcor);
+> 	for(i = 0; i < depth; i++) {
+> 		if(t == T || t->etype != TIND) {
+> 			diag(Z, "auto: pointer declarator depth exceeds initializer type");
+> 			return types[TINT];
+> 		}
+> 		t = t->link;
+> 	}
+> 	return t;
+> }
+Only in /usr/glenda/APExp/sys/src/cmd/cc: cmplx.6
+Only in /usr/glenda/APExp/sys/src/cmd/cc: cmplx.c
+Only in /usr/glenda/APExp/sys/src/cmd/cc: com.6
+diff -r /sys/src/cmd/cc/com.c /usr/glenda/APExp/sys/src/cmd/cc/com.c
+56a57,90
+> /*
+>  * C99 6.3.1.2: when any scalar value is converted to _Bool, the result
+>  * is 0 if the value compares equal to 0, and 1 otherwise. It is a
+>  * comparison, not a truncation.
+>  *
+>  * kencc has no TBOOL etype -- bool is unsigned char (lex.c, and see
+>  * typebool in cc.h) -- so without this, converting to bool keeps the
+>  * low byte. Every 8-byte-aligned pointer then converts to something
+>  * whose bit 0 is 0, and (bool)256 is 0 as well. Perl's
+>  *
+>  *	#define OpMAYBESIB_set(o, sib, parent) \
+>  *	    ((o)->op_moresib = cBOOL(sib), ...)
+>  *
+>  * with cBOOL(x) being ((bool)(x)), is the case that found this: every
+>  * op in a compiled program got op_moresib = 0 beside a perfectly good
+>  * op_sibparent, so Perl_op_linklist saw no siblings, every statement
+>  * list collapsed to its first element, and a program compiled and then
+>  * executed almost nothing -- silently, exit status 0.
+>  *
+>  * n is already type-checked; !! needs nothing but int, which is what
+>  * tcomo's ONOT case gives it.
+>  */
+> static Node*
+> boolnorm(Node *n)
+> {
+> 	Node *q;
+> 
+> 	q = new1(ONOT, n, Z);
+> 	q->type = types[TINT];
+> 	q = new1(ONOT, q, Z);
+> 	q->type = types[TINT];
+> 	return q;
+> }
+> 
+69c103
+< 	int o;
+---
+> 	int o, uns;
+83a118,123
+> 	case OBIT:
+> 		if(tcom(l))
+> 			goto bad;
+> 		n->addable = l->addable;
+> 		break;
+> 
+103a144,157
+> 		if(iscmplx(n->type->etype)) {
+> 			/* cast to complex type: promote operand */
+> 			Node *c = cplxcast(l, n->type);
+> 			*n = *c;
+> 			break;
+> 		}
+> 		if(l->type != T && iscmplx(l->type->etype)) {
+> 			/* cast from complex to real: extract real part */
+> 			Node *re = cplxre(l);
+> 			Node *cast = new1(OCAST, re, Z);
+> 			cast->type = n->type;
+> 			*n = *cast;
+> 			break;
+> 		}
+105a160,161
+> 		if(n->type->isbool && (l->type == T || !l->type->isbool))
+> 			n->left = boolnorm(l);
+115a172,182
+> 		if(iscmplx(n->type->etype)) {
+> 			/* returning complex: promote real to complex if needed */
+> 			if(!iscmplx(l->type->etype)) {
+> 				l = cplxcast(l, n->type);
+> 				n->left = l;
+> 			} else if(!sametype(n->type, l->type)) {
+> 				l = cplxcast(l, n->type);
+> 				n->left = l;
+> 			}
+> 			break;
+> 		}
+119a187,191
+> 		/* returning is a conversion too; see the OAS case */
+> 		if(n->type->isbool && !l->type->isbool) {
+> 			l = boolnorm(l);
+> 			n->left = l;
+> 		}
+127c199
+< 	case OASI:	/* same as as, but no test for const */
+---
+> 	case OASI:	/* same as as, but no test for const or lvalue (init1 guarantees CAUTO target) */
+134c206
+< 		if(tlvalue(l) || tcompat(n, l->type, r->type, tasign))
+---
+> 		if(tcompat(n, l->type, r->type, tasign))
+135a208,212
+> 		/* initialising converts; see the OAS case below */
+> 		if(l->type->isbool && !r->type->isbool) {
+> 			r = boolnorm(r);
+> 			n->right = r;
+> 		}
+147a225,229
+> 		/* ONAME/OIND/ODOT after successful tcom are always lvalues;
+> 		 * tcom's ONAME/OIND case sets addable=1, and arrays/funcs are
+> 		 * transformed to OADDR by addaddr (so l->op wouldn't be ONAME).
+> 		 * Workaround for kencc bug: addable can be 0 here for ONAME locals. */
+> 		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
+151a234,240
+> 		if(iscmplx(l->type->etype) && !iscmplx(r->type->etype)) {
+> 			/* assigning real value to complex variable: promote rhs */
+> 			r = cplxcast(r, l->type);
+> 			n->right = r;
+> 			n->type = l->type;
+> 			break;
+> 		}
+155a245,254
+> 		/*
+> 		 * Assigning to a bool converts, so the same comparison
+> 		 * applies. It has to happen before the sametype test
+> 		 * below, which sees only etypes and so would let an
+> 		 * unsigned char through with no cast at all.
+> 		 */
+> 		if(l->type->isbool && !r->type->isbool) {
+> 			r = boolnorm(r);
+> 			n->right = r;
+> 		}
+168a268
+> 		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
+172a273,277
+> 		if(iscmplx(l->type->etype)) {
+> 			n->type = l->type;
+> 			cplxarith(n);
+> 			break;
+> 		}
+198a304
+> 		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
+202a309,316
+> 		if(iscmplx(l->type->etype)) {
+> 			n->type = l->type;
+> 			if(n->op == OASMUL || n->op == OASDIV)
+> 				cplxarith(n);
+> 			else
+> 				diag(n, "complex ldiv/lmul not supported");
+> 			break;
+> 		}
+210a325,345
+> 		/*
+> 		 * C99 6.5.16.2p3: "E1 op= E2" is equivalent to
+> 		 * "E1 = E1 op (E2)", so the usual arithmetic conversions
+> 		 * apply to the operation and only the result is converted
+> 		 * back to E1's type. The operation is therefore performed
+> 		 * in arith()'s promoted type, and that is what decides
+> 		 * whether it is signed.
+> 		 *
+> 		 * Read it here, before the branches below overwrite
+> 		 * n->type with t. They used to leave the test reading
+> 		 * E1's type instead, so a signed lvalue with an unsigned
+> 		 * operand divided signed:
+> 		 *
+> 		 *   vlong rv1 = -1, rv2 = 2;
+> 		 *   rv1 /= (uvlong)rv2;   gave 0, not 0x7fffffffffffffff
+> 		 *
+> 		 * mixedasop only spots an integer lvalue with a floating
+> 		 * operand, so a signed/unsigned pair never reached it.
+> 		 * See sys/lib/tests/compound-assign-test.c.
+> 		 */
+> 		uns = typeu[n->type->etype];
+222c357
+< 		if(typeu[n->type->etype]) {
+---
+> 		if(uns) {
+235a371
+> 		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
+258a395
+> 		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
+268a406,407
+> 		/* as for OASDIV above */
+> 		uns = typeu[n->type->etype];
+278c417
+< 		if(typeu[n->type->etype]) {
+---
+> 		if(uns) {
+289a429
+> 		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
+311a452,457
+> 		if(iscmplx(l->type->etype) || iscmplx(r->type->etype)) {
+> 			n->type = mkcplxtype(iscmplx(l->type->etype) ? l->type->etype : r->type->etype);
+> 			cplxarith(n);
+> 			n->type = types[TINT];
+> 			break;
+> 		}
+370a517,521
+> 		if(iscmplx(l->type->etype) || iscmplx(r->type->etype)) {
+> 			n->type = mkcplxtype(iscmplx(l->type->etype) ? l->type->etype : r->type->etype);
+> 			cplxarith(n);
+> 			break;
+> 		}
+381a533,537
+> 		if(iscmplx(l->type->etype) || iscmplx(r->type->etype)) {
+> 			n->type = mkcplxtype(iscmplx(l->type->etype) ? l->type->etype : r->type->etype);
+> 			cplxarith(n);
+> 			break;
+> 		}
+395a552,556
+> 		if(iscmplx(l->type->etype) || iscmplx(r->type->etype)) {
+> 			n->type = mkcplxtype(iscmplx(l->type->etype) ? l->type->etype : r->type->etype);
+> 			cplxarith(n);
+> 			break;
+> 		}
+457a619,629
+> 		/*
+> 		 * Unary + is the value of its operand (C99 6.5.3.3p2).
+> 		 * Rewriting it as 0 + x below is a way of applying the
+> 		 * integer promotions; floating point has none to apply,
+> 		 * and the rewrite is wrong there -- 0.0 + -0.0 is +0.0,
+> 		 * so +(-0.0) lost its sign.
+> 		 */
+> 		if(typefd[l->type->etype]) {
+> 			*n = *l;
+> 			break;
+> 		}
+479c651,655
+< 
+---
+> 		if(iscmplx(l->type->etype)) {
+> 			n->type = l->type;
+> 			cplxarith(n);
+> 			break;
+> 		}
+540a717
+> 	case OLIST:		/* compound literal initialiser list */
+541a719,746
+> 		/*
+> 		 * The right operand carries the comma's type, so it has to be
+> 		 * typed with the flags this node was typed with -- not with
+> 		 * tcom(), which is tcomo(..., ADDROF) and so decays an array
+> 		 * to a pointer at the bottom of this function.
+> 		 *
+> 		 * sizeof is the case that cares. It types its operand with
+> 		 * tcomo(l, 0) precisely to keep an array an array, and an
+> 		 * array compound literal reaches it as OCOMMA(init, ONAME)
+> 		 * from compoundlit(). Decaying the ONAME made every such
+> 		 * sizeof the size of a pointer:
+> 		 *
+> 		 *	sizeof((int[]){1,2,3,4,5,6,7})		8, not 28
+> 		 *	sizeof((char const *[]){"a",...,"e"})	8, not 40
+> 		 *
+> 		 * which silently breaks the standard way of counting variadic
+> 		 * arguments,
+> 		 *
+> 		 *	#define ARRAY_CARDINALITY(a) (sizeof (a) / sizeof (*(a)))
+> 		 *	ARRAY_CARDINALITY (((char const *[]) {__VA_ARGS__}))
+> 		 *
+> 		 * used by gnulib and by bison, where it made every muscle key
+> 		 * come out as its first fragment alone. Note it reads as 1
+> 		 * rather than 0, since sizeof the element is a pointer too.
+> 		 *
+> 		 * The left operand is evaluated only for its side effects, so
+> 		 * tcom() stays right for it.
+> 		 */
+543c748
+< 		if(o | tcom(r))
+---
+> 		if(o | tcomo(r, f))
+545a751,769
+> 		/*
+> 		 * Propagate lvalue-ness from the right child to the OCOMMA node
+> 		 * so that &(type){...} compound literals are addressable (C99 §6.5.2.5p4).
+> 		 * Guard: only for scalar/pointer types.  Complex and struct/union OCOMMA
+> 		 * nodes (built by cmplx.c) must NOT be marked addable — they are handled
+> 		 * by sugen(), not cgen(), and marking them addable causes "unknown type in
+> 		 * regalloc" errors when cgen tries to load them into a register.
+> 		 */
+> 		if(r->addable && n->type != T
+> 		&& !iscmplx(n->type->etype) && !typesu[n->type->etype])
+> 			n->addable = 1;
+> 		break;
+> 
+> 	case OINIT:		/* compound literal initialiser */
+> 		if(l != Z)
+> 			if(tcom(l))
+> 				goto bad;
+> 		if(n->type == T)
+> 			n->type = l != Z && l->type != T ? l->type : types[TINT];
+585a810,827
+> 		/*
+> 		 * VLA: sizeof returns the runtime byte count stored in the
+> 		 * hidden _vlaN auto variable rather than the static width
+> 		 * (which is 0 for VLAs).  Rewrite the node in-place to an
+> 		 * ONAME load of vlasizevar; type is long (same as the hidden var).
+> 		 */
+> 		if(n->type->vla && n->type->vlasizevar != Z) {
+> 			Node *sv = n->type->vlasizevar;
+> 			n->op    = sv->op;
+> 			n->sym   = sv->sym;
+> 			n->type  = sv->type;
+> 			n->etype = sv->etype;
+> 			n->class = sv->class;
+> 			n->xoffset = sv->xoffset;
+> 			n->left  = Z;
+> 			n->right = Z;
+> 			break;
+> 		}
+597,598c839,908
+< 		n->vconst = convvtox(n->type->width, TINT);
+< 		n->type = types[TINT];
+---
+> 		/* Plan9: long is always 32-bit, even on amd64.  sizeof must return
+> 		 * TULONG (unsigned long, 32-bit) so it matches the ABI width of
+> 		 * every long/int parameter without corrupting the call stack.
+> 		 * Assignments to size_t (uvlong, 64-bit) zero-extend automatically
+> 		 * at the call site when the prototype is visible. */
+> 		n->vconst = convvtox(n->type->width, TULONG);
+> 		n->type = types[TULONG];
+> 		break;
+> 
+> 	case OTYPEOF:
+> 	case OTYPEOF_UNQUAL:
+> 		/*
+> 		 * typeof(expr): the grammar action already evaluated the
+> 		 * expression and set n->type from it (complex production),
+> 		 * OR the left child holds the expression whose type we want.
+> 		 *
+> 		 * Rewrite to a zero OCONST carrying the derived type so that
+> 		 * sizeof(typeof(x)) etc. work via the OSIZE case above.
+> 		 * The type itself is what callers care about; the value is unused.
+> 		 */
+> 		if(l != Z) {
+> 			if(tcomo(l, 0))
+> 				goto bad;
+> 			n->type = l->type;
+> 		}
+> 		if(n->type == T || n->type == types[TVOID])
+> 			goto bad;
+> 
+> 		if(n->op == OTYPEOF_UNQUAL) {
+> 			/* Strip top-level const/volatile qualifiers */
+> 			if(n->type->garb & (GCONSTNT|GVOLATILE)) {
+> 				n->type = copytyp(n->type);
+> 				n->type->garb &= ~(GCONSTNT|GVOLATILE);
+> 			}
+> 		}
+> 
+> 		/* Collapse to a typed zero constant — no code generated */
+> 		n->op = OCONST;
+> 		n->left = Z;
+> 		n->right = Z;
+> 		n->vconst = 0;
+> 		break;
+> 
+> 	case OALIGNOF:
+> 		/*
+> 		 * _Alignof(type) / _Alignof(expr): returns the alignment
+> 		 * requirement of the type as a compile-time integer constant.
+> 		 *
+> 		 * Formula: align(1, T, Ael1) rounds 1 up to the next multiple
+> 		 * of the type's natural alignment, giving the alignment directly.
+> 		 * Examples: char->1, short->2, int->4, double->8, struct->max_member.
+> 		 */
+> 		if(l != Z) {
+> 			/* _Alignof(expr) form: evaluate child for its type only */
+> 			if(l->op != OSTRING && l->op != OLSTRING)
+> 				if(tcomo(l, 0))
+> 					goto bad;
+> 			n->type = l->type;
+> 		}
+> 		if(n->type == T)
+> 			goto bad;
+> 		if(n->type->width < 0) {
+> 			diag(n, "_Alignof undefined type");
+> 			goto bad;
+> 		}
+> 		n->op = OCONST;
+> 		n->left = Z;
+> 		n->right = Z;
+> 		n->vconst = align(1, n->type, Ael1);
+> 		n->type = types[TULONG];
+694a1005,1026
+> 		/*
+> 		 * &(a, b) => (a, &b).  compoundlit() lowers a C99 compound
+> 		 * literal to OCOMMA(init, ONAME); for struct/union (and
+> 		 * complex) types that OCOMMA cannot be marked addable,
+> 		 * because those are generated by sugen(), not cgen(), so
+> 		 * &(struct S){...} would fail the l-value test below.
+> 		 * Hoisting the comma out leaves OADDR applied to the hidden
+> 		 * temporary's ONAME, which is addressable in every case.
+> 		 */
+> 		if(l->op == OCOMMA && l->right != Z && l->right->addable
+> 		&& l->right->type != T && l->right->type->nbits == 0) {
+> 			r = new1(OADDR, l->right, Z);
+> 			r->lineno = n->lineno;
+> 			r->type = typ(TIND, l->right->type);
+> 			r->type->width = types[TIND]->width;
+> 			n->op = OCOMMA;
+> 			n->left = l->left;
+> 			n->right = r;
+> 			n->type = r->type;
+> 			break;
+> 		}
+> 		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
+726c1058
+< 	if(t->width < 0) {
+---
+> 	if(t->width < 0 && !(f & ADDROP)) {
+744a1077
+> 	if(n->op != ONAME && n->op != OIND && n->op != ODOT && n->op != OBIT)
+803a1137,1148
+> 		/*
+> 		 * Passing an argument converts, so the same comparison
+> 		 * applies -- and it has to happen before the promotion
+> 		 * below turns a bool parameter into unsigned int, which
+> 		 * would otherwise pass the value through untouched.
+> 		 */
+> 		if(t->isbool && !n->type->isbool) {
+> 			n1 = new1(OXXX, Z, Z);
+> 			*n1 = *n;
+> 			n1 = boolnorm(n1);
+> 			*n = *n1;
+> 		}
+1208c1553,1565
+< 		if(vconst(l) == 0 && !side(r)) {
+---
+> 		/*
+> 		 * 0/x is 0 only for integers. In floating point 0.0/0.0 is
+> 		 * NaN and 0.0/-1.0 is -0.0, and folding it away also
+> 		 * replaced the node with the integer constant, so the
+> 		 * result was a positive integer zero. The t == 0 case below
+> 		 * already had this guard; this one did not.
+> 		 *
+> 		 * asin(2.0) is what found it: musl reports a domain error
+> 		 * with "return 0/(x-x);", which folded to 0 and returned
+> 		 * 0.0 instead of NaN.
+> 		 */
+> 		if(vconst(l) == 0 && !side(r)
+> 		&& !(n->type != T && typefd[n->type->etype])) {
+1214a1572,1575
+> 			/* IEEE 754: float/double division by zero is well-defined
+> 			 * (yields +-Inf or NaN); suppress the diagnostic for fp types. */
+> 			if(n->type != T && typefd[n->type->etype])
+> 				goto common;
+Only in /usr/glenda/APExp/sys/src/cmd/cc: com64.6
+Only in /usr/glenda/APExp/sys/src/cmd/cc: compat.6
+Only in /usr/glenda/APExp/sys/src/cmd/cc: dcl.6
+diff -r /sys/src/cmd/cc/dcl.c /usr/glenda/APExp/sys/src/cmd/cc/dcl.c
+2a3,242
+> static Node*	mkvlasym(Node*);
+> /* defined beside contig(), ~2200 lines down, and used by clitzero() here */
+> static Node*	initz(Node*, Type*, long, Node*);
+> 
+> /*
+>  * compoundlit(t, initnode) -- lower a C99 compound literal to a hidden auto.
+>  *
+>  * Called from the cc.y xuexpr production after both the type and the
+>  * brace-enclosed initialiser list have been fully parsed.
+>  *
+>  *   t        resolved Type* (from dodecl(NODECL,...)  lastdcl, done
+>  *            by the grammar action before calling us)
+>  *   initnode the ilist tree built by the existing ilist production --
+>  *            same format as a normal variable initialiser
+>  *
+>  * We mirror exactly what the grammar does for  T name = { ... }:
+>  *
+>  *   push1(s)          save on dclstack so revertdcl() cleans up at
+>  *                     block exit  (C99 §6.5.2.5 p5: lifetime = block)
+>  *   adecl(CAUTO,t,s)  assign a frame slot (sets s->offset, stkoff)
+>  *   doinit(s,t,0,n)   generate the assignment tree
+>  *
+>  * Return value:
+>  *   init != Z:  OCOMMA(init-tree, ONAME)
+>  *               side-effects run first; ONAME is the lvalue on which
+>  *               postfix operators ([], ., ->, &, ...) compose normally.
+>  *   init == Z:  bare ONAME  (trivially-zero or empty literal)
+>  */
+> /*
+>  * clitzero -- zero every byte of a compound literal's hidden auto that the
+>  * initialiser list does not write.  C99 6.7.8p21 (and 6.5.2.5p1, which
+>  * defers to it): a member with no initialiser is initialised as an object
+>  * with static storage duration would be, i.e. to zero.
+>  *
+>  * WHY THIS IS NOT JUST A CALL TO contig().  `contig()' is exactly this
+>  * function for an ordinary declaration -- `adlist' in cc.y does
+>  * `doinit(); contig()' -- and compoundlit() is the ONE caller of doinit()
+>  * that never had the second half.  But contig()'s bulk arm emits an
+>  * **ODWHILE**, a STATEMENT, and everything compoundlit builds has to
+>  * survive cgen() in EXPRESSION context: the literal's value is an operand.
+>  * So the front and back trims are reused verbatim and the loop is spelled
+>  * out as straight-line stores instead.
+>  *
+>  * ORDER IS WHAT MAKES CLOBBERING SAFE, and it is the same reasoning
+>  * contig() relies on.  `initz()' skips a word only when it is ENTIRELY
+>  * covered, so a word holding both an initialised member and a gap is
+>  * zeroed whole -- and that is correct because every store this builds is
+>  * prepended, so all of them run BEFORE the member assignments in `n'.
+>  *
+>  * THE COST IS LINEAR AND IS THE REASON contig() HAS A LOOP: one store per
+>  * uncovered pointer-sized word, so `(char[4096]){0}' emits 512 of them
+>  * where a declaration emits a four-node loop.  Compound literals in this
+>  * tree are small (muon's `struct tstr' is 24 bytes); recorded rather than
+>  * capped, because a cap would have to reject legal C or fall back to a
+>  * statement this expression cannot hold.
+>  */
+> static Node*
+> clitzero(Node *q, Type *t, long v, Node *n)
+> {
+> 	long w;
+> 	Type *zt;
+> 
+> 	w = t->width;
+> 	if(w <= 0)
+> 		return n;
+> 
+> 	/* unaligned front -- contig()'s own arm, character for character */
+> 	while(w > 0 && (v % ewidth[TIND]) != 0) {
+> 		zt = types[TCHAR];
+> 		if(w >= ewidth[TLONG] && (v % ewidth[TLONG]) == 0)
+> 			zt = types[TLONG];
+> 		n = initz(q, zt, v, n);
+> 		v += zt->width;
+> 		w -= zt->width;
+> 	}
+> 
+> 	/* the body, in the width contig() uses for its loop pointer */
+> 	zt = ewidth[TIND] > ewidth[TLONG]? types[TVLONG]: types[TLONG];
+> 	while(w >= zt->width) {
+> 		n = initz(q, zt, v, n);
+> 		v += zt->width;
+> 		w -= zt->width;
+> 	}
+> 
+> 	/* and whatever tail is left over */
+> 	while(w > 0) {
+> 		n = initz(q, types[TCHAR], v, n);
+> 		v++;
+> 		w--;
+> 	}
+> 	return n;
+> }
+> 
+> Node*
+> compoundlit(Type *t, Node *initnode)
+> {
+> 	static long litseq;
+> 	char  name[32];
+> 	Sym  *s;
+> 	Node *var, *init, *seq, *p, *q;
+> 	Decl *d;
+> 	int class;
+> 
+> 	/* Unique hidden name; leading '.' follows Plan 9 convention
+> 	 * (cf. mkvlasym "_vla%ld", fndecls "__func__"). */
+> 	snprint(name, sizeof name, ".clit%ld", litseq++);
+> 	s = slookup(name);
+> 
+> 	/* Save sym state for revertdcl() at enclosing block exit. */
+> 	d = push1(s);
+> 	d->val   = DAUTO;
+> 
+> 	/* C99 §6.5.2.5 p5: compound literal occurs outside function body
+> 	 * has static storage duration. */
+> 	class = CAUTO;
+> 	if(autobn == 0)
+> 		class = CSTATIC;
+> 
+> 	/* Assign a stack or data slot; sets s->class, s->block, s->offset, stkoff. */
+> 	adecl(class, t, s);
+> 
+> 	/* Must come AFTER adecl() — adecl() unconditionally clears s->aused=0
+> 	 * for CAUTO symbols (dcl.c ~line 1495), so setting aused before the
+> 	 * call is silently overwritten.  Set it here to correctly suppress the
+> 	 * "auto declared and not used" warning for hidden compound-literal
+> 	 * temporaries (.clit0, .clit1, …). */
+> 	s->aused = 1;		/* suppress "declared and not used" warning */
+> 
+> 	/* Build the ONAME node callers and postfix operators will use. */
+> 	var          = new(ONAME, Z, Z);
+> 	var->sym     = s;
+> 	var->type    = t;
+> 	var->etype   = t->etype;
+> 	var->xoffset = s->offset;
+> 	var->class   = s->class;
+> 	var->addable = 1;
+> 
+> 	/* Generate assignment tree from the already-parsed ilist. */
+> 	init = doinit(s, t, 0L, initnode);
+> 
+> 	/*
+> 	 * ZERO THE GAPS.  MEASURED: without this, `initzero-test' under pcc
+> 	 * reports 6 failures where gcc reports 0 -- muon faulted in
+> 	 * `memset(sb->buf, 0, sb->len)' with `sb->len' holding 2,731,952,
+> 	 * because `tstr_init' ends
+> 	 *     *sb = (struct tstr){.flags = .., .buf = .., .cap = ..};
+> 	 * and `.len' is omitted.  The hidden auto is a stack slot like any
+> 	 * other, so an omitted member kept whatever the frame last held.
+> 	 *
+> 	 * THE SYMPTOM LOOKED INTERMITTENT, AND THAT IS THE EVIDENCE FOR AN
+> 	 * UNINITIALISED SLOT RATHER THAN A RULE.  In that run `.len' was
+> 	 * garbage and `.s' was zero through a pointer, and the other way
+> 	 * round into a local -- the same two gaps of the same struct, in
+> 	 * the same program, differing only in what the frame last held.
+> 	 * Section 6b, an array literal with three holes, passed outright.
+> 	 * *A blanket "omitted members are never zeroed" would have been
+> 	 * uniform; this is what a dirty slot looks like.*
+> 	 *
+> 	 * AND THE ONE DECLARATION CASE PASSED FOR A REAL REASON, not for
+> 	 * that one: `adlist' in cc.y is `doinit(); contig()', so an
+> 	 * ordinary `T x = {.c = 9};' has always had its gaps cleared.  That
+> 	 * is what makes this the only site -- the asymmetry between the two
+> 	 * productions is the whole bug, and it is why no amount of ordinary
+> 	 * C in this tree ever tripped over it.
+> 	 *
+> 	 * MUST COME BEFORE THE OLIST->OCOMMA FLATTENING BELOW.  `covered1()'
+> 	 * descends OLIST and OASI and nothing else, so once the tree is
+> 	 * OCOMMA it reads as entirely uncovered and every member would be
+> 	 * zeroed on top of its own initialiser.
+> 	 *
+> 	 * CAUTO only: a file-scope literal is CSTATIC, doinit() writes DATA
+> 	 * records for it and BSS is already zero, so stores here would be
+> 	 * both wrong and unreachable.
+> 	 */
+> 	if(class == CAUTO)
+> 		init = clitzero(var, t, s->offset, init);
+> 
+> 	/*
+> 	 * doinit() builds the init tree with newlist(), which left-folds:
+> 	 *   1 member:  OASI_a
+> 	 *   2 members: OLIST(OASI_a, OASI_b)
+> 	 *   3 members: OLIST(OLIST(OASI_a, OASI_b), OASI_c)   -- left-leaning
+> 	 *   4 members: OLIST(OLIST(OLIST(a,b), c), d)
+> 	 *
+> 	 * gen() (statement generator) handles OLIST, but cgen() (expression
+> 	 * generator) does not.  Our OCOMMA(init, var) wrapper puts the whole
+> 	 * init tree into expression context, so we must convert every OLIST
+> 	 * node to OCOMMA before returning.
+> 	 *
+> 	 * The old code walked only the right spine and missed left-child OLIST
+> 	 * nodes present in trees with 3+ members, causing "unknown op in cgen: LIST".
+> 	 *
+> 	 * Fix: iterative in-order traversal (simulated with an explicit stack)
+> 	 * that visits every leaf in left-to-right order and chains them into a
+> 	 * left-leaning OCOMMA sequence.
+> 	 */
+> 	if(init != Z && init->op == OLIST) {
+> 		Node *stk[256];
+> 		int top;
+> 		top = 0;
+> 		seq = Z;
+> 		p = init;
+> 		for(;;) {
+> 			while(p != Z && p->op == OLIST) {
+> 				if(top < 256)
+> 					stk[top++] = p;
+> 				p = p->left;
+> 			}
+> 			q = p;
+> 			if(q != Z) {
+> 				if(seq == Z)
+> 					seq = q;
+> 				else {
+> 					seq = new(OCOMMA, seq, q);
+> 					seq->type = q->type != T ? q->type : t;
+> 				}
+> 			}
+> 			if(top == 0)
+> 				break;
+> 			p = stk[--top]->right;
+> 		}
+> 		init = seq;
+> 	}
+> 
+> 	if(init != Z) {
+> 		seq       = new(OCOMMA, init, var);
+> 		seq->type = t;
+> 		/*
+> 		 * Mark the OCOMMA as an lvalue for scalar/pointer compound literals
+> 		 * so that &(type){...} is addressable (C99 §6.5.2.5p4).
+> 		 * Not set for struct/union/complex types — those go through sugen()
+> 		 * and must not be treated as register-loadable by cgen().
+> 		 */
+> 		if(!iscmplx(t->etype) && !typesu[t->etype])
+> 			seq->addable = 1;
+> 		return seq;
+> 	}
+> 	return var;
+> }
+> 
+27,28c267,268
+< 			v = -1;
+< 			if(n1->op == OCONST)
+---
+> 			if(n1->op == OCONST) {
+> 				/* ordinary constant-size array */
+30,32c270,315
+< 			if(v <= 0) {
+< 				diag(n, "array size must be a positive constant");
+< 				v = 1;
+---
+> 				if(v <= 0) {
+> 					diag(n, "array size must be a positive constant");
+> 					v = 1;
+> 				}
+> 				t->width = v * t->link->width;
+> 			} else {
+> 				/*
+> 				 * C99 variable-length array (item 33) or VLA
+> 				 * parameter (item 14).
+> 				 *
+> 				 * If the dimension is OVLAVAR the source wrote
+> 				 * "a[*]" (unspecified VLA in a prototype); no
+> 				 * runtime size variable is needed.
+> 				 *
+> 				 * Otherwise we create two hidden CAUTO variables:
+> 				 *   _vlaN   stores the element count at runtime
+> 				 *   _vlaN+1 stores the byte count (= count *
+> 				 *           sizeof element) so that sizeof(arr)
+> 				 *           can be lowered to a plain load.
+> 				 *
+> 				 * t->width stays 0 (unknown at compile time).
+> 				 */
+> 				Node *countvar, *sizevar, *mul;
+> 				long ewidth;
+> 
+> 				t->vla = 1;
+> 				vlanest++;
+> 
+> 				if(n1->op == OVLAVAR) {
+> 					/* prototype-only [*]: no storage */
+> 					t->vlasizevar = Z;
+> 				} else {
+> 					countvar = mkvlasym(n1);
+> 					ewidth = t->link->width;
+> 					if(ewidth <= 1) {
+> 						sizevar = countvar;
+> 					} else {
+> 						mul = new(OMUL, countvar,
+> 							new(OCONST, Z, Z));
+> 						mul->right->vconst = ewidth;
+> 						mul->right->type   = types[TLONG];
+> 						mul->right->etype  = TLONG;
+> 						sizevar = mkvlasym(mul);
+> 					}
+> 					t->vlasizevar = sizevar;
+> 				}
+34d316
+< 			t->width = v * t->link->width;
+109a392,442
+> /*
+>  * mkvlasym – create a hidden CAUTO variable of type long to cache
+>  * a VLA dimension or byte-count expression at runtime.
+>  *
+>  * The symbol is named _vla<N> (N from vlaseq).  It is pushed onto
+>  * dclstack so that revertdcl() restores it at scope exit.
+>  *
+>  * If e is already a reference to a _vla* symbol it is returned as-is
+>  * (avoids double-wrapping when element width is 1).
+>  */
+> static Node*
+> mkvlasym(Node *e)
+> {
+> 	char name[32];
+> 	Sym *s;
+> 	Node *n;
+> 	Decl *d;
+> 
+> 	if(e != Z && e->op == ONAME &&
+> 	   e->sym != S && strncmp(e->sym->name, "_vla", 4) == 0)
+> 		return e;
+> 
+> 	snprint(name, sizeof name, "_vla%ld", vlaseq++);
+> 	s = slookup(name);
+> 
+> 	/* save current sym state onto dclstack (mirrors push1) */
+> 	d = push();
+> 	d->sym       = s;
+> 	d->val       = DAUTO;
+> 	d->type      = s->type;
+> 	d->class     = s->class;
+> 	d->offset    = s->offset;
+> 	d->block     = s->block;
+> 	d->varlineno = s->varlineno;
+> 	d->aused     = s->aused;
+> 
+> 	s->class  = CAUTO;
+> 	s->type   = types[TLONG];
+> 	s->block  = autobn;
+> 	s->offset = 0;		/* adecl() will assign the real frame offset */
+> 	s->aused  = 1;		/* suppress "declared and not used" warning */
+> 
+> 	n = new(ONAME, Z, Z);
+> 	n->sym     = s;
+> 	n->type    = types[TLONG];
+> 	n->etype   = TLONG;
+> 	n->class   = CAUTO;
+> 	n->addable = 1;
+> 	return n;
+> }
+> 
+261a595
+> 	case OARRAY:
+283a618,684
+> /*
+>  * EMIT A BIT-FIELD GROUP'S STATIC INITIALISER BYTE BY BYTE, over the
+>  * bytes the GROUP occupies rather than the bytes its CONTAINER does.
+>  *
+>  * WHAT THIS IS FOR.  `init1' accumulates a group's constants into one
+>  * value shifted by each field's `shift', and the old code handed that
+>  * to `gextern' as a single DATA of `bitaggt->width' -- `tfield's
+>  * width, four bytes, at the container's offset.  **A container is not
+>  * the group**: with the head of a container shared (`sualign's
+>  * conforming arm) the three bytes before the group belong to ordinary
+>  * members, and with the tail shared the bytes after it do.  A DATA
+>  * four bytes wide at the container therefore writes over them, and
+>  * `6l' answers `multiple initialization' -- not a false alarm, since
+>  * the same four bytes really were written twice.
+>  *
+>  * GNU make's `struct function_table_entry' is what found it: a union,
+>  * a `const char *', `len', `minimum_args' and `maximum_args' as three
+>  * `unsigned char', then `expand_args:1, alloc_fn:1, adds_command:1'.
+>  * The ordinary members end at byte 19, so the group's container is the
+>  * aligned unit at 16 and its one live byte is 19 -- and the link
+>  * reported exactly `DATA function_table_init<8>+16(SB)/4,$16777216'
+>  * for every one of eighty-odd entries, 0x01000000 being `expand_args'
+>  * at shift 24.
+>  *
+>  * **THE TAIL RULE HAD THE SAME LATENT DEFECT**, which is worth saying
+>  * rather than filing this as the head rule's cost:
+>  * `struct{unsigned a:1; char c;} x = {1, 'z'};' puts `c' at byte 1,
+>  * inside the same container, so a four-byte DATA at 0 would have
+>  * clobbered it.  Nothing in the tree had statically initialised that
+>  * shape, so it never fired.  *A bug that needs two features at once to
+>  * become reachable is still one bug, and this is the fix for both.*
+>  *
+>  * BYTE BY BYTE RATHER THAN ONE NARROWER DATA, and the linker decides
+>  * that: `6l/asm.c's `datblk' switches on `p->from.scale' with
+>  * **`case 1, 2, 4, 8` and a `diag("bad nuxi")` default**, so a group
+>  * spanning three bytes -- 24 bits, or 17 starting at a byte boundary
+>  * -- has no width to ask for.  One-byte records always exist, need no
+>  * per-architecture width table across the eleven linkers, and cost at
+>  * most four DATA lines per statically-initialised group.
+>  *
+>  * Zero bytes are skipped because a DATA-less byte is already zero;
+>  * `init1' relies on that for whole zero initialisers two hundred lines
+>  * above, so it is this file's own invariant rather than an assumption.
+>  *
+>  * `first' and `end' are BIT positions within the struct, and `ct' is
+>  * the group's first field -- its `offset' is the container, which is
+>  * what the accumulated value's shifts are relative to.
+>  */
+> static void
+> gbitagg(Sym *s, Node *a, long o, Type *ct, long first, long end)
+> {
+> 	vlong v;
+> 	long b, b0, b1;
+> 
+> 	if(a == Z || ct == T)
+> 		return;
+> 	v = a->vconst;
+> 	b0 = first/8;
+> 	b1 = (end + 7)/8;
+> 	for(b = b0; b < b1; b++) {
+> 		a->vconst = (v >> ((b - ct->offset)*8)) & 0xffLL;
+> 		if(a->vconst != 0)
+> 			gextern(s, a, o + b, 1);
+> 	}
+> 	a->vconst = v;
+> }
+> 
+287c688
+< 	Node *a, *l, *r, nod;
+---
+> 	Node *a, *l, *r, *pre, nod;
+289c690
+< 	long e, w, so, mw, bitoff;
+---
+> 	long e, w, so, mw, bitfirst, bitend;
+321a723,724
+> 	case TCFLOAT:
+> 	case TCDOUBLE:
+375c778,786
+< 			if(vconst(a) == 0)
+---
+> 			/*
+> 			 * A zero initialiser needs no DATA record: the
+> 			 * object goes in BSS, which is already zero. That
+> 			 * is the fifth place the sign of zero was lost --
+> 			 * -0.0 is not all-zero bits, and vconst() answers 0
+> 			 * for it because it truncates to an int. Emit it.
+> 			 */
+> 			if(vconst(a) == 0
+> 			&& !(typefd[a->type->etype] && fpnegzero(a->fconst)))
+395,397c806,827
+< 			if(!sametype(t, a->type))
+< 				diag(a, "initialization of incompatible pointers: %s\n%T and %T",
+< 					s->name, t, a->type);
+---
+> 			if(!sametype(t, a->type)) {
+> 				/*
+> 				 * Same relaxation as stcompat's: a pointer
+> 				 * differing only in the signedness of what
+> 				 * it points at is -Wpointer-sign, a warning
+> 				 * everywhere else, and it reaches static
+> 				 * initializers too. LibreSSL's
+> 				 * apps/openssl/s_client.c has
+> 				 *
+> 				 *   unsigned int off;
+> 				 *   ...
+> 				 *   .opt.value = &cfg.off,
+> 				 *
+> 				 * against the union's "int *value".
+> 				 */
+> 				if(!ptrsignonly(t, a->type))
+> 					diag(a, "initialization of incompatible pointers: %s\n%T and %T",
+> 						s->name, t, a->type);
+> 				else
+> 					warn(a, "pointer signedness: %s\n%T and %T",
+> 						s->name, t, a->type);
+> 			}
+461c891,897
+< 			if(a->op == OELEM && t->link->etype != TSTRUCT)
+---
+> 			Node *ap = a;
+> 			Node *parent = Z;
+> 			while(ap->left != Z && (ap->op == OELEM || ap->op == OARRAY)){
+> 				parent = ap;
+> 				ap = ap->left;
+> 			}
+> 			if(ap->op == OELEM && t->link->etype != TSTRUCT)
+463c899
+< 			if(a->op == OARRAY) {
+---
+> 			if(ap->op == OARRAY) {
+466,467c902,906
+< 				a = nextinit();
+< 				r = a->left;
+---
+> 				r = ap->right;
+> 				if(parent != Z)
+> 					parent->left = Z;
+> 				else
+> 					nextinit();
+486a926,940
+> 			/*
+> 			 * If the element type cannot use this designator, the
+> 			 * designator belongs to an enclosing aggregate: stop,
+> 			 * and let the caller re-dispatch it. init1 signals that
+> 			 * by consuming nothing.
+> 			 *
+> 			 * Without this, a flat designator list that walks back
+> 			 * out of an array, as in
+> 			 *
+> 			 *   { .file[0].desc = a, .file[1].desc = b }
+> 			 *
+> 			 * kept handing .file[1] to the element type, which does
+> 			 * not have a member called file.
+> 			 */
+> 			pre = peekinit();
+488a943,945
+> 			if(pre != Z && peekinit() == pre)
+> 			if(pre->op == OELEM || pre->op == OARRAY)
+> 				break;
+511c968,969
+< 		bitoff = -1;
+---
+> 		bitfirst = 0;
+> 		bitend = -1;
+515c973,979
+< 			if(a->op == OARRAY && t1->etype != TARRAY)
+---
+> 			Node *ap = a;
+> 			Node *parent = Z;
+> 			while(ap->left != Z && (ap->op == OELEM || ap->op == OARRAY)){
+> 				parent = ap;
+> 				ap = ap->left;
+> 			}
+> 			if(ap->op == OARRAY && t1->etype != TARRAY)
+517,518c981,982
+< 			if(a->op == OELEM) {
+< 				if(t1->sym != a->sym)
+---
+> 			if(ap->op == OELEM) {
+> 				if(t1->sym != ap->sym)
+520c984,987
+< 				nextinit();
+---
+> 				if(parent != Z)
+> 					parent->left = Z;
+> 				else
+> 					nextinit();
+522,529c989,1016
+< 			if(t1->nbits && (bitoff != t1->offset || !bitagg)) {
+< 				if(a->op == OELEM && bitoff != -1)
+< 					diag(a, "named bitfield static initializers not supported %F", a);
+< 				if(bitagg)
+< 					gextern(s, bitagg, o+bitaggt->offset, bitaggt->width);
+< 				bitagg = Z;
+< 				bitaggt = t1;
+< 				bitoff = t1->offset;
+---
+> 			if(t1->nbits) {
+> 				long fb;
+> 
+> 				/*
+> 				 * A NEW GROUP IS A GAP IN THE BITS, not a
+> 				 * change of container offset, which is what
+> 				 * this tested before.  Within a group `cc.y's
+> 				 * `lastbit' makes the fields contiguous; a
+> 				 * group boundary always leaves a gap -- either
+> 				 * an ordinary member between them or an
+> 				 * overflow into the next unit.  **And with the
+> 				 * container's head shared the old test is
+> 				 * wrong rather than merely indirect**: in
+> 				 * `struct{unsigned a:1; char c; unsigned b:1;}'
+> 				 * both groups round DOWN to the container at 0,
+> 				 * so comparing offsets would merge them and
+> 				 * emit `c's byte from the bit-field value.
+> 				 */
+> 				fb = t1->offset*8 + t1->shift;
+> 				if(bitend != fb || !bitagg) {
+> 					if(a->op == OELEM && bitend != -1)
+> 						diag(a, "named bitfield static initializers not supported %F", a);
+> 					gbitagg(s, bitagg, o, bitaggt, bitfirst, bitend);
+> 					bitagg = Z;
+> 					bitaggt = t1;
+> 					bitfirst = fb;
+> 				}
+> 				bitend = fb + t1->nbits;
+536c1023,1055
+< 			if(a->op == OELEM)
+---
+> 			if(a->op == OELEM || a->op == OARRAY) {
+> 				/*
+> 				 * A designator is interpreted relative to
+> 				 * the object of the enclosing brace list
+> 				 * (C99 6.7.8p17). If we were entered
+> 				 * implicitly -- exflag -- we are not that
+> 				 * list, so this designator is not ours even
+> 				 * if we happen to have a member of that
+> 				 * name. Stop, consuming nothing, and let the
+> 				 * level that owns the braces match it.
+> 				 *
+> 				 * Restarting here instead is what made
+> 				 * LibreSSL's ciphers.c fail:
+> 				 *
+> 				 *   .type = OPTION_VALUE,
+> 				 *   .opt.value = &cfg.version,
+> 				 *   .value = TLS1_2_VERSION,
+> 				 *
+> 				 * ".opt.value" enters the union to reach its
+> 				 * "int *value", and ".value" then matched
+> 				 * that same pointer a second time rather
+> 				 * than the "const int value" beside the
+> 				 * union in the struct:
+> 				 *
+> 				 *   ciphers.c:55 initialize pointer to an
+> 				 *     integer: ciphers_options
+> 				 *
+> 				 * The union is incidental. Two members of
+> 				 * the same name at different depths are
+> 				 * enough -- see designated-init-test.c.
+> 				 */
+> 				if(exflag)
+> 					break;
+537a1057
+> 			}
+539c1059,1073
+< 		if(a && a->op == OELEM)
+---
+> 		/*
+> 		 * A designator naming no member of this struct is an error
+> 		 * only at a level that has its own braces: exflag is 0 for
+> 		 * the outermost aggregate and for anything reached through
+> 		 * doinit, which is the brace case.
+> 		 *
+> 		 * When exflag is set we were entered implicitly, without
+> 		 * braces of our own, so a designator we cannot use is one
+> 		 * that belongs to an enclosing aggregate. Return, consuming
+> 		 * nothing, and let that level match it -- the array case
+> 		 * above watches for exactly this. A designator that matches
+> 		 * nothing anywhere still reaches the outermost level, where
+> 		 * exflag is 0 and it is reported.
+> 		 */
+> 		if(a && (a->op == OELEM || a->op == OARRAY) && !exflag)
+541,543c1075,1076
+< 		if(bitoff != -1) {
+< 			if(bitagg)
+< 				gextern(s, bitagg, o+bitaggt->offset, bitaggt->width);
+---
+> 		if(bitend != -1) {
+> 			gbitagg(s, bitagg, o, bitaggt, bitfirst, bitend);
+559a1093,1120
+> /*
+>  * The alignment one member imposes on the struct containing it.
+>  *
+>  * `align(1, t, Ael1)' rounds 1 up to the next multiple of that
+>  * member's alignment, which IS that alignment -- the same identity
+>  * `__alignof__' already uses at com.c:907, rather than a second
+>  * expression of the same fact that could drift from it.
+>  *
+>  * It follows packflg for free: inside `#pragma pack on' every member
+>  * aligns to 1, so the struct's own alignment comes out 1 and its tail
+>  * padding with it, which is what packing means.
+>  */
+> static int
+> memberalign(Type *l)
+> {
+> 	int a;
+> 
+> 	if(l->nbits)
+> 		a = align(1, tfield, Ael1);
+> 	else
+> 		a = align(1, l, Ael1);
+> 	if(l->alignas_req > a)
+> 		a = l->alignas_req;
+> 	if(a < 1)
+> 		a = 1;
+> 	return a;
+> }
+> 
+564c1125,1126
+< 	long o, w;
+---
+> 	long o, w, nw, bw, gbit, fbit;
+> 	int a, ma;
+565a1128,1157
+> 	/*
+> 	 * `ma' EXISTS BECAUSE `o' IS CARRIED ACROSS ITERATIONS.
+> 	 *
+> 	 * In the TSTRUCT loop `o' holds the offset of the CURRENT
+> 	 * BIT-FIELD UNIT: the first field of a group (`l->shift <= 0')
+> 	 * sets it, and every later field of the same group reads it
+> 	 * back. The max-member-alignment loop added for -J first wrote
+> 	 * its result into `o' as well, which destroyed that offset --
+> 	 * so the second and later fields of every bit-field group were
+> 	 * placed at the ALIGNMENT of the previous member rather than at
+> 	 * the unit's offset, landing on top of an earlier member.
+> 	 *
+> 	 * It cost a link failure three commits later, and it was NOT
+> 	 * gated on `conformalign': the line runs on every compile, so
+> 	 * it broke plain builds too. GNU make's `struct command_switch'
+> 	 * is the one that named it -- `int c; enum type; void *; then
+> 	 * env:1, toenv:1, no_makefile:1, specified:1' -- where the
+> 	 * three later bits moved to offset 4, on top of `type', and
+> 	 * `6l' answered `multiple initialization' for every entry whose
+> 	 * two writes to those four bytes were both non-zero.
+> 	 *
+> 	 * *A variable reused for a second purpose in the same loop is a
+> 	 * variable with one purpose too many*, and the compiler cannot
+> 	 * warn: both uses are a `long' holding a small number.
+> 	 *
+> 	 * `gbit' IS CARRIED THE SAME WAY and for the same reason -- it
+> 	 * is where bit 0 of the current group landed, in absolute bits
+> 	 * -- so it is subject to exactly the hazard above.  Nothing but
+> 	 * the conforming bit-field arm may write it.
+> 	 */
+566a1159
+> 	gbit = 0;
+571a1165,1166
+> 		bw = 0;
+> 		a = 1;
+573c1168,1290
+< 			if(l->nbits) {
+---
+> 			if(l->nbits && conformalign) {
+> 				/*
+> 				 * CONFORMING, THE SECOND RULE: a bit-field
+> 				 * group that FOLLOWS an ordinary member starts
+> 				 * at the next available BIT, and its container
+> 				 * is the `tfield'-aligned unit CONTAINING that
+> 				 * bit -- rounded DOWN, not up.
+> 				 *
+> 				 * The FIRST rule, which landed earlier and is
+> 				 * folded into this same arm below, shares a
+> 				 * container's unused TAIL with the member that
+> 				 * comes after. This shares its unused HEAD with
+> 				 * the member that came before, which is the
+> 				 * other half of the same gcc/SysV rule and the
+> 				 * one `-J' left behind: `w = round(w,
+> 				 * tfield->width)' at group start closed the
+> 				 * head unconditionally, so `struct{char c;
+> 				 * unsigned a:1; char d;}' was `d@5 size 8'
+> 				 * where gcc says `d@2 size 4'.
+> 				 *
+> 				 * `gbit' IS THE WHOLE MECHANISM, and it exists
+> 				 * because `l->shift' is not absolute.  `cc.y's
+> 				 * OBIT arm counts `lastbit' from the GROUP's
+> 				 * start, so a field's `shift' is its bit offset
+> 				 * within the group, measured as though the
+> 				 * group began on a container boundary.  `gbit'
+> 				 * records where bit 0 of the group really went,
+> 				 * in absolute bits from the struct's start, and
+> 				 * `fbit = gbit + l->shift' is where this field
+> 				 * really goes.  *The grammar's own numbers are
+> 				 * relative and only this function knows the
+> 				 * base*, which is why the fix cannot be a
+> 				 * smaller change in cc.y.
+> 				 *
+> 				 * AND THE CROSSING TEST HAS TO BE REDONE HERE,
+> 				 * which is the part reading the grammar does
+> 				 * not give you.  `cc.y' already splits a group
+> 				 * whose bits pass `tfield->width*8' -- but it
+> 				 * tests against a container starting at bit 0
+> 				 * of the group, and with the head shared the
+> 				 * first container has fewer bits left than
+> 				 * that.  So a field the grammar thought fitted
+> 				 * may not: `struct{char c[3]; unsigned a:16;}'
+> 				 * is one group of one field to the grammar, and
+> 				 * bits 24..39 cross the 32-bit boundary.  C and
+> 				 * the SysV ABI both say such a field begins at
+> 				 * the next unit boundary, so `o' is bumped and
+> 				 * `gbit' carried with it -- the carry being for
+> 				 * the LATER fields of the same group, since the
+> 				 * ones already placed are already right.
+> 				 *
+> 				 * gcc: that struct is size 8 with the field at
+> 				 * bits 32..47, and `straddle'/`straddle2' in
+> 				 * `sys/lib/tests/sualign-model.py' measure both
+> 				 * shapes against it.
+> 				 *
+> 				 * ---------------------------------------------
+> 				 * AND THE TAIL IS SHARED HERE TOO -- this arm
+> 				 * is both rules, which is why `-9' is the only
+> 				 * way back to either.  `w' advances to the
+> 				 * group's last USED byte rather than past its
+> 				 * container, so the next ordinary member may
+> 				 * sit in what is left of it at its own
+> 				 * alignment.
+> 				 *
+> 				 * `nw > w' RATHER THAN A BARE ASSIGNMENT, and
+> 				 * the honest account is that it CANNOT FIRE
+> 				 * TODAY.  I wrote first that kencc does not
+> 				 * restart the container when an ordinary member
+> 				 * comes BETWEEN two bit fields, so `nw' for the
+> 				 * second could be below `w' and a bare
+> 				 * assignment would move `w' BACKWARDS, putting
+> 				 * a later member on top of an earlier one.
+> 				 * **The GRAMMAR says otherwise**: `cc.y's
+> 				 * `edecor: xdecor' arm does `lastbit = 0;
+> 				 * firstbit = 1;' for every ordinary declarator,
+> 				 * so `b' in `struct{unsigned a:1; char x;
+> 				 * unsigned b:1; char y;}' starts a fresh group
+> 				 * and `nw' only ever grows.
+> 				 *
+> 				 * *It stays because the invariant it protects
+> 				 * -- `w' never retreats -- is not local to this
+> 				 * function*: it holds only as long as that
+> 				 * grammar action does, which is two files away,
+> 				 * and one comparison is a cheaper guard than a
+> 				 * rule nobody re-checks.  Marked as defensive
+> 				 * rather than left to read as load-bearing,
+> 				 * which is the almost-true-claim trap this tree
+> 				 * has already paid for once.
+> 				 */
+> 				if(l->shift <= 0) {
+> 					l->shift = -l->shift;
+> 					gbit = w*8 - l->shift;
+> 				}
+> 				fbit = gbit + l->shift;
+> 				/*
+> 				 * round DOWN by division rather than by a
+> 				 * mask: `round()' next door uses `%' for the
+> 				 * same reason, and nothing here needs
+> 				 * `tfield->width' to be a power of two.
+> 				 */
+> 				o = (fbit/8) / tfield->width * tfield->width;
+> 				if(fbit + l->nbits > (o + tfield->width)*8) {
+> 					o = round((fbit + 7)/8, tfield->width);
+> 					gbit += o*8 - fbit;
+> 					fbit = o*8;
+> 				}
+> 				l->offset = o;
+> 				l->shift = fbit - o*8;
+> 				if(o + tfield->width > bw)
+> 					bw = o + tfield->width;
+> 				nw = (fbit + l->nbits + 7)/8;
+> 				if(nw > w)
+> 					w = nw;
+> 			} else if(l->nbits) {
+> 				/*
+> 				 * THE 9front RULE, kept for `pcc -9' and for
+> 				 * native `6c': a group reserves the whole
+> 				 * `tfield' unit, closed at both ends.  That is
+> 				 * MSVC's allocation, and `6c' must keep it
+> 				 * because `cmd2/vts' and `vtwin' link the
+> 				 * host's own `libc.a'.
+> 				 */
+589a1307,1308
+> 				if(l->alignas_req > 0)
+> 					w = round(w, l->alignas_req);
+592a1312,1314
+> 			ma = memberalign(l);
+> 			if(ma > a)
+> 				a = ma;
+593a1316,1358
+> 		/*
+> 		 * AND THE STRUCT MUST STILL COVER THE LAST BIT-FIELD
+> 		 * CONTAINER, which only the sharing rule can break.
+> 		 *
+> 		 * `sub.c's `makedot' types a bit-field reference as
+> 		 * `tfield' itself, so EVERY read and write of one is a
+> 		 * whole `tfield->width' access at `o' -- and with the
+> 		 * tail now shared, `w' can stop at `o+1'.
+> 		 *
+> 		 * **UNDER `#pragma pack on' THAT IS A THREE-BYTE
+> 		 * OVER-ACCESS PAST THE END OF THE OBJECT**, and a write
+> 		 * at that, since setting a bit field is a
+> 		 * read-modify-write of the container. The old rule could
+> 		 * not produce it: it reserved the whole unit, so the
+> 		 * size always covered it.
+> 		 *
+> 		 * *It costs nothing anywhere else, and the arithmetic
+> 		 * rather than a measurement is what says so*: any struct
+> 		 * holding a bit field has `talign >= tfield->width'
+> 		 * (`memberalign' answers `align(1, tfield, Ael1)' for
+> 		 * one), `o' is a multiple of that width, and `w >= o+1`,
+> 		 * so `Asu2' already rounds to at least `o+width'. The
+> 		 * line can only bite where `packflg' took `talign' to 1
+> 		 * -- which is exactly where it is needed.
+> 		 *
+> 		 * AND WITH THE HEAD SHARED TOO, THAT SAME `makedot'
+> 		 * ACCESS NOW COVERS THE MEMBER BEFORE THE GROUP.
+> 		 * `struct{char c; unsigned a:1; char d;}' puts a's
+> 		 * container at `o' = 0, so setting `a' is a 4-byte
+> 		 * read-modify-write across `c' and `d' as well.  It stays
+> 		 * in bounds (the guard above is what guarantees that) and
+> 		 * it is correct single-threaded, since the RMW writes
+> 		 * back what it read.  **What it is not is C11-clean**:
+> 		 * 3.14 makes `c' and `d' separate memory locations from
+> 		 * `a', so a concurrent write to either can be lost.
+> 		 * *Recorded, not fixed* -- gcc had exactly this until C11
+> 		 * forced it to narrow its accesses, and narrowing here is
+> 		 * a change to `sub.c's `makedot' rather than to a layout
+> 		 * rule.  Nothing in this tree has measured it.
+> 		 */
+> 		if(conformalign && bw > w)
+> 			w = bw;
+> 		t->talign = a;
+602a1368
+> 		a = 1;
+614a1381,1383
+> 			ma = memberalign(l);
+> 			if(ma > a)
+> 				a = ma;
+615a1385
+> 		t->talign = a;
+776c1546
+< 		n->type = typ(TARRAY, garbt(types[TCHAR], (Spec){0, BCONSTNT}));
+---
+> 		n->type = typ(TARRAY, garbt(types[TCHAR], BCONSTNT));
+1306a2077,2082
+> 		/* _Alignas: round the end-of-allocation up so start is aligned.
+> 		 * Variable starts at base-autoffset; base%req==0 → autoffset%req==0. */
+> 		if(alignasval > 0) {
+> 			autoffset = round(autoffset, alignasval);
+> 			alignasval = 0;
+> 		}
+1319a2096
+> 		alignasval = 0;	/* _Alignas on parameters is ignored */
+1390,1392c2167,2182
+< 			diag(Z, "external redeclaration of: %s", s->name);
+< 			Bprint(&diagbuf, "	%s %T %L\n", cnames[c], t, nearln);
+< 			Bprint(&diagbuf, "	%s %T %L\n", cnames[s->class], s->type, s->varlineno);
+---
+> 			/*
+> 			 * Demote function redeclaration type mismatches to warnings.
+> 			 * kencc's sametype() mismatches typedef chains vs direct types,
+> 			 * so proto.h forward decls and .c definitions of the same function
+> 			 * (both static and global) fail the check even when semantically
+> 			 * identical. The definition's type wins via tmerge() below.
+> 			 */
+> 			if(t->etype == TFUNC &&
+> 			   ((s->class == CSTATIC && c == CSTATIC) ||
+> 			    (s->class == CGLOBL  && c == CGLOBL)))
+> 				warn(Z, "redeclaration of: %s", s->name);
+> 			else {
+> 				diag(Z, "external redeclaration of: %s", s->name);
+> 				Bprint(&diagbuf, "	%s %T %L\n", cnames[c], t, nearln);
+> 				Bprint(&diagbuf, "	%s %T %L\n", cnames[s->class], s->type, s->varlineno);
+> 			}
+1398a2189
+> 	alignasval = 0;	/* _Alignas on globals not yet supported; discard */
+1488a2280,2283
+> 	if(alignasval > 0) {
+> 		t->alignas_req = alignasval;
+> 		alignasval = 0;
+> 	}
+Only in /usr/glenda/APExp/sys/src/cmd/cc: dpchk.6
+Only in /usr/glenda/APExp/sys/src/cmd/cc: dwtypes.6
+Only in /usr/glenda/APExp/sys/src/cmd/cc: dwtypes.c
+Only in /usr/glenda/APExp/sys/src/cmd/cc: dwtypes.h
+Only in /usr/glenda/APExp/sys/src/cmd/cc: funct.6
+Only in /usr/glenda/APExp/sys/src/cmd/cc: lex.6
+diff -r /sys/src/cmd/cc/lex.c /usr/glenda/APExp/sys/src/cmd/cc/lex.c
+73c73
+< 	tufield = simplet((Spec){(1L<<tfield->etype) | BUNSIGNED, 0});
+---
+> 	tufield = simplet((1L<<tfield->etype) | BUNSIGNED);
+97a98,143
+> 	case 'J':			/* conforming struct layout; see cc.h */
+> 		conformalign = 1;
+> 		/*
+> 		 * And SAY SO to the source being compiled. A layout flag
+> 		 * that a stale compiler silently ignores -- `pcc' drops an
+> 		 * unnamed flag, and `6c' turns an unknown letter into
+> 		 * debug['J'] -- produces a run indistinguishable from one
+> 		 * where the flag worked and changed nothing. *A null result
+> 		 * with two explanations is not a measurement*, which is the
+> 		 * rule `_ttymark' and `_getcwdmark' already exist for; this
+> 		 * is the same idiom for a COMPILER rather than a library.
+> 		 *
+> 		 * AND IT HAS TO GO IN `defs[]', NOT ONLY THROUGH
+> 		 * dodefine(). `compile()' FORKS AN EXTERNAL cpp and hands
+> 		 * it `-D%s' for each entry of `defs[]' (lex.c:289), so a
+> 		 * macro defined here in `cc's own symbol table is not seen
+> 		 * by the preprocessor that actually runs. The first version
+> 		 * called dodefine() alone, the macro was invisible, and the
+> 		 * test reported `-J NOT in effect' for a flag whose real
+> 		 * state it had not measured -- *an instrument that reports
+> 		 * the ABSENCE of a thing it never had access to*. Both, so
+> 		 * the name is defined whichever preprocessor runs.
+> 		 */
+> 		if((ndef & 15) == 0)
+> 			defs = allocn(defs, ndef*sizeof(defs[0]),
+> 				16*sizeof(defs[0]));
+> 		defs[ndef++] = "__APEXP_CONFORMALIGN__";
+> 		dodefine("__APEXP_CONFORMALIGN__");
+> 		break;
+> 
+> 	case 'C':			/* COMDAT: mark TEXT/GLOBL dupok; see cc.h */
+> 		dupokall = 1;
+> 		/*
+> 		 * Both lists, for the reason spelled out under `-J' above:
+> 		 * `compile()' FORKS an external cpp and hands it `-D%s' per
+> 		 * entry of `defs[]', so `dodefine()' alone defines the name
+> 		 * only in `cc's own table and the preprocessor that actually
+> 		 * runs never sees it.
+> 		 */
+> 		if((ndef & 15) == 0)
+> 			defs = allocn(defs, ndef*sizeof(defs[0]),
+> 				16*sizeof(defs[0]));
+> 		defs[ndef++] = "__APEXP_DUPOK__";
+> 		dodefine("__APEXP_DUPOK__");
+> 		break;
+> 
+444a491,581
+> 
+> /*
+>  * C99 hex floating constants: 0x h.hhh p[+-]ddd
+>  *
+>  * Plan 9's strtod does not parse these. It reads the leading "0", stops
+>  * at the 'x', and returns 0.0 -- so every hex float literal in the tree
+>  * was silently zero, with no diagnostic from anything. The lexer already
+>  * collects the whole literal into symb; it only ever needed a converter
+>  * that understands it.
+>  *
+>  * What that cost: musl's math tables are written entirely this way, so
+>  * exp_data.c, log_data.c, log2_data.c and pow_data.c (597 constants)
+>  * were all-zero, and __rem_pio2.c's pio4 threshold and
+>  * __rem_pio2_large.c's 0x1p24 scaling with them. It is the reason a
+>  * "0x1p-120f" added to a result to raise inexact is harmless while a
+>  * table of coefficients is not.
+>  *
+>  * The mantissa is accumulated in a uvlong and stopped at 60 bits, which
+>  * is more than a double can hold, so every literal short enough to be
+>  * exactly representable converts exactly. Longer ones truncate rather
+>  * than round to nearest -- half an ulp, and no constant in the tree is
+>  * that long.
+>  */
+> static int
+> hexdigit(int c)
+> {
+> 	if(c >= '0' && c <= '9')
+> 		return c - '0';
+> 	if(c >= 'a' && c <= 'f')
+> 		return c - 'a' + 10;
+> 	if(c >= 'A' && c <= 'F')
+> 		return c - 'A' + 10;
+> 	return -1;
+> }
+> 
+> static double
+> hexfloat(char *s)
+> {
+> 	uvlong m;
+> 	int frac, adj, e, esign, d, dropped;
+> 
+> 	s += 2;				/* skip "0x" */
+> 	m = 0;
+> 	frac = 0;
+> 	adj = 0;
+> 	dropped = 0;
+> 	for(; *s; s++) {
+> 		if(*s == '.') {
+> 			frac = 1;
+> 			continue;
+> 		}
+> 		if(*s == 'p' || *s == 'P')
+> 			break;
+> 		d = hexdigit(*s);
+> 		if(d < 0)
+> 			break;
+> 		if(m < ((uvlong)1 << 60)) {
+> 			m = m*16 + d;
+> 			if(frac)
+> 				adj -= 4;	/* digit is below the point */
+> 		} else {
+> 			/*
+> 			 * The mantissa holds more bits than a double can,
+> 			 * so anything further only decides the rounding.
+> 			 * Round to nearest on the first digit dropped.
+> 			 */
+> 			if(!dropped) {
+> 				dropped = 1;
+> 				if(d >= 8)
+> 					m++;
+> 			}
+> 			if(!frac)
+> 				adj += 4;	/* keep the magnitude */
+> 		}
+> 	}
+> 	e = 0;
+> 	esign = 1;
+> 	if(*s == 'p' || *s == 'P') {
+> 		s++;
+> 		if(*s == '+')
+> 			s++;
+> 		else if(*s == '-') {
+> 			esign = -1;
+> 			s++;
+> 		}
+> 		for(; *s >= '0' && *s <= '9'; s++)
+> 			e = e*10 + (*s - '0');
+> 	}
+> 	return ldexp((double)m, e*esign + adj);
+> }
+> 
+452a590,603
+> 	static long lasttok;	/* previous token returned, for _Complex combining */
+> 	static long pendtok;	/* one pending token to return before lexing */
+> 
+> 	/*
+> 	 * Pending token: used to re-inject a token that was already
+> 	 * consumed as part of a _Complex combination but needs to be
+> 	 * returned separately (e.g. if we decided not to combine).
+> 	 */
+> 	if(pendtok) {
+> 		t = pendtok;
+> 		pendtok = 0;
+> 		lasttok = t;
+> 		return t;
+> 	}
+519c670,677
+< 		if(isdigit(c1)) {
+---
+> 		if(c1 == '.'){
+> 			c = GETC();
+> 			if(c == '.')
+> 				return LDOTDOTDOT;
+> 			else
+> 				yyerror(".. instead of ...");
+> 				
+> 		} else if(isdigit(c1)) {
+721a880,913
+> 	case '[':
+> 		/*
+> 		 * C23 [[attributes]]: if we see "[[", swallow everything
+> 		 * up to and including the matching "]]" and re-lex.
+> 		 * Single '[' is returned normally for array indexing.
+> 		 */
+> 		c1 = GETC();
+> 		if(c1 == '[') {
+> 			int brdepth = 1;
+> 			for(;;) {
+> 				c = GETC();
+> 				if(c == EOF) {
+> 					yyerror("unexpected EOF in [[attribute]]");
+> 					break;
+> 				}
+> 				if(c == '\n')
+> 					lineno++;
+> 				else if(c == '[')
+> 					brdepth++;
+> 				else if(c == ']') {
+> 					c = GETC();
+> 					if(c == ']') {
+> 						if(--brdepth == 0)
+> 							break;
+> 					} else {
+> 						unget(c);
+> 					}
+> 				}
+> 			}
+> 			goto l0;	/* re-lex next real token */
+> 		}
+> 		peekc = c1;
+> 		return '[';
+> 
+770a963,968
+> 			/*
+> 			 * We used to goto l0 here, but that could skip
+> 			 * rescanning if peekc was set and then reset.
+> 			 * By going to l0 and ensuring GETC() reads the buffer,
+> 			 * we guarantee deep rescanning.
+> 			 */
+779a978,1200
+> 	/*
+> 	 * GNU __attribute__((...)), __declspec(...), __extension__:
+> 	 * swallow the following parenthesised argument list entirely so
+> 	 * the parser never sees it.  We peek at the next non-space char;
+> 	 * if it is '(' we consume everything up to the matching ')'.
+> 	 * __extension__ takes no arguments; it is simply dropped.
+> 	 *
+> 	 * After consuming we loop back to lex the next real token,
+> 	 * making these constructs completely invisible to the grammar.
+> 	 */
+> 	if(s->lexical == LNAME && (
+> 	    strcmp(s->name, "__attribute__") == 0 ||
+> 	    strcmp(s->name, "__attribute")   == 0 ||
+> 	    strcmp(s->name, "__declspec")    == 0 ||
+> 	    strcmp(s->name, "__extension__") == 0 ||
+> 	    strcmp(s->name, "__asm__")       == 0 ||
+> 	    strcmp(s->name, "__asm")         == 0)) {
+> 		int ac, depth;
+> 		/*
+> 		 * After reading the identifier above, peekc holds the char that
+> 		 * ended the identifier loop (e.g. the first '(' of '((...))').
+> 		 * Consume peekc FIRST so we don't lose it; otherwise GETC reads
+> 		 * the second '(', depth tracking finishes at the inner ')',
+> 		 * and the outer ')' leaks to the parser as a phantom token —
+> 		 * the parser then sees "name(args) ()" and types the function
+> 		 * as "function returning function".
+> 		 */
+> 		if(peekc != IGN) {
+> 			ac = peekc;
+> 			peekc = IGN;
+> 		} else {
+> 			ac = GETC();
+> 		}
+> 		while(ac == ' ' || ac == '\t')
+> 			ac = GETC();
+> 		if(ac == '(') {
+> 			depth = 1;
+> 			while(depth > 0) {
+> 				ac = GETC();
+> 				if(ac == EOF) {
+> 					yyerror("unexpected EOF in __attribute__");
+> 					break;
+> 				}
+> 				if(ac == '(') depth++;
+> 				else if(ac == ')') depth--;
+> 				else if(ac == '\n') lineno++;
+> 			}
+> 		} else {
+> 			/* no argument list (e.g. bare __extension__); put char back */
+> 			unget(ac);
+> 		}
+> 		/* Do NOT reset lasttok here: the swallowed keyword is invisible
+> 		 * to the parser, so the previous type keyword (e.g. LDOUBLE before
+> 		 * __asm__("sym") _Complex) must still be visible for _Complex combining. */
+> 		goto l0;	/* fetch next real token */
+> 	}
+> 	/*
+> 	 * C99 __func__ and GCC __FUNCTION__: predefined string literal
+> 	 * containing the current function name. kencc has no tracking of the
+> 	 * current function name at the lex level, so we return an empty string.
+> 	 * This satisfies type-checking (const char[]) without the expense of
+> 	 * tracking function names through the lexer.
+> 	 */
+> 	if(s->lexical == LNAME && (
+> 	    strcmp(s->name, "__func__")     == 0 ||
+> 	    strcmp(s->name, "__FUNCTION__") == 0 ||
+> 	    strcmp(s->name, "__PRETTY_FUNCTION__") == 0)) {
+> 		char *cp;
+> 		int c1;
+> 		cp = alloc(0);
+> 		c1 = 0;
+> 		yylval.sval.l = c1;
+> 		do {
+> 			cp = allocn(cp, c1, 1);
+> 			cp[c1++] = 0;
+> 		} while(c1 & MAXALIGN);
+> 		yylval.sval.s = cp;
+> 		strcpy(symb, "\"\"");
+> 		return LSTRING;
+> 	}
+> 	/*
+> 	 * GCC __builtin_* functions: swallow the entire call and
+> 	 * substitute a zero constant.  This handles the common cases:
+> 	 *   __builtin_expect(x, v)         -> 0  (branch prediction hint)
+> 	 *   __builtin_types_compatible_p() -> 0  (type query)
+> 	 *   __builtin_offsetof(T,m)        -> 0  (use offsetof macro instead)
+> 	 *   __builtin_unreachable()        -> 0  (hint, no effect)
+> 	 * For __builtin_va_* the <stdarg.h> macros handle them before we see them.
+> 	 */
+> 	if(s->lexical == LNAME && strncmp(s->name, "__builtin_", 10) == 0) {
+> 		int ac, depth;
+> 		do { ac = GETC(); } while(ac == ' ' || ac == '\t');
+> 		if(ac == '(') {
+> 			depth = 1;
+> 			while(depth > 0) {
+> 				ac = GETC();
+> 				if(ac == EOF) break;
+> 				if(ac == '(') depth++;
+> 				else if(ac == ')') depth--;
+> 				else if(ac == '\n') lineno++;
+> 			}
+> 		} else {
+> 			unget(ac);
+> 		}
+> 		/* return integer constant 0 in place of the builtin call */
+> 		yylval.vval = 0;
+> 		strcpy(symb, "0");
+> 		return LCONST;
+> 	}
+> 
+> 	/*
+> 	 * GNU/C11 storage class and visibility qualifiers that Plan 9 ignores.
+> 	 * Drop silently and re-lex the next token.
+> 	 * Reset lasttok so a dropped qualifier cannot spuriously trigger
+> 	 * _Complex combining on the next token.
+> 	 *
+> 	 * "__hidden"/"__visible" and the double-underscore variants are C-reserved
+> 	 * identifiers — always swallow them.  Plain "hidden"/"visible" are common
+> 	 * English words used as struct member names and variable declarators, so
+> 	 * only swallow them in declaration-specifier position: skip the swallow
+> 	 * when the previous token was a type-specifier keyword (char, int, ...),
+> 	 * a typedef/variable name (LNAME), a member-access operator (. or ->),
+> 	 * or a pointer star — all positions where the next identifier is a name,
+> 	 * not an attribute.
+> 	 */
+> #define indeclname(t) \
+> 	((t)=='.' || (t)==LMG || (t)=='*' || (t)==',' || (t)=='(' || (t)==')' || \
+> 	 (t)=='[' || (t)=='=' || (t)=='&' || (t)=='|' || (t)=='^' || \
+> 	 (t)==LCHAR || (t)==LINT || (t)==LFLOAT || (t)==LDOUBLE || \
+> 	 (t)==LLONG || (t)==LSHORT || (t)==LUNSIGNED || (t)==LSIGNED || \
+> 	 (t)==LVOID || (t)==LTYPE || (t)==LTYPESTR || (t)==LSTRUCT || \
+> 	 (t)==LUNION || (t)==LENUM || (t)==LNAME)
+> 	if(s->lexical == LNAME && (
+> 	    strcmp(s->name, "__thread")      == 0 ||
+> 	    strcmp(s->name, "_Thread_local") == 0 ||
+> 	    strcmp(s->name, "_Atomic")       == 0 ||
+> 	    strcmp(s->name, "__atomic")      == 0 ||
+> 	    strcmp(s->name, "__hidden")      == 0 ||
+> 	    strcmp(s->name, "__visible")     == 0 ||
+> 	    strcmp(s->name, "__used")        == 0 ||
+> 	    strcmp(s->name, "__leaf__")      == 0 ||
+> 	    strcmp(s->name, "__pure__")      == 0 ||
+> 	    strcmp(s->name, "__nonnull__")   == 0 ||
+> 	    (!indeclname(lasttok) && (
+> 	        strcmp(s->name, "hidden")    == 0 ||
+> 	        strcmp(s->name, "visible")   == 0)))) {
+> #undef indeclname
+> 		lasttok = 0;
+> 		/*
+> 		 * talph set peekc to the first char after the identifier.
+> 		 * goto l0 bypasses the peekc check at the top of yylex,
+> 		 * which would lose that character.  Consume it via l1 instead.
+> 		 */
+> 		if(peekc != IGN) {
+> 			c = peekc;
+> 			peekc = IGN;
+> 			goto l1;
+> 		}
+> 		goto l0;
+> 	}
+> 	/*
+> 	 * _Complex combining: when we see LCOMPLEX or LIMAGINARY, check what
+> 	 * the previous token was.  If it was a float/double/long type keyword,
+> 	 * combine them into a single LCOMPLEXF or LCOMPLEXD token, consuming
+> 	 * the _Complex keyword silently.  This avoids multi-token grammar rules
+> 	 * like "LLONG LDOUBLE LCOMPLEX" which cause shift/reduce conflicts.
+> 	 *
+> 	 * Cases handled:
+> 	 *   float _Complex        -> LCOMPLEXF  (lasttok == LFLOAT)
+> 	 *   double _Complex       -> LCOMPLEXD  (lasttok == LDOUBLE)
+> 	 *   long _Complex         -> LCOMPLEXD  (lasttok == LLONG)
+> 	 *   long double _Complex  -> LCOMPLEXD  (lasttok == LDOUBLE, before that LLONG)
+> 	 *                           The "long double" -> LDOUBLE path via simplet()
+> 	 *                           means lasttok will be LDOUBLE when _Complex arrives.
+> 	 *
+> 	 * For "_Complex float" / "_Complex double" (prefix form), the grammar
+> 	 * rules "LCOMPLEX LFLOAT" / "LCOMPLEX LDOUBLE" handle them; we do not
+> 	 * combine those here (lasttok won't be a type keyword when _Complex is first).
+> 	 */
+> 	if(s->lexical == LCOMPLEX || s->lexical == LIMAGINARY) {
+> 		if(lasttok == LFLOAT) {
+> 			lasttok = LCOMPLEXF;
+> 			return LCOMPLEXF;
+> 		}
+> 		if(lasttok == LDOUBLE || lasttok == LLONG) {
+> 			lasttok = LCOMPLEXD;
+> 			return LCOMPLEXD;
+> 		}
+> 		/* prefix form: _Complex appears before the type word; return as-is */
+> 		lasttok = s->lexical;
+> 		return s->lexical;
+> 	}
+> 	/*
+> 	 * C23 `true' and `false' are the only keywords whose token
+> 	 * carries a VALUE, and the keyword table has nowhere to put one
+> 	 * (see the note beside them in itab). Supply it here, or the
+> 	 * grammar reads whatever `yylval.sym = s' left in the union
+> 	 * above -- which is a pointer, not 0 or 1.
+> 	 *
+> 	 * WHAT THAT COST, because it was silent and it was not small:
+> 	 * libvterm's VT parser clears its escape flag with
+> 	 * `vt->parser.in_esc = false;' in one place and
+> 	 * `vt->parser.in_esc = 0;' in another. The second worked and the
+> 	 * first did not, so the parser never left escape state after
+> 	 * `ESC [' -- every CSI sequence consumed exactly three bytes and
+> 	 * printed the rest, and a terminal under vts showed `2004h' on
+> 	 * screen instead of turning on bracketed paste. Measured by
+> 	 * sys/src/cmd2/vts/test/vtparse-probe.c (nine sequences) and
+> 	 * localised to this one store by vtlayout-probe.c.
+> 	 *
+> 	 * NOT bit-field-specific and NOT libvterm-specific: every
+> 	 * `x = false', `return true;' and `== false' in every NATIVE C23
+> 	 * program had the same junk. APE code was unaffected only
+> 	 * because APE's <stdbool.h> #defines them to 1 and 0, so the
+> 	 * preprocessor answered before the lexer could get it wrong --
+> 	 * which is also why no test under sys/lib/tests could catch it.
+> 	 */
+> 	if(s->lexical == LCONST){
+> 		yylval.vval = strcmp(s->name, "true") == 0;
+> 		lasttok = LCONST;
+> 		return LCONST;
+> 	}
+> 	lasttok = s->lexical;
+788a1210
+> 			if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
+806a1229
+> 			if(c == '\'') continue;			/* C23 digit separator */
+820a1244,1247
+> 			if(c == '.')
+> 				goto casedothex;
+> 			if(c == 'p' || c == 'P')
+> 				goto casep;
+828a1256
+> 			if(c == '\'') continue;			/* C23 digit separator */
+839a1268
+> 		if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
+879,880c1308,1331
+< 	if(c1 & Numvlong || (c1 & Numlong) == 0 && (uvlong)vv >= 1ULL<<w){
+< 		if((c1&(Numdec|Numvlong)) == Numdec && vv < 1ULL<<32)
+---
+> 	/*
+> 	 * A SINGLE `L' DOES NOT CAP THE WIDTH.  C99 6.4.4.1 says a
+> 	 * constant suffixed `l'/`L' has the first of long, unsigned
+> 	 * long, long long, unsigned long long IN WHICH ITS VALUE CAN BE
+> 	 * REPRESENTED -- so `L' is a floor on the type, not a ceiling.
+> 	 * This used to widen only when no `L' was written, so an
+> 	 * L-suffixed constant too big for a 32-bit long was silently
+> 	 * truncated (with a warning nobody reads in a 2000-line header).
+> 	 *
+> 	 * It bites here and not on a unix because kencc's long is 32
+> 	 * bits with 64-bit pointers: upstream code written for LP64
+> 	 * spells its 64-bit constants with one L, which is correct
+> 	 * there and arrives here as a value to truncate.  CHICKEN's
+> 	 * chicken.h is where it was found -- `C_STRING_TYPE' and its
+> 	 * thirteen neighbours are 0x0n00000000000000L -- and every one
+> 	 * of them became 0, so runtime.c's two literal-decoding
+> 	 * switches reported `duplicate cases in switch 0'.  The value
+> 	 * in that message is the evidence: all the labels were 0.
+> 	 *
+> 	 * The threshold is the same `w' as for an unsuffixed constant
+> 	 * because long and int are both 32 bits here.
+> 	 */
+> 	if(c1 & Numvlong || (uvlong)vv >= 1ULL<<w){
+> 		if((c1&(Numdec|Numlong|Numvlong)) == Numdec && vv < 1ULL<<32)
+917a1369,1405
+> casedothex:
+> 	/* collect optional hex fractional digits after '.' in a hex float */
+> 	for(;;) {
+> 		if(cp >= &symb[NSYMB-1])
+> 			goto toolong;
+> 		*cp++ = c;
+> 		c = GETC();
+> 		if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
+> 		if(!isdigit(c) && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F'))
+> 			break;
+> 	}
+> 	if(c != 'p' && c != 'P')
+> 		yyerror("hex float constant requires binary exponent (p or P)");
+> 
+> casep:
+> 	/* binary exponent for C99 hex float: p[+-]?[0-9]+ */
+> 	if(cp >= &symb[NSYMB-2])
+> 		goto toolong;
+> 	*cp++ = 'p';
+> 	c = GETC();
+> 	if(c == '+' || c == '-') {
+> 		if(cp >= &symb[NSYMB-1])
+> 			goto toolong;
+> 		*cp++ = c;
+> 		c = GETC();
+> 	}
+> 	if(!isdigit(c))
+> 		yyerror("malformed hex float constant exponent");
+> 	while(isdigit(c)) {
+> 		if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
+> 		if(cp >= &symb[NSYMB-1])
+> 			goto toolong;
+> 		*cp++ = c;
+> 		c = GETC();
+> 	}
+> 	goto caseout;
+> 
+923a1412
+> 		if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
+941a1431
+> 		if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
+959c1449,1452
+< 	yylval.dval = strtod(symb, nil);
+---
+> 	if(symb[0] == '0' && (symb[1] == 'x' || symb[1] == 'X'))
+> 		yylval.dval = hexfloat(symb);
+> 	else
+> 		yylval.dval = strtod(symb, nil);
+1131a1625,1657
+> 	case 'u':
+> 	case 'U':
+> 		/*
+> 		 * C99 §6.4.3 universal character names: \uXXXX and \UXXXXXXXX.
+> 		 * Read exactly 4 (u) or 8 (U) mandatory hex digits.
+> 		 * The resulting code point is returned as a Rune; the caller's
+> 		 * runetochar() encodes it as UTF-8 (Plan9 is natively UTF-8).
+> 		 */
+> 		{
+> 			int ndigs = (c == 'u') ? 4 : 8;
+> 			long cp = 0;
+> 			for(i = 0; i < ndigs; i++) {
+> 				c = GETC();
+> 				if(c >= '0' && c <= '9')
+> 					cp = cp*16 + c-'0';
+> 				else if(c >= 'a' && c <= 'f')
+> 					cp = cp*16 + c-'a'+10;
+> 				else if(c >= 'A' && c <= 'F')
+> 					cp = cp*16 + c-'A'+10;
+> 				else {
+> 					yyerror("invalid universal character name");
+> 					unget(c);
+> 					return Runeerror;
+> 				}
+> 			}
+> 			/* C99: \u0000-\u009F (except \u0024, \u0040, \u0060) are
+> 			 * reserved; reject surrogates and code points > U+10FFFF. */
+> 			if(cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF)) {
+> 				yyerror("universal character name out of range");
+> 				return Runeerror;
+> 			}
+> 			return cp;
+> 		}
+1133c1659
+< 	return c;
+---
+> return c;
+1181a1708,1855
+> 
+> 	/*
+> 	 * GNU / C99 compatibility aliases.
+> 	 * Double-underscore spellings map to the same token as their
+> 	 * standard counterparts so the grammar needs no changes.
+> 	 */
+> 
+> 	/* restrict aliases */
+> 	"__restrict",		LRESTRICT,	0,
+> 	"__restrict__",		LRESTRICT,	0,
+> 
+> 	/* inline aliases */
+> 	"__inline",		LINLINE,	0,
+> 	"__inline__",		LINLINE,	0,
+> 
+> 	/* C11 _Generic type-generic selection expression */
+> 	"_Generic",		LGENERIC,	0,
+> 
+> 	/* C23 nullptr: null pointer constant — proper token, handled in cc.y pexpr */
+> 	"nullptr",		LNULLPTR,	0,
+> 
+> 	/* C11 _Static_assert / C23 static_assert */
+> 	"_Static_assert",	LSTATICASSERT,	0,
+> 	"static_assert",	LSTATICASSERT,	0,
+> 
+> 	"__noreturn__",		LNORET,		0,
+> 
+> 	/* const/volatile/signed aliases - map to existing qualifier tokens */
+> 	"__const",		LCONSTNT,	0,
+> 	"__const__",		LCONSTNT,	0,
+> 	"__volatile",		LVOLATILE,	0,
+> 	"__volatile__",		LVOLATILE,	0,
+> 	"__signed",		LSIGNED,	0,
+> 	"__signed__",		LSIGNED,	0,
+> 
+> 	/*
+> 	 * _Bool (C99) and bool (C23). Its own token rather than LCHAR:
+> 	 * the grammar's "tname: LCHAR" yields BCHAR, so these used to
+> 	 * declare a plain signed char, and a conversion to one truncates
+> 	 * where C99 6.3.1.2 requires a comparison against zero. LBOOL
+> 	 * reduces to typebool, and com.c normalises conversions to it.
+> 	 */
+> 	"_Bool",		LBOOL,		0,
+> 	"bool",			LBOOL,		0,
+> 
+> 	/*
+> 	 * C23 true and false. THEIR VALUE CANNOT LIVE IN THIS TABLE --
+> 	 * the third column is `ushort type', an index into types[] that
+> 	 * lexinit() applies as `s->type = types[...]'. It is not a value
+> 	 * and never was.
+> 	 *
+> 	 * They were written here as `1' and `0' as though it were one.
+> 	 * `true' therefore set s->type = types[1] (nonsense, though
+> 	 * harmless on a keyword symbol) and `false' set nothing, and
+> 	 * NEITHER set yylval.vval -- which is what the grammar reads for
+> 	 * LCONST (cc.y: `$$->vconst = $1'). yylex had already done
+> 	 * `yylval.sym = s', and sym and vval are the same union member,
+> 	 * so both keywords arrived carrying junk.
+> 	 *
+> 	 * The value is supplied in yylex() instead; see the LCONST arm
+> 	 * there. Zero here means "no type", which is correct.
+> 	 */
+> 	"true",			LCONST,		0,
+> 	"false",		LCONST,		0,
+> 
+> 	/*
+> 	 * __attribute__((...)) and __declspec(...):
+> 	 * These are registered as LNAME so lookup() returns them as
+> 	 * ordinary identifiers.  The yylex() function detects them by
+> 	 * name after lookup and swallows the following argument list,
+> 	 * making them completely transparent to the parser.
+> 	 *
+> 	 * __extension__ is a no-op marker; same treatment.
+> 	 */
+> 	"__attribute__",	LNAME,		0,
+> 	"__attribute",		LNAME,		0,
+> 	"__declspec",		LNAME,		0,
+> 	"__extension__",	LNAME,		0,
+> 
+> 	/*
+> 	 * __asm__ / __asm: inline assembly specifier used as a
+> 	 * function or variable qualifier, e.g.:
+> 	 *   int foo(void) __asm__("_foo");
+> 	 *   extern int errno __asm__("errno");
+> 	 * Registered as LNAME; yylex() swallows the argument list.
+> 	 * Note: bare "asm" is NOT listed here — it may be used as an
+> 	 * identifier in C89 code and must not be treated as a keyword.
+> 	 */
+> 	"__asm",		LNAME,		0,
+> 	"__asm__",		LNAME,		0,
+> 
+> 	/*
+> 	 * __thread / _Thread_local: thread-local storage class.
+> 	 * Plan 9 has no TLS; silently drop the qualifier.
+> 	 */
+> 	"__thread",		LNAME,		0,
+> 	"_Thread_local",	LNAME,		0,
+> 
+> 	/*
+> 	 * typeof / __typeof__ / __typeof: C23/GCC type-of extension.
+> 	 * Returns LTYPEOF token; the grammar handles the argument list.
+> 	 * "typeof" is the C23 standard spelling.
+> 	 * "__typeof__" / "__typeof" are the GCC spellings.
+> 	 * Previously these were swallowed as LNAME (broken); now properly parsed.
+> 	 */
+> 	"typeof",		LTYPEOF,	0,
+> 	"typeof_unqual",	LTYPEOF_UNQUAL,	0,	/* C23: like typeof but strips qualifiers */
+> 	"__typeof",		LTYPEOF,	0,
+> 	"__typeof__",		LTYPEOF,	0,
+> 
+> 	/*
+> 	 * _Alignof / __alignof__ / __alignof: C11/GCC alignment query.
+> 	 * Returns LALIGNOF token; grammar produces compile-time constant.
+> 	 * Previously swallowed (broken); now properly parsed.
+> 	 * "alignof" is the C23 standard spelling (no underscore).
+> 	 */
+> 	"_Alignof",		LALIGNOF,	0,
+> 	"alignof",		LALIGNOF,	0,
+> 	"__alignof__",		LALIGNOF,	0,
+> 	"__alignof",		LALIGNOF,	0,
+> 
+> 	/* _Alignas / alignas: C11/C23 alignment specifier.  Layout effect. */
+> 	"_Alignas",		LALIGNAS,	0,
+> 	"alignas",		LALIGNAS,	0,
+> 
+> 	/*
+> 	 * GNU visibility / linkage hints.
+> 	 * These appear as function/variable attributes.  When used as
+> 	 * plain identifiers (not inside __attribute__) they are harmless
+> 	 * LNAME tokens the parser ignores in declaration-specifier position.
+> 	 */
+> 	"hidden",		LNAME,		0,
+> 	"visible",		LNAME,		0,
+> 	"__hidden",		LNAME,		0,
+> 	"__visible",		LNAME,		0,
+> 	"__used",		LNAME,		0,
+> 	"__leaf__",		LNAME,		0,
+> 	"__pure__",		LNAME,		0,
+> 	"__nonnull__",		LNAME,		0,
+> 
+> 	/*
+> 	 * C99 _Complex and _Imaginary.
+> 	 * Also accept GCC's __complex__ spelling.
+> 	 */
+> 	"_Complex",		LCOMPLEX,	0,
+> 	"__complex__",		LCOMPLEX,	0,
+> 	"_Imaginary",		LIMAGINARY,	0,
+> 
+1215a1890,1896
+> 	/*
+> 	 * bool has unsigned char's representation, width and alignment,
+> 	 * but is a distinct Type object: see the note in cc.h.
+> 	 */
+> 	typebool = typ(TUCHAR, T);
+> 	typebool->isbool = 1;
+> 
+1419,1420c2100
+< 	Spec s;
+< 	long t, c;
+---
+> 	long b;
+1423,1434c2103,2107
+< 	s = va_arg(fp->args, Spec);
+< 	t = s.type;
+< 	c = s.class;
+< 	while(c) {
+< 		i = bitno(c);
+< 		c &= ~(1L << i);
+< 		fmtprint(fp, "%s%s", qcnames[i], (t || c)? " ": "");
+< 	}
+< 	while(t) {
+< 		i = bitno(t);
+< 		t &= ~(1L << i);
+< 		fmtprint(fp, "%s%s", qtnames[i], t? " ": "");
+---
+> 	b = va_arg(fp->args, long);
+> 	while(b) {
+> 		i = bitno(b);
+> 		b &= ~(1L << i);
+> 		fmtprint(fp, "%s%s", qnames[i], b? " ": "");
+Only in /usr/glenda/APExp/sys/src/cmd/cc: mac.6
+diff -r /sys/src/cmd/cc/macbody /usr/glenda/APExp/sys/src/cmd/cc/macbody
+515a516,527
+> 			/*
+> 			 * #### in macro definition means ## in source.
+> 			 * Strip trailing whitespace from b before joining,
+> 			 * so that "CD ## a" with arg a="iCCP" produces
+> 			 * "CDiCCP" rather than "CD iCCP".
+> 			 */
+> 			if(*cp == '#') {
+> 				while(b > ob && b[-1] == ' ')
+> 					b--;
+> 				cp++;
+> 				continue;
+> 			}
+diff -r /sys/src/cmd/cc/mkfile /usr/glenda/APExp/sys/src/cmd/cc/mkfile
+2a3,4
+> APEXPROOT=../../../..
+> 
+12a15
+> 	cmplx.$O\
+19a23,24
+> 	vla.$O\
+> 	dwtypes.$O\
+24,25c29
+< 	lexbody\
+< 	macbody
+---
+> 	dwtypes.h\
+34c38
+< </sys/src/cmd/mklib
+---
+> <$APEXPROOT/sys/src/cmd/mklib
+diff -r /sys/src/cmd/cc/mkfile.port /usr/glenda/APExp/sys/src/cmd/cc/mkfile.port
+2c2,3
+< BIN=/$objtype/bin
+---
+> APEXPROOT=../../../..
+> BIN=$APEXPROOT/$objtype/bin
+7c8,21
+< $LIB:	../cc/cc.h
+---
+> # Rebuild cc.a whenever ANY cc source or header changes.  The old rule
+> # depended only on ../cc/cc.h, so edits to lex.c / cc.y / dcl.c / com.c
+> # never triggered a rebuild: stale cc.a survived the C99/C11/C23 patches
+> # (the 'bool' keyword, _Generic, ...) and every arch backend that links
+> # cc.a kept shipping the pre-patch behaviour.
+> # NB: mk does not expand globs in prerequisites, so the list is explicit.
+> # Add new cc/ sources here when they appear.
+> CCSRC=../cc/cc.h ../cc/compat.h ../cc/dwtypes.h ../cc/cc.y ../cc/macbody\
+> 	../cc/acid.c ../cc/bits.c ../cc/cmplx.c ../cc/com.c ../cc/com64.c\
+> 	../cc/compat.c ../cc/dcl.c ../cc/dpchk.c ../cc/dwtypes.c ../cc/funct.c\
+> 	../cc/lex.c ../cc/mac.c ../cc/omachcap.c ../cc/pgen.c ../cc/pickle.c\
+> 	../cc/pswt.c ../cc/scon.c ../cc/sub.c ../cc/vla.c
+> 
+> $LIB:	$CCSRC
+Only in /usr/glenda/APExp/sys/src/cmd/cc: omachcap.6
+diff -r /sys/src/cmd/cc/pgen.c /usr/glenda/APExp/sys/src/cmd/cc/pgen.c
+1a2
+> #include "dwtypes.h"
+12a14
+> 	vlanest = 0;		/* reset VLA scope depth for this function */
+79,82c81,105
+< 		if(debug['B'])
+< 			warn(Z, "no return at end of function: %s", n1->sym->name);
+< 		else
+< 			diag(Z, "no return at end of function: %s", n1->sym->name);
+---
+> 		/*
+> 		 * C99 §5.1.2.2.3: reaching the closing } of main() is
+> 		 * equivalent to return 0.  Synthesise that silently.
+> 		 * For all other non-void functions, warn (not error) —
+> 		 * ported code frequently omits return on unreachable paths.
+> 		 * Use -B to suppress even the warning.
+> 		 */
+> 		if(strcmp(n1->sym->name, "main") == 0 &&
+> 		   thisfn->link->etype == TINT) {
+> 			/* emit: return 0 */
+> 			Node ret, zero;
+> 			ret = znode;
+> 			ret.op = ORETURN;
+> 			ret.type = thisfn->link;
+> 			zero = znode;
+> 			zero.op = OCONST;
+> 			zero.type = thisfn->link;
+> 			zero.vconst = 0;
+> 			ret.left = &zero;
+> 			gen(&ret);
+> 		} else {
+> 			if(!debug['B'])
+> 				warn(Z, "no return at end of function: %s",
+> 				     n1->sym->name);
+> 		}
+92a116
+> 	dwtypes_emit_func(n1->sym);
+Only in /usr/glenda/APExp/sys/src/cmd/cc: pickle.6
+diff -r /sys/src/cmd/cc/pswt.c /usr/glenda/APExp/sys/src/cmd/cc/pswt.c
+35d34
+< 		isv |= c->isv;
+38,43c37,44
+< 	if(typev[n->type->etype])
+< 		isv = 1;
+< 	else if(isv){
+< 		warn(n, "32-bit switch expression with 64-bit case constant");
+< 		isv = 0;
+< 	}
+---
+> 	/*
+> 	 * `isv' is a property of the SWITCH EXPRESSION and of nothing
+> 	 * else.  It used to be OR'd with every case's own `isv' first
+> 	 * and then overridden here, which read as though a wide label
+> 	 * could widen the comparison; it cannot, since C converts
+> 	 * each label to the expression's promoted type (see below).
+> 	 */
+> 	isv = typev[n->type->etype];
+50,51d50
+< 		if(c->isv && !isv)
+< 			continue;	/* can never match */
+56a56,95
+> 		/*
+> 		 * A 64-bit case TYPE IS NOT A 64-BIT CASE VALUE, and
+> 		 * this used to `continue' here -- dropping the label
+> 		 * -- for any case whose TYPE was wide, under the
+> 		 * comment "can never match".  `pgen.c:342' sets a
+> 		 * case's `isv' from `typev[type]' alone, so
+> 		 * `case (int64_t)14:' in a switch on an `int' was
+> 		 * discarded, and the switch fell to `default' for a
+> 		 * value it plainly contains.  SILENT: the file
+> 		 * compiled.
+> 		 *
+> 		 * C 6.8.4.2p5 settles it and gcc agrees when asked:
+> 		 * the constant expression "is converted to the
+> 		 * promoted type of the controlling expression", so a
+> 		 * wide label is TRUNCATED and then compared like any
+> 		 * other -- `case 0x100000001LL:' in a switch on an
+> 		 * int is reached by 1, and a label that truncates
+> 		 * onto another one is a genuine duplicate rather than
+> 		 * something to throw away.  The `(long)' cast above
+> 		 * already performs exactly that conversion, so the
+> 		 * rule costs nothing but the deletion.
+> 		 *
+> 		 * The warning stays, and is now about the VALUE: it
+> 		 * fires only where a WIDE label's conversion actually
+> 		 * changed the constant, which is gcc's `-Woverflow'
+> 		 * case.  `c->isv' is still in the test and has to be:
+> 		 * without it an ordinary `case 0xffffffffU:' in a
+> 		 * switch on an `unsigned' warns, because `(long)'
+> 		 * sign-extends it to -1 -- correct bits, different
+> 		 * `vlong', and a warning on code that is right.
+> 		 *
+> 		 * CHICKEN's `runtime.c' is where this was found, and
+> 		 * the spelling is not exotic: `chicken.h' writes
+> 		 * every immediate as `((C_word)(C_SPECIAL_BITS |
+> 		 * 0x10))' and `C_word' is 64 bits here, so four of
+> 		 * `decode_literal2''s eight labels are small numbers
+> 		 * wearing a wide type.
+> 		 */
+> 		if(c->isv && !isv && q->val != c->val)
+> 			warn(n, "case constant truncated to the switch expression's type");
+58a98,112
+> 	/*
+> 	 * AND `nc' IS RECOUNTED, which is the half that was loud.  It
+> 	 * was the number of non-default cases, counted BEFORE the
+> 	 * loop above could drop any -- while `alloc()' is a hunk bump
+> 	 * allocator and does not zero.  So `qsort' and the duplicate
+> 	 * scan below ran over `nc' entries of which the last few had
+> 	 * never been written, and reported those against each other:
+> 	 * **`duplicate cases in switch 0', once per unwritten pair,
+> 	 * naming a case the program does not contain.**  Five dropped
+> 	 * labels gave exactly the four reports chicken showed.
+> 	 * Nothing drops any more, so the two counts agree -- this is
+> 	 * insurance against the next `continue' added to that loop,
+> 	 * and it is one line.
+> 	 */
+> 	nc = q - iq;
+176a231,241
+> 	/*
+> 	 * Zero must be tested before the sign, not after: -0.0 is not
+> 	 * < 0, so it used to fall into the "native == 0" arm below and
+> 	 * come out as +0.0.  A constant -0.0 in the source was
+> 	 * therefore emitted with its sign lost.
+> 	 */
+> 	if(native == 0) {
+> 		ieee->l = 0;
+> 		ieee->h = fpnegzero(native)? 0x80000000L: 0;
+> 		return;
+> 	}
+180,184d244
+< 		return;
+< 	}
+< 	if(native == 0) {
+< 		ieee->l = 0;
+< 		ieee->h = 0;
+Only in /usr/glenda/APExp/sys/src/cmd/cc: scon.6
+diff -r /sys/src/cmd/cc/scon.c /usr/glenda/APExp/sys/src/cmd/cc/scon.c
+41,43c41,54
+< 		if(isf)
+< 			d = -l->fconst;
+< 		else
+---
+> 		if(isf) {
+> 			/*
+> 			 * Negating +0.0 has to give -0.0. The plain "-x"
+> 			 * here would be right in a compiler that generates
+> 			 * negation correctly, but this one compiles itself:
+> 			 * writing it as an exclusive-or with the sign bit
+> 			 * makes the fold correct on the first rebuild
+> 			 * rather than the second.
+> 			 */
+> 			if(l->fconst == 0)
+> 				d = fpnegzero(l->fconst)? 0.0: fpnegzeroval();
+> 			else
+> 				d = -l->fconst;
+> 		} else
+57a69,96
+> 			else if(typeu[et])
+> 				/*
+> 				 * vconst is a vlong, so an unsigned source
+> 				 * with the top bit set folds to a negative
+> 				 * double unless it is read back unsigned.
+> 				 * (double)(uvlong)~0 is 1.8446744e19, not -1.
+> 				 *
+> 				 * This was "d = l->vconst;" for every integer
+> 				 * type. It only began to matter when SIZE_MAX
+> 				 * became a 64-bit constant: gnulib's
+> 				 * hash.c has
+> 				 *
+> 				 *	float new_candidate = candidate / ...;
+> 				 *	if (SIZE_MAX <= new_candidate)
+> 				 *		return 0;
+> 				 *
+> 				 * which folded to "-1.0 <= 128.75", true, so
+> 				 * hash_initialize() returned NULL and every
+> 				 * program that hashes -- cp, mv, ln, du --
+> 				 * died with "memory exhausted" before it had
+> 				 * looked at its arguments.
+> 				 *
+> 				 * The reverse direction, float to unsigned
+> 				 * below, has the same shape and is still
+> 				 * wrong for values at or above 2**63; no
+> 				 * caller in this tree reaches it.
+> 				 */
+> 				d = (uvlong)l->vconst;
+Only in /usr/glenda/APExp/sys/src/cmd/cc: sub.6
+diff -r /sys/src/cmd/cc/sub.c /usr/glenda/APExp/sys/src/cmd/cc/sub.c
+128c128,137
+< 	t->width = ewidth[et];
+---
+> 	/*
+> 	 * Complex types (TCFLOAT, TCDOUBLE) are >= NTYPE so they are
+> 	 * out of bounds for ewidth[].  Use the base float widths.
+> 	 */
+> 	if(et == TCFLOAT)
+> 		t->width = 2 * ewidth[TFLOAT];
+> 	else if(et == TCDOUBLE)
+> 		t->width = 2 * ewidth[TDOUBLE];
+> 	else
+> 		t->width = ewidth[et];
+147c156
+< garbt(Type *t, Spec s)
+---
+> garbt(Type *t, long b)
+151c160
+< 	if(s.class & BGARB) {
+---
+> 	if(b & BGARB) {
+153c162
+< 		t1->garb = simpleg(s);
+---
+> 		t1->garb = simpleg(b);
+160c169
+< simpleg(Spec s)
+---
+> simpleg(long b)
+163c172,173
+< 	switch(s.class & BGARB) {
+---
+> 	b &= BGARB;
+> 	switch(b) {
+177c187
+< simplec(Spec s)
+---
+> simplec(long b)
+180c190,191
+< 	switch(s.class & BCLASS) {
+---
+> 	b &= BCLASS;
+> 	switch(b) {
+198c209
+< 	diag(Z, "illegal combination of classes %Q", s);
+---
+> 	diag(Z, "illegal combination of classes %Q", b);
+203c214
+< simplet(Spec s)
+---
+> simplet(long b)
+205c216,218
+< 	switch(s.type) {
+---
+> 
+> 	b &= ~BCLASS & ~BGARB;
+> 	switch(b) {
+265c278
+< 	diag(Z, "illegal combination of types %Q", s);
+---
+> 	diag(Z, "illegal combination of types %Q", b);
+268a282,343
+> /*
+>  * Do t1 and t2 differ only in the signedness of what they point at?
+>  *
+>  * "char *" and "unsigned char *" are distinct types, so passing one
+>  * where the other is wanted is a constraint violation and C requires a
+>  * diagnostic. Every compiler this code is written for makes that a
+>  * warning -- gcc and clang call it -Wpointer-sign and it is not in
+>  * -Werror by default -- so portable C is full of it. LibreSSL's
+>  * asn1/a_object.c is representative:
+>  *
+>  *	char s[22];
+>  *	n = snprintf(s, sizeof(s), fmt, arc);
+>  *	if (!CBB_add_bytes(cbb, s, n))
+>  *
+>  * against "int CBB_add_bytes(CBB *, const uint8_t *, size_t)". There is
+>  * nothing wrong with it, and there is no portable spelling that avoids
+>  * a cast at every such call.
+>  *
+>  * -Wpointer-sign is not about char: it is any integer type against its
+>  * own opposite signedness, and the wider ones turn up just as often.
+>  * LibreSSL's evp/e_sm4.c passes "&ctx->num", an int *, to
+>  * CRYPTO_ctr128_encrypt's "unsigned int *num".
+>  *
+>  * So: one level of indirection, and the two pointees must be the signed
+>  * and unsigned spellings of the same type. "int *" for "char *" is
+>  * still an error; so is "int *" for "unsigned long *", which merely
+>  * happen to be the same width here and are what gcc calls incompatible
+>  * pointer types rather than a signedness difference; and so is
+>  * "char **" for "unsigned char **", which is the case where the
+>  * difference can actually be observed. Signedness of the pointee
+>  * changes no representation, so nothing generated differs either way.
+>  */
+> int
+> ptrsignonly(Type *t1, Type *t2)
+> {
+> 	static int pairs[][2] = {
+> 		{TCHAR, TUCHAR},
+> 		{TSHORT, TUSHORT},
+> 		{TINT, TUINT},
+> 		{TLONG, TULONG},
+> 		{TVLONG, TUVLONG},
+> 	};
+> 	Type *p1, *p2;
+> 	int i, e1, e2;
+> 
+> 	if(t1 == T || t2 == T)
+> 		return 0;
+> 	if(t1->etype != TIND || t2->etype != TIND)
+> 		return 0;
+> 	p1 = t1->link;
+> 	p2 = t2->link;
+> 	if(p1 == T || p2 == T)
+> 		return 0;
+> 	e1 = p1->etype;
+> 	e2 = p2->etype;
+> 	for(i = 0; i < nelem(pairs); i++)
+> 		if((e1 == pairs[i][0] && e2 == pairs[i][1])
+> 		|| (e1 == pairs[i][1] && e2 == pairs[i][0]))
+> 			return 1;
+> 	return 0;
+> }
+> 
+274a350,362
+> 	/*
+> 	 * Complex types (TCFLOAT, TCDOUBLE) have etype >= NTYPE and are
+> 	 * not present in the ttab[] arrays (which have NTYPE entries).
+> 	 * Accessing ttab[TCFLOAT] or ttab[TCDOUBLE] would be out of bounds.
+> 	 * Compatibility for complex types is handled in com.c before tcompat
+> 	 * is called; report compatible (return 0) here so we never fire
+> 	 * the "incompatible type" diagnostic for complex operands.
+> 	 */
+> 	if(t1 != T && iscmplx(t1->etype))
+> 		return 0;
+> 	if(t2 != T && iscmplx(t2->etype))
+> 		return 0;
+> 
+289,290c377,382
+< 				if(!sametype(t1, t2))
+< 					return 1;
+---
+> 				if(!sametype(t1, t2)) {
+> 					if(!ptrsignonly(t1, t2))
+> 						return 1;
+> 					warn(n, "pointer signedness: \"%T\" and \"%T\"",
+> 						t1, t2);
+> 				}
+550c642
+< 	if(st->etype == TIND && vconst(l) == 0) {
+---
+> 	if(st->etype == TIND && zpconst(l)) {
+639c731,733
+< 		if(ewidth[et1] < ewidth[et2])
+---
+> 		long w1 = (et1==TCFLOAT)? 2*ewidth[TFLOAT] : (et1==TCDOUBLE)? 2*ewidth[TDOUBLE] : ewidth[et1];
+> 		long w2 = (et2==TCFLOAT)? 2*ewidth[TFLOAT] : (et2==TCDOUBLE)? 2*ewidth[TDOUBLE] : ewidth[et2];
+> 		if(w1 < w2)
+1012a1107,1109
+> 	case OTYPEOF:
+> 	case OTYPEOF_UNQUAL:
+> 	case OALIGNOF:
+1136a1234,1270
+>  * Is this negative zero?  -0.0 compares equal to 0.0 and is not less
+>  * than it, so every ordinary test misses it; the sign bit is the only
+>  * thing that distinguishes the two, and it has to be read directly.
+>  * Both members are eight bytes, so the byte order does not matter.
+>  */
+> int
+> fpnegzero(double d)
+> {
+> 	union {
+> 		double	d;
+> 		uvlong	v;
+> 	} u;
+> 
+> 	if(d != 0)
+> 		return 0;
+> 	u.d = d;
+> 	return (int)(u.v >> 63);
+> }
+> 
+> /*
+>  * -0.0, assembled from its bits.  Writing the constant would not do:
+>  * this compiler is compiled by itself, so before the fix has been
+>  * through a rebuild the -0.0 in the source folds to +0.0.
+>  */
+> double
+> fpnegzeroval(void)
+> {
+> 	union {
+> 		double	d;
+> 		uvlong	v;
+> 	} u;
+> 
+> 	u.v = (uvlong)1 << 63;
+> 	return u.d;
+> }
+> 
+> /*
+1220,1221c1354,1355
+< Spec
+< typebitor(Spec a, Spec b)
+---
+> long
+> typebitor(long a, long b)
+1223c1357
+< 	Spec c;
+---
+> 	long c;
+1225,1229c1359,1362
+< 	c.type = a.type | b.type;
+< 	c.class = a.class | b.class;
+< 	if((a.type & b.type) || (a.class & b.class))
+< 		if((a.type & b.type) == BLONG)
+< 			c.type |= BVLONG;	/* long long => vlong */
+---
+> 	c = a | b;
+> 	if(a & b)
+> 		if((a & b) == BLONG)
+> 			c |= BVLONG;		/* long long => vlong */
+1231c1364
+< 			warn(Z, "once is enough: %Q", (Spec){a.type & b.type, a.class & b.class});
+---
+> 			warn(Z, "once is enough: %Q", a & b);
+1352a1486
+> 	TNORET,		0x19242ac3,	0,
+1394a1529
+> 	TNORET,		0,	"NORET",
+1411,1412c1546,1547
+< char*	qtnames[NALLTYPES];
+< Init	qtnamesinit[] =
+---
+> char*	qnames[NALLTYPES];
+> Init	qnamesinit[] =
+1434a1570,1577
+> 	TAUTO,		0,	"AUTO",
+> 	TEXTERN,	0,	"EXTERN",
+> 	TSTATIC,	0,	"STATIC",
+> 	TTYPEDEF,	0,	"TYPEDEF",
+> 	TTYPESTR,	0,	"TYPESTR",
+> 	TREGISTER,	0,	"REGISTER",
+> 	TCONSTNT,	0,	"CONSTNT",
+> 	TVOLATILE,	0,	"VOLATILE",
+1437a1581
+> 	TNORET,		0,	"NORET",
+1441,1454d1584
+< char*	qcnames[NCGTYPE];
+< Init	qcnamesinit[] =
+< {
+< 	CGAUTO,		0,	"AUTO",
+< 	CGEXTERN,	0,	"EXTERN",
+< 	CGSTATIC,	0,	"STATIC",
+< 	CGTYPEDEF,	0,	"TYPEDEF",
+< 	CGTYPESTR,	0,	"TYPESTR",
+< 	CGREGISTER,	0,	"REGISTER",
+< 	CGCONSTNT,	0,	"CONSTNT",
+< 	CGVOLATILE,	0,	"VOLATILE",
+< 	CGNORET,	0,	"NORET",
+< 	-1,		0,	0,
+< };
+1552a1683,1685
+> 	OTYPEOF,	0,	"TYPEOF",
+> 	OTYPEOF_UNQUAL,	0,	"TYPEOF_UNQUAL",
+> 	OALIGNOF,	0,	"ALIGNOF",
+1600c1733
+< char	typesuv[NTYPE];
+---
+> char	typesuv[NCTYPE];
+1603c1736
+< 	TVLONG, TUVLONG, TSTRUCT, TUNION, -1,
+---
+> 	TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1,
+1656c1789
+< char	typefd[NTYPE];
+---
+> char	typefd[NCTYPE];
+1889a2023,2038
+> /*
+>  * The TFLOAT column here used to say TFLOAT, so "double op float" was
+>  * computed in FLOAT -- a straight violation of C99 6.3.1.8, which makes
+>  * the common type the one with the greater rank. Note the TFLOAT row
+>  * above has TDOUBLE in its TDOUBLE column, so "float op double" was
+>  * always right; only this direction was wrong, which is how it survived.
+>  *
+>  * asin(1.0) is what found it. musl's returns
+>  *
+>  *	x*pio2_hi + 0x1p-120f
+>  *
+>  * -- a double plus a float constant that exists only to raise inexact --
+>  * and the answer came back as float pi/2, 1.5707963705062866, exactly
+>  * 4.371e-08 above the double value. Any mixed-precision arithmetic in
+>  * the tree was silently rounded to 24 bits.
+>  */
+1891c2040
+< 			TDOUBLE, TDOUBLE, TDOUBLE, TFLOAT, TDOUBLE, TIND,
+---
+> 			TDOUBLE, TDOUBLE, TDOUBLE, TDOUBLE, TDOUBLE, TIND,
+1929,1935c2078,2080
+< 	for(p=qtnamesinit; p->code >= 0; p++) {
+< 		urk("qtnames", nelem(qtnames), p->code);
+< 		qtnames[p->code] = p->s;
+< 	}
+< 	for(p=qcnamesinit; p->code >= 0; p++) {
+< 		urk("qcnames", nelem(qcnames), p->code);
+< 		qcnames[p->code] = p->s;
+---
+> 	for(p=qnamesinit; p->code >= 0; p++) {
+> 		urk("qnames", nelem(qnames), p->code);
+> 		qnames[p->code] = p->s;
+2042a2188,2227
+> 
+> 	/*
+> 	 * C99 complex number types.
+> 	 * Layout: two consecutive base floats ({re, im}).
+> 	 * typesuvinit[] includes TCFLOAT/TCDOUBLE so pgen.c uses the
+> 	 * hidden-pointer return ABI for complex-returning functions.
+> 	 */
+> 	types[TCFLOAT] = alloc(sizeof(*types[TCFLOAT]));
+> 	types[TCFLOAT]->etype = TCFLOAT;
+> 	types[TCFLOAT]->width = 2 * ewidth[TFLOAT];
+> 
+> 	types[TCDOUBLE] = alloc(sizeof(*types[TCDOUBLE]));
+> 	types[TCDOUBLE]->etype = TCDOUBLE;
+> 	types[TCDOUBLE]->width = 2 * ewidth[TDOUBLE];
+> 
+> 	/* fill in the separate iscmplx() predicate array */
+> 	typecmplxv[TCFLOAT]  = 1;
+> 	typecmplxv[TCDOUBLE] = 1;
+> }
+> 
+> /*
+>  * cplxbase: return the real base type for a complex etype.
+>  */
+> Type*
+> cplxbase(int etype)
+> {
+> 	if(etype == TCFLOAT)
+> 		return types[TFLOAT];
+> 	return types[TDOUBLE];
+> }
+> 
+> /*
+>  * mkcplxtype: given a real or complex etype, return the complex type.
+>  */
+> Type*
+> mkcplxtype(int etype)
+> {
+> 	if(etype == TFLOAT || etype == TCFLOAT)
+> 		return types[TCFLOAT];
+> 	return types[TCDOUBLE];
+Only in /usr/glenda/APExp/sys/src/cmd/cc: vla.6
+Only in /usr/glenda/APExp/sys/src/cmd/cc: vla.c
+Only in /usr/glenda/APExp/sys/src/cmd/cc: vla_test.c
+Only in /usr/glenda/APExp/sys/src/cmd/cc: y.tab.6
+Only in /usr/glenda/APExp/sys/src/cmd/cc: y.tab.c
+Only in /usr/glenda/APExp/sys/src/cmd/cc: y.tab.h
