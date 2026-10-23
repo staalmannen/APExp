@@ -66,6 +66,71 @@
  * construct, and which construct does not matter until the half is
  * known.
  *
+ * ***FIRST RUN, 2026-10-23, APExp's own compilers, ALL TEN BACKENDS.***
+ * The split is by WORD SIZE and it is total:
+ *
+ *	6c amd64    COMPILES      7c arm64    COMPILES
+ *	9c power64  COMPILES      kc sparc64  COMPILES
+ *
+ *	8c 386      116
+ *	5c arm      122, 127
+ *	qc power    127
+ *	1c 68000    116 126 127 136 145 153 164  (and `too many errors')
+ *	2c 68020    the same set
+ *
+ * **Every 64-bit backend compiles this file and every 32-bit backend
+ * fails it**, which is what you would expect of a path only a register
+ * PAIR can reach -- and it says the four that pass prove nothing about
+ * the four that fail.
+ *
+ * ***A COMPILE-TIME RESULT CAN ONLY NAME A LINE, SO IT ROTS THE MOMENT
+ * THE FILE IS EDITED ABOVE IT -- AND THIS FILE PROVED THAT ON ITSELF.***
+ * Cases 7 to 11 were appended BELOW case6 precisely so the measured
+ * line numbers would survive, and then writing this table pushed every
+ * one of them down 48 lines anyway, because the table is in the
+ * header.  *Appending to the code is not enough when the prose is at
+ * the top.*  So the mapping is by CASE, which is stable, with both
+ * line numbers given:
+ *
+ *	case  run of 2026-10-23  now  construct
+ *	 1          116          181  d->offset = s->size  (ar.c:586)
+ *	 2          122          187  a vlong PARAMETER arriving
+ *	 2          126          191  b = a   (local to local)
+ *	 2          127          192  RETURN of a vlong
+ *	 3          136          201  d->offset = v  (32 -> 64)
+ *	 4          145          210  return s->size
+ *	 5          153          218  d->offset = d->offset + 1
+ *	 6          164          229  a vlong as a vararg
+ *
+ * **Re-key the table, do not renumber the cases**, and when the next
+ * run comes back, read it against the `now' column and then move that
+ * column's name to the date of the run.
+ *
+ * ***AND THEY ARE NOT ONE BUG.*** 5c and qc fail on the RETURN of a
+ * vlong, which 8c compiles; 8c fails on case 1, which 5c and qc
+ * compile; 1c and 2c fail on everything, which reads as no vlong
+ * support rather than as a defect in it.  *Three different faults at
+ * least, so "the 32-bit backends are broken" is a summary and not a
+ * diagnosis.*
+ *
+ * ***8c's RESULT IS THE SHARPEST THING HERE: CASE 1 AND NOTHING
+ * ELSE.***  Not the parameter, not the return, not the widening, not
+ * `d->offset = d->offset + 1', not the vararg.  So 8c's 64-bit support
+ * is broadly working and ONE shape is not -- and the shape is the one
+ * ar.c uses.  Cases 7 to 11 split it along its three seams: how many
+ * indirections, whether the two structs are the same TYPE, and whether
+ * the load and the store are in one expression.  **If case 8 compiles
+ * where case 1 does not, the fault is holding two register pairs live
+ * at once, which is the register allocator and not the front end.**
+ *
+ * **WHAT IS STILL MISSING IS STOCK 8c ON THIS FILE**, and it is one
+ * command from a plain `term%' window.  The ar.c A/B says APExp's
+ * compiler is at fault; this file says which construct; *only the two
+ * together say that this construct is a regression rather than
+ * something kencc never supported.*  If stock 8c also fails on 116,
+ * then case 1 differs from ar.c:586 in some way that matters and the
+ * reduction is not yet faithful.
+ *
  * Build, and the build IS the test:
  *
  *	8c -FTVw regpair-probe.c && 8l -o regpair-probe regpair-probe.8
@@ -164,6 +229,71 @@ case6(Src *s)
 	print("case6 %lld\n", s->size);
 }
 
+/*
+ * CASES 7 TO 11 WERE ADDED AFTER THE FIRST RUN AND ARE DELIBERATELY
+ * PLACED HERE, below case6 and above main, SO THAT THE LINE NUMBERS
+ * ALREADY MEASURED STILL MEAN WHAT THEY MEANT.  A compile-time result
+ * can only name a LINE, so a recorded result rots the moment the file
+ * is edited above it; the table in the header is keyed on lines, and
+ * appending is what keeps it honest.
+ *
+ * They exist because 8c failed on case 1 and on NOTHING ELSE -- not
+ * the vlong parameter, not the vlong return, not the widening, not
+ * `d->offset = d->offset + 1', not the vararg.  So its 64-bit support
+ * is broadly working and one shape is not, and these five split that
+ * shape along its three seams: how many indirections, whether the two
+ * structs are the same TYPE, and whether the load and the store are in
+ * one expression.
+ */
+
+vlong	gsrc;
+vlong	gdst;
+
+/* 7: TWO POINTERS, ONE TYPE. If case 1 fails and this passes, what
+ * matters is that the structs DIFFER, which would point at the type
+ * machinery rather than at addressing. */
+void
+case7(Dst *d, Dst *e)
+{
+	d->offset = e->offset;
+}
+
+/* 8: THE SAME WORK IN TWO STATEMENTS. If case 1 fails and this passes,
+ * the fault is in holding two register pairs live at once -- the load
+ * and the store are each fine alone. That is the register allocator,
+ * not the front end. */
+void
+case8(Dst *d, Src *s)
+{
+	vlong t;
+
+	t = s->size;
+	d->offset = t;
+}
+
+/* 9: NO INDIRECTION AT ALL, two 64-bit statics. */
+void
+case9(void)
+{
+	gdst = gsrc;
+}
+
+/* 10: ONE indirection, on the READ side only. */
+void
+case10(Src *s)
+{
+	gdst = s->size;
+}
+
+/* 11: ONE indirection, on the WRITE side only -- and from a 64-bit
+ * source rather than case 3's 32-bit one, so a failure here is about
+ * the store and not about the conversion. */
+void
+case11(Dst *d)
+{
+	d->offset = gsrc;
+}
+
 void
 main(void)
 {
@@ -191,6 +321,24 @@ main(void)
 	case5(&d);
 	print("case5 %lld\n", d.offset);
 	case6(&s);
+
+	{
+		Dst e;
+
+		e = d;
+		e.offset = 7;
+		case7(&d, &e);
+		print("case7 %lld\n", d.offset);
+	}
+	case8(&d, &s);
+	print("case8 %lld\n", d.offset);
+	gsrc = 0x7fffffff00000001LL;
+	case9();
+	print("case9 %lld\n", gdst);
+	case10(&s);
+	print("case10 %lld\n", gdst);
+	case11(&d);
+	print("case11 %lld\n", d.offset);
 
 	print("regpair-probe: it COMPILED, which is the whole result\n");
 	exits(0);
