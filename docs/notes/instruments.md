@@ -425,3 +425,26 @@ test reports **3 failures**, with `returned 11 (EAGAIN) after 0 ms` and
 in one compile.* 0 failures on glibc.
 
 `_pthreadmark()` is the version marker, the tenth use of the idiom.
+
+## `fsync-test.c`
+
+**Three sections, and section 2 exists because section 0 can pass for
+the wrong reason.** The bug was `fsync` returning `EINVAL` always; the
+obvious test is "fsync of an open file returns 0", and an `fsync` that
+returned 0 to *everything* would pass it. So section 2 requires EBADF
+for a closed descriptor and for `-1`: **a function that cannot fail is
+its own kind of lie.**
+
+Section 1 reads the bytes back after the call. It cannot fail on either
+system, and that is what it is for -- it says the call is a no-op
+rather than something that quietly did harm.
+
+**Where it came from**: `unxz` decompressing correctly, printing
+`Synchronizing the file failed: Invalid argument`, and **deleting its
+own output** -- xz turns a nonzero `fsync` into `success = false` and
+then removes the destination, with `opt_synchronous` on by default.
+`docs/notes/libap.md` has the chain.
+
+0 on gcc; the control, a one-line `sed` putting the replaced
+`errno = EINVAL; return -1` back, reports 1. `_syncmark()` is the
+version marker, the eleventh use.
