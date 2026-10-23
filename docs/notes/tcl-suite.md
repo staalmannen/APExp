@@ -7988,3 +7988,75 @@ them:
 `Skipped` identical, `Passed` 712 -> 716, empty new-failure column.
 **itcl is DONE as a port** -- the remaining ten are upstream or
 Tcl-9's, two of them settled at source, and none is ours.
+
+## The second per-name baseline: 42 failing tests, 2026-10-23
+
+**One fixed, nothing broken, and the name is `io-52.22.1`.** This is
+the first Tcl round in this tree compared the way the file's own rule
+demands -- name by name against a written-down list -- rather than by
+total, and it took one `diff`.
+
+```
+tcl-runall: tcl::test 9.0.3 present -- this is the test interpreter.
+Tests began at 2026-10-23 04:30:59 +0200
+Tests ended at 2026-10-23 04:34:47 +0200
+all.tcl:  Total 68118  Passed 62160  Skipped 5916  Failed 42
+tcl-runall: every file ran, now entering exit (code 0)
+```
+
+Committed at `tmp/tcl-all.out`. The marker is present, the exit code is
+0, and `Total` and `Skipped` are **identical to the digit** against the
+2026-10-07 run -- which is what makes `62159 -> 62160` and `43 -> 42`
+an arithmetic statement about the same population rather than two
+unrelated numbers. The extraction is the one written beside the first
+baseline:
+
+```
+grep -h '^==== ' <log> | awk '{print $2}' | sort -u
+```
+
+**Note the `Contents` and `Test` lines it also matches** -- `==== Contents
+of test case:` is part of every failure report -- so the two have to be
+dropped, which the `-oE '^==== [^ ]+ FAILED'` form in the first baseline
+does and the plain form does not. 44 names out, 42 real.
+
+The diff against the 43 is a single line:
+
+```
+< io-52.22.1
+```
+
+**This run contains the release's whole ABI move** -- `-J`, the 64-bit
+`ino_t`/`dev_t`, `struct stat` 88 -> 104 -- plus the `st_rdev` fix and
+the `poll()`/`select()` work. *A change of that size moving exactly one
+test, and in the right direction, is the result worth recording*: the
+widening cost nothing measurable here, which was the open question the
+re-run existed to answer.
+
+`io-52.22.1` was one of the eleven singletons listed as unattributed
+earlier in this file; it is not attributed now either, only observed to
+have gone. **Nothing in this round was aimed at it**, so which of the
+changes took it is unknown and saying otherwise would be inventing a
+mechanism to fit a number.
+
+The 42, sorted:
+
+```
+Tcl_Main-5.10  chan-io-28.7  chan-io-40.3  chan-io-6.31  chan-io-6.43
+chan-io-6.44  chan-io-6.45  chan-io-6.46  cmdAH-20.5  cmdAH-25.3
+env-2.1  env-2.2  env-2.3  env-2.4  env-3.1  env-4.1  env-4.3
+env-4.4  env-4.5  event-1.1  exec-19.1  io-29.33b  io-40.3
+io-6.31  io-6.43  io-6.44  io-6.45  io-6.46  lseq-4.21.4
+scan-15.1  socket-14.19  socket_inet-2.11  socket_inet-5.1
+socket_inet-5.3  socket_inet-7.3  unixFCmd-1.1  unixInit-1.2
+zipfs-password-read-cipher-2  zipfs-password-write-cipher-w-2
+zipfs-password-write-cipher-deflate-w
+zipfs-password-write-cipher-deflate-w+
+zipfs-password-write-cipher-deflate-a+
+```
+
+**This run is BEFORE the `_selregular` narrowing**, and tclsh does not
+open `/dev/mouse`, so the Tk freeze does not touch it -- but the next
+Tcl run is still the one that says whether the narrowing moved anything
+here. *A clean number measured on a tree is not a prediction about the
+next tree.*

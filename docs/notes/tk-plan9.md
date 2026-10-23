@@ -3535,3 +3535,51 @@ covers A-Z and the accented capitals and is what makes
 `bind .e <Shift-Key-A>` fire. Which *punctuation* needs Shift is a
 property of the physical layout and is not knowable here, so those are
 reported unshifted.
+
+## The white window: a libap select() change, not a Tk one
+
+**Tk's suite went from 97 files and `Failed 177` to a white window and
+a freeze on `bell.test`** -- the first file of the 97 -- in the rebuild
+that carried this release's `struct stat` widening and a `select()`
+change. The log is twelve lines and the last is the file name, which
+with `tk-runall.tcl`'s line buffering means it genuinely stopped there
+rather than losing a buffer.
+
+**It is not `bell.test`, and `XBell` is not involved.** This port's
+`XBell` (`tkPlan9Init.c:1227`) is `return 0` and cannot block. The
+first file is simply the first one to create a window, and the fault is
+in the first event poll of the first window.
+
+**`PollP9Events` is the whole mechanism** (`tkPlan9Event.c:220-255`):
+
+```c
+    if (select(maxfd + 1, &rset, NULL, NULL, &tv) <= 0)   /* tv = {0,0} */
+        return;
+    ...
+    if (mfd >= 0 && FD_ISSET(mfd, &rset))
+        if (tkp9_readmouse(&mouse) == 0)
+```
+
+-- a zero-timeout select on `/dev/mouse` and `/dev/cons`, and then a
+**plain blocking read** of whichever select marks. The design is sound
+and has worked for the whole port's life, because libap's `select`
+buffers every watched descriptor through a copy process and answers
+from what that process has collected: *the blocking read only ever runs
+when a record is already there.*
+
+The `select()` change added an arm that reports a **regular file**
+readable at once and does not buffer it -- correct for a regular file,
+and `_dirtostat` calls rio's `/dev/mouse` regular because it reaches it
+through a 9P mount. So select said yes, Tk read the mouse, and the
+mouse had not moved.
+
+**This is the `stub that answers the wrong category` family again**, in
+libap rather than here, and it is worth reading beside the entries in
+this file for `XLoadFont` and `TkUnixSetMenubar`: the answer was not
+missing, it was the answer to a *neighbouring question*.
+
+`docs/notes/libap.md` has the fix (`_selregular`, length as the
+discriminator) and `sys/lib/tests/devreg-probe.c` is the instrument.
+**Nothing here was changed**, which is the point worth keeping: a
+port-shaped symptom with no port-shaped cause. *The suite numbers in
+this file predate the freeze and have not been re-measured since.*

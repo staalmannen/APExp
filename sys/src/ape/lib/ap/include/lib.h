@@ -143,11 +143,16 @@ typedef struct Fdinfo{
 /*
  * Is this descriptor a regular file?  Cached in the two flag bits
  * above, so it costs one fstat per descriptor and nothing after.
- * read() has used it since the O_NONBLOCK-on-a-regular-file fix;
- * select() needs the same answer for the same reason, so it is shared
- * rather than written twice.
+ * read() has used it since the O_NONBLOCK-on-a-regular-file fix.
+ *
+ * select() does NOT use it and must not: _isregular answers "O_NONBLOCK
+ * does not apply here", select needs "this cannot block", and on Plan 9
+ * those differ -- _dirtostat calls every file reached through a 9P mount
+ * regular, rio's /dev/mouse among them.  _selregular is the strict form;
+ * read.c says at length what the difference cost.
  */
 extern int _isregular(int);
+extern int _selregular(int);
 
 #define MAXSIG SIGPROF
 
