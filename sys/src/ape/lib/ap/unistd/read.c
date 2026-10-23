@@ -52,6 +52,73 @@ _isregular(int d)
 	return (f->flags & FD_ISREG) != 0;
 }
 
+/*
+ * THE SAME QUESTION ASKED STRICTLY, FOR select().
+ *
+ * `_isregular' above is a statement about O_NONBLOCK, and for that it is
+ * exactly right: whatever `S_ISREG' covers, O_NONBLOCK does not apply to
+ * it.  **It is NOT a statement that the file cannot block**, and select()
+ * needs that stronger one -- it reports a regular file readable without
+ * arranging for anything to read it, so a file that says S_ISREG and then
+ * blocks hangs the caller inside its next read().
+ *
+ * AND ON PLAN 9 S_IFREG IS A FALLBACK, NOT A FACT.  `_dirtostat' has no
+ * device-type bit to work from, so it reads `Dir.type': a directory, then
+ * `|' and `s' for pipes and sockets, then **anything that is not `M' is a
+ * character special, and everything left -- every file reached through a
+ * 9P MOUNT -- is called regular.**  That last clause is the trap, because
+ * rio serves /dev/cons, /dev/mouse, /dev/winname and /dev/snarf from its
+ * own file server.  They arrive as type `M' and so answer S_ISREG, and
+ * /dev/mouse blocks until the mouse moves.
+ *
+ * WHAT IT COST was wish: Tk's `PollP9Events' (tkPlan9Event.c:237) does a
+ * ZERO-TIMEOUT select on the mouse and console descriptors and, on
+ * FD_ISSET, calls `tkp9_readmouse' -- a plain blocking read.  With select
+ * answering "ready" for both, the first poll of the first window blocked
+ * before anything was ever drawn: a white window and a suite frozen on
+ * its first file.
+ *
+ * THE DISCRIMINATOR IS LENGTH, and it is chosen because the fallback is
+ * safe rather than because it is pretty.  A Plan 9 device file reports
+ * length 0; a file whose readiness anyone cares about does not.  A file
+ * that IS zero-length -- an empty regular file -- simply takes the old
+ * buffered path, which gets the right answer by a copy process that hits
+ * end of file at once.  *The bug that path has is a RACE, not a wrong
+ * answer*, so losing the fast arm for empty files costs latency and
+ * nothing else.
+ *
+ * It re-stats rather than caching, because a file grows: a length cached
+ * when the file was empty would keep it on the slow path for ever, and
+ * the cost is one fstat per watched descriptor per select -- against a
+ * function whose other arm FORKS A PROCESS.
+ */
+int
+_selregular(int d)
+{
+	struct stat st;
+
+	if(!_isregular(d))
+		return 0;
+	if(fstat(d, &st) != 0)
+		return 0;
+	return st.st_size > 0;
+}
+
+/*
+ * Version marker for `devreg-probe.c'.  `pcc -o x x.c' relinks against
+ * the INSTALLED libap, so a probe built from a fresh pull can run
+ * days-old library code and report on it; a probe that calls this will
+ * not LINK against a libap predating the narrowing above.  Ninth use of
+ * the idiom, and the one with the shortest fuse: the state it
+ * distinguishes is "wish draws" against "wish freezes with a white
+ * window", which from the prompt look the same for the first second.
+ */
+int
+_selregmark(void)
+{
+	return 1;
+}
+
 ssize_t
 pread(int d, void *buf, size_t nbytes, off_t offset)
 {

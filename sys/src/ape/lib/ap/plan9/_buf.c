@@ -616,16 +616,27 @@ select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeo
 			 * a file opened read-write, asked for POLLIN and
 			 * POLLOUT, answered POLLOUT alone.
 			 *
-			 * This is the same rule read() already follows for
-			 * the same reason, which is why `_isregular' is
-			 * shared rather than written twice: *O_NONBLOCK
-			 * does nothing to a regular file*, and neither
-			 * does watching one.
+			 * THE PREDICATE IS `_selregular' AND NOT
+			 * `_isregular', AND THE DIFFERENCE IS A WHOLE BUG.
+			 * read()'s question is whether O_NONBLOCK applies;
+			 * this one's is whether the file can BLOCK, because
+			 * the arm below reports readable WITHOUT arranging
+			 * for anything to read.  On Plan 9 `_dirtostat' has
+			 * no device-type bit and calls every file reached
+			 * through a 9P mount regular -- which is rio's
+			 * /dev/mouse, and /dev/mouse blocks until the mouse
+			 * moves.  Tk polls exactly those two descriptors
+			 * with a zero timeout and then reads whichever
+			 * select marks, so the first poll of the first
+			 * window never returned: a WHITE WINDOW and a suite
+			 * frozen on its first file.  `read.c' has the rest,
+			 * including why length is the discriminator and why
+			 * falling back is safe.
 			 *
 			 * An exceptional condition is likewise impossible
 			 * on one, so efds is cleared rather than reported.
 			 */
-			if(_isregular(i)){
+			if(_selregular(i)){
 				if(efds && FD_ISSET(i, efds))
 					FD_CLR(i, efds);
 				if(rfds && FD_ISSET(i, rfds))

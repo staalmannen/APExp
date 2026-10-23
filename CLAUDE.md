@@ -243,10 +243,11 @@ against a broken tree and proves nothing; the command is in the file.
 so a test built from a fresh pull can run days-old library code and say
 nothing. `_sock_listenmark`, `_execmark`, `_ttymark`, `_getcwdmark`,
 `_printfmark`, `_dupmark`, `_dotdirmark`, `_tempmark`, `_fdinfomark`,
-`_umaskmark`, `_bufmark`, `_rdevmark` each make the test **fail to
-LINK** against a libap predating its fix. The idiom has paid eight
-times; bump one when a file changes in a way a test must see — and it
-matters most where the bug's whole symptom is that nothing is printed.
+`_umaskmark`, `_bufmark`, `_rdevmark`, `_selregmark` each make the test
+**fail to LINK** against a libap predating its fix. The idiom has paid
+nine times; bump one when a file changes in a way a test must see — and
+it matters most where the bug's whole symptom is that nothing is
+printed.
 
 **Host cross-checks** (not Plan 9 tests — they run on the build host):
 `tz-xcheck`, `ctype-xcheck`, `strtod-xcheck`, `strtof-xcheck`,
@@ -284,7 +285,12 @@ deliberate break; `bitinit-model` is the only one with an EXTERNAL oracle
 `pcc -9 -c -a`; the DIFF is the ABI cost, named struct by struct, from
 the compiler itself), `edgtuoff-probe`, `edgscope-probe`, `tarhdr-probe`,
 `tarblock-probe` (**must be built with tar's own `-I` flags**),
-`chickenword-probe`, `vtparse-probe`, `vtlayout-probe`, and
+`chickenword-probe`, `vtparse-probe`, `vtlayout-probe`,
+`devreg-probe` (**no host form and `pcc` only** — which files APE calls
+regular and whether `select()` then reports them readable; the subject
+is what *rio* serves, so run it in a rio window with no wish running,
+and note that it never READS any of them, since reading `/dev/mouse` is
+the call that hangs), and
 `mkrecipe-probe/`, which is a whole mk DIRECTORY because the question is
 what `mk` hands `rc` (`mk -k all`; `-k` is not optional).
 
@@ -472,12 +478,23 @@ built by hand has not been measured in that position*.
   `b->n`/`b->eof`, which are zero until that process's first read
   completes — so the bit was cleared. POSIX says a regular file is
   always ready, at EOF too; it cannot block, so there was nothing to
-  wait for. `_isregular()` is shared out of `read.c`, the same rule
-  read() already follows. ***A LIVE CANDIDATE FOR xz's HANG and not
-  claimed as it***: xz polls a redirected (regular) stdin for POLLIN,
-  and a "not readable" answer sends `io_wait` round a loop with no
-  sleep in it. *Run xz once after the next rebuild before writing the
-  limitation down* — the fix may have removed it.
+  wait for. That fix was offered as a live candidate for xz's hang,
+  with a refutation condition written down first — **and the condition
+  FIRED**: xz still hangs on the rebuilt tree. *So the select answer
+  was not xz's cause*, and the new datum is the shape of the load —
+  `l` lower than before but **`s` pinned at the maximum**, which by the
+  rule two lines up is a SYSCALL LOOP and sends the next step to
+  `ratrace` rather than to `acid`.
+  ***AND THAT FIX BROKE wish***, which is the cost of the round: its
+  predicate was `_isregular()`, i.e. `S_ISREG`, and on Plan 9 that is
+  `_dirtostat`'s FALLBACK for "reached through a 9P mount" rather than
+  a fact — so rio's `/dev/mouse` is "regular", select reported it
+  readable without buffering it, and Tk's `PollP9Events` read it and
+  blocked. `_selregular()` narrows it by LENGTH (a device file reports
+  0; an empty regular file takes the old buffered path, whose bug is a
+  RACE and not a wrong answer). **Believed fixed, NOT measured**;
+  `devreg-probe` settles it in one run. *Two questions wore one
+  function's name because they agree on Unix.*
   **Found on the way and fixed, though NOT claimed as the cause**:
   `poll()` had three POSIX violations, two of which can spin a caller —
   it returned `select`'s count of BITS rather than of pollfd ENTRIES,
@@ -531,7 +548,7 @@ covers what you are about to touch; do not re-derive from scratch.
 | `docs/notes/invariants.md` | the traps that bite silently: ABI widths, variadic sentinels, missing prototypes, `free()`'s contract, amd64 setjmp/longjmp, the FP environment, header search order, and the stdio bugs found through flex |
 | `docs/notes/tk-plan9.md` | the `sys/src/external/tk/plan9/` backend and Tk's own suite, runs 1 to 16. Also the `HFILES` trap and the gcc syntax check, which apply tree-wide |
 | `docs/notes/vts.md` | the VT emulator and its two clients: what `vtwin` and `vts-attach` are, why the missing piece is inside `vts/session.c`, and the order of work |
-| `docs/notes/tcl-suite.md` | Tcl's suite: the allocator, sockets and the missing loopback, `shutdown()`, `listen()`, `select()` and `ap/plan9/_buf.c`, `fd_set`, the `chan-io` hangs, the per-name baseline for all 43, and itcl |
+| `docs/notes/tcl-suite.md` | Tcl's suite: the allocator, sockets and the missing loopback, `shutdown()`, `listen()`, `select()` and `ap/plan9/_buf.c`, `fd_set`, the `chan-io` hangs, the per-name baselines (43, then 42), and itcl |
 | `docs/notes/bash.md` | the bash campaign: the allocation storm and the twelve instrument faults it cost, the fourteen `config.h` features, printf, strftime, strtoull, strerror, dup, readdir, and the per-file state of its suite |
 | `docs/notes/edg.md` | EDG's C++ front end: the target description, the link model, the `auto` grammar bug, the entry point, the folded `offsetof`, and the two bit-field rules it flushed out of kencc |
 | `docs/notes/ports.md` | one section per package — cfront, bacon, muon, go, chicken, perl, GNU tar — what each took to build and what the breakage turned out to be about |
@@ -983,18 +1000,30 @@ the index, so that nothing here is a surprise.
 state and the open list; every claim here was measured, and where it was
 not the entry says so.
 
-**Tcl's suite**: `Total 68118 Passed 62159 Skipped 5916 Failed 43`, 167
-files, marker, exit 0, four minutes. **All 43 are listed BY NAME in
-`docs/notes/tcl-suite.md`** with the one-command extraction beside them;
-the log is at `tmp/tcl-all.out`. *The absence of a per-name baseline is
-what kept that campaign open for rounds while every comparison was made
-by total.*
+**Tcl's suite**: `Total 68118 Passed 62160 Skipped 5916 Failed 42`, 167
+files, marker, exit 0, four minutes — re-measured on the tree that
+carries this release's whole ABI move (`-J`, 64-bit `ino_t`/`dev_t`,
+`struct stat` 88 → 104). **`Total` and `Skipped` are identical to the
+digit** against the 43-failure baseline, so the arithmetic is a
+statement about the same population: **one fixed, nothing broken, and
+the name is `io-52.22.1`** — one of the eleven unattributed singletons,
+and still unattributed, since nothing this round was aimed at it. Both
+lists are BY NAME in `docs/notes/tcl-suite.md` with the extraction
+command; the log is `tmp/tcl-all.out`. *That a change of this size moved
+exactly one test is the result the re-run existed to get.*
 
-**Tk's suite**: 97 files, `Total 10027 Passed 8925 Skipped 924 Failed
-177`, clean exit. The remaining 177 are mostly out of reach (a second
-wish, an X property, a system tray, a scalable font, or a constraint that
-fails on Linux too). The port's own share is `focus-6.1`, `geometry-4.7`,
-`event-9.13`/`9.14` and `visual-3.1`.
+**Tk's suite**: the last clean run was 97 files, `Total 10027 Passed
+8925 Skipped 924 Failed 177`. **IT DOES NOT RUN TODAY**: the rebuild
+above left a **white window frozen on `bell.test`**, the first file of
+the 97, and the cause is libap's and not Tk's. `select()`'s new
+regular-file arm reports readable *without buffering*, `_dirtostat`
+calls rio's `/dev/mouse` regular (every file reached through a 9P mount
+is), and `PollP9Events` polls it with a zero timeout and then does a
+**blocking read** — so the first poll of the first window never
+returned and nothing was ever drawn. `_selregular` narrows the
+predicate by LENGTH; **believed fixed, NOT yet measured**, and
+`devreg-probe` is the one-run instrument. The 177's own share is
+`focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **bash's suite**: `PASS 49 / REAL 36 / WARNONLY 1` of 86 files, from 0
 passing. ~950 of the 1015 remaining differing lines are platform limits —

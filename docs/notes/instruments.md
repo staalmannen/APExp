@@ -342,3 +342,46 @@ right arm of `same_file` rather than merely noticing something is wrong.
 one it matters most for: *the bug it guards against is one whose entire
 symptom is that nothing is printed*, so a test silently measuring a
 stale libap would be indistinguishable from a pass.
+
+## `devreg-probe.c`
+
+**A probe, not a test, and the only instrument here with NO HOST
+FORM.** Every other cross-check in this tree exists because the host
+can answer the question more cheaply; this one asks what *rio* serves
+and over which protocol, so a gcc build would measure a machine that
+has neither rio nor `/dev/mouse`. The build line is `pcc` alone, and it
+has to be run inside a rio window with no wish running.
+
+**Where it came from.** `select()` was given an arm that reports a
+regular file readable at once, which is what POSIX requires and what
+`poll-test` had just measured as broken. The predicate was
+`_isregular`, i.e. `S_ISREG` -- and on Plan 9 `S_IFREG` is
+`_dirtostat`'s FALLBACK for "reached through a 9P mount" rather than a
+fact about the file. rio serves `/dev/mouse` that way. The same rebuild
+that put `poll-test` at 0 left Tk showing a **white window**, frozen on
+the first of 97 files.
+
+**What it prints**: for an ordinary file with bytes in it, an empty
+one, rio's four (`mouse`, `cons`, `winname`, `snarf`) and three kernel
+devices -- the `S_IS*` kind, the length, and what a zero-timeout
+`select` answers. **It never reads any of them**, which is the one
+thing it must not do: reading `/dev/mouse` is exactly the call that
+hangs, and a probe that hangs measures nothing.
+
+- **Section 0 is the control** -- a file with five bytes in it must be
+  `REG` and must select readable. It says so in the output if it is
+  not.
+- **Section 1 is the deliberate fallback** and is printed only so that
+  nobody reads it as a fault: an empty regular file does not take the
+  fast arm, because the discriminator is a positive length.
+- **Section 2 is the question**, and the header writes down what would
+  refute the whole story: `/dev/mouse` reported `chr`, or reported
+  `REG` and *not ready*, means the freeze is something else.
+
+`_selregmark()` is the version marker, the ninth use of the idiom, and
+the one with the shortest fuse -- the two states it separates are "wish
+draws" and "wish freezes with a white window", which look identical
+from the prompt for the first second.
+
+**It has not been run yet.** The mechanism above is argued from source,
+and this file's own tally for that is about one in eight.

@@ -3441,3 +3441,74 @@ asserting on them -- *a failure should name itself*.
 **NOT COMPILED ANYWHERE**: `_buf.c` is Plan 9's, so the first build of
 this is the VM's, the same weaker position every `cc/` change ships
 from.
+
+#### THE PREDICTION FIRED, AND SO DID A SECOND ONE NOBODY HAD WRITTEN DOWN
+
+Both halves of the paragraph above came back, and they came back
+opposite ways.
+
+**xz still hangs**, so the refutation condition fired exactly as
+written: *the select answer was not xz's cause.* The new datum is the
+shape of the load -- `l` lower than before but **`s` pinned at the
+maximum** -- and this file's own rule separates those two: a pinned
+*system* figure is a SYSCALL LOOP, not a compute loop. So the next step
+is the one already named, `ratrace` on the spinning process, and the
+`acid`/`stk()` branch is now the unlikely one.
+
+**And the fix broke wish.** The same rebuild that put `poll-test` at 0
+put Tk's suite at a **white window frozen on `bell.test`**, the first
+file of 97. The two are one thing:
+
+- `PollP9Events` (`tk/plan9/tkPlan9Event.c:237`) does a **zero-timeout
+  `select`** on `/dev/mouse` and `/dev/cons` and then, on `FD_ISSET`,
+  calls `tkp9_readmouse` -- which is a plain blocking `read` of 49
+  bytes (`tkPlan9DrawImpl.c:711`).
+- The new arm reports a regular file readable **without arranging for
+  anything to read it**, which is sound only if the file genuinely
+  cannot block.
+- `_isregular` does not say that. It says `S_ISREG`, and **on Plan 9
+  `S_IFREG` is `_dirtostat`'s FALLBACK rather than a fact**: with no
+  device-type bit to read it takes `Dir.type` -- directory, then `|`
+  and `s`, then *anything that is not `M`* is a character special, and
+  everything remaining, meaning **every file reached through a 9P
+  mount**, is called regular. rio serves `/dev/cons`, `/dev/mouse`,
+  `/dev/winname` and `/dev/snarf` from its own file server.
+
+So wish asked whether the mouse had moved, was told yes, and read it.
+*A white window is what a first poll that never returns looks like* --
+the event loop blocked before anything was drawn.
+
+**THE PREDICATE WAS THE BUG, NOT THE RULE.** POSIX's statement about
+regular files is still right and `poll-test` still asserts it. What was
+wrong is that two different questions were answered by one function
+because they happened to have the same name on Unix:
+
+| question | who asks | answer on Plan 9 |
+|---|---|---|
+| does `O_NONBLOCK` apply here? | `read()` | `S_ISREG` is exactly right |
+| can this file block? | `select()` | `S_ISREG` is far too broad |
+
+`_selregular` in `unistd/read.c` is the strict form, and **the
+discriminator is LENGTH, chosen because the fallback is safe rather
+than because it is pretty.** A Plan 9 device file reports length 0; a
+file whose readiness anyone cares about does not. An empty regular file
+loses the fast arm and takes the old buffered path -- *whose bug is a
+RACE and not a wrong answer*, since its copy process reaches end of
+file at once. The cost of being wrong in that direction is latency.
+It re-stats rather than caching, because a file grows, and the price is
+one `fstat` against a function whose other arm **forks a process**.
+
+**`devreg-probe.c` is the instrument and it has no host form**, since
+the subject is rio. It prints, for an ordinary file, an empty one,
+rio's four and three kernel devices: the `S_IS*` kind, the length, and
+what a zero-timeout `select` says. **Section 0 is the control and
+section 2 is the question**, and the header writes down what would
+refute it: `/dev/mouse` reported `chr`, or reported `REG` and *not
+ready*, means the freeze is something else and this whole section is
+wrong. *A mechanism argued from source alone runs about one in eight
+here, and this one has not been measured yet.*
+
+**The honest statement of the release position**: the narrowing is
+believed to restore wish and is unproven; the `poll()` entry-count,
+negative-fd and `POLLNVAL` fixes beside it are independent of all of
+this and were confirmed on the VM at 0 failures.
