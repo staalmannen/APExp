@@ -3629,3 +3629,78 @@ this paragraph is wrong. `zstd` is in the same position untested
 
 *The rule this cost a round to restate: a grep that finds nothing has
 ruled out what you grepped for and nothing else.*
+
+## unistd/fsync.c: the stub that answered FAILURE, and deleted files
+
+With the pthread fixes in, `xz -c <sample.txt >/tmp/t.xz` stopped
+hanging and produced 72 bytes. `unxz /tmp/t.xz` then decompressed it
+and printed
+
+```
+unxz: /tmp/t: Synchronizing the file failed: Invalid argument
+```
+
+**and deleted the output.** libap's `fsync` was, in full:
+
+```c
+int
+fsync(int)
+{
+	errno = EINVAL;
+	return -1;
+}
+```
+
+**This is the stub-answers-failure family**, which CLAUDE.md already
+calls the single commonest bug in this tree -- `XLoadFont`, `wm title`,
+`testembed`, `TkUnixSetMenubar`, `shutdown`, and now this. *A stub that
+says "I failed" is not a stub that says "there was nothing to do."*
+
+### Why it deleted the file rather than merely complaining
+
+`io_sync_dest` (`xz/src/xz/file_io.c:484`) calls `fsync(pair->dest_fd)`
+and returns true on any nonzero; `file_io.c:1207` turns that into
+`success = false`; `io_close_dest(pair, false)` then REMOVES the
+destination. `opt_synchronous` is `true` by default
+(`xz/src/xz/args.c:24`), so **this was every `xz` and `unxz` on a named
+file, every time.** The bytes were correct, written, and thrown away on
+the way out.
+
+*The message named the sync and the user lost the file*, which is about
+as far apart as a symptom and a cause get -- and it is why this one was
+worth the paragraph: nothing in "Synchronizing the file failed" says
+"your output is gone".
+
+### The right answer was already in libap, in a place that disagreed
+
+`plan9/__p9_syscall.c:594`:
+
+```c
+	case SYS_fsync:	/* [STUB] Plan9 writes are synchronous; no-op is correct */
+		(void)a1;
+		return 0;
+```
+
+**Two files in the same library held opposite answers to the same
+question, and the one programs actually call was the wrong one.** Plan
+9 has no `fsync` because a write to a file server has already been
+acknowledged by the server when `write` returns; there is no local
+cache for the call to flush. *Nothing to do is not the same as cannot
+be done.*
+
+### What it answers now
+
+0 for an open descriptor, EBADF for one that is not -- the fd check
+copied from `read.c` rather than reinvented, because **a function that
+cannot fail is its own kind of lie** and a test that only asked section
+0 would pass against an `fsync` that returned 0 to everything.
+POSIX permits EINVAL only for a file that does not *support*
+synchronising; on this system every file supports it by already having
+done it.
+
+`fdatasync` was deliberately NOT added. Nothing in `external/` calls
+it -- the only hits are gnulib's own `unistd.in.h`, gated on
+`HAVE_FDATASYNC` -- and a new name in a public APE header has the whole
+tree as its blast radius, for no measured need.
+
+`fsync-test` is 0 on gcc and **1 on the replaced line**.

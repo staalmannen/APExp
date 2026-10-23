@@ -230,7 +230,10 @@ an APE build never reaches kencc's own C23 keywords.
 `dup-fdinfo-test`, `rmdir-test`, `copyfile-test`, `deeppath-test`,
 `bufexec-test`, `mkstemp-test`, `printfmod-test`, `umask-test`,
 `dupbuf-test`, `dotdir-test`, `getcwd-test`, `progname-test`,
-`select-test`, `cxaatexit-test`, `pthread-test` (**the one test here
+`select-test`, `cxaatexit-test`, `fsync-test` (**a stub that answers
+FAILURE is not one that answers NOTHING TO DO** — and its section 2 is
+there because section 0 passes for an `fsync` that returns 0 to
+everything), `pthread-test` (**the one test here
 that can HANG, so the only one that arms a `SIGALRM`** — a thread must
 reach its start routine and `pthread_cond_timedwait` must actually
 wait; the two are different bugs and the sections are split so), `poll-test` (the count is
@@ -246,9 +249,9 @@ against a broken tree and proves nothing; the command is in the file.
 so a test built from a fresh pull can run days-old library code and say
 nothing. `_sock_listenmark`, `_execmark`, `_ttymark`, `_getcwdmark`,
 `_printfmark`, `_dupmark`, `_dotdirmark`, `_tempmark`, `_fdinfomark`,
-`_umaskmark`, `_bufmark`, `_rdevmark`, `_selregmark`, `_pthreadmark`
-each make the test **fail to LINK** against a libap predating its fix.
-The idiom has paid ten times; bump one when a file changes in a way a test must see — and
+`_umaskmark`, `_bufmark`, `_rdevmark`, `_selregmark`, `_pthreadmark`,
+`_syncmark` each make the test **fail to LINK** against a libap
+predating its fix. The idiom has paid eleven times; bump one when a file changes in a way a test must see — and
 it matters most where the bug's whole symptom is that nothing is
 printed.
 
@@ -454,38 +457,45 @@ built by hand has not been measured in that position*.
   `bacon-test.bac` remains 3 failures, all three the 32-bit-`long`
   invariant arriving through a language whose only integer type is that
   `long`.
-- **the archivers** — **xz's HANG IS NAMED, AND IT WAS `pthread_create`.**
-  Two rounds went to `poll`, `select` and `O_NONBLOCK` — xz uses all
-  three and none was the fault. `ps` first, then two `acid` stacks,
-  settled it in one run: **xz is MULTITHREADED**
-  (`liblzma/common/stream_encoder_mt.c`), and libap's pthread layer had
-  **three** bugs. (1) The child half of `pthread_create` did
-  `_RENDEZVOUS(tag, 0)` and **the parent never answered** — that was
-  the only `_RENDEZVOUS` in the whole thread directory — so *every
-  thread ever created blocked before reaching its start routine while
-  its creator was told it had succeeded*. (2) `*t` was never written.
-  (3) `attr != NULL` returned EINVAL and **libap's own
-  `pthread_cond_timedwait` always passes one**, so it returned EAGAIN
-  *without ever waiting*; `wait_for_work` is a loop, so each turn cost
-  a `clock_gettime` → `_PREAD`. ***That is a spin made of syscalls,
-  which is exactly why `s` was pinned and `l` was not*** — the two
-  figures were the diagnosis and had been read correctly a round
-  before the cause was found. `pthread-test` (**the first test here
-  that can hang, so the first that arms an alarm**) is 0 on gcc and
-  **3 on the replaced code**, reproducing the spin on the build host.
-  **Fixed, NOT yet measured against xz.**
-  ***AND THE "THEY SHARE NO MECHANISM" CLAIM IS WITHDRAWN.*** This
-  entry used to say, in capitals, that `lz4` uses neither `poll` nor
-  `select` nor `O_NONBLOCK`. True, and the wrong question: **`lz4` has
-  `programs/threadpool.c`, its mkfile compiles with
-  `-DLZ4IO_MULTITHREAD`, and `threadpool.$O` is in the link.** Both go
-  through `pthread_create`, and a worker that never starts is exactly
-  "froze and left an EMPTY output". *A grep that finds nothing has
-  ruled out what you grepped for and nothing else.* **Prediction with
-  its refutation attached: if lz4 still hangs after this rebuild they
-  are two bugs after all.** `zstd` is in the same position untested
-  (`lib/common/pool.c`); `unarj` lists a 1MB archive correctly; unrar,
-  unace and clzip untried.
+- **the archivers** — **BOTH HANGS ARE FIXED AND MEASURED, AND THE
+  PREDICTION HELD.** `xz -c <sample.txt >/tmp/t.xz` returns and writes
+  72 bytes; `unlz4` returns with an error instead of freezing. The
+  cause was libap's `pthread_create` (three bugs — a child rendezvous
+  the parent never answered, an unwritten `*t`, and an `attr != NULL`
+  EINVAL that libap's own `pthread_cond_timedwait` tripped over every
+  call, spinning `wait_for_work` through `clock_gettime` → `_PREAD`,
+  which is why `s` was pinned and `l` was not). ***The refutation
+  condition written down before the run did not fire***: lz4 was
+  wedged on the same mechanism, via `programs/threadpool.c`, so the
+  earlier "they share no mechanism" claim stays withdrawn. *A grep
+  that finds nothing has ruled out what you grepped for and nothing
+  else.* `docs/notes/libap.md` has the two `acid` stacks.
+  **Then `fsync` DELETED THE OUTPUT.** `unxz /tmp/t.xz` decompressed
+  correctly and printed `Synchronizing the file failed: Invalid
+  argument` — libap's `fsync` was `errno = EINVAL; return -1`, xz
+  turns a nonzero fsync into `success = false`, and
+  `io_close_dest(pair, false)` REMOVES the destination;
+  `opt_synchronous` is on by default, so this was every `xz`/`unxz` on
+  a named file, every time. **The stub-answers-FAILURE family again**,
+  and libap already held the right answer in a second place that
+  disagreed (`plan9/__p9_syscall.c:594`, "Plan9 writes are
+  synchronous; no-op is correct"). Fixed; `fsync-test` 0 on gcc, 1 on
+  the replaced line. **Not yet measured on the VM.**
+  **WHAT IS LEFT IS TWO DECODE FAILURES, AND NEITHER IS SEPARATED**:
+  `unxz xz_sample_file_1MB.xz` says `Compressed data is corrupt` and
+  `unlz4 sample.txt.lz4` says `Error 26 : LZ4F frame decoding could
+  not complete: invalid frame`, `Decompressed : 0 MiB`. **Both files
+  were produced ELSEWHERE**, so each has two explanations — a bad
+  download, or a path only those files reach — and *an absence of a
+  local round trip is what keeps them unseparated*. ***The positive
+  result is hidden inside the sync error***: `unxz /tmp/t.xz` reached
+  `io_sync_dest`, which runs AFTER decoding, so **encoder and decoder
+  already agree on a small file.** The discriminators are a local
+  round trip at 1MB and `-T1` against the default `-T0`, since the
+  threaded encoder is ground nothing has ever covered — *a fix that
+  makes a process reach code it never reached before can expose
+  anything on that path*. `unarj` lists a 1MB archive correctly;
+  unrar, unace, zstd and clzip untried.
   **`pcc -9` is NOT available as an A/B**: one package rebuilt under
   the old layout rule against a `-J` libap is the silent ABI split, so
   it cannot separate "`-J` broke it" from "it never worked".
