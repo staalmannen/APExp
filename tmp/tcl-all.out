@@ -10,7 +10,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-10-07 17:50:49 +0200
+Tests began at 2026-10-23 04:30:59 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -200,7 +200,7 @@ cmdAH.test
     expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
 
 ---- Result was:
-1791388285 != 1791388284
+1792722695 != 1792722694
 ---- Result should have been (exact matching):
 1
 ==== cmdAH-20.5 FAILED
@@ -425,7 +425,7 @@ exec.test
     file size $tmpfile
 
 ---- Result was:
-14
+24
 ---- Result should have been (exact matching):
 26
 ==== exec-19.1 FAILED
@@ -637,7 +637,7 @@ bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
     ("uplevel" body line 15)
     invoked from within
 "uplevel 1 $script"
----- errorCode: CHILDSTATUS 102572 1
+---- errorCode: CHILDSTATUS 52627 1
 ==== io-29.33b FAILED
 
 
@@ -657,34 +657,6 @@ bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
 ---- Result should have been (exact matching):
 0o666
 ==== io-40.3 FAILED
-
-
-
-==== io-52.22.1 TclCopyChannel & encodings & tell position FAILED
-==== Contents of test case:
-
-    # binary to encoding => the input has to be
-    # in utf-8 to make sense to the encoder
-
-    set in  [open $path(utf8-fcopy.txt) r]
-    set out [open $path(kyrillic.txt) w]
-
-    # Using "-encoding ascii" means reading the "Á" gives an error
-    fconfigure $in  -encoding ascii -profile strict
-    fconfigure $out -encoding koi8-r -translation lf
-    proc ::xxx args {
-	set ::s0 $args
-    }
-
-    fcopy $in $out -command ::xxx
-    vwait ::s0
-    list [tell $in] [tell $out] {*}[set ::s0]
-
----- Result was:
--1 1 1 {error reading "file5": invalid or incomplete multibyte or wide character}
----- Result should have been (glob matching):
-1 1 1 {error reading "file*": invalid or incomplete multibyte or wide character}
-==== io-52.22.1 FAILED
 
 ioCmd.test
 ioTrans.test
@@ -1043,7 +1015,7 @@ unixInit.test
     }
 
 ---- Result was:
-Expected: `127.0.0.1 localhost 39777', Got `'
+Expected: `127.0.0.1 localhost 34563', Got `'
 ---- Result should have been (exact matching):
 OK
 ==== unixInit-1.2 FAILED
@@ -1185,8 +1157,8 @@ zipfs.test
 
 zlib.test
 
-Tests ended at 2026-10-07 17:54:57 +0200
-all.tcl:	Total	68118	Passed	62159	Skipped	5916	Failed	43
+Tests ended at 2026-10-23 04:34:47 +0200
+all.tcl:	Total	68118	Passed	62160	Skipped	5916	Failed	42
 Sourced 167 Test Files.
 Files with failing tests: chanio.test cmdAH.test env.test event.test exec.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
 Number of tests skipped for each constraint:

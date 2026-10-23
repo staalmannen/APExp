@@ -1,0 +1,12 @@
+tk-runall: Tk's test commands are present -- this is tktest.
+tk-runall: starting, line buffered, default bgerror dialog replaced by a log line (tkerror delegation kept), exit wrapped for the marker
+Tests running in interp:  /usr/glenda/APExp/sys/src/ape/cmd/wish/tktest
+Tests located in:  /usr/glenda/APExp/sys/src/external/tk/tests
+Tests running in:  /usr/glenda/APExp/sys/src/external/tk/tests
+Temporary files stored in /usr/glenda/APExp/sys/src/external/tk/tests
+Test files sourced into current interpreter
+Running tests that match:  *
+Skipping test files that match:  l.*.test
+Only running test files that match:  *.test
+Tests began at 2026-10-23 04:38:54 +0200
+bell.test
