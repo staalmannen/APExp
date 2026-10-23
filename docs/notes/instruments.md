@@ -760,3 +760,31 @@ So `regpair-min.c`: case 1 and nothing else, ten lines, native `8c`.
 **Either answer is worth more than a sixteenth case.** When a reduction
 stops narrowing, stop adding to it and ask whether the harness has
 become part of the measurement.
+
+### `regpair-min.c` fails: two structs and one assignment
+
+```
+regpair-min.c:69 bad in naddr: REGPAIR   (twice, with the tree)
+```
+
+**Ten lines reproduce it.** No other cases, no 450-line harness --
+`regpair-probe.c` did its job and is now superseded for this question.
+*The reduction that matters is the one somebody else can paste into a
+bug report.*
+
+**And `8c/cgen.c` is cleared by reading too**: against upstream HEAD its
+only non-rename, non-comment difference is the `OALLOCA` case, a new
+`case` label unreachable without a VLA. All five of our 8c deltas hold
+as inert, which leaves `cc/`.
+
+**The one hypothesis a minimal file cannot kill by being minimal** is
+the one the probe imposed: `case1` is the first function here too.
+`-DLEADER` puts a trivial function ahead of it, so two compiles of one
+file settle it -- and `cpp` keeps line numbering through an `#ifdef`,
+so the assignment is on the same line in both builds and the
+diagnostics compare directly.
+
+*A toggle inside the file beats a second file*, because the two builds
+then differ in exactly the thing being tested and in nothing else --
+not in struct layout, not in line numbers, not in what else happens to
+be present.

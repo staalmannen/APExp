@@ -63,6 +63,38 @@ struct Dst
 	Dst	*next;
 };
 
+/*
+ * -DLEADER PUTS A TRIVIAL FUNCTION AHEAD OF case1, and that is the one
+ * hypothesis this file does NOT settle by existing.
+ *
+ * `regpair-probe.c' could never test it, because case1 was the first
+ * function there too and every case added to that file came after it.
+ * It still is here.  So per-function backend state -- `regsalloc''s
+ * stack offsets, `maxargsafe', the register tables, all in their
+ * initial condition for the first function compiled and in some
+ * accumulated one for every later one -- remains live, and two
+ * compiles of ONE file settle it:
+ *
+ *	8c regpair-min.c            both name the same line
+ *	8c -DLEADER regpair-min.c
+ *
+ * **Both fail** -> position is irrelevant and this is a true minimal
+ * reproduction: two structs, one assignment.
+ * **-DLEADER compiles** -> the construct is innocent and the fault is
+ * POSITIONAL, which is a different bug in a different place and a much
+ * bigger finding than a tenth case would have been.
+ *
+ * cpp keeps line numbering through an `#ifdef', so the assignment
+ * below is on the same line in both builds and the two diagnostics are
+ * directly comparable.
+ */
+#ifdef LEADER
+void
+leader(void)
+{
+}
+#endif
+
 void
 case1(Dst *d, Src *s)
 {
