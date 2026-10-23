@@ -484,3 +484,45 @@ a different reading:
 *`pthread-test` had the first two from the start, for the same reason
 written down before the fact. `fsync-test` did not, and the round it
 cost is the argument for making it the default.*
+
+## `regpair-probe.c`
+
+**The second NATIVE file in this directory**, after `truefalse-test.c`,
+and for a related reason: the question is about a *backend*, so it has
+to be asked of that backend directly. `8c`/`8l`, not `pcc`. To ask it
+of 386 from an amd64 machine, that is `8c` either way -- 8c is the 386
+compiler and it runs on the host.
+
+***Its result is whether it COMPILES, not what it prints.*** If it
+links it prints its own sums, so that the code cannot be dismissed as
+dead, but the measurement is the compile.
+
+**Where it came from.** `objtype=386 mk install`, the first cross build
+this tree has attempted, stopped on the fourth command with `ar.c:586
+bad in naddr: REGPAIR` -- `as->offset = ap->size;`, both members
+`vlong`. A plain 64-bit member-to-member assignment, in a file with one
+commit in this repo.
+
+**Why no previous build could have found it**: `OREGPAIR` appears in
+`8c/` and `cc/pswt.c` and nowhere else, and `8c/cgen64.c` -- the entire
+64-bit code generator -- is 8c's alone, because a vlong is a single
+amd64 register and 6c needs no such file. *The 386 backend's 64-bit
+path is precisely the part of kencc every build here has been unable to
+reach.*
+
+**Six cases, each in its own function so a diagnostic names a line and
+therefore a construct**: ar.c's exact shape (two pointers, member to
+member), the same between locals, a 32-bit widening into a 64-bit
+member, a 64-bit member read with no 64-bit destination, the
+single-pointer shape, and a 64-bit member passed as an argument. The
+split between "store" and "load" is the one that pays first: if case 1
+fails and case 4 passes, the store side is where to look.
+
+***BUT THE HEADER SENDS THE READER AWAY FIRST***, and that is the point
+of it. Which construct breaks does not matter until it is known whose
+bug it is, and one command settles that: `8c -FTVw /sys/src/cmd/ar.c`
+in a plain `term%` window, where `8c` is 9front's own rather than
+APExp's. The same message means upstream's; a clean compile means ours,
+and `git log --oneline sys/src/cmd/cc/` is a thirteen-commit bisect.
+*An instrument that would be read before the question it answers is
+worth a paragraph telling the reader not to.*
