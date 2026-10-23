@@ -683,3 +683,47 @@ from `Dst` in THREE ways at once -- no self-pointer, eight bytes
 shorter, differently named member. A case that varies three things
 cannot say which one matters, which is the same defect as a test with
 no control. Cases 12 to 14 hold two constant at a time.
+
+### The tree printed; hypothesis B died too; and I repeated my own mistake
+
+```
+ == naddr ==
+REGPAIR <11> VLONG regpair-probe.c:181
+   REGISTER R9 <11> LONG <eof>
+   REGISTER R10 <11> ULONG <eof>
+```
+
+The uncommented `prtree` works, and the shape is unremarkable: an
+ordinary VLONG register pair reaching a function that can only take an
+address, twice.
+
+**Only 181 is named, so cases 12, 13 and 14 compile** -- and **case 14
+is `s->size = d->offset`, the SAME two types as case 1 merely
+reversed.** So "the two structs are different types" is dead, as
+`case 7` killed "two register pairs live at once".
+
+***AND CASES 12 TO 14 EACH VARIED THREE THINGS FROM CASE 1*** -- tag,
+layout and member name. That is precisely the fault written down one
+entry above them, about the original reduction varying three things.
+*Writing a rule down is not the same as following it*, and the cost was
+a round: three cases that narrow the space less than one well-chosen
+one would have.
+
+What the round does establish is the narrowness:
+
+	d->offset = s->size     case 1   FAILS
+	s->size   = d->offset   case 14  passes   same two types
+	gdst      = s->size     case 10  passes   same source
+	d->offset = gsrc        case 11  passes   same destination
+	d->offset = p->offset   case 13  passes   Src's LAYOUT
+	return s->size          case 4   passes
+
+`Src.size` loads fine, `Dst.offset` stores fine, and only the two
+together fail -- while `Plain`, which has `Src`'s layout, stores into
+`Dst.offset` happily.
+
+**Case 15 is one variable**: `Named` is `Plain` with the member renamed
+`size`. Fails -> the member NAME, which would point at `dotsearch` and
+the Sym. Passes -> `Src` itself, tag or position, and separating those
+needs a struct declared early, which moves line 181 and is therefore a
+separate round.
