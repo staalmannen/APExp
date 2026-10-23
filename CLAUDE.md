@@ -392,9 +392,14 @@ nothing else** — not the parameter, the return, the widening,
 broadly works and exactly one shape, `ar.c:586`'s, does not. Cases
 7-11 split that shape; **if case 8 (the same work in two statements)
 compiles where case 1 does not, it is the register allocator holding
-two pairs live, not the front end.** Still missing: **stock `8c` on
-that file**, which is what would make it a regression rather than
-something kencc never had.
+two pairs live, not the front end.** **STOCK `8c` COMPILES THE PROBE TOO**, so both halves agree — stock
+compiles `ar.c` and the probe, APExp's fails on both — and ***it is a
+REGRESSION with a three-line reproduction***. What to look for is a
+change that breaks `d->offset = s->size` on a 32-bit target and
+nothing else. **The full delta is `diff -r /sys/src/cmd/cc
+$home/APExp/sys/src/cmd/cc` on the VM and nothing else can supply it.**
+The prediction for cases 7-11 is written down in `docs/releases/0.7.md`
+before the run, with its refutation condition.
 ***AND IT DEMONSTRATED A REPORTING TRAP ON ITSELF***: a compile-time
 result can only name a LINE, so it rots when the file is edited above
 it. The new cases were appended BELOW the old ones for exactly that

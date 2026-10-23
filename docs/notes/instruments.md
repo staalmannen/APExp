@@ -621,3 +621,31 @@ fault; this file says which construct; *only the two together say the
 construct is a regression rather than something kencc never had.* And
 if stock 8c also fails on case 1, then case 1 differs from `ar.c:586`
 in some way that matters and the reduction is not yet faithful.
+
+### Stock 8c compiles the probe: it is a regression, with a three-line repro
+
+```
+term% cd APExp/sys/lib/tests
+term% 8c regpair-probe.c
+term% lc regpair-probe*
+regpair-probe.6  regpair-probe.8  regpair-probe.c
+regpair-probe.7  regpair-probe.9  regpair-probe.k
+```
+
+A `regpair-probe.8` where APExp's own `8c` produced a diagnostic.
+**Both halves of the A/B now agree**: stock compiles `ar.c` and the
+probe, APExp's fails on both, same inputs. *So the probe is a faithful
+reduction and the thing to look for is a change that breaks
+`d->offset = s->size` on a 32-bit target and nothing else.*
+
+**That is the whole value of a reduction**, and it is worth saying what
+it bought: the search went from "something in a compiler, against a
+946-line `ar.c`" to three lines, two structs and one statement, with
+eleven neighbouring constructs that all compile and bound it on every
+side.
+
+The prediction for cases 7 to 11 is written down **in
+`docs/releases/0.7.md` and deliberately not in the probe's header**,
+because editing that header is what moved the measured line numbers
+last time. *An instrument's results table and the speculation about the
+next run do not belong in the same file.*
