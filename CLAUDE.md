@@ -393,51 +393,51 @@ built by hand has not been measured in that position*.
 - **chicken** — both compiler bugs it found are fixed and measured
   (`longconst-test`, `switchcase-test`, both 0). What remains is running
   `chickenword-probe` with chicken's own flags.
-- **bacon** — **IT SELF-HOSTS, and generation 3 is a fixpoint.**
-  `bacon -q -c cc bacon.bac` converts its own 10518 lines, compiles and
-  links; `./bacon -q -c cc bacon.bac` then does the same job, which is
-  the half that matters — *a compiler that produces a binary has not
-  been shown to produce a WORKING one*, the gap `miniperl` had. **And
-  generations 2 and 3 are the same size, 3048736 both times**, which is
-  what a converter that reproduces itself looks like from outside.
-  *The gen1-against-gen2 size difference proved nothing and this one is
-  decisive, for one reason*: the second comparison holds the LINK
-  COMMAND constant, so the only thing left varying is the C. **A
-  comparison is not worthless or valuable in itself; it depends on what
-  else is held constant.**
-  One command short of proof, and **it is the comparison between two
-  GENERATIONS, not against the committed C**: `src/bacon.bac.c` came
-  from `bacon.sh`, a *second, independent implementation of BaCon
-  written in bash*, so agreement with it was never the expected
-  outcome — the first difference is at byte 17, exactly where
-  `/* Created with BaCon ` and `/* Created with Shell BaCon ` diverge.
-  The test that asks the right thing is `bacon -p -n -q bacon.bac`,
-  keep that `.c`, then `./bacon -p -n -q bacon.bac` and compare the
-  two: both from the compiled converter, so only the generation
-  varies. **And compare with Plan 9's `cmp` or check `$?`** — see the
-  `st_rdev` item below for why APE's was silent.
-  Getting the file out at all needs a flag, because bacon DELETES
-  the C it generated (`bacon.bac:8294` puts it on the temp list,
-  `:10509` removes it), and the flags do not do what their names
-  suggest: **`-n` alone converts and then throws the conversion away**,
-  since the cleanup is outside the no-compile branch. `-p` is the one
-  that keeps it. ***And `-p` also runs `indent` over what it keeps***
-  (`:10399`), which would rewrite the file and make the comparison
-  measure formatting — **safe here only because APExp ships no
-  `indent`**, and bacon says which case it is: `WARNING: 'indent' not
-  found` means the file is untouched, `Applying indentation... done.`
-  means the comparison is void.
-  *`cmp` rather than `diff` is justified rather than assumed*: the `.c`
-  carries no timestamp (the version stamp goes to the `.generic.h`) and
-  **none of `bacon.bac`'s eleven `OS$` conditionals separates Linux from
-  Plan 9** — they test SunOS, Haiku, BSD, OSF1 and Darwin — so a
-  difference would be a real disagreement rather than a platform
-  artefact. `bacon-test.bac` remains 3 failures, all three the
-  32-bit-`long` invariant arriving through a language whose only integer
-  type is that `long`.
+- **bacon** — **IT SELF-HOSTS, AND THE FIXPOINT IS PROVEN AT THE
+  SOURCE.** `bacon -p -n -q bacon.bac` and then `./bacon -p -n -q
+  bacon.bac` produce **identical C**: the compiled converter reproduces
+  its own input exactly. Generation 2 doing real work is the half that
+  matters — *a compiler that produces a binary has not been shown to
+  produce a WORKING one*, the gap `miniperl` had.
+  **And that EXPLAINS the equal binary sizes rather than merely agreeing
+  with them**: gen 2 was built from C1 and gen 3 from C2, so with
+  C1 == C2 and the same `Makefile.bacon` link command both times the two
+  binaries must be identical — which is what 3048736 twice was saying.
+  *Two observables, one of which accounts for the other.*
+  ***THE REMAINING DOUBT IS THE INSTRUMENT, NOT THE RESULT.*** APE's
+  `cmp` prints nothing when two files are the SAME, and it also printed
+  nothing when it wrongly believed its stdout was `/dev/null` — and
+  those are indistinguishable from the prompt. The `st_rdev` fix below
+  reaches the VM only after `mk install` in `lib/ap` **and a relink of
+  `cmp`**, since a libap fix does not reach a binary already built. Any
+  one of three settles it without a rebuild: Plan 9's own `cmp` from
+  `term%`; `echo $?` (the status is correct even when it is silent); or
+  **the sharpest, running the same `cmp` on a pair KNOWN to differ** —
+  if it speaks there and is silent here, the silence means identical.
+  *The equal binary sizes were already independent corroboration, so
+  this tightens a result rather than doubting it.*
+  **Comparing against `src/bacon.bac.c` is a DIFFERENT question and was
+  the wrong test**: that file came from `bacon.sh`, a *second,
+  independent implementation of BaCon written in bash*, so agreement was
+  never the expected outcome — the first difference is at byte 17,
+  exactly where `/* Created with BaCon ` and `/* Created with Shell
+  BaCon ` diverge, and `/* Created with ` is sixteen characters.
+  **Getting the C out at all needs a flag**, because bacon DELETES it
+  (`bacon.bac:8294` puts it on the temp list, `:10509` removes it), and
+  the flags do not do what their names suggest: **`-n` alone converts
+  and then throws the conversion away**, since the cleanup is outside
+  the no-compile branch. `-p` is the one that keeps it. ***And `-p`
+  also runs `indent` over what it keeps*** (`:10399`), which would
+  rewrite the file and make any comparison measure formatting — **safe
+  here only because APExp ships no `indent`**, and bacon says which case
+  it is: `WARNING: 'indent' not found` means untouched, `Applying
+  indentation... done.` means the comparison is void.
   ***And it had to be `./bacon`***: plain `bacon` resolves through
   `$PATH` to generation 1, so the second run would have re-measured the
   first binary and reported a clean, meaningless result.
+  `bacon-test.bac` remains 3 failures, all three the 32-bit-`long`
+  invariant arriving through a language whose only integer type is that
+  `long`.
 - **the archivers** — bzip2, xz, unrar, unace, unarj, clzip. `-J` retires
   the padding hunt, so this is a CHECK rather than a hunt, and the way to
   do it is to run each one on a real archive.
