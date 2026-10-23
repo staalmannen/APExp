@@ -727,3 +727,36 @@ together fail -- while `Plain`, which has `Src`'s layout, stores into
 the Sym. Passes -> `Src` itself, tag or position, and separating those
 needs a struct declared early, which moves line 181 and is therefore a
 separate round.
+
+### Case 15 passes, and the probe ran out -- `regpair-min.c`
+
+`Named` is `Plain` with its member renamed `size`, and it compiles, so
+**the member name is innocent**. Three hypotheses are now dead:
+register pressure (case 7), the two struct types differing (case 14),
+and the member name (case 15).
+
+*The run was verified with a `grep` for `case15` before being
+believed.* Output identical to the previous run is exactly what a file
+that never got saved produces, and that check belongs in the same
+family as the stale-log rule.
+
+***AND THE PROBE IMPOSED A VARIABLE IT COULD NEVER TEST***: `case1` is
+the **first function in the translation unit**, and every case that
+passes comes after it. No case added to that file could show this,
+because every one of them was added to the same file. **A harness can
+hold something constant so thoroughly that it stops looking like a
+variable at all.**
+
+So `regpair-min.c`: case 1 and nothing else, ten lines, native `8c`.
+
+- **Fails** -> the construct is self-contained and this is the
+  reproduction a bug report carries.
+- **Compiles** -> the construct is innocent and the surrounding file is
+  the variable, with per-function backend state (`regsalloc`'s stack
+  offsets, `maxargsafe`, the register tables) as the live candidate --
+  initial for the first function, accumulated for every later one.
+  *That would explain why the probe's other fourteen are unanimous.*
+
+**Either answer is worth more than a sixteenth case.** When a reduction
+stops narrowing, stop adding to it and ask whether the harness has
+become part of the measurement.
