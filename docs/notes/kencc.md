@@ -1545,3 +1545,81 @@ message: 5c and qc answer `bad vlong in gmove` from a different site,
 
 **And the fix is the same work whichever fork the hunk came from**,
 which is the point of reaching for the shape instead of the blame.
+
+### Upstream's history settles it: the rathole change is 9front's, not ours
+
+`git://git.9front.org` is unreachable from the build host, but
+`https://github.com/9front/9front` is, and a blobless sparse clone of
+`sys/src/cmd/cc` and `sys/src/cmd/8c` answers every attribution
+question the `diff -r` could not.
+
+**The `nodrat` → `regsalloc` change is upstream's:**
+
+```
+ed3c7d491  2025-12-27  cinap_lenrek
+    ?c: eliminate .rathole for arm, arm64, 386, arm-thumb and mips
+```
+
+It deletes `nodrat`, `nrathole` and `symrathole` from `gc.h`, `txt.c`
+and `swt.c`, and replaces four `sugen(l, nodrat, ...)` sites with
+`regsalloc`. **APExp has it.** `diff -r` between upstream HEAD's `8c`
+and APExp's shows no such hunk -- the two are identical there.
+
+So the user's installed `/sys/src/cmd/8c` is what lacks it, and ***the
+"stock 8c compiles it" measurement means "9front from before December
+2025 compiles it"***, not "an unmodified compiler compiles it".
+
+### APExp's kencc base is datable, and now dated
+
+- It **has** `3ea08ad83` (2025-12-28, *"?c: grow regions dynamically"*):
+  `reg.c` carries the `allocn`/`maxregion += 128` loop. We changed only
+  the initial constant, 300 -> 600.
+- It **lacks** `a68335214` (2026-06-10, *"cc: untangle class and type
+  specifiers"*), which is where `struct Spec` comes from.
+
+**So the fork point is between 2025-12-28 and 2026-06-10**, and the
+`Spec`/`long` signatures in `sub.c` are upstream moving on, exactly as
+suspected.
+
+### What APExp's 8c actually adds to upstream HEAD
+
+The whole list, from `diff -r` against the real upstream:
+
+- `cgen.c`: `OALLOCA` (VLA) and the `true` -> `cond` rename.
+- `cgen64.c`: the rename only. **So we have `f4c733880` (2025-09-23,
+  *"c: use hint for register pair"*) untouched** -- which matters,
+  since it is the most recent upstream work on REGPAIR itself.
+- `txt.c`: complex (`typecmplx`, `iscmplx`), the VLA epilogue, `CLOCAL`
+  added to one class test, and the `prtree` above.
+- `swt.c`: `-J`, gated on `conformalign`.
+- `reg.c`: `maxregion` 300 -> 600.
+
+*Nothing there is on the path from one `vlong` member to another*, and
+four of the five are gated, cosmetic or additive.
+
+### An inconsistency in the installed tree, worth the user's attention
+
+Their `/sys/src/cmd/cc/cc.h` **has** `struct Spec` (2026-06-10) while
+their `/sys/src/cmd/8c/cgen.c` **has** `nodrat` (removed 2025-12-27).
+Upstream HEAD has `Spec` and no `nodrat`, and never reverted the
+rathole commit. **No single 9front checkout can be in that state**, so
+that tree is a mix of vintages -- and separately, whatever built their
+`/386/bin/8c` is a third question again.
+
+*Which is the argument for the test below rather than for more
+reading*: it removes every question about what "stock" was.
+
+### The decisive test
+
+**Build upstream 9front HEAD's `8c`, unmodified, and run it on
+`regpair-probe.c`.**
+
+- **It fails** -> the bug is upstream's, in or after `ed3c7d491`, and
+  APExp merely has it. That is a 9front bug report with a three-line
+  reproduction attached, and we can carry a local fix meanwhile.
+- **It passes** -> the fault is in one of the five deltas above, and
+  `reg.c`'s `maxregion` and `txt.c`'s `CLOCAL` are the two that are
+  neither gated nor obviously inert.
+
+Either way the `prtree` in `naddr` prints the shape on the failing
+side, so the next round has the tree and not just the message.
