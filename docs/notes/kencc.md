@@ -1661,3 +1661,74 @@ needs to download.
 
 Either way the `prtree` in `naddr` prints the shape on the failing
 side, so the next round has the tree and not just the message.
+
+### The clean VM is current 9front, and that exonerates upstream
+
+```
+bash-5.3$ grep -c nodrat /sys/src/cmd/8c/cgen.c
+0
+bash-5.3$ grep -c Spec /sys/src/cmd/cc/cc.h
+8
+```
+
+`nodrat` gone and `Spec` present, so that machine is **after
+2026-06-10** -- current 9front, and it carries `ed3c7d491`. **Its `8c`
+compiles `ar.c` and `regpair-probe.c`.**
+
+***So the rathole change is exonerated and this is not a 9front bug.***
+Upstream HEAD works, APExp does not, and APExp's `8c` IS upstream HEAD
+plus five things. **The fault is in our delta.**
+
+### Which half: 8c or cc?
+
+**There is no missing upstream `8c` work** -- `diff -r` against the
+real upstream found only our five. **Every upstream change we lack is
+in `cc/`**: `b43ec1215` (2026-04-11, *fix the fix of taking address of
+incompletely defined types*), `9932a824a` (2026-03-02), `a68335214`
+(2026-06-10, `Spec`).
+
+So the fault is in **our five 8c changes**, or in **`cc/`** -- ours or
+the upstream ones we lack.
+
+**Reading rules the five out, one at a time:**
+
+- `OALLOCA` is a new `case` in `cgen`; unreachable without a VLA.
+- `true` -> `cond` is a rename.
+- `swt.c`'s hunks are gated on `conformalign`, and this compile passes
+  no `-J`.
+- `txt.c`'s `iscmplx` addition is a third disjunct beside
+  `typesu`/`typev`; **the vlong arm is untouched**.
+- `typecmplx = typesuv` is read only by `pgen.c`, and only for RETURN
+  values -- and **case 2 returns a vlong and compiles**.
+- The two `CLOCAL` additions: one lists globals for `AGLOBL`, the other
+  is inside `naddr`'s **`case ONAME`** -- and our node reaches
+  `default: bad:` as an `OREGPAIR`, so it never gets there.
+- `reg.c`'s `maxregion` 300 -> 600 is the initial size of an array that
+  `3ea08ad83` made **grow dynamically**, so it cannot change
+  correctness.
+
+***Prediction, written before the run: the fault is in `cc/`, and the
+split build below FAILS.*** What refutes it: that build compiling the
+probe, which would put the fault in one of the five above and make the
+reading wrong seven times over.
+
+### The split build, and the one line it needs
+
+Build `8c` from **APExp's `cc/` and upstream's `8c/`**. That pairing
+compiles where the reverse does not, because upstream's `8c` references
+none of `conformalign`, `talign` or `dupokall`.
+
+***But it needs one line added, or it faults and the fault gets read as
+a result.*** APExp's `cc/pgen.c` reads `typecmplx[...]`, and the only
+thing that ever sets it is **APExp's own `8c/txt.c ginit()**:
+
+```c
+	typecmplx = typesuv;
+```
+
+Upstream's `ginit` does not, so `typecmplx` would be nil and `pgen.c:36`
+would dereference it on the first function with a return value. Add
+that one line to upstream's `txt.c` for the test.
+
+*A test that crashes for a reason unrelated to the question is worse
+than no test, and this one would have crashed in the first function.*
