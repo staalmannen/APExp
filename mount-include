@@ -1,12 +1,43 @@
 #!/bin/rc
+#
+# $objtype IS WHAT YOU COMPILE FOR; $cputype IS WHAT YOU RUN ON.
+#
+# Every line below is one or the other, and until now every line said
+# $cputype.  **On a native build the two strings are equal, so nothing
+# could ever have shown it** -- and the whole tree has only ever been
+# built on amd64 for amd64.
+#
+# The rule, and it is mechanical:
+#
+#   headers and libraries -> $objtype.  They are compiled AGAINST, and
+#       `/$objtype/include/ape' is what pcc searches (ahead of
+#       /sys/include/ape -- see the header-order invariant).  With
+#       $cputype here, `objtype=386 mk install' on an amd64 machine
+#       binds amd64's `float.h', `stdarg.h', `stdint.h' and
+#       `stddef_arch.h' into place and pcc then looks in
+#       /386/include/ape, which this script never touched -- so the
+#       build quietly reads **stock 9front's** 386 headers, or fails to
+#       find APExp's.  *Neither of those says `wrong architecture'
+#       anywhere in the message.*
+#   binaries -> $cputype.  They are EXECUTED.  A 386 `pcc' bound over
+#       /bin on an amd64 machine cannot run at all.
+#
+# `apexp-sh' was already right for the same reason read the other way:
+# it binds $cputype/bin and $cputype/bin/ape, which is what you run.
+# And `sys/src/ape/config' is right too -- APEBIN is /$objtype/bin/ape,
+# where the cross-built binaries are INSTALLED rather than run.
+#
+# So this file was the one place the two were confused, and the change
+# is a no-op on every build anyone has done so far.
+#
 if(! test -e /sys/include/ape/THIS_IS_APExp) {
     bind -b sys/lib /sys/lib
 	bind -b sys/man /sys/man
     bind -b sys/include /sys/include
-    bind -b $cputype/include/ape /$cputype/include/ape
-    bind -b $cputype/include/ape /sys/include/ape
-    bind -b $cputype/lib/ape /$cputype/lib/ape
-	bind -b $cputype/lib /$cputype/lib
+    bind -b $objtype/include/ape /$objtype/include/ape
+    bind -b $objtype/include/ape /sys/include/ape
+    bind -b $objtype/lib/ape /$objtype/lib/ape
+	bind -b $objtype/lib /$objtype/lib
     bind -b sys/include/ape /sys/include/ape
     bind -b $cputype/bin /bin
     bind -a $cputype/bin/ape /bin
