@@ -325,12 +325,45 @@ SHA-3 vectors, run by `mk test` there.
 Beyond that, testing is still mostly ad-hoc — compile a program under
 APExp and see whether it builds and runs.
 
-## Current Development Focus (as of 2026-09)
+## Current Development Focus: 0.7
 
-- POSIX threading (`pthread`) — `sys/src/ape/lib/ap/thread/`
-- Async I/O (`aio`) — `sys/src/ape/lib/ap/aio/aio.c`
-- C11/C23 compiler features — `_Generic`, and `bool` as a real type
-- perl 5.42.2 — see the section below
+**The plan and the running state are in `docs/releases/0.7.md`**; 0.6's
+open-bug inventory stays in `docs/releases/0.6.md`. Five items:
+the archivers, go/clisp/chicken, cross-compilation, portable_stl, and a
+C++ proof-of-concept application.
+
+**`$objtype` is what you compile FOR; `$cputype` is what you run ON.**
+Headers and libraries take `$objtype` — they are compiled *against* —
+and binaries take `$cputype`, because they are *executed*.
+`sys/src/ape/config` and `apexp-sh` were already right; **`mount-include`
+was not**, and bound the target's headers and libraries using
+`$cputype`. *On a native build the two strings are equal, so nothing
+could ever have shown it.* Hardcoding is NOT the problem: a grep for
+`amd64`/`6c`/`6l`/`6a` across every mkfile in `sys/src/ape` finds two
+non-comment hits and both are deliberate.
+**The blocker that comes first is `stddef_arch.h`, which existed for
+three architectures out of eleven** — the 64-bit ones, which are LLP64
+under kencc and need `size_t` forced ahead of `<stddef.h>`'s own arm.
+`<stddef.h>`, `<sys/types.h>`, `<limits_generic.h>` and
+`<stdint_generic.h>` all include it **unconditionally**, so a missing
+copy is a failure at the first `#include <stddef.h>` in the first file
+compiled. 386 has one now. *The other seven are left out deliberately:
+a cross build stops at the first thing missing and there will be more,
+so the next should be found by a build rather than guessed.*
+**And a recipe that runs a binary it just built cannot cross-compile** —
+`cmd/perl/mkfile:86` (`./miniperl`) and `cmd/muon/mkfile:192`
+(`./embedder`) are the two outside `mk test`.
+
+**portable_stl: both questions are answered and both answers are no.**
+Its `CMakeLists.txt` has **no `install()` rule and no `configure_file`**
+— the single target is the gtest binary, so *the headers are the
+product* and installing is a copy. And the namespace cannot become
+`std`: **the library already declares `namespace std` itself**, for
+`initializer_list` and `type_info`, which the core language requires to
+live there. Renaming would not buy compatibility anyway —
+`vector::push_back` returns `expected<void, portable_stl_error>`,
+because the library is exception-free by construction. *A conformance
+corpus and a usable library, not a drop-in `std`.*
 
 ## What is open, as a list
 
