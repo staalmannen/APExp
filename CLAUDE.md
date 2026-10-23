@@ -230,7 +230,10 @@ an APE build never reaches kencc's own C23 keywords.
 `dup-fdinfo-test`, `rmdir-test`, `copyfile-test`, `deeppath-test`,
 `bufexec-test`, `mkstemp-test`, `printfmod-test`, `umask-test`,
 `dupbuf-test`, `dotdir-test`, `getcwd-test`, `progname-test`,
-`select-test`, `cxaatexit-test`, `rdev-test` (two different files must
+`select-test`, `cxaatexit-test`, `poll-test` (the count is
+of pollfd ENTRIES, a negative fd is ignored, a closed one is POLLNVAL —
+the two rules whose absence makes a `while(poll())` caller SPIN),
+`rdev-test` (two different files must
 be distinguishable — it transcribes diffutils' `same_file()` verbatim,
 because the question is what THAT function answers), `stdio-test`.
 **`strerror-test.c` must be linked against `libgnu.a`** or it passes
@@ -365,13 +368,17 @@ built by hand has not been measured in that position*.
   back end does honour the mode and **C++ with templates is a working
   pipeline on this machine** — which is the first thing in this port
   that is a capability rather than a stage.
-  **WHAT THE RUN DOES NOT SHOW is whether the program COMPUTED
-  anything**, and that is one command away rather than a doubt to carry:
-  `./a.out` printed nothing, so if `/tmp/t.cpp` was meant to print, the
-  silence is the next finding and the static-init gap below is the first
-  suspect; if it was only ever a link exercise, silence is correct.
-  *A program that links and runs is not a program that works* — read
-  `/tmp/t.cpp` and `echo $status` before calling this closed.
+  **THE SILENCE IS CORRECT AND THE TOY RETURNS ITS ANSWER INSTEAD.**
+  `/tmp/t.cpp` is a virtual base with an override, a destructor, a
+  template, and `int main(){ D d; B *p = &d; return p->f() + twice(3); }`
+  — no `printf` anywhere, so nothing should print. **But it is not inert
+  either: it returns `2 + 6`, and `echo $?` is the measurement.**
+  ***8 means virtual dispatch AND the template both work at run time***
+  — `p->f()` reaching `D::f()` for 2, `twice(3)` for 6. **7 means the
+  vtable resolved to the BASE** (`B::f()` returning 1) with the template
+  fine, which is a different bug in a different place. *A program that
+  links and runs is not a program that works*, and here one command
+  separates three outcomes rather than two.
   **Its cost is named rather than feared**: internal linkage gives each object
   its own copy, so a template's static data member or a static local
   inside a template function stops being one object shared across the
@@ -393,54 +400,79 @@ built by hand has not been measured in that position*.
 - **chicken** — both compiler bugs it found are fixed and measured
   (`longconst-test`, `switchcase-test`, both 0). What remains is running
   `chickenword-probe` with chicken's own flags.
-- **bacon** — **IT SELF-HOSTS, and generation 3 is a fixpoint.**
-  `bacon -q -c cc bacon.bac` converts its own 10518 lines, compiles and
-  links; `./bacon -q -c cc bacon.bac` then does the same job, which is
-  the half that matters — *a compiler that produces a binary has not
-  been shown to produce a WORKING one*, the gap `miniperl` had. **And
-  generations 2 and 3 are the same size, 3048736 both times**, which is
-  what a converter that reproduces itself looks like from outside.
-  *The gen1-against-gen2 size difference proved nothing and this one is
-  decisive, for one reason*: the second comparison holds the LINK
-  COMMAND constant, so the only thing left varying is the C. **A
-  comparison is not worthless or valuable in itself; it depends on what
-  else is held constant.**
-  One command short of proof, and **it is the comparison between two
-  GENERATIONS, not against the committed C**: `src/bacon.bac.c` came
-  from `bacon.sh`, a *second, independent implementation of BaCon
-  written in bash*, so agreement with it was never the expected
-  outcome — the first difference is at byte 17, exactly where
-  `/* Created with BaCon ` and `/* Created with Shell BaCon ` diverge.
-  The test that asks the right thing is `bacon -p -n -q bacon.bac`,
-  keep that `.c`, then `./bacon -p -n -q bacon.bac` and compare the
-  two: both from the compiled converter, so only the generation
-  varies. **And compare with Plan 9's `cmp` or check `$?`** — see the
-  `st_rdev` item below for why APE's was silent.
-  Getting the file out at all needs a flag, because bacon DELETES
-  the C it generated (`bacon.bac:8294` puts it on the temp list,
-  `:10509` removes it), and the flags do not do what their names
-  suggest: **`-n` alone converts and then throws the conversion away**,
-  since the cleanup is outside the no-compile branch. `-p` is the one
-  that keeps it. ***And `-p` also runs `indent` over what it keeps***
-  (`:10399`), which would rewrite the file and make the comparison
-  measure formatting — **safe here only because APExp ships no
-  `indent`**, and bacon says which case it is: `WARNING: 'indent' not
-  found` means the file is untouched, `Applying indentation... done.`
-  means the comparison is void.
-  *`cmp` rather than `diff` is justified rather than assumed*: the `.c`
-  carries no timestamp (the version stamp goes to the `.generic.h`) and
-  **none of `bacon.bac`'s eleven `OS$` conditionals separates Linux from
-  Plan 9** — they test SunOS, Haiku, BSD, OSF1 and Darwin — so a
-  difference would be a real disagreement rather than a platform
-  artefact. `bacon-test.bac` remains 3 failures, all three the
-  32-bit-`long` invariant arriving through a language whose only integer
-  type is that `long`.
+- **bacon** — **IT SELF-HOSTS, AND THE FIXPOINT IS PROVEN AT THE
+  SOURCE.** `bacon -p -n -q bacon.bac` and then `./bacon -p -n -q
+  bacon.bac` produce **identical C**: the compiled converter reproduces
+  its own input exactly. Generation 2 doing real work is the half that
+  matters — *a compiler that produces a binary has not been shown to
+  produce a WORKING one*, the gap `miniperl` had.
+  **And that EXPLAINS the equal binary sizes rather than merely agreeing
+  with them**: gen 2 was built from C1 and gen 3 from C2, so with
+  C1 == C2 and the same `Makefile.bacon` link command both times the two
+  binaries must be identical — which is what 3048736 twice was saying.
+  *Two observables, one of which accounts for the other.*
+  ***THE REMAINING DOUBT IS THE INSTRUMENT, NOT THE RESULT.*** APE's
+  `cmp` prints nothing when two files are the SAME, and it also printed
+  nothing when it wrongly believed its stdout was `/dev/null` — and
+  those are indistinguishable from the prompt. The `st_rdev` fix below
+  reaches the VM only after `mk install` in `lib/ap` **and a relink of
+  `cmp`**, since a libap fix does not reach a binary already built. Any
+  one of three settles it without a rebuild: Plan 9's own `cmp` from
+  `term%`; `echo $?` (the status is correct even when it is silent); or
+  **the sharpest, running the same `cmp` on a pair KNOWN to differ** —
+  if it speaks there and is silent here, the silence means identical.
+  *The equal binary sizes were already independent corroboration, so
+  this tightens a result rather than doubting it.*
+  **Comparing against `src/bacon.bac.c` is a DIFFERENT question and was
+  the wrong test**: that file came from `bacon.sh`, a *second,
+  independent implementation of BaCon written in bash*, so agreement was
+  never the expected outcome — the first difference is at byte 17,
+  exactly where `/* Created with BaCon ` and `/* Created with Shell
+  BaCon ` diverge, and `/* Created with ` is sixteen characters.
+  **Getting the C out at all needs a flag**, because bacon DELETES it
+  (`bacon.bac:8294` puts it on the temp list, `:10509` removes it), and
+  the flags do not do what their names suggest: **`-n` alone converts
+  and then throws the conversion away**, since the cleanup is outside
+  the no-compile branch. `-p` is the one that keeps it. ***And `-p`
+  also runs `indent` over what it keeps*** (`:10399`), which would
+  rewrite the file and make any comparison measure formatting — **safe
+  here only because APExp ships no `indent`**, and bacon says which case
+  it is: `WARNING: 'indent' not found` means untouched, `Applying
+  indentation... done.` means the comparison is void.
   ***And it had to be `./bacon`***: plain `bacon` resolves through
   `$PATH` to generation 1, so the second run would have re-measured the
   first binary and reported a clean, meaningless result.
-- **the archivers** — bzip2, xz, unrar, unace, unarj, clzip. `-J` retires
-  the padding hunt, so this is a CHECK rather than a hunt, and the way to
-  do it is to run each one on a real archive.
+  `bacon-test.bac` remains 3 failures, all three the 32-bit-`long`
+  invariant arriving through a language whose only integer type is that
+  `long`.
+- **the archivers** — **`xz` AND `lz4` BOTH HANG, AND THEY ARE TWO BUGS
+  UNTIL SOMETHING SAYS OTHERWISE.** `unarj` lists a 1MB archive
+  correctly. `unlz4` froze and left an **empty** output — *its earlier
+  `Decoding file sample.txt` was never a pass: it says the program
+  started, not that the bytes came out right*. And **`xz` hangs
+  COMPRESSING seven bytes** (`xz -c <sample.txt` where the file holds
+  the word `sample`), at high load — so the downloaded-sample
+  explanation is dead and the fault is ours either way. Not tried:
+  unrar, unace, zstd, clzip.
+  ***ONE GREP SAYS THEY SHARE NO MECHANISM***: `lz4` uses neither
+  `poll` nor `select` nor `O_NONBLOCK`, where xz sets `O_NONBLOCK` on a
+  redirected stdin and polls it. *Reading two failures reported
+  together as one story has cost this tree a round before.*
+  **`pcc -9` is NOT available as an A/B**: one package rebuilt under
+  the old layout rule against a `-J` libap is the silent ABI split, so
+  it cannot separate "`-J` broke it" from "it never worked".
+  **The instrument is `ratrace`, and the `ps` STATE first** — *constant
+  light CPU is a wait, a pinned core is a loop*. A spin either shows one
+  syscall repeating, which names it, or shows none, which says compute
+  loop and sends the next step to `acid` and `stk()`.
+  **Found on the way and fixed, though NOT claimed as the cause**:
+  `poll()` had three POSIX violations, two of which can spin a caller —
+  it returned `select`'s count of BITS rather than of pollfd ENTRIES,
+  and it skipped a negative fd when building the sets but not when
+  reading them. `xz`'s `io_wait()` is a `while(true)` whose
+  fall-through has no sleep in it, so a positive return with the
+  watched entry unmarked is a busy-wait exactly. `poll-test` 0 on gcc,
+  **4 on the replaced code**; `docs/notes/libap.md` has the rest.
 - **itcl** — done. 10 failures, all upstream or Tcl 9's, two settled at
   source, none ours.
 
@@ -985,7 +1017,8 @@ allocation storm; `getcwd(NULL,n)`; `mktemp`'s 26 names; `printf`'s
 **`st_rdev` being 0 for every file, which made APE's `cmp` compare two
 different files in SILENCE** (it believed its own stdout was
 `/dev/null`) and made `diff -r` call every pair of special files
-identical; itcl's
+identical; **16-bit `ino_t`/`dev_t`**, against a tree of 64799 files;
+itcl's
 four `sfbug`s; kencc's `false` keyword, the `L`-suffix width cap, the
 wide case label, the compound-literal zero fill, and both bit-field
 rules with the static initialiser underneath them.
@@ -1000,20 +1033,27 @@ the public headers is sockets, locks and `termios`** — `sockaddr_in`
 the acid diff refuted. *The feared cost and the measured cost were
 different sizes, and only the probe could have said so.*
 
-**`ino_t` AND `dev_t` ARE 16 BITS, measured and NOT fixed.**
-`sys/include/ape/sys/types.h:16-17` makes both `unsigned short`, and
-`_dirtostat` assigns `st_ino = d->qid.path` — a 64-bit qid truncated to
-sixteen bits, so two unrelated files are "the same file" to every POSIX
-program once a server holds more than 65536. ***The APExp tree is 64799
-files***, 1.1% short of guaranteeing a collision inside itself. What
-reads dev+ino: `same_file` in diffutils, `find`'s loop detection, `du`'s
-hard links, `fts`, `tar`, and **libap's own `_sock_listenpid.c`**, keyed
-on dev/ino precisely because a descriptor number is retired by `dup2()`.
-*Not fixed because of the cost rather than doubt*: widening either
-typedef moves every field after it in `struct stat`, so every binary
-needs relinking — one line plus a mandatory `mk distclean`, which is
-exactly what this release already requires. `rdev-test` section 0 prints
-both widths and both inodes.
+**`ino_t` AND `dev_t` ARE 64 BITS NOW, and `struct stat` is 104 bytes
+where it was 88** — so this release carries a SECOND ABI change beside
+`-J`, and `mk distclean` before `mk install` covers both. They were
+`unsigned short`, and `_dirtostat` assigns `st_ino = d->qid.path`: a
+64-bit qid truncated to sixteen bits, so two unrelated files were "the
+same file" to anything keyed on dev+ino once a server held more than
+65536. ***The APExp tree is 64799 files***, about one percent short of
+guaranteeing a collision inside itself.
+***Widening a typedef only reaches the copies DECLARED with it***:
+`include/priv.h`'s `Rock` held `unsigned long dev, inode` — 32 bits
+here — and would have gone on truncating. `acidlib`'s `stat` aggregate
+was **already stale by several ABIs** (28 bytes, no `st_rdev`) and is
+regenerated from the compiler's own `pcc -c -a` output rather than by
+hand; it carries no comment explaining that, because **no acid file in
+this tree has ever had one** and the syntax cannot be checked here —
+the `<termios.h>` glob rule. The reasoning is in `docs/notes/libap.md`.
+*Two things it fixes rather than costs*: musl's `<sys/sysmacros.h>`
+already assumed a 64-bit `dev_t` and becomes correct untouched, and
+perl's hand-maintained `config.h` already declared `ST_INO_SIZE 8` —
+the first hand-maintained capability file in this tree that was right
+while the library was not.
 
 **Smaller open items**: `strtol`/`strtoul` have the same
 one-limit-for-both-signs shape as `strtoll` had, so `strtol(LONG_MIN)`

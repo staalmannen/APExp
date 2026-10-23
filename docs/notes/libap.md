@@ -3266,3 +3266,136 @@ release where that is already mandatory. It is one line of
 `sys/include/ape/sys/types.h` plus that rebuild. **Section 0 of
 `rdev-test` prints both widths and both inodes**, so a run says which
 world it is in instead of leaving it to be assumed.
+
+### Widened, and what followed it
+
+**`ino_t` and `dev_t` are `unsigned long long` now**, and `struct stat`
+goes **88 bytes to 104** -- every field after `st_ino` moves, so this is
+an ABI change and wants the `mk distclean` that 0.6 already required
+for `-J`.
+
+***WIDENING A TYPEDEF ONLY REACHES THE COPIES DECLARED WITH IT***, which
+is the half that would have been missed:
+
+- **`include/priv.h`'s `Rock` held `unsigned long dev, inode`** -- 32
+  bits on kencc -- so it truncated a qid independently of whatever
+  `<sys/types.h>` said, and would have gone on truncating afterwards.
+  `dev_t`/`ino_t` now. `_sock_listenpid.c` was already written with the
+  typedefs and needed nothing.
+- **`plan9/acidlib`'s `stat` aggregate was ALREADY STALE, and by a long
+  way**: `sizeofstat = 28`, no `st_rdev` at all, a 32-bit `st_size` at
+  12 and three 32-bit times -- a `struct stat` from several ABIs ago.
+  *`acid` has been printing the wrong fields of every struct stat it was
+  asked about, quietly, for as long as anyone has been asking*, and a
+  debugger's own struct description is exactly the place nobody checks.
+  **The replacement is not hand-computed**: `pcc -c -a` emits acid for
+  every struct a translation unit lays out -- it is what `mkone`'s
+  `%.acid` rule runs -- and `tmp/abi-bf-after.acid` is a committed dump
+  from the VM, so the offsets and the format letters came from the
+  COMPILER and were only adjusted for the two widened typedefs. (`'W'`
+  64-bit unsigned, `'V'` 64-bit signed, `'D'` 32-bit signed, `'u'`/`'d'`
+  16-bit -- read off that dump rather than recalled. `size_t iov_len` is
+  `'W'`, which is what pins it.)
+  **The three times are spelled as their `tv_sec`** rather than as a
+  `timespec`, because this acidlib defines no such aggregate and a
+  reference to one it has not got would break the file for every APE
+  program.
+  ***AND THE EXPLANATION IS NOT IN THE FILE, DELIBERATELY.*** No acid
+  file anywhere in this tree carries a comment, `cc/acid.c` never emits
+  one, and `acid` itself is not vendored here, so there is no way to
+  check the syntax short of running it. *A comment whose syntax is
+  unverified, in a file read by every debugging session, is the
+  `<termios.h>` glob again* -- the explanation lives here instead.
+
+### Two things the widening FIXES rather than costs
+
+- **`<sys/sysmacros.h>`** is musl's and its `major`/`minor`/`makedev`
+  already assume a 64-bit `dev_t` -- `(x)>>31>>1`, `<<32` -- so they
+  have been nonsense for a 16-bit one since the day they were imported,
+  and become correct without being touched.
+- **perl's hand-maintained `config.h` already declared the truth**:
+  `ST_DEV_SIZE 8`, `ST_INO_SIZE 8`, both `_SIGN 1`. *A third
+  hand-maintained capability file disagreeing with the library, and the
+  first one where the file was right* -- bash's got the same class wrong
+  in both directions. **The mismatch was harmless rather than silently
+  wrong**, and saying which matters: those symbols steer perl's choice
+  of representation for the value, not the offset it reads from, so perl
+  got the correct two bytes and merely over-provisioned for them. What
+  perl did share with everything else was the collisions.
+
+**The sweep for the opposite hazard came back clean**: a widened field
+printed through a narrow conversion. Four hits in the whole tree, none
+of them built -- `readline/examples/rlfe`, `bash/examples/loadables`,
+and two `(int)sizeof` probes inside perl's `Configure`, which APExp does
+not run.
+
+
+---
+
+## poll(): three POSIX rules, and two of them can spin a caller
+
+**Found while reading why `xz` hangs, and they are wrong whether or not
+they are xz's hang.**
+
+1. **THE RETURN VALUE IS A COUNT OF ENTRIES, NOT OF BITS.** POSIX:
+   *"poll() shall return the number of pollfd structures that have
+   selected events (nonzero revents)"*. This returned `select()`'s
+   value, which counts BITS ACROSS THREE `fd_set`s -- so one descriptor
+   ready for both reading and writing counted **twice**, and poll could
+   report a number larger than the number of entries it had marked.
+2. **A NEGATIVE fd WAS SKIPPED WHEN BUILDING THE SETS AND NOT WHEN
+   READING THEM.** The first loop has `if(p->fd < 0) continue;`; the
+   second went straight to `FD_ISSET(p->fd, &rfds)` -- out of bounds,
+   and whatever it found became a `revents` the caller believed. *The
+   asymmetry between two loops over the same array is the whole bug.*
+3. **POLLNVAL did not exist**, so one closed descriptor failed the whole
+   call with EBADF where POSIX marks that entry and answers the others.
+
+### Why 1 and 2 are spins rather than wrong answers
+
+`xz/file_io.c`'s `io_wait()` is, in full, `while(true){ ret =
+poll(pfd,2,timeout); if(user_abort) ...; if(ret==-1) ...; if(ret==0)
+return TIMEOUT; if(pfd[0].revents) return MORE; }` -- **nothing in the
+fall-through path**: no sleep, no progress. Any poll that returns a
+positive number without setting `pfd[0].revents` turns it into a
+busy-wait, which is exactly the reported *high load and frozen*. Both
+defects produce that shape, and xz passes `user_abort_pipe[0]` as
+`pfd[1]`, which is **-1 whenever that pipe was not created**.
+
+***THIS IS NOT CLAIMED AS xz's BUG.*** The rules are wrong on their own
+evidence; whether xz stops hanging is a separate measurement and the
+only one that settles it. **And `lz4` hangs too while using neither
+`poll` nor `select` nor `O_NONBLOCK`** -- one grep, and it says the two
+failures share no mechanism at this level, so there are at least two
+faults and this is at most one of them. *Reading them as one story would
+have cost a round.*
+
+**`poll-test.c`**: 15 checks, 0 on gcc; the replaced code beside it
+reports **4**, and section 1 is the one that matters -- `poll returns 1,
+not 2` answers **2**, a positive return with a single entry marked.
+**Section 1 had to be rewritten to be reachable at all**: it used a
+PIPE, whose read end is readable and not writable, so the bit-count
+defect could not arise and the check could not fail. A regular file
+opened read-write is ready for both, which is what exposes it.
+*Defect 2 is deliberately absent from that control*: `FD_ISSET(-1, ...)`
+is undefined behaviour, so replicating it on the host risks a crash
+rather than a failure, and the test says so instead of pretending.
+
+### What is still open on the archivers
+
+- **`xz` hangs COMPRESSING seven bytes.** The downloaded sample is
+  exonerated -- a file holding the word `sample` cannot be a corrupt
+  archive -- so the fault is ours either way.
+- **`lz4` froze decoding and left an EMPTY output.** Its earlier
+  `Decoding file sample.txt` was not a pass: *it says the program
+  started, not that the bytes came out right*, which is why that line
+  was recorded as "not yet a pass" rather than as success.
+- **Neither has been confirmed fixed, and `pcc -9` is NOT available as
+  an A/B here**: rebuilding one package under the old layout rule
+  against a `-J` libap is the silent ABI split this tree has a rule
+  about, so that cannot separate "`-J` broke it" from "it never worked".
+- **The instrument is `ratrace`**, and `ps` STATE first: *constant light
+  CPU is a wait, a pinned core is a loop*. A spin either shows one
+  syscall repeating -- which names it outright -- or shows none, which
+  says it is a compute loop and sends the next step to `acid` and
+  `stk()`. Both have paid here before.

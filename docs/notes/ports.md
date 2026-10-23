@@ -2650,9 +2650,43 @@ only thing varying is which generation wrote it:
 	cmp /tmp/gen1.c bacon.bac.c          # or Plan 9's cmp
 ```
 
-Identical is the expectation and **would be self-hosting proven at the
-source level**, where the equal binary sizes only imply it. `-n` skips
-a compile nobody needs; it changes nothing about what is generated.
+**IT WAS RUN AND THE TWO ARE IDENTICAL.** So the compiled converter
+reproduces its own input exactly: BaCon self-hosts on APExp, proven at
+the SOURCE level rather than inferred from two equal binary sizes.
+
+**And it explains those sizes rather than merely agreeing with them.**
+gen 2 was built from C1 and gen 3 from C2; with C1 == C2 and the same
+`Makefile.bacon` link command both times, the two binaries must be
+identical, which is what 3048736 twice was saying. *Two observables,
+one of which now accounts for the other, is better than two that merely
+point the same way.*
+
+### One caveat, and it is mine rather than the result's
+
+**APE's `cmp` prints nothing when two files are the SAME, and it also
+printed nothing when it wrongly believed its stdout was `/dev/null`.**
+Those two are indistinguishable from the prompt. The `st_rdev` fix that
+cures the second is committed but reaches the VM only after `mk
+install` in `lib/ap` AND a relink of `cmp` -- *a libap fix does not
+reach a binary already built*, which is this tree's own rule -- so a
+run on the unrebuilt tree cannot tell the two apart by looking.
+
+It does not need a rebuild to settle, and there are three ways, any one
+of which is enough:
+
+```
+	term% cmp /tmp/gen1.c bacon.bac.c      # native cmp: no such optimisation
+	cmp /tmp/gen1.c bacon.bac.c; echo $?   # the status is correct even when silent
+	cmp /tmp/gen1.c src/bacon.bac.c        # a pair KNOWN to differ -- the control
+```
+
+**The third is the sharpest and costs nothing**: run the same `cmp` on
+two files that are known to be different. If it speaks there and stays
+silent on the pair under test, the silence means identical. If it is
+silent on both, the measurement is void. *A check that cannot fail is
+not a check* -- and the honest position is that the equal binary sizes
+were already independent corroboration, so this is tightening a result
+rather than doubting it.
 
 *Comparing against `src/bacon.bac.c` is still worth one look, but as a
 question about how far the two implementations have drifted -- not as a
@@ -2667,3 +2701,38 @@ plausible, meaningless result. *A measurement of a build that does not
 contain the change measures nothing*, and nowhere in this tree are two
 builds as easy to confuse as here: one word apart, the same name, and
 both on the path.
+
+
+---
+
+## unrar, and what EDG does and does not unlock
+
+**The last pure-C unrar is 2.71**, which is what this tree vendors;
+every later one is C++. With `c++` now translating, compiling and
+linking, a newer unrar looks reachable -- and the deciding question is
+narrow enough to answer before anyone starts.
+
+***THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE.*** The
+reachable subset is the one EDG itself is written in: classes,
+templates, virtual dispatch, RAII, `new`/`delete`, plus
+`bad_alloc`/`type_info`/`initializer_list`. So the criterion is not
+"is it C++" but **how much `std::` it uses**:
+
+- unrar historically carried its own `Array<>` template, its own
+  wide-string helpers and its own allocator, and leaned on the C library
+  for the rest -- which is exactly the shape that works here.
+- Later versions reach for `std::vector` and friends in places.
+
+**So the check is one grep on a candidate tarball, not an attempt**:
+count `std::` and `#include <` of the standard C++ headers. A version
+that uses none is a port; a version that uses `std::vector` needs a
+`std::` implementation this tree has decided twice it has not got --
+`paragon_portable_stl` is the best corpus available and is disqualified
+as a LIBRARY, because its namespace is `portable_stl` and
+`vector::push_back` returns `expected<...>`, so no aliasing recovers the
+API.
+
+**And the static-constructor gap applies**: nothing calls EDG's
+`__call_ctors`, so a translated program's file-scope constructors do not
+run. unrar has tables that may be built that way. *That is a second,
+independent criterion and it is cheaper to check than to debug.*

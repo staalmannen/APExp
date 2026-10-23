@@ -23,8 +23,15 @@ enum
 struct Rock
 {
 	Rock		*next;
-	unsigned long	dev;		/* inode & dev of data file */
-	unsigned long	inode;		/* ... */
+	/*
+	 * dev_t/ino_t, not `unsigned long' -- which is 32 bits here, so
+	 * these truncated a 64-bit qid independently of whatever
+	 * <sys/types.h> said, and would have gone on doing it after
+	 * that header was widened.  *Widening a typedef only reaches
+	 * the copies that were declared with it.*
+	 */
+	dev_t		dev;		/* inode & dev of data file */
+	ino_t		inode;		/* ... */
 	int		domain;		/* from socket call */
 	int		stype;		/* ... */
 	int		protocol;	/* ... */
