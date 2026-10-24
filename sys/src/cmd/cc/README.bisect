@@ -1,0 +1,79 @@
+Bisecting the `bad in naddr: REGPAIR' fault into one cc/ file
+=============================================================
+
+WHERE THE HUNT STANDS
+
+`sys/lib/tests/regpair-min.c' is ten lines -- two structs and
+`d->offset = s->size', both members `vlong' -- and APExp's 8c cannot
+compile it.  Current 9front's 8c can.  So can every 64-bit backend.
+
+`sys/src/cmd/8cu' settled which half: it is UPSTREAM's 8c linked
+against APExp's cc.a, and **it fails too**.  So the fault is in this
+directory, and the four non-rename differences in our own 8c are
+cleared by measurement rather than by reading.
+
+FIVE HYPOTHESES ARE DEAD, each by a run rather than an argument:
+
+	two register pairs live at once	regpair-probe case 7
+	the two structs differing	case 14 (same types, reversed)
+	the member name			case 15
+	position in the file		-DLEADER
+	the OAS lvalue bypass		the addable notice never fired
+
+That last one is worth keeping in mind: `com.c's OAS skips `tlvalue'
+for ONAME/OIND/ODOT/OBIT, and `tlvalue' does nothing but test
+`addable' -- so the exemption looked like it could hand the backend a
+node it knew was not addressable.  **The notice says `addable' is 1,
+so it cannot.**
+
+WHAT THIS DIRECTORY CONTAINS FOR THE NEXT STEP
+
+`com.c.9front' is upstream 9front's `com.c' at 38c61773c, verbatim.
+Swapping it in is the next bisection step, and it is a real one rather
+than a guess: `com.c' is where the tree is type-checked and where
+`addable' is set, it is the largest single difference from upstream in
+this directory, and it is one of only four files here that CAN be
+swapped.  `dcl.c', `lex.c', `sub.c' and `cc.y' all reference `Spec'
+upstream -- the 2026-06-10 declaration-specifier refactor APExp does
+not have -- so upstream's copies of those will not compile here at all.
+
+Checked before shipping, in both directions:
+
+  - the only function our `com.c' defines that upstream's does not is
+    `boolnorm', and it is `static', so nothing outside the file wants
+    it;
+  - every function upstream's `com.c' calls exists in this tree.
+
+So it ought to build.  It has NOT been built -- kencc's sources need
+Plan 9's <u.h>, so the first build of anything here is the VM's.
+
+HOW TO RUN IT
+
+	cd sys/src/cmd/cc
+	cp com.c com.c.apexp
+	cp com.c.9front com.c
+	mk install
+	cd ../8c && mk install
+	cd ../../../lib/tests && 8c regpair-min.c
+
+	# and to go back
+	cd sys/src/cmd/cc && cp com.c.apexp com.c && mk install
+	cd ../8c && mk install
+
+  it COMPILES -> the fault is in our `com.c', 1507 lines, and the
+                 next bisection is within one file instead of ten.
+  it FAILS    -> `com.c' is cleared, and what is left is `scon.c',
+                 `pgen.c', `pswt.c' (also swappable) and the four
+                 Spec-entangled ones, which need the merge before they
+                 can be tested this way.
+
+READ THE LINE NUMBER.  `regpair-min.c's assignment is on line 101.
+Any other line means the file under test is not the one you think it
+is -- that has already happened once here and cost a round.
+
+AND EXPECT THE SWAP TO COST FEATURES, NOT JUST THE BUG.  Upstream's
+`com.c' has none of APExp's complex-number handling, no `boolnorm',
+and no VLA `sizeof' rewriting, so a tree built with it will fail
+elsewhere.  **This is a diagnostic, not a candidate fix**, and the
+restore line above is part of the procedure rather than an
+afterthought.
