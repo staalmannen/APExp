@@ -1,0 +1,55 @@
+#
+# 8cu -- UPSTREAM 9front's 8c, linked against APExp's shared cc/.
+#
+# This is not a compiler anyone should use.  It is ONE EXPERIMENT,
+# built the same way as every other backend here so that nothing about
+# the build is a variable: see README in this directory.
+#
+# Deliberately NOT in sys/src/cmd/mkfile's DIRS.  One failing entry
+# aborts the whole tree's mk, and a vendored copy that has never been
+# compiled on this machine is exactly the kind of thing that would.
+# Build it by hand:
+#
+#	cd sys/src/cmd/8cu && mk install
+#
+# TARG=8cu so it lands beside 8c in $objtype/bin rather than over it;
+# mkfile.port sets BIN=$APEXPROOT/$objtype/bin (no /ape).
+#
+# OFILES is upstream's list MINUS 8c_vla.$O, which is APExp's own file
+# and does not exist here.  Nothing in cc/ calls the one function it
+# defines (gvlalloc), and gvla_prologue/gvla_epilogue have weak
+# defaults in cc/vla.c, so dropping it costs nothing but VLA support --
+# which this experiment does not use.
+#
+# T=8 makes mkfile.port's `enam.c: ../$D/$T.out.h' rule read
+# ../8c/8.out.h.  That is APExp's copy and it is byte-identical to the
+# one beside this file, so the generated enam.c is the same either way.
+#
+</$objtype/mkfile
+APEXPROOT=../../../..
+TARG=8cu
+OFILES=\
+	cgen.$O\
+	cgen64.$O\
+	div.$O\
+	enam.$O\
+	list.$O\
+	machcap.$O\
+	mul.$O\
+	peep.$O\
+	pgen.$O\
+	pswt.$O\
+	reg.$O\
+	sgen.$O\
+	swt.$O\
+	txt.$O\
+
+HFILES=\
+	gc.h\
+	8.out.h\
+	../cc/compat.h\
+	../cc/cc.h\
+
+T=8
+<../cc/mkfile.port
+<$APEXPROOT/sys/src/cmd/mkone
