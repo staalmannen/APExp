@@ -51,6 +51,48 @@ assignment is on line 101.  A diagnostic naming any other line means
 the file under test is not the one you think it is; that has already
 happened once in this investigation and cost a round.
 
+THE ONE CHANGE THE SOURCES NEEDED, AND WHY IT IS NOT A CONTAMINANT
+------------------------------------------------------------------
+
+The first build answered
+
+	6c -FTVw cgen.c
+	cgen.c:1205 syntax error, last name: true
+
+***`true' IS A KEYWORD IN APExp's kencc AND AN ORDINARY IDENTIFIER IN
+UPSTREAM's 8c.***  So upstream's backend cannot be compiled by this
+tree's own compiler at all, which is a fact worth having on its own:
+**any future attempt to build a stock 9front source tree with APExp's
+kencc meets this first.**
+
+Earlier notes called APExp's `true' -> `cond' rename "cosmetic" and
+listed it among five changes that could not matter.  *It is not
+cosmetic; it is REQUIRED*, and that was a mislabelling.  What it is
+not is a change to code generation: it renames a parameter and a local
+and two words inside comments, and nothing else.
+
+So this directory carries the rename and nothing else, and **that is
+checked rather than asserted**: `cgen.c' and `cgen64.c' here are
+upstream's with every differing line being `true' -> `cond' or
+`true' -> `vcond'; the other eleven files are byte-identical to
+upstream.
+
+	cgen.c     38 changed lines, 0 that are not a rename
+	cgen64.c   44 changed lines, 0 that are not a rename
+	everything else          0 changed lines
+
+`cgen.c' was built from APExp's own copy with the 27-line `OALLOCA'
+case deleted, since APExp's differs from upstream by exactly that case
+plus the rename; `cgen64.c' is APExp's verbatim, because APExp's
+differs from upstream by the rename alone.
+
+***AND THIS MAKES THE EXPERIMENT SHARPER THAN PLANNED.***  8cu now
+differs from APExp's 8c by exactly the FOUR changes that are not the
+rename: the `OALLOCA' case, the complex/VLA/`CLOCAL' edits in `txt.c',
+`-J' in `swt.c', and `maxregion' in `reg.c'.  A pass does not merely
+say "the fault is in cc/" -- it clears those four by measurement where
+they had only been cleared by reading.
+
 WHERE THE SOURCES CAME FROM
 ---------------------------
 
@@ -58,8 +100,9 @@ github.com/9front/9front, sys/src/cmd/8c, at the commit whose log reads
 
 	38c61773c  news(1): remove notes about trash handling
 
-Copied verbatim.  The only file not taken from upstream is this mkfile,
-which differs from upstream's in three ways and no more:
+Copied verbatim apart from the `true' rename described above.  The only
+file not taken from upstream at all is this mkfile, which differs from
+upstream's in three ways and no more:
 
   - TARG=8cu rather than 8c, so it lands beside the real compiler in
     $objtype/bin instead of over it.
