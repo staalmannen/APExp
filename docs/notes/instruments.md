@@ -760,3 +760,61 @@ So `regpair-min.c`: case 1 and nothing else, ten lines, native `8c`.
 **Either answer is worth more than a sixteenth case.** When a reduction
 stops narrowing, stop adding to it and ask whether the harness has
 become part of the measurement.
+
+### `regpair-min.c` fails: two structs and one assignment
+
+```
+regpair-min.c:69 bad in naddr: REGPAIR   (twice, with the tree)
+```
+
+**Ten lines reproduce it.** No other cases, no 450-line harness --
+`regpair-probe.c` did its job and is now superseded for this question.
+*The reduction that matters is the one somebody else can paste into a
+bug report.*
+
+**And `8c/cgen.c` is cleared by reading too**: against upstream HEAD its
+only non-rename, non-comment difference is the `OALLOCA` case, a new
+`case` label unreachable without a VLA. All five of our 8c deltas hold
+as inert, which leaves `cc/`.
+
+**The one hypothesis a minimal file cannot kill by being minimal** is
+the one the probe imposed: `case1` is the first function here too.
+`-DLEADER` puts a trivial function ahead of it, so two compiles of one
+file settle it -- and `cpp` keeps line numbering through an `#ifdef`,
+so the assignment is on the same line in both builds and the
+diagnostics compare directly.
+
+*A toggle inside the file beats a second file*, because the two builds
+then differ in exactly the thing being tested and in nothing else --
+not in struct layout, not in line numbers, not in what else happens to
+be present.
+
+### The -DLEADER run measured nothing, and the LINE NUMBER is what said so
+
+```
+bash-5.3$ 8c -DLEADER regpair-min.c
+regpair-min.c:69 bad in naddr: REGPAIR
+```
+
+**69 is the PRE-LEADER file.** With the `#ifdef LEADER` block present
+the assignment is on line **101**, and the header said so in advance:
+*"the assignment is line 101 in both"*. So that copy had no `#ifdef
+LEADER` for `-DLEADER` to switch, the flag defined a macro nothing
+reads, and the compile was the previous one repeated.
+
+***A `-D` that names nothing is silent***, which is the same shape as
+the APE header rule about `pcc` dropping an unnamed flag: a switch that
+does nothing and a switch that worked and changed nothing produce
+identical output. The only thing separating them here was a line number
+written down before the run.
+
+**That is the whole value of predicting the OBSERVATION rather than the
+conclusion**, and it is worth noting that it cost nothing: one clause
+in a comment, which then caught a void measurement the same day. *The
+rule this tree already carries -- a measurement of a build that does
+not contain the change measures nothing -- usually needs
+`git merge-base` to enforce. For a compiler diagnostic, the line number
+enforces it for free.*
+
+**Re-run after pulling `d3602728`.** Line 101 in the diagnostic means
+the file under test is the right one; 69 means it is not.
