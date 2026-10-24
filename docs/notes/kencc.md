@@ -1898,3 +1898,82 @@ file keeps warning about.
   have picked.
 - **`13c041218`** sits on the fork boundary; whether we have it is
   worth checking before anyone assumes either way.
+
+### FOUND: `typesuvinit[]` lost TVLONG and TUVLONG
+
+```
+upstream:  TVLONG, TUVLONG, TSTRUCT, TUNION, -1
+APExp:     TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1
+```
+
+**The two complex entries were put in place of the two vlong ones
+instead of beside them.** `typesuv` is not a complex predicate: it is
+the *"this type is handled as a memory object"* predicate, and
+`typesu` -- struct and union alone -- sits beside it precisely so the
+two questions stay apart.
+
+`8c/cgen.c` opens with
+
+```c
+	if(typesuv[n->type->etype]) {
+		sugen(n, nn, n->type->width);
+		return;
+	}
+```
+
+and `1c`, `2c` and `5c` carry the same line. With vlong out of the
+set, a 64-bit value stopped going to `sugen` and fell into the ordinary
+register path, where it is a register PAIR -- and a pair eventually
+reaches `naddr`, which can only take an address.
+
+***That is `bad in naddr: REGPAIR`.*** It stopped `objtype=386 mk
+install` at `ar.c:586` and reduces to ten lines.
+
+**And it is invisible on amd64 because `6c/cgen.c` has no such line**:
+a vlong is one register there, the register path is correct, and
+nothing notices the set is wrong. *The five backends that fail are
+exactly the ones whose `cgen` consults this array* -- which is also why
+`8cu` (upstream's backend, our front end) failed, and why `com.c`
+turned out innocent.
+
+#### How the search reached it, and what each step cost
+
+Five hypotheses died to runs: register pressure, the two struct types
+differing, the member name, position in the file, the OAS lvalue
+bypass. Three things were cleared by reading: `com64.c` (identical to
+upstream), `pgen.c`, and all five of our 8c deltas. **`8cu` moved it
+from "somewhere in the compiler" to `cc/`, and the `com.c` swap cleared
+the largest file in `cc/`** -- after which the remaining candidates
+were the four `Spec`-entangled ones, and `sub.c` is where the type
+tables live.
+
+*The reduction did not find the bug; it made the bug cheap enough to
+ask ten questions about.*
+
+#### The second half is an ABI
+
+`typecmplx` points at this array (`tinit`, and again in every backend's
+`ginit`), and `pgen.c` uses it to decide whether a function returns
+through a hidden `.ret` pointer. **So removing vlong also moved every
+`vlong`-returning function off the hidden-pointer convention on all
+eleven targets, amd64 included** -- silently and self-consistently,
+because everything APExp builds is built by this compiler.
+
+Restoring it restores upstream's convention and **needs `mk distclean`
+before `mk install`**, like any other ABI change.
+
+***And it predicts something worth checking on its own***: native code
+built here and linked against the HOST's `libc.a` -- `cmd2/vts` and
+`vtwin` -- has been disagreeing with it about every `vlong`-returning
+libc call, `nsec()` among them. **That is a prediction and not a
+finding**, and the way to settle it is to look, rather than to let it
+explain anything retrospectively.
+
+#### What would refute the fix
+
+`regpair-min.c` compiling and `objtype=386 mk install` getting past
+`ar.c` is the confirmation. If `regpair-min.c` still fails, the array
+is not the whole story and `scon.c`, `pswt.c` and the `Spec`-entangled
+files are still in front of us. If it compiles but something on amd64
+breaks, that is the return-ABI half and it will show as a link or a
+wrong value rather than a diagnostic.

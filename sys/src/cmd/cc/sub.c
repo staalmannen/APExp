@@ -1731,9 +1731,63 @@ int	typeuinit[] =
 };
 
 char	typesuv[NCTYPE];
+/*
+ * TVLONG AND TUVLONG BELONG HERE AND WERE REMOVED, AND THAT IS WHAT
+ * BROKE EVERY 32-BIT BACKEND.
+ *
+ * Upstream reads `TVLONG, TUVLONG, TSTRUCT, TUNION'.  APExp replaced
+ * the two vlong entries with the two complex ones instead of ADDING
+ * them, and `typesuv' is not a complex predicate -- it is the "this
+ * type is handled as a memory object" predicate, which `typesu'
+ * (struct and union alone) sits beside precisely so that the two
+ * questions stay apart.
+ *
+ * `8c/cgen.c' opens with
+ *
+ *	if(typesuv[n->type->etype]) {
+ *		sugen(n, nn, n->type->width);
+ *		return;
+ *	}
+ *
+ * and 1c, 2c and 5c have the same line.  With `vlong' out of the set,
+ * a 64-bit value stopped going to `sugen' and fell through into the
+ * ordinary register path, where it is a REGISTER PAIR -- and a pair
+ * eventually reaches `naddr', which can only take an address.  That is
+ * `bad in naddr: REGPAIR', which stopped `objtype=386 mk install' at
+ * `ar.c:586' and reduces to `sys/lib/tests/regpair-min.c': two structs
+ * and `d->offset = s->size'.
+ *
+ * ***AND IT IS INVISIBLE ON amd64***, because `6c/cgen.c' has no such
+ * line: a vlong is one register there, so the register path is the
+ * right one and nothing notices the set is wrong.  Every build this
+ * tree has ever done was amd64.  *The five backends that fail are
+ * exactly the ones whose `cgen' consults this array.*
+ *
+ * THE SECOND HALF IS AN ABI, and it is why this is not a one-word
+ * edit.  `typecmplx' points at this array (`tinit' below, and again in
+ * every backend's `ginit'), and `pgen.c' uses it to decide whether a
+ * function returns through a hidden `.ret' pointer.  So removing vlong
+ * also moved every `vlong'-returning function OFF the hidden-pointer
+ * convention, on all eleven targets including amd64 -- silently, and
+ * self-consistently, because everything APExp builds is built by this
+ * compiler.
+ *
+ * **Restoring it restores upstream's convention**, which needs
+ * `mk distclean' before `mk install' like any other ABI change. It
+ * also predicts something worth checking on its own: native code built
+ * here and linked against the HOST's `libc.a' -- `cmd2/vts' and
+ * `vtwin' -- has been disagreeing with it about every `vlong'-returning
+ * libc call, `nsec()' among them. *That is a prediction, not a
+ * finding*, and the way to settle it is to look rather than to assume
+ * it explains anything.
+ *
+ * Complex stays, because complex really is a memory object and really
+ * does want `sugen' and the hidden pointer. The fault was the
+ * replacement, not the addition.
+ */
 int	typesuvinit[] =
 {
-	TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1,
+	TVLONG, TUVLONG, TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1,
 };
 
 char	typeilp[NTYPE];
