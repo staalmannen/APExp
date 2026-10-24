@@ -76,6 +76,14 @@ enum
  * n is already type-checked; !! needs nothing but int, which is what
  * tcomo's ONOT case gives it.
  */
+/*
+ * Set once the "assignment target not addable" notice below has been
+ * printed, so a tree build gets one line per translation unit rather
+ * than one per assignment.  See the OAS case for why it is not a
+ * `warn'.
+ */
+static int saidnotaddable;
+
 static Node*
 boolnorm(Node *n)
 {
@@ -261,13 +269,33 @@ tcomo(Node *n, int f)
 		 * every build -- and `-v' beside it prints the tree, since
 		 * `warn' calls `prtree' under `debug['v']'.
 		 *
-		 * ***IF THIS FLOODS, THAT IS THE FINDING***, not a reason to
-		 * narrow the condition: it would mean `addable' is routinely 0
-		 * on assignment targets here, and the exemption is load-
-		 * bearing across the whole tree rather than a corner.
+		 * ***IF THIS FIRES EVERYWHERE, THAT IS THE FINDING***, not a
+		 * reason to narrow the condition: it would mean `addable' is
+		 * routinely 0 on assignment targets here, and the exemption is
+		 * load-bearing across the whole tree rather than a corner.
+		 *
+		 * UNCONDITIONAL, AND ONCE PER COMPILATION, AND BOTH HALVES OF
+		 * THAT COST A ROUND TO LEARN.  It was a `warn' first -- and
+		 * `warn' is gated on `debug['w']', which `-FTVw' and `pcc''s
+		 * `-Fw' both set but which a bare `8c file.c' does not. So the
+		 * run that was meant to settle this printed nothing, and
+		 * "the condition is false" and "the diagnostic could not
+		 * speak" looked identical. *That is the second void run in
+		 * this investigation from a flag nobody passed*, after
+		 * `-DLEADER' against a file with no `#ifdef LEADER' in it.
+		 *
+		 * So it does not depend on a flag. The `once' guard is what
+		 * makes that affordable: a tree build gets at most one line
+		 * per translation unit, which is loud enough to notice and
+		 * quiet enough to live with -- and one line is all the
+		 * question needs, since it is `does this EVER happen', not
+		 * `how often'.
 		 */
-		if(!l->addable)
-			warn(n, "assignment target not addable: %O of %T", l->op, l->type);
+		if(!l->addable && !saidnotaddable) {
+			saidnotaddable = 1;
+			Bprint(&diagbuf, "%L assignment target not addable: %O of %T\n",
+				n->lineno, l->op, l->type);
+		}
 		if(isfunct(n))
 			break;
 		if(iscmplx(l->type->etype) && !iscmplx(r->type->etype)) {

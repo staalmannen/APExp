@@ -818,3 +818,34 @@ enforces it for free.*
 
 **Re-run after pulling `d3602728`.** Line 101 in the diagnostic means
 the file under test is the right one; 69 means it is not.
+
+### The second void run, and why the diagnostic lost its flag
+
+```
+bash-5.3$ 8c regpair-min.c
+regpair-min.c:101 bad in naddr: REGPAIR
+bash-5.3$ 8cu regpair-min.c
+regpair-min.c:101 bad in naddr: REGPAIR
+```
+
+The new "assignment target not addable" notice did not appear -- and
+**that measured nothing**, because it was a `warn`, and `warn` is gated
+on `debug['w']`. `'w'` has no named case in `cc/lex.c`'s `ARGBEGIN`, so
+`-FTVw` and `pcc`'s `-Fw` set it and **a bare `8c file.c` does not.**
+So "the condition is false" and "the diagnostic could not speak" looked
+identical, which is the shape this file keeps a rule about.
+
+***Second void run of this investigation from a flag nobody passed***,
+after `-DLEADER` against a copy with no `#ifdef LEADER` in it. Both
+were my instruction being incomplete rather than the run being wrong,
+and the fix is the same both times: **take the flag out of the
+instrument** rather than add it to the instruction.
+
+So the notice is unconditional now, with a `static` guard that caps it
+at **one line per translation unit**. That is what makes unconditional
+affordable: a tree build gets one line per file, loud enough to notice
+and quiet enough to live with -- and one line answers the question,
+which is *does this ever happen*, not *how often*.
+
+*A diagnostic that needs a flag is a diagnostic that will be missed on
+the run that mattered.*
