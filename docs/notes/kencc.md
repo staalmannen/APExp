@@ -1842,3 +1842,59 @@ carry, which left the `isv = 0` initialiser dead. One line, and it had
 been warning in every backend build since. *A warning nobody reads is
 the same as no warning*, which is the argument for keeping the build
 output clean rather than for learning to skip a line.
+
+### Backporting from upstream: what is missing, and what was taken
+
+With the clone in hand the gap is small and enumerable. Everything
+upstream has touched in `cc/` or the backends since APExp's fork
+window opened:
+
+```
+a68335214  2026-06-10  cc: untangle class and type specifiers
+b43ec1215  2026-04-11  cc: fix the fix of taking address of
+                       incompletely defined types
+9932a824a  2026-03-02  cc: bump max include directories limit
+13c041218  2025-12-27  cc: reuse memory for Typetab by using allocn()
+
+421b1cc87  2026-02-09  6c: disable storeprop optimisation (temporarily)
+78b4f3f1d  2026-02-08  6c: implement storeprop peephole optimisation
+3ea08ad83  2025-12-28  ?c: grow regions dynamically          [we have]
+ed3c7d491  2025-12-27  ?c: eliminate .rathole for ...         [we have]
+```
+
+**Taken:**
+
+- **`9932a824a`** -- `include[20]` -> `include[NINCLUDE]`, 64. Twenty
+  was the limit since forever and *APExp reaches it easily*:
+  `mount-include` binds four trees, every gnulib package passes `-I`
+  for the shared tree, its own and `lib/`, and EDG's driver adds
+  several more. The twenty-first `-I` was a hard `diag`. `lex.c` bounds
+  the array with `nelem(include)`, so `cc.h` is the only file that
+  moves.
+- **`b43ec1215`** -- two lines in `tcomo`: `snap()` now runs before the
+  `ADDROP` test rather than being skipped under it, so a forward-
+  declared struct gets completed even when the expression is `&x`. The
+  diagnostic fires on exactly the same inputs.
+
+***And `b43ec1215` was applied DURING the `naddr` hunt on purpose***,
+because it cannot move the measurement: the reproduction contains no
+`&`, so `f & ADDROP` is false there and both versions run identically.
+*A backport that could have moved it would have waited* -- changing
+`cc/` while `cc/` is the thing under investigation is the confound this
+file keeps warning about.
+
+**Not taken, with reasons:**
+
+- **`a68335214`** (the `Spec` refactor) rewrites how declaration
+  specifiers are represented -- `garbt`, `simpleg`, `simplec`,
+  `simplet` all change signature -- and `dcl.c` and `lex.c` are two of
+  the files APExp has changed most. **It is a merge, not a backport**,
+  and it should be done deliberately rather than in passing.
+- **`78b4f3f1d` + `421b1cc87`** are a pair: 6c's `storeprop` peephole
+  was implemented and then **disabled one day later**. We have neither,
+  which puts us in the same state as upstream-after-the-disable.
+  ***Backporting only the first would have been actively harmful***,
+  and it is the one a naive "take the newest optimisation" sweep would
+  have picked.
+- **`13c041218`** sits on the fork boundary; whether we have it is
+  worth checking before anyone assumes either way.

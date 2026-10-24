@@ -1094,9 +1094,27 @@ tcomo(Node *n, int f)
 	t = n->type;
 	if(t == T)
 		goto bad;
-	if(t->width < 0 && !(f & ADDROP)) {
+	/*
+	 * Backported from 9front b43ec1215 (2026-04-11), "cc: fix the fix
+	 * of taking address of incompletely defined types".
+	 *
+	 * `snap()' completes a forward-declared struct once its real
+	 * definition has been seen.  It used to be skipped entirely under
+	 * ADDROP -- so `&x' on a type that was incomplete at first mention
+	 * left the type incomplete, rather than merely declining to
+	 * complain about it.  The fix snaps first and tests ADDROP second,
+	 * which only widens where the completion happens; the diagnostic
+	 * fires on exactly the same inputs as before.
+	 *
+	 * NOT RELATED TO THE `naddr: REGPAIR' HUNT, and deliberately
+	 * applied during it for that reason: our reproduction takes no `&'
+	 * at all, so `f & ADDROP' is false there and both versions run
+	 * identically.  *A backport that could have moved the measurement
+	 * would have waited.*
+	 */
+	if(t->width < 0) {
 		snap(t);
-		if(t->width < 0) {
+		if(t->width < 0 && !(f & ADDROP)) {
 			if(typesu[t->etype] && t->tag)
 				diag(n, "structure not fully declared %s", t->tag->name);
 			else
