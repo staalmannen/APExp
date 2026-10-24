@@ -229,6 +229,45 @@ tcomo(Node *n, int f)
 		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
 		if(tlvalue(l))
 			goto bad;
+		/*
+		 * AND SAY SO WHEN THAT BYPASS ACTUALLY FIRES.
+		 *
+		 * `tlvalue' is identical to upstream's and does exactly one
+		 * thing: `if(!n->addable) { diag("not an l-value"); return 1; }'.
+		 * So the four-op exemption above has ONE effect -- it lets an
+		 * assignment whose target has `addable == 0' through, where
+		 * upstream stops with a clean diagnostic.
+		 *
+		 * **THAT TURNS A FRONT-END ERROR INTO A BACKEND CRASH.** The
+		 * 386 cross build dies at `ar.c:586' with `bad in naddr:
+		 * REGPAIR', reduced to `sys/lib/tests/regpair-min.c': two
+		 * structs and `d->offset = s->size', both members `vlong'.
+		 * `8cu' -- upstream's 8c against THIS front end -- fails on
+		 * it too, so the fault is here and not in the backend. A node
+		 * the front end knows is not addressable, handed to a code
+		 * generator that assumes it is, is exactly how a register
+		 * PAIR reaches `naddr'.
+		 *
+		 * *And it is invisible on amd64*, where a vlong is one
+		 * register and `cgen' never needs `naddr' on a pair -- which
+		 * is why every build this tree has ever done was fine.
+		 *
+		 * This is a WARNING and not a `diag', deliberately: the
+		 * exemption exists because something really does leave
+		 * `addable' at 0 for shapes that are genuine lvalues, and
+		 * turning that back into an error would break the tree before
+		 * anyone could read why. `warn' is gated on `debug['w']',
+		 * which both `-FTVw' and `pcc''s `-Fw' set, so it speaks in
+		 * every build -- and `-v' beside it prints the tree, since
+		 * `warn' calls `prtree' under `debug['v']'.
+		 *
+		 * ***IF THIS FLOODS, THAT IS THE FINDING***, not a reason to
+		 * narrow the condition: it would mean `addable' is routinely 0
+		 * on assignment targets here, and the exemption is load-
+		 * bearing across the whole tree rather than a corner.
+		 */
+		if(!l->addable)
+			warn(n, "assignment target not addable: %O of %T", l->op, l->type);
 		if(isfunct(n))
 			break;
 		if(iscmplx(l->type->etype) && !iscmplx(r->type->etype)) {

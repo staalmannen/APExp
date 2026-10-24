@@ -1763,3 +1763,82 @@ replicated or reverted to get it.*
 
 Not a bug for us, and nothing to do: recorded because a confirmation
 that arrives free is worth the two minutes of writing it down.
+
+### 8cu FAILS: the fault is in `cc/`, and the four 8c changes are cleared
+
+```
+cd sys/src/cmd/8cu && mk install
+8cu regpair-min.c
+regpair-min.c:101 bad in naddr: REGPAIR
+```
+
+**Upstream's 8c against APExp's `cc.a` fails identically** -- with and
+without `-DLEADER`. The prediction written before the run held.
+
+So **the fault is in the shared front end**, and the four non-rename 8c
+changes (`OALLOCA`, the complex/VLA/`CLOCAL` edits in `txt.c`, `-J` in
+`swt.c`, `maxregion` in `reg.c`) are now cleared **by measurement**
+where they had only been cleared by reading. *The experiment was built
+to answer one question and answered two.*
+
+It also establishes that APExp's `cc.h` is a workable superset:
+upstream's backend compiles against it once `true` is renamed.
+
+### And the mechanism is visible in the OAS case
+
+`com.c`'s `OAS` in APExp reads
+
+```c
+	if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
+	if(tlvalue(l))
+		goto bad;
+```
+
+against upstream's unconditional `if(tlvalue(l)) goto bad;`, with the
+comment *"Workaround for kencc bug: addable can be 0 here for ONAME
+locals"*.
+
+**`tlvalue` is byte-identical to upstream's and does exactly one
+thing:**
+
+```c
+	if(!n->addable) { diag(n, "not an l-value"); return 1; }
+```
+
+***So the exemption has ONE effect: an assignment whose target has
+`addable == 0` goes through, where upstream stops with a clean
+diagnostic.*** That turns a front-end error into a backend crash -- a
+node the front end knows is not addressable, handed to a code
+generator that assumes it is, is exactly how a register PAIR reaches
+`naddr`. **And it is invisible on amd64**, where a vlong is one
+register and `cgen` never needs `naddr` on a pair.
+
+*This is a mechanism argued from source, which this tree's tally puts
+at about one in eight*, so it is not claimed yet. `com.c` now carries a
+`warn` that fires when the exemption actually fires:
+
+```
+assignment target not addable: <op> of <type>
+```
+
+A **warning** and not a `diag`, deliberately: the exemption exists
+because something really does leave `addable` at 0 for shapes that are
+genuine lvalues, and turning it back into an error would break the tree
+before anyone could read why. `warn` is gated on `debug['w']`, which
+both `-FTVw` and `pcc`'s `-Fw` set, so it speaks in every build; `-v`
+beside it prints the tree, since `warn` calls `prtree` under
+`debug['v']`.
+
+**If it floods, that is the finding** -- it would mean `addable` is
+routinely 0 on assignment targets here and the exemption is
+load-bearing across the whole tree rather than a corner. **So run it on
+`regpair-min.c` before any tree build.**
+
+### A dead store, found by the same build
+
+`../cc/pswt.c:27 set and not used: isv` scrolled past while `8cu` built.
+Mine: the `doswit` rewrite removed the `isv |= c->isv` the loop used to
+carry, which left the `isv = 0` initialiser dead. One line, and it had
+been warning in every backend build since. *A warning nobody reads is
+the same as no warning*, which is the argument for keeping the build
+output clean rather than for learning to skip a line.

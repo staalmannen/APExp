@@ -24,7 +24,13 @@ doswit(Node *n)
 
 	def = 0;
 	nc = 0;
-	isv = 0;
+	/*
+	 * No `isv = 0' here: the loop below no longer touches it -- the
+	 * `isv |= c->isv' it used to carry is gone -- so the initialiser
+	 * became dead the moment that line went, and every backend built
+	 * since has printed `../cc/pswt.c:27 set and not used: isv'.
+	 * It is assigned unconditionally a few lines down.
+	 */
 	for(c = cases; c->link != C; c = c->link) {
 		if(c->def) {
 			if(def)
