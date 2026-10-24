@@ -27,6 +27,17 @@ typedef	struct	Bits	Bits;
 #define YYMAXDEPTH	1500
 #define	NTERM		10
 #define	MAXALIGN	7
+/*
+ * Backported from 9front 9932a824a (2026-03-02), "cc: bump max include
+ * directories limit".  Twenty was the limit since forever, and APExp
+ * reaches it easily: `mount-include' binds four trees, gnulib packages
+ * pass -I for the shared tree, the package tree and lib/, and EDG's
+ * driver adds several more.  The twenty-first -I was a hard diag.
+ *
+ * `lex.c' bounds the array with nelem(include), so this is the only
+ * line that has to move.
+ */
+#define	NINCLUDE	64
 
 #define	SIGN(n)		(1ULL<<(n-1))
 #define	MASK(n)		(SIGN(n)|(SIGN(n)-1))
@@ -447,7 +458,7 @@ EXTERN	Decl*	firstdcl;
 EXTERN	int	fperror;
 EXTERN	Sym*	hash[NHASH];
 EXTERN	int	hasdoubled;
-EXTERN	char*	include[20];
+EXTERN	char*	include[NINCLUDE];
 EXTERN	Io*	iofree;
 EXTERN	Io*	ionext;
 EXTERN	Io*	iostack;

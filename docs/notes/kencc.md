@@ -1763,3 +1763,138 @@ replicated or reverted to get it.*
 
 Not a bug for us, and nothing to do: recorded because a confirmation
 that arrives free is worth the two minutes of writing it down.
+
+### 8cu FAILS: the fault is in `cc/`, and the four 8c changes are cleared
+
+```
+cd sys/src/cmd/8cu && mk install
+8cu regpair-min.c
+regpair-min.c:101 bad in naddr: REGPAIR
+```
+
+**Upstream's 8c against APExp's `cc.a` fails identically** -- with and
+without `-DLEADER`. The prediction written before the run held.
+
+So **the fault is in the shared front end**, and the four non-rename 8c
+changes (`OALLOCA`, the complex/VLA/`CLOCAL` edits in `txt.c`, `-J` in
+`swt.c`, `maxregion` in `reg.c`) are now cleared **by measurement**
+where they had only been cleared by reading. *The experiment was built
+to answer one question and answered two.*
+
+It also establishes that APExp's `cc.h` is a workable superset:
+upstream's backend compiles against it once `true` is renamed.
+
+### And the mechanism is visible in the OAS case
+
+`com.c`'s `OAS` in APExp reads
+
+```c
+	if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
+	if(tlvalue(l))
+		goto bad;
+```
+
+against upstream's unconditional `if(tlvalue(l)) goto bad;`, with the
+comment *"Workaround for kencc bug: addable can be 0 here for ONAME
+locals"*.
+
+**`tlvalue` is byte-identical to upstream's and does exactly one
+thing:**
+
+```c
+	if(!n->addable) { diag(n, "not an l-value"); return 1; }
+```
+
+***So the exemption has ONE effect: an assignment whose target has
+`addable == 0` goes through, where upstream stops with a clean
+diagnostic.*** That turns a front-end error into a backend crash -- a
+node the front end knows is not addressable, handed to a code
+generator that assumes it is, is exactly how a register PAIR reaches
+`naddr`. **And it is invisible on amd64**, where a vlong is one
+register and `cgen` never needs `naddr` on a pair.
+
+*This is a mechanism argued from source, which this tree's tally puts
+at about one in eight*, so it is not claimed yet. `com.c` now carries a
+`warn` that fires when the exemption actually fires:
+
+```
+assignment target not addable: <op> of <type>
+```
+
+A **warning** and not a `diag`, deliberately: the exemption exists
+because something really does leave `addable` at 0 for shapes that are
+genuine lvalues, and turning it back into an error would break the tree
+before anyone could read why. `warn` is gated on `debug['w']`, which
+both `-FTVw` and `pcc`'s `-Fw` set, so it speaks in every build; `-v`
+beside it prints the tree, since `warn` calls `prtree` under
+`debug['v']`.
+
+**If it floods, that is the finding** -- it would mean `addable` is
+routinely 0 on assignment targets here and the exemption is
+load-bearing across the whole tree rather than a corner. **So run it on
+`regpair-min.c` before any tree build.**
+
+### A dead store, found by the same build
+
+`../cc/pswt.c:27 set and not used: isv` scrolled past while `8cu` built.
+Mine: the `doswit` rewrite removed the `isv |= c->isv` the loop used to
+carry, which left the `isv = 0` initialiser dead. One line, and it had
+been warning in every backend build since. *A warning nobody reads is
+the same as no warning*, which is the argument for keeping the build
+output clean rather than for learning to skip a line.
+
+### Backporting from upstream: what is missing, and what was taken
+
+With the clone in hand the gap is small and enumerable. Everything
+upstream has touched in `cc/` or the backends since APExp's fork
+window opened:
+
+```
+a68335214  2026-06-10  cc: untangle class and type specifiers
+b43ec1215  2026-04-11  cc: fix the fix of taking address of
+                       incompletely defined types
+9932a824a  2026-03-02  cc: bump max include directories limit
+13c041218  2025-12-27  cc: reuse memory for Typetab by using allocn()
+
+421b1cc87  2026-02-09  6c: disable storeprop optimisation (temporarily)
+78b4f3f1d  2026-02-08  6c: implement storeprop peephole optimisation
+3ea08ad83  2025-12-28  ?c: grow regions dynamically          [we have]
+ed3c7d491  2025-12-27  ?c: eliminate .rathole for ...         [we have]
+```
+
+**Taken:**
+
+- **`9932a824a`** -- `include[20]` -> `include[NINCLUDE]`, 64. Twenty
+  was the limit since forever and *APExp reaches it easily*:
+  `mount-include` binds four trees, every gnulib package passes `-I`
+  for the shared tree, its own and `lib/`, and EDG's driver adds
+  several more. The twenty-first `-I` was a hard `diag`. `lex.c` bounds
+  the array with `nelem(include)`, so `cc.h` is the only file that
+  moves.
+- **`b43ec1215`** -- two lines in `tcomo`: `snap()` now runs before the
+  `ADDROP` test rather than being skipped under it, so a forward-
+  declared struct gets completed even when the expression is `&x`. The
+  diagnostic fires on exactly the same inputs.
+
+***And `b43ec1215` was applied DURING the `naddr` hunt on purpose***,
+because it cannot move the measurement: the reproduction contains no
+`&`, so `f & ADDROP` is false there and both versions run identically.
+*A backport that could have moved it would have waited* -- changing
+`cc/` while `cc/` is the thing under investigation is the confound this
+file keeps warning about.
+
+**Not taken, with reasons:**
+
+- **`a68335214`** (the `Spec` refactor) rewrites how declaration
+  specifiers are represented -- `garbt`, `simpleg`, `simplec`,
+  `simplet` all change signature -- and `dcl.c` and `lex.c` are two of
+  the files APExp has changed most. **It is a merge, not a backport**,
+  and it should be done deliberately rather than in passing.
+- **`78b4f3f1d` + `421b1cc87`** are a pair: 6c's `storeprop` peephole
+  was implemented and then **disabled one day later**. We have neither,
+  which puts us in the same state as upstream-after-the-disable.
+  ***Backporting only the first would have been actively harmful***,
+  and it is the one a naive "take the newest optimisation" sweep would
+  have picked.
+- **`13c041218`** sits on the fork boundary; whether we have it is
+  worth checking before anyone assumes either way.
