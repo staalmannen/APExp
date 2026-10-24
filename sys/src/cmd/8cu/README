@@ -1,0 +1,107 @@
+8cu -- upstream 9front's 8c, linked against APExp's shared cc/.
+
+WHAT THIS IS FOR
+----------------
+
+`objtype=386 mk install' stops on
+
+	ar.c:586 bad in naddr: REGPAIR
+
+and `sys/lib/tests/regpair-min.c' reduces that to two structs and one
+assignment:
+
+	void
+	case1(Dst *d, Src *s)
+	{
+		d->offset = s->size;		/* both vlong */
+	}
+
+APExp's 8c fails on it.  Current 9front's 8c compiles it, and so does
+every 64-bit backend.  Four hypotheses have been killed by measurement
+-- register pressure, the two struct types differing, the member name,
+and position in the file -- and reading has cleared all five of
+APExp's own differences from upstream's 8c.  That leaves the shared
+front end, `sys/src/cmd/cc/', and this directory is the one build that
+says so or does not.
+
+	8cu  =  upstream 8c sources  +  APExp cc.a
+
+	it FAILS  -> the fault is in APExp's cc/, which is where every
+	             other line of evidence already points.
+	it PASSES -> the fault is in APExp's 8c/ after all, and the
+	             reading that cleared those five changes is wrong
+	             somewhere.  That would be worth more than a
+	             confirmation.
+
+HOW TO BUILD AND RUN IT
+-----------------------
+
+	cd sys/src/cmd/8cu
+	mk install
+	cd ../../../lib/tests
+	8cu regpair-min.c
+
+`mk install' builds `../cc' first -- `mkfile.port's `$LIB: $CCSRC' rule
+does `cd ../cc; mk install' -- so the cc.a it links is APExp's current
+one, not a stale copy.  That is the point of the experiment and not an
+accident of the mkfile.
+
+**Read the LINE NUMBER in any diagnostic.**  `regpair-min.c''s
+assignment is on line 101.  A diagnostic naming any other line means
+the file under test is not the one you think it is; that has already
+happened once in this investigation and cost a round.
+
+WHERE THE SOURCES CAME FROM
+---------------------------
+
+github.com/9front/9front, sys/src/cmd/8c, at the commit whose log reads
+
+	38c61773c  news(1): remove notes about trash handling
+
+Copied verbatim.  The only file not taken from upstream is this mkfile,
+which differs from upstream's in three ways and no more:
+
+  - TARG=8cu rather than 8c, so it lands beside the real compiler in
+    $objtype/bin instead of over it.
+  - APEXPROOT and `<$APEXPROOT/sys/src/cmd/mkone' rather than
+    `</sys/src/cmd/mkone', which is this tree's idiom everywhere.
+  - OFILES drops `8c_vla.$O'.  That file is APExp's, it does not exist
+    upstream, and nothing in cc/ calls the one function it defines
+    (`gvlalloc' is declared in cc.h and called only from APExp's own
+    `OALLOCA' case).  `gvla_prologue' and `gvla_epilogue' have weak
+    defaults in `cc/vla.c'.
+
+WHAT IT DOES *NOT* NEED, which was got wrong first
+--------------------------------------------------
+
+An earlier version of this plan said upstream's `ginit' must gain
+
+	typecmplx = typesuv;
+
+or `cc/pgen.c' would dereference a nil pointer on the first function
+with a return value.  **That is wrong.**  `cc/sub.c's `tinit()' sets
+`typecmplx = typesuv' itself, among the 32-bit defaults, and every
+backend's copy of the line is redundant.  No shim of any kind is
+needed, and following that instruction would have meant editing a
+vendored file for no reason and then wondering whether the edit was
+load-bearing.
+
+NOT IN THE DEFAULT BUILD
+------------------------
+
+`sys/src/cmd/mkfile's DIRS does not list this directory, on purpose.
+One failing entry aborts the whole tree's mk, and these sources have
+never been compiled on this machine -- APExp's `cc.h' is a superset of
+the one upstream's 8c was written against, which ought to be enough and
+has not been shown to be.  **The first build is the VM's**, the same
+weaker position every `cc/' change ships from.
+
+If it does not compile, that is itself informative and belongs in
+`docs/notes/kencc.md' beside the rest: it would mean upstream's backend
+has moved past APExp's front end in some way the diff did not show.
+
+WHEN IT HAS SERVED ITS PURPOSE
+------------------------------
+
+Delete it.  A second compiler in the tree is a maintenance cost and a
+thing to be confused by, and this one answers exactly one question.
