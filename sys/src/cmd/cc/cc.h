@@ -617,6 +617,7 @@ extern	char	typefd[];
 extern	char	typei[];
 extern	char	typesu[];
 extern	char	typesuv[];
+extern	char	typesuc[];	/* typesu plus complex; see sub.c */
 extern	char	typeu[];
 extern	char	typev[];
 extern	char	typec[];

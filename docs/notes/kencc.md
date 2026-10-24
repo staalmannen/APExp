@@ -1977,3 +1977,63 @@ is not the whole story and `scon.c`, `pswt.c` and the `Spec`-entangled
 files are still in front of us. If it compiles but something on amd64
 breaks, that is the return-ABI half and it will show as a link or a
 wrong value rather than a diagnostic.
+
+### I broke the build: the two changes were a MATCHED PAIR
+
+Restoring `TVLONG`/`TUVLONG` to `typesuvinit[]` alone broke
+`sys/src/cmd`: a freshly built `6l` could not resolve a single libc
+symbol while linking `7a`.
+
+**Because APExp had made TWO changes, not one**, and they cancelled on
+the 64-bit targets:
+
+```
+                 typecmplx points at      typesuv contains
+upstream  6c     typesu                   vlong uvlong struct union
+upstream  8c     typesuv (tinit default)  vlong uvlong struct union
+APExp     6c     typesuv                  struct union cfloat cdouble
+APExp     8c     typesuv                  struct union cfloat cdouble
+```
+
+***`typecmplx` is the RETURN ABI and `typesuv` is the sugen dispatch,
+and upstream separates them in the BACKEND rather than in the array.***
+6c, 7c and 9c point `typecmplx` at `typesu` because a `vlong` is a
+register on those targets and must not be returned through a hidden
+`.ret` pointer; the 32-bit backends take `tinit`'s default of
+`typesuv`, where it is not.
+
+APExp pointed every backend at `typesuv` *and* emptied `typesuv` of
+vlong. On amd64 those cancel exactly -- the set is {struct, union,
+complex} either way. On every 32-bit target the second change alone
+survives, and `cgen`'s opening `if(typesuv[...]) sugen()` stops firing
+for vlongs.
+
+**So restoring one half moved amd64's return ABI**, `6l` was rebuilt
+with hidden-pointer `vlong` returns, it called the host's `libc.a`
+which returns them in a register, and the first thing that noticed was
+every symbol in the next link.
+
+*A fix that restores upstream's data without restoring upstream's use
+of it is not a backport, it is half of one.*
+
+### The fix, and why it is a third array
+
+- `typesuv` = {vlong, uvlong, struct, union, **cfloat, cdouble**} --
+  upstream's membership plus complex.
+- **`typesuc` = {struct, union, cfloat, cdouble}** -- new, and what
+  6c, 7c and 9c now point `typecmplx` at. It is upstream's `typesu`
+  plus complex, and it is *exactly* what APExp's `typesuv` used to be,
+  so those three targets are behaviourally unchanged.
+- `typesu` is **untouched**, and that is deliberate: `signat` reads it,
+  so widening it would move every type SIGNATURE in the tree -- and
+  signatures are how the linker matches against the host's own
+  `libc.a`. It is also `[NTYPE]`, so complex would not fit without
+  widening the array as well.
+
+Checked after writing: 6c, 7c and 9c read `typesuv` nowhere else, so
+`typecmplx` was its only use there and the three are unaffected.
+
+**`kc` (sparc64) does change**: it reads `typesuv` in `cgen.c`,
+`swt.c` and `txt.c` and does not override `typecmplx`, exactly as
+upstream does -- so it moves to upstream's behaviour. Untested target,
+recorded rather than claimed.

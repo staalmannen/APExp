@@ -1858,6 +1858,28 @@ int	typesuinit[] =
 	TSTRUCT, TUNION, -1,
 };
 
+/*
+ * `typesu' PLUS COMPLEX, AND IT IS [NCTYPE] BECAUSE `typesu' IS
+ * [NTYPE] AND COMPLEX WOULD NOT FIT IN IT.
+ *
+ * This is what the 64-bit backends point `typecmplx' at: the set of
+ * types returned through a hidden `.ret' pointer rather than in a
+ * register.  Upstream they point it at `typesu' -- struct and union --
+ * because a `vlong' IS a register there; the 32-bit backends take
+ * `tinit''s default of `typesuv', where a vlong is not.
+ *
+ * APExp needs complex in that set as well, and complex cannot go in
+ * `typesu' without widening it. Hence a third array rather than a
+ * wider one: `typesu' is read by `signat', so changing its membership
+ * would move every type SIGNATURE in the tree, and signatures are how
+ * the linker matches symbols against the host's own `libc.a'.
+ */
+int	typesucinit[] =
+{
+	TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1,
+};
+char	typesuc[NCTYPE];
+
 long	tasign[NTYPE];
 Init	tasigninit[] =
 {
@@ -2201,6 +2223,10 @@ tinit(void)
 	for(ip=typesuinit; *ip >= 0; ip++) {
 		urk("typesu", nelem(typesu), *ip);
 		typesu[*ip] = 1;
+	}
+	for(ip=typesucinit; *ip >= 0; ip++) {
+		urk("typesuc", nelem(typesuc), *ip);
+		typesuc[*ip] = 1;
 	}
 	for(p=tasigninit; p->code >= 0; p++) {
 		urk("tasign", nelem(tasign), p->code);
