@@ -208,6 +208,14 @@ addpool(Prog *p, Adr *a)
 	case C_LOREG:
 	case C_ROREG:
 	case C_FOREG:
+	/*
+	 * Backported from 9front c144bcb6e (2026-06-01), "5l: add missing
+	 * [F]HOREG case for register offset class (thanks qwx)".  These
+	 * two are register-offset classes like the ones around them and
+	 * were simply absent from the list.
+	 */
+	case C_HOREG:
+	case C_HFOREG:
 	case C_SOREG:
 	case C_FAUTO:
 	case C_SAUTO:

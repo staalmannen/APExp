@@ -1977,3 +1977,121 @@ is not the whole story and `scon.c`, `pswt.c` and the `Spec`-entangled
 files are still in front of us. If it compiles but something on amd64
 breaks, that is the return-ABI half and it will show as a link or a
 wrong value rather than a diagnostic.
+
+### I broke the build: the two changes were a MATCHED PAIR
+
+Restoring `TVLONG`/`TUVLONG` to `typesuvinit[]` alone broke
+`sys/src/cmd`: a freshly built `6l` could not resolve a single libc
+symbol while linking `7a`.
+
+**Because APExp had made TWO changes, not one**, and they cancelled on
+the 64-bit targets:
+
+```
+                 typecmplx points at      typesuv contains
+upstream  6c     typesu                   vlong uvlong struct union
+upstream  8c     typesuv (tinit default)  vlong uvlong struct union
+APExp     6c     typesuv                  struct union cfloat cdouble
+APExp     8c     typesuv                  struct union cfloat cdouble
+```
+
+***`typecmplx` is the RETURN ABI and `typesuv` is the sugen dispatch,
+and upstream separates them in the BACKEND rather than in the array.***
+6c, 7c and 9c point `typecmplx` at `typesu` because a `vlong` is a
+register on those targets and must not be returned through a hidden
+`.ret` pointer; the 32-bit backends take `tinit`'s default of
+`typesuv`, where it is not.
+
+APExp pointed every backend at `typesuv` *and* emptied `typesuv` of
+vlong. On amd64 those cancel exactly -- the set is {struct, union,
+complex} either way. On every 32-bit target the second change alone
+survives, and `cgen`'s opening `if(typesuv[...]) sugen()` stops firing
+for vlongs.
+
+**So restoring one half moved amd64's return ABI**, `6l` was rebuilt
+with hidden-pointer `vlong` returns, it called the host's `libc.a`
+which returns them in a register, and the first thing that noticed was
+every symbol in the next link.
+
+*A fix that restores upstream's data without restoring upstream's use
+of it is not a backport, it is half of one.*
+
+### The fix, and why it is a third array
+
+- `typesuv` = {vlong, uvlong, struct, union, **cfloat, cdouble**} --
+  upstream's membership plus complex.
+- **`typesuc` = {struct, union, cfloat, cdouble}** -- new, and what
+  6c, 7c and 9c now point `typecmplx` at. It is upstream's `typesu`
+  plus complex, and it is *exactly* what APExp's `typesuv` used to be,
+  so those three targets are behaviourally unchanged.
+- `typesu` is **untouched**, and that is deliberate: `signat` reads it,
+  so widening it would move every type SIGNATURE in the tree -- and
+  signatures are how the linker matches against the host's own
+  `libc.a`. It is also `[NTYPE]`, so complex would not fit without
+  widening the array as well.
+
+Checked after writing: 6c, 7c and 9c read `typesuv` nowhere else, so
+`typecmplx` was its only use there and the three are unaffected.
+
+**`kc` (sparc64) does change**: it reads `typesuv` in `cgen.c`,
+`swt.c` and `txt.c` and does not override `typecmplx`, exactly as
+upstream does -- so it moves to upstream's behaviour. Untested target,
+recorded rather than claimed.
+
+### The full backport survey: twelve upstream commits, four taken
+
+Every 9front commit touching `cc/`, `cpp/`, `ld/` or any `?a`/`?c`/`?l`
+since 2025-01-01, and what APExp does about each:
+
+| commit | date | what | state |
+|---|---|---|---|
+| `f4c733880` | 2025-09-23 | c: use hint for register pair | **have** |
+| `ed3c7d491` | 2025-12-27 | eliminate `.rathole` | **have** |
+| `13c041218` | 2025-12-27 | Typetab via `allocn()` | **have** |
+| `3ea08ad83` | 2025-12-28 | grow regions dynamically | **have** |
+| `78b4f3f1d` | 2026-02-08 | 6c storeprop peephole | *skip* |
+| `421b1cc87` | 2026-02-09 | 6c disable storeprop | *skip* |
+| `9932a824a` | 2026-03-02 | include dir limit 20 -> 64 | **TAKEN** |
+| `b43ec1215` | 2026-04-11 | address of incomplete types | **TAKEN** |
+| `c144bcb6e` | 2026-06-01 | 5l `[F]HOREG` in `addpool` | **TAKEN** |
+| `a68335214` | 2026-06-10 | untangle class/type specifiers | *merge* |
+| `be2b95b7c` | 2026-07-25 | 9a/9l/tl unused declarations | *skip* |
+| `8e9bc0b69` | 2026-08-08 | 5l conditional return, profiling | **TAKEN** |
+
+**The two arm fixes matter for 0.7** because arm is a cross-compilation
+target and neither would ever have shown on amd64:
+
+- `c144bcb6e` is two `case` labels. `addpool` listed `C_FOREG` and
+  `C_SOREG` and not the two register-offset classes between them, so a
+  constant that wanted pooling under those classes was not pooled.
+- `8e9bc0b69` threaded the profiling `BL` onto `p->link` and then
+  complemented the condition, which chains a conditional `RET` onto the
+  wrong successor. It now builds the chain through `p->cond` and keeps
+  the condition. **Reaches only `-p` builds on arm**, which is why it
+  could sit unnoticed.
+
+Both applied cleanly: after them, `5l/obj.c` and `5l/span.c` differ from
+upstream only by APExp's own additions.
+
+**Skipped, each for a stated reason:**
+
+- `78b4f3f1d` + `421b1cc87` are a pair -- implemented, then **disabled
+  the next day**. Having neither puts us where upstream is. *Taking
+  only the first is what a "newest optimisation wins" sweep would do.*
+- `be2b95b7c` deletes eleven declarations from `9a/a.h` as unused. They
+  may not be unused *here*, the benefit is zero, and the build has
+  already been broken once today by a change that looked inert. **Zero
+  benefit, nonzero risk, skipped on purpose rather than missed.**
+- `a68335214` is the `Spec` refactor: `garbt`, `simpleg`, `simplec` and
+  `simplet` all change signature, and `dcl.c` and `lex.c` are two of
+  the files APExp has changed most. **A merge, not a backport**, and it
+  wants its own round.
+
+**Two false alarms, both checked rather than assumed**: `5l/span.c`'s
+`Reloc` block looked missing and is merely placed elsewhere in our
+copy; and the uniform five-file difference in every `?c` directory
+(`cgen.c`, `mkfile`, `reg.c`, `swt.c`, `txt.c`) is APExp's own VLA,
+`maxregion` and `-J` work rather than upstream drift.
+
+`tc` and `tl` -- arm-thumb -- exist upstream and not here at all. Not a
+gap: arm-thumb is not in `_ARCHS`.

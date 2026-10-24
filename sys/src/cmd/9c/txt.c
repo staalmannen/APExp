@@ -27,7 +27,20 @@ ginit(void)
 
 	typeword = typechlvp;
 	typeswitch = typechlv;
-	typecmplx = typesuv;
+	/*
+	 * `typesuc', not `typesuv': upstream points this at `typesu'
+	 * because a `vlong' is a REGISTER on this target and must not be
+	 * returned through a hidden pointer.  APExp needs complex in the
+	 * set too, which is the only thing `typesuc' adds.
+	 *
+	 * It was `typesuv' here, which was correct only while `typesuv'
+	 * had been emptied of TVLONG/TUVLONG -- a matched pair of changes
+	 * that cancelled on the 64-bit targets and broke every 32-bit one.
+	 * Restoring one half without the other moves this target's return
+	 * ABI, and the first thing that notices is a freshly built `6l'
+	 * calling the host's `libc.a'.
+	 */
+	typecmplx = typesuc;
 	/* TO DO */
 	memmove(typechlpv, typechlp, sizeof(typechlpv));
 	typechlpv[TVLONG] = 1;

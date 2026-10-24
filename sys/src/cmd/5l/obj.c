@@ -1307,9 +1307,24 @@ doprof2(void)
 			q->cond = p->cond;
 			q->link = p->link;
 			q->reg = p->reg;
-			p->link = q;
 
+			/*
+			 * Backported from 9front 8e9bc0b69 (2026-08-08),
+			 * "5l: fix conditional return instruction for
+			 * profiling".  The conditional arm threaded the new
+			 * BL onto `p->link' and then complemented the
+			 * condition, which chains a conditional RET onto the
+			 * wrong successor; it now builds the chain through
+			 * `p->cond' and keeps the condition as written.
+			 * `p->link = q' moves into the unconditional arm,
+			 * which is the only one that wants it.
+			 *
+			 * Reaches only `-p' profiling builds on arm, which is
+			 * why it could sit here unnoticed.
+			 */
 			if(p->scond != 14) {
+				p->cond = q;
+
 				q = prg();
 				q->as = ABL;
 				q->from = zprg.from;
@@ -1317,19 +1332,16 @@ doprof2(void)
 				q->to.type = D_BRANCH;
 				q->cond = ps4;
 				q->to.sym = s4;
-				q->link = p->link;
-				p->link = q;
+				q->link = p->cond;
+				p->cond = q;
 
-				p->as = brcond[p->scond^1];	/* complement */
+				p->as = brcond[p->scond];
 				p->scond = 14;
 				p->from = zprg.from;
 				p->to = zprg.to;
 				p->to.type = D_BRANCH;
-				p->cond = q->link->link;	/* successor of RET */
-				p->to.offset = q->link->link->pc;
-
-				p = q->link->link;
 			} else {
+				p->link = q;
 
 				/*
 				 * BL	profout
