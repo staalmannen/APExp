@@ -3704,3 +3704,68 @@ it -- the only hits are gnulib's own `unistd.in.h`, gated on
 tree as its blast radius, for no measured need.
 
 `fsync-test` is 0 on gcc and **1 on the replaced line**.
+
+### fenv/ — the whole API is a stub, on every architecture
+
+Found by the 386 cross build, in the only way it could have been: by
+the one architecture whose translated `fenv.s` would not even assemble.
+
+**`grep -c '^TEXT'` over all six `arch/*/fenv.s` is 0.** `sys/src/ape/cmd/as`
+rendered musl's `.globl name` and `.type name,@function` as COMMENTS and
+emitted `name:` — and `8a/a.y`'s
+
+```
+|	LNAME ':'
+	{
+		$1->type = LLAB;
+		...
+	}
+```
+
+makes a bare label an **assembler-internal address**, not a symbol. Only
+`TEXT`, `GLOBL` and `DATA` reach the object file.
+
+So every one of those six objects is empty of symbols, and what answers
+`feclearexcept`, `feraiseexcept`, `fetestexcept`, `fegetround`,
+`__fesetround`, `fegetenv` and `fesetenv` in every APE program ever
+built here is `fenv/fenv.c`:
+
+```
+/* Dummy functions for archs lacking fenv implementation */
+```
+
+which is musl's own fallback, **and it says so**. `fetestexcept()`
+returns 0 to every mask, `fegetround()` returns `FE_TONEAREST`
+unconditionally, `fesetround()` does nothing and reports success. In
+musl the arch file is built *instead of* that one; here `fenv/mkfile`
+and `arch/$objtype/mkfile` both contributed, and the member with
+symbols won.
+
+***This is the stub-answers-the-wrong-thing family and the widest
+instance of it in the tree.*** The others were one call or one
+subsystem; this is a whole C99 API answering plausibly on eleven
+targets, and nothing anywhere diagnosed it, because a stub that answers
+`FE_TONEAREST` is right most of the time by accident.
+
+**What was done**: `fenv.$O` removed from all six `arch/*/mkfile`,
+which unblocks the 386 build and **cannot change behaviour**, by
+construction — an object defining no symbols cannot affect a link. Each
+`.s` keeps a banner saying what it is, with `386`'s carrying the three
+`as` bugs it exposed as well.
+
+**What was NOT done**: real implementations. That is per-architecture
+assembly with `TEXT` directives and the Plan 9 argument convention, and
+`arch/386/getfcr.s` is the shape. **386's cannot come from musl's
+source at all**: it reads `__hwcap` to choose between MXCSR and x87,
+`__hwcap` exists nowhere in libap, and the five references in that file
+are the only five in the tree. The 386 version is the x87 path, written
+by hand.
+
+**Two things this does not touch, and both were checked rather than
+assumed.** The FP *environment* is still set correctly at process start
+— `arch/amd64/main9.s:43` loads MXCSR `0x1f80` with FTZ and DAZ clear,
+a real `TEXT` file on the startup path. **And the invariant in
+`CLAUDE.md` had credited `fenv.s` for that load**, which is the wrong
+file of the two and happens to be the one that does nothing; corrected.
+*A note naming the wrong file is harmless until the right file turns
+out to be empty.*

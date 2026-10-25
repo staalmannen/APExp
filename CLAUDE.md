@@ -1047,9 +1047,20 @@ the index, so that nothing here is a surprise.
   defines `IEEE_8087` only under `_RESEARCH_SOURCE`, which fconv.h
   defines just before pulling `<float.h>` -- include them the other way
   round and fconv.h reaches its own deliberate syntax error.
-- **amd64 underflow is GRADUAL**: `fenv.s` loads MXCSR `0x1f80`, FTZ
-  and DAZ both clear, so `Sudden_Underflow` is not defined for it any
-  more. The other seven architectures still claim it, unchecked.
+- **amd64 underflow is GRADUAL**: **`main9.s`** loads MXCSR `0x1f80`,
+  FTZ and DAZ both clear, so `Sudden_Underflow` is not defined for it
+  any more. The other seven architectures still claim it, unchecked.
+  **This line used to say `fenv.s` and that was the wrong file** —
+  which mattered, because *every* `arch/*/fenv.s` turns out to define
+  no symbols at all (see below). The startup load is `main9.s:43` and
+  is real; the API is the stub.
+- **The fenv API is a STUB on every architecture.** `grep -c '^TEXT'` over
+  all six `arch/*/fenv.s` is 0: `as` turned musl's `.globl`/`.type`
+  into comments and left a bare `name:`, which Plan 9 asm reads as a
+  LOCAL label. `lib/ap/fenv/fenv.c` — musl's fallback for archs with no
+  fenv — answers instead, so `fetestexcept()` reports nothing ever
+  raised and `fesetround()` does nothing. `fenv.$O` is out of the six
+  mkfiles; the entry in 0.6's inventory has the mechanism.
 - `sizeof` is 32-bit, so a call with **no prototype in scope** corrupts
   the argument. An argument that arrives half right means a missing
   prototype. **And the RETURN value is the half that bites hardest**:
