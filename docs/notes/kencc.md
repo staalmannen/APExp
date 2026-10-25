@@ -2038,6 +2038,71 @@ Checked after writing: 6c, 7c and 9c read `typesuv` nowhere else, so
 upstream does -- so it moves to upstream's behaviour. Untested target,
 recorded rather than claimed.
 
+### The other nine backends: what the fix predicts for each
+
+The arrangement is now upstream's **exactly, modulo complex**, and
+that is the whole basis for predicting anything about the other nine.
+Upstream's `typesuvinit[]` is `TVLONG, TUVLONG, TSTRUCT, TUNION`; its
+6c, 7c and 9c override `typecmplx = typesu` and the other seven take
+`tinit`'s `typesuv`. APExp's `typesuv` is that list plus
+`TCFLOAT`/`TCDOUBLE` and `typesuc` is `typesu` plus the same two. So
+for every type upstream has, every backend's `typecmplx` membership
+matches upstream's — **a failure that survives this is upstream's own
+32-bit limit or one of APExp's other deltas, and not this.**
+
+| cc | arch | reads `typesuv` in `cgen`? | `typecmplx` | `newvlongcode` |
+|---|---|---|---|---|
+| 1c | 68000 | yes | `typesuv` (default) | no |
+| 2c | 68020 | yes | `typesuv` (default) | no |
+| 5c | arm | yes | `typesuv` | no |
+| 6c | amd64 | no | `typesuc` | no |
+| 7c | arm64 | no | `typesuc` | **yes** |
+| 8c | 386 | yes | `typesuv` | no |
+| 9c | power64 | no | `typesuc` | no |
+| kc | sparc64 | yes | `typesuv` | no |
+| qc | power | no | `typesuv` (default) | **yes** |
+| vc | mips | yes | `typesuv` | no |
+
+**The `newvlongcode` column is why 5c and qc are predicted to move,
+and it was not visible when their failures were recorded as separate
+work.** `cc/pgen.c` tests `typecmplx` to decide the hidden `.ret`
+pointer, and the `regret` arm underneath it is gated on
+`newvlongcode`. With `TVLONG` gone from `typesuv`, a vlong return on
+5c took **neither** arm; on qc it took the `newvlongcode` one, which
+is not the convention the rest of qc expects. *`regpair-probe`
+recorded both as failing on RETURNING a vlong — which 8c compiled —
+and nothing at the time connected that to 8c's own failure.* One
+cause, three symptoms, recorded as three pieces of work.
+
+The written-down prediction, with its refutation condition for each
+backend, is in `docs/releases/0.7.md` — made before the run, as the
+rule in `CLAUDE.md` requires. Its load-bearing half is 5c and qc;
+1c and 2c are predicted to **stay** broken, since they answered `GOK
+in gopcode: AS` on cases with no vlong in them at all.
+
+### Two instruments removed, having answered
+
+- **`sys/src/cmd/8cu`** — upstream's 8c against APExp's front end. It
+  FAILED, which is what moved the hunt from "somewhere in the
+  compiler" to `cc/` and cleared all five of APExp's 8c deltas by
+  measurement rather than by reading. Its own README said to delete it
+  once it had answered; a second compiler in the tree is a maintenance
+  cost and a thing to be confused by.
+- **`com.c`'s "assignment target not addable" notice** — unconditional
+  and once per translation unit. It **never fired**, so the four-op
+  lvalue bypass is innocent. A short comment stays at the bypass
+  saying so, because the suspicion is a natural one and should not be
+  raised twice.
+
+Also gone: `cc/com.c.9front` and `cc/README.bisect`, the scaffolding
+for the swap experiment that cleared the largest file in `cc/`.
+
+**What stays is `8c/txt.c`'s uncommented `prtree(n, "naddr")`.** That
+arm only runs when the compile has already failed, so it costs nothing
+in a working build, and it is the thing that printed the tree that
+killed both surviving hypotheses. `bad in naddr: REGPAIR` names the
+victim; the tree names the cause.
+
 ### The full backport survey: twelve upstream commits, four taken
 
 Every 9front commit touching `cc/`, `cpp/`, `ld/` or any `?a`/`?c`/`?l`
