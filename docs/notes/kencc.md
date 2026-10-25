@@ -2080,6 +2080,65 @@ rule in `CLAUDE.md` requires. Its load-bearing half is 5c and qc;
 1c and 2c are predicted to **stay** broken, since they answered `GOK
 in gopcode: AS` on cases with no vlong in them at all.
 
+#### The run: eight of ten, and the two that fail are upstream's
+
+**`regpair-min.c` compiles on all ten.** The probe compiles on eight:
+**kc and vc answer `regpair-probe.c:201 unknown op in lcgen: CAST`**,
+and line 201 is **case 3**, `d->offset = v` — a 32-bit value widened
+into a 64-bit member.
+
+- **5c and qc: the load-bearing prediction CONFIRMED.** Both compile
+  the probe, the vlong return included. Their recorded failure on
+  *returning* a vlong was this same missing pair of entries, through
+  `pgen.c`'s hidden `.ret` pointer and the `newvlongcode` arm beneath
+  it. **Three backends, three symptoms, one cause** — filed at the time
+  as "at least three pieces of work".
+- **1c and 2c: refuted, welcomely.** Both compile both files. `GOK in
+  gopcode: AS` on cases with no vlong in them read as no 64-bit support
+  at all, and it was this bug after all.
+- **kc and vc: refuted**, and it was the clause that said a failure
+  here matters more than any pass. For **kc** it is a move from
+  compiling to failing. For **vc** it is not: the first run's two lists
+  name nine backends and vc is in neither, so *a name absent from a
+  list is not a measurement* — and that applies to a list in these
+  notes as much as to a suite log.
+
+**The mechanism is the 8c bug read from the other end.** `d->offset = v`
+has type `vlong`, `cgen` sends it to `sugen`, `sugen` falls through
+`default:` to `copy:`, and `copy:` calls `reglcgen` on the `OCAST`.
+A value the front end does not hold as a memory object, handed to a
+path that assumes one.
+
+**Only two of the six dispatching backends fail, and the discriminator
+is a way out of `copy:` for a 64-bit value:**
+
+| cc | `cgen` → `sugen` for vlong? | way out of `copy:` | case 3 |
+|---|---|---|---|
+| 1c, 2c | yes | older `sugen(n, result, nn, w)` | compiles |
+| 5c | yes | `cgen64()`, in `cgen.c` | compiles |
+| 8c | yes | `cgen64()`, in `cgen64.c` | compiles |
+| kc, vc | yes | **none** | **fails** |
+| 6c, 7c, 9c, qc | no | n/a | compiles |
+
+***And it is upstream's.*** `kc/cgen.c` and `vc/cgen.c` differ from
+9front HEAD by **`OALLOCA` and the `true` → `cond` rename and nothing
+else** (97 and 100 diff lines, every one in those two). The `typesuv`
+dispatch at line 20, `sugen`, `copy:` and `lcgen` are upstream's
+verbatim, and **upstream's `typesuvinit[]` carries `TVLONG`** as ours
+does again. So upstream's own kc and vc fail on this, and *our fix
+stopped masking it rather than causing it*: the same emptied table that
+broke 8c was hiding a different gap on these two.
+
+**This is the rule about a fix exposing code a process never reached
+before, applied to a compiler.** And it is why the refutation condition
+was worth writing in the form it was: "the fix moved a backend from
+working to broken" was the right thing to watch for and the wrong
+description of what happened. *kc was not working. It was not asked.*
+
+**Not fixed**, as a decision: sparc64 and mips, nothing here builds for
+either, and the repair is code generation for instruction sets with no
+way to test it. In 0.6's open-bug inventory with the mechanism.
+
 ### Two instruments removed, having answered
 
 - **`sys/src/cmd/8cu`** — upstream's 8c against APExp's front end. It
