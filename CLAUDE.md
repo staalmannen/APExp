@@ -383,11 +383,29 @@ cancelled on amd64 and only one of which survived on 32-bit targets.
 of it is half of one, and the half I shipped first broke the build.*
 Second, **`regpair-min.c` and `regpair-probe.c` are regression tests
 now**, and the only things here that ask a non-amd64 backend anything.
-**The per-backend prediction for the other nine is written down in
-`docs/releases/0.7.md` before the run**, with a refutation condition
-for each; its load-bearing half is that 5c's and qc's recorded
-failures on *returning* a vlong were this same bug and not separate
-work.
+**ALL TEN BACKENDS COMPILE `regpair-min.c` and eight compile the
+probe**, against a prediction written down before the run with a
+refutation condition per backend. *One clause confirmed, two refuted.*
+**The confirmation is the load-bearing one**: 5c's and qc's recorded
+failure on *returning* a vlong was this same bug, through `pgen.c`'s
+hidden `.ret` pointer — three backends, three symptoms, one cause,
+filed at the time as three pieces of work. 1c and 2c, predicted to
+stay broken, compile both files.
+***The two that fail are kc and vc, on case 3 — and the fault is
+UPSTREAM's, newly exposed rather than newly caused.*** `d->offset = v`,
+widening into a `vlong` member, answers `unknown op in lcgen: CAST`:
+of the six backends whose `cgen` hands a vlong to `sugen`, four have a
+way out of `copy:` for a 64-bit value and kc and vc have none.
+**Their `cgen.c` differs from 9front HEAD by `OALLOCA` and the
+`true` → `cond` rename and nothing else**, and upstream's `typesuv`
+carries `TVLONG` as ours does again — so *the emptied table that broke
+8c was MASKING this on those two.* **This tree's rule about a fix
+reaching code nothing reached before, applied to a compiler.** Not
+fixed (sparc64 and mips, nothing builds for either); in 0.6's
+open-bug inventory with the mechanism. **And "kc regressed" is only
+half right**: vc appears in neither of the first run's two lists, so
+its earlier state was never measured — *a name absent from a list is
+not a measurement, including a list in these notes.*
 
 **Three reading errors from that hunt, each of which cost rounds:**
 *(1)* `git bisect` could not reach it — this repository's ROOT COMMIT

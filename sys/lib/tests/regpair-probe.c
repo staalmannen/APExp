@@ -92,26 +92,67 @@
  * the top.*  So the mapping is by CASE, which is stable, with both
  * line numbers given:
  *
- *	case  run of 2026-10-23  now  construct
- *	 1          116          181  d->offset = s->size  (ar.c:586)
- *	 2          122          187  a vlong PARAMETER arriving
- *	 2          126          191  b = a   (local to local)
- *	 2          127          192  RETURN of a vlong
- *	 3          136          201  d->offset = v  (32 -> 64)
- *	 4          145          210  return s->size
- *	 5          153          218  d->offset = d->offset + 1
- *	 6          164          229  a vlong as a vararg
+ *	case  2026-10-23  2026-10-25  now  construct
+ *	 1        116         181      222  d->offset = s->size (ar.c:586)
+ *	 2        122         187      228  a vlong PARAMETER arriving
+ *	 2        126         191      232  b = a   (local to local)
+ *	 2        127         192      233  RETURN of a vlong
+ *	 3        136         201      242  d->offset = v  (32 -> 64)
+ *	 4        145         210      251  return s->size
+ *	 5        153         218      259  d->offset = d->offset + 1
+ *	 6        164         229      270  a vlong as a vararg
  *
  * **Re-key the table, do not renumber the cases**, and when the next
  * run comes back, read it against the `now' column and then move that
  * column's name to the date of the run.
  *
- * ***AND THEY ARE NOT ONE BUG.*** 5c and qc fail on the RETURN of a
- * vlong, which 8c compiles; 8c fails on case 1, which 5c and qc
- * compile; 1c and 2c fail on everything, which reads as no vlong
- * support rather than as a defect in it.  *Three different faults at
- * least, so "the 32-bit backends are broken" is a summary and not a
- * diagnosis.*
+ * ***AND THE TRAP FIRED A SECOND TIME, ON THE SAME FILE, WHILE WRITING
+ * UP THE RUN THAT PROVED IT.***  Recording the 2026-10-25 result added
+ * thirty lines to this header, so case 1 moved 181 -> 213 and the
+ * `2026-10-25' column was stale before the paragraph describing it was
+ * finished.  *The only reason the table is still right is that the new
+ * numbers were taken from the file with grep rather than computed.*
+ * **Add a column, never overwrite one**, and re-read the file every
+ * time this header grows.
+ *
+ * ***AND THEY WERE ONE BUG AFTER ALL, WHICH THE NEXT PARAGRAPH USED TO
+ * DENY.***  It said: 5c and qc fail on the RETURN of a vlong, which 8c
+ * compiles; 8c fails on case 1, which they compile; 1c and 2c fail on
+ * everything, which reads as no vlong support rather than as a defect
+ * in it -- *three different faults at least, so "the 32-bit backends
+ * are broken" is a summary and not a diagnosis.*
+ *
+ * **The summary was right and the count was wrong.**  All five failures
+ * were `cc/sub.c's `typesuvinit[]' having lost `TVLONG'/`TUVLONG':
+ * `cgen' stopped treating a 64-bit value as a memory object (8c's case
+ * 1) and `pgen.c's `typecmplx' stopped giving a `vlong'-returning
+ * function its hidden `.ret' pointer (5c's and qc's case 2).  **One
+ * cause, two mechanisms, five backends.**  *The instinct to split them
+ * was correct -- they ARE different mechanisms -- and the inference
+ * from that to different CAUSES was not.*
+ *
+ * ***RUN OF 2026-10-25, after the fix: EIGHT OF TEN.***  1c, 2c, 5c,
+ * 6c, 7c, 8c, 9c and qc compile the whole file; `regpair-min.c'
+ * compiles on all ten.  **kc and vc fail, on CASE 3 alone**:
+ *
+ *	regpair-probe.c:201 unknown op in lcgen: CAST
+ *
+ * which is `d->offset = v', a 32-bit value widened into a 64-bit
+ * member.  **That one is UPSTREAM's and the fix only stopped masking
+ * it**: their `cgen.c' differs from 9front HEAD by `OALLOCA' and the
+ * `true' -> `cond' rename and nothing else, and upstream's `typesuv'
+ * carries `TVLONG' as ours does again.  Of the six backends whose
+ * `cgen' hands a vlong to `sugen', four have a way out of `copy:' for
+ * a 64-bit value -- `cgen64()' for 5c and 8c, the older
+ * `sugen(n, result, nn, w)' for 1c and 2c -- and kc and vc have none,
+ * so `copy:' calls `reglcgen' on the cast.  `docs/notes/kencc.md' has
+ * the table; 0.6's inventory has the entry.  **Not fixed**: sparc64 and
+ * mips, nothing in this tree builds for either.
+ *
+ * *And "kc regressed" is only half right.*  The first run's two lists
+ * name nine backends and **vc is in neither**, so its earlier state was
+ * never measured -- a name absent from a list is not a measurement,
+ * including a list written in this header.
  *
  * ***8c's RESULT IS THE SHARPEST THING HERE: CASE 1 AND NOTHING
  * ELSE.***  Not the parameter, not the return, not the widening, not
