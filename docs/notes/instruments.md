@@ -849,3 +849,28 @@ which is *does this ever happen*, not *how often*.
 
 *A diagnostic that needs a flag is a diagnostic that will be missed on
 the run that mattered.*
+
+### And the answer was no, so both instruments are gone
+
+The notice **never fired**. The lvalue bypass is innocent, and the
+cause was `typesuvinit[]` having lost `TVLONG`/`TUVLONG` — a type
+table, not a check that was skipped. The notice is removed and a short
+comment at the bypass records what it measured, so the same suspicion
+is not raised a second time.
+
+`8cu` is removed too, having answered the one question it was built
+for: it FAILED, which put the fault in `cc/` and cleared all five of
+APExp's 8c deltas by measurement where reading had only cleared them
+by argument. Its README said to delete it once it had answered.
+
+**Three instruments from that hunt stay**, and the difference is worth
+naming. `regpair-min.c` and `regpair-probe.c` stay because they are
+**regression tests now** — the fix moved a type table every backend
+reads, and these are the only things in the tree that ask a
+non-amd64 backend anything. `8c/txt.c`'s `prtree(n, "naddr")` stays
+because it costs nothing: that arm runs only after the compile has
+already failed.
+
+*An instrument that answers a question about ONE BUG is scaffolding;
+one that asks a question the tree will keep having is a test. `8cu`
+was the first kind and `regpair-min` turned out to be the second.*

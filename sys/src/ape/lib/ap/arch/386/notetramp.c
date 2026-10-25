@@ -1,5 +1,21 @@
-#include "../plan9/lib.h"
-#include "../plan9/sys9.h"
+/*
+ * `../../include/', not `../plan9/'.  Every other architecture's
+ * notetramp.c -- all nine of them -- spells it the first way, and
+ * `plan9/' has not been a sibling of `arch/' since libap was
+ * reorganised to mirror musl's layout.  386 kept the old spelling and
+ * nothing noticed, because nothing had built 386 since.
+ *
+ * It surfaced as the FIRST error of `objtype=386 mk install' after the
+ * compiler was fixed:
+ *
+ *	cpp: notetramp.c:1 Could not find include file "../plan9/lib.h"
+ *
+ * The form here appears 26 times across the other architectures and
+ * twice in the stale spelling; a sweep of the whole of `lib/ap' finds
+ * no other `../plan9/' include.
+ */
+#include "../../include/lib.h"
+#include "../../include/sys9.h"
 #include <signal.h>
 #include <setjmp.h>
 

@@ -76,14 +76,6 @@ enum
  * n is already type-checked; !! needs nothing but int, which is what
  * tcomo's ONOT case gives it.
  */
-/*
- * Set once the "assignment target not addable" notice below has been
- * printed, so a tree build gets one line per translation unit rather
- * than one per assignment.  See the OAS case for why it is not a
- * `warn'.
- */
-static int saidnotaddable;
-
 static Node*
 boolnorm(Node *n)
 {
@@ -238,64 +230,18 @@ tcomo(Node *n, int f)
 		if(tlvalue(l))
 			goto bad;
 		/*
-		 * AND SAY SO WHEN THAT BYPASS ACTUALLY FIRES.
-		 *
-		 * `tlvalue' is identical to upstream's and does exactly one
-		 * thing: `if(!n->addable) { diag("not an l-value"); return 1; }'.
-		 * So the four-op exemption above has ONE effect -- it lets an
-		 * assignment whose target has `addable == 0' through, where
-		 * upstream stops with a clean diagnostic.
-		 *
-		 * **THAT TURNS A FRONT-END ERROR INTO A BACKEND CRASH.** The
-		 * 386 cross build dies at `ar.c:586' with `bad in naddr:
-		 * REGPAIR', reduced to `sys/lib/tests/regpair-min.c': two
-		 * structs and `d->offset = s->size', both members `vlong'.
-		 * `8cu' -- upstream's 8c against THIS front end -- fails on
-		 * it too, so the fault is here and not in the backend. A node
-		 * the front end knows is not addressable, handed to a code
-		 * generator that assumes it is, is exactly how a register
-		 * PAIR reaches `naddr'.
-		 *
-		 * *And it is invisible on amd64*, where a vlong is one
-		 * register and `cgen' never needs `naddr' on a pair -- which
-		 * is why every build this tree has ever done was fine.
-		 *
-		 * This is a WARNING and not a `diag', deliberately: the
-		 * exemption exists because something really does leave
-		 * `addable' at 0 for shapes that are genuine lvalues, and
-		 * turning that back into an error would break the tree before
-		 * anyone could read why. `warn' is gated on `debug['w']',
-		 * which both `-FTVw' and `pcc''s `-Fw' set, so it speaks in
-		 * every build -- and `-v' beside it prints the tree, since
-		 * `warn' calls `prtree' under `debug['v']'.
-		 *
-		 * ***IF THIS FIRES EVERYWHERE, THAT IS THE FINDING***, not a
-		 * reason to narrow the condition: it would mean `addable' is
-		 * routinely 0 on assignment targets here, and the exemption is
-		 * load-bearing across the whole tree rather than a corner.
-		 *
-		 * UNCONDITIONAL, AND ONCE PER COMPILATION, AND BOTH HALVES OF
-		 * THAT COST A ROUND TO LEARN.  It was a `warn' first -- and
-		 * `warn' is gated on `debug['w']', which `-FTVw' and `pcc''s
-		 * `-Fw' both set but which a bare `8c file.c' does not. So the
-		 * run that was meant to settle this printed nothing, and
-		 * "the condition is false" and "the diagnostic could not
-		 * speak" looked identical. *That is the second void run in
-		 * this investigation from a flag nobody passed*, after
-		 * `-DLEADER' against a file with no `#ifdef LEADER' in it.
-		 *
-		 * So it does not depend on a flag. The `once' guard is what
-		 * makes that affordable: a tree build gets at most one line
-		 * per translation unit, which is loud enough to notice and
-		 * quiet enough to live with -- and one line is all the
-		 * question needs, since it is `does this EVER happen', not
-		 * `how often'.
+		 * The bypass above was suspected of being how a register PAIR
+		 * reached `naddr' on the 386 cross build (`ar.c:586', reduced
+		 * to `sys/lib/tests/regpair-min.c'): a node the front end
+		 * knows is not addressable, handed to a code generator that
+		 * assumes it is.  A once-per-file notice was put here to say
+		 * whether `addable == 0' ever actually arrives, and **it never
+		 * fired** -- the bypass is innocent, and the real cause was
+		 * `typesuv' having lost TVLONG/TUVLONG in `sub.c'.  The notice
+		 * is gone; what it measured is recorded here so the same
+		 * suspicion is not raised twice.  `docs/notes/kencc.md' has
+		 * the round.
 		 */
-		if(!l->addable && !saidnotaddable) {
-			saidnotaddable = 1;
-			Bprint(&diagbuf, "%L assignment target not addable: %O of %T\n",
-				n->lineno, l->op, l->type);
-		}
 		if(isfunct(n))
 			break;
 		if(iscmplx(l->type->etype) && !iscmplx(r->type->etype)) {
