@@ -16,9 +16,7 @@ OFILES=\
 	setjmp.$O\
 	tas.$O\
 # lib9\
-	getcallerpc.$O\
-# fenv\
-	fenv.$O\
+	getcallerpc.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

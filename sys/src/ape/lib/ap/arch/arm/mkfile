@@ -25,10 +25,7 @@ OFILES=\
 	mpvecdigmuladd.$O\
 	mpvecdigmulsub.$O\
 	mpvecadd.$O\
-	mpvecsub.$O\
-# fenv\
-	fenv.$O\
-
+	mpvecsub.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
