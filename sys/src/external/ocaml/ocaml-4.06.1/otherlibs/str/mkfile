@@ -1,0 +1,21 @@
+</$objtype/mkfile
+CC=pcc
+LD=pcc
+CFLAGS=\
+	-I../../byterun/$objtype\
+	-I../../byterun\
+	-D_PLAN9_SOURCE\
+	-D_BSD_EXTENSION\
+	-D_C99_SNPRINTF_EXTENSION\
+	-D_POSIX_SOURCE\
+	-DCAML_NAME_SPACE\
+	-Bc
+LIBNAME=str
+LIB=lib$LIBNAME.a
+SYSOFILES=
+OFILES=strstubs.$O
+</sys/src/cmd/mklib
+
+CMOFILES=str.cmo
+
+<../mkfile

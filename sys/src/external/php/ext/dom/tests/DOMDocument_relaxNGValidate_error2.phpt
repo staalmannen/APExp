@@ -1,0 +1,28 @@
+--TEST--
+DOMDocument::relaxNGValidate() should fail on invalid RelaxNG file source
+--CREDITS--
+Knut Urdalen <knut@php.net>
+--EXTENSIONS--
+dom
+--FILE--
+<?php
+$rng = __DIR__.'/foo.rng';
+$xml = <<< XML
+<?xml version="1.0"?>
+<apple>
+  <pear>Pear</pear>
+  <pear>Pear</pear>
+</apple>
+XML;
+$doc = new DOMDocument();
+$doc->loadXML($xml);
+$result = $doc->relaxNGValidate($rng);
+var_dump($result);
+?>
+--EXPECTF--
+Warning: DOMDocument::relaxNGValidate(): I/O %s : failed to load %s
+
+Warning: DOMDocument::relaxNGValidate(): xmlRelaxNGParse: could not load %sfoo.rng in %s on line %d
+
+Warning: DOMDocument::relaxNGValidate(): Invalid RelaxNG in %s on line %d
+bool(false)

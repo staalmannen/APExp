@@ -1,0 +1,11 @@
+#!/bin/rc
+echo '#define CAML_INTERNALS'
+echo '#include "caml/mlvalues.h"'
+echo '#include "caml/prims.h"'
+sed 's/.*/extern value &();/' primitives
+echo 'c_primitive caml_builtin_cprim[] = {'
+sed 's/.*/	&,/' $1
+echo '	 0 };'
+echo 'char * caml_names_of_builtin_cprim[] = {';
+sed 's/.*/	"&",/' $1
+echo '	 0 };'

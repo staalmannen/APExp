@@ -1,0 +1,83 @@
+OCAMLRUN=../boot/ocamlrun
+OCAMLC=$OCAMLRUN ../boot/ocamlc
+OCAMLFLAGS=-use-prims ../byterun/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error A -bin-annot -nostdlib -safe-string -strict-formats -c
+TARG=stdlib.cma
+OFILES=\
+	list.cmo\
+	char.cmo\
+	uchar.cmo\
+	bytes.cmo\
+	string.cmo\
+	sys.cmo\
+	sort.cmo\
+	marshal.cmo\
+	obj.cmo\
+	array.cmo\
+	int32.cmo\
+	int64.cmo\
+	nativeint.cmo\
+	lexing.cmo\
+	parsing.cmo\
+	set.cmo\
+	map.cmo\
+	stack.cmo\
+	queue.cmo\
+	camlinternalLazy.cmo\
+	lazy.cmo\
+	stream.cmo\
+	buffer.cmo\
+	camlinternalFormat.cmo\
+	printf.cmo\
+	arg.cmo\
+	printexc.cmo\
+	gc.cmo\
+	digest.cmo\
+	random.cmo\
+	hashtbl.cmo\
+	weak.cmo\
+	format.cmo\
+	scanf.cmo\
+	callback.cmo\
+	camlinternalOO.cmo\
+	oo.cmo\
+	camlinternalMod.cmo\
+	genlex.cmo\
+	ephemeron.cmo\
+	filename.cmo\
+	complex.cmo\
+	arrayLabels.cmo\
+	listLabels.cmo\
+	bytesLabels.cmo\
+	stringLabels.cmo\
+	moreLabels.cmo\
+	stdLabels.cmo\
+	spacetime.cmo\
+	camlinternalBigarray.cmo
+IFILES=${OFILES:%.cmo=%.cmi}
+
+all:V: $TARG std_exit.cmo $IFILES
+
+$TARG: camlinternalFormatBasics.cmo pervasives.cmo $OFILES
+	$OCAMLC -use-prims ../byterun/primitives -a -o $TARG camlinternalFormatBasics.cmo pervasives.cmo $OFILES
+
+install: all
+	cp stdlib.cma std_exit.cmo camlheader camlheader_ur *.cmi ../boot
+
+$IFILES std_exit.cmo: pervasives.cmi
+
+sys.ml: sys.mlp ../VERSION
+	sed 's|%%VERSION%%|'^`{sed -e 1q ../VERSION | tr -d '\r'}^'|' sys.mlp > sys.ml
+
+camlinternalBigarray.cmi camlinternalBigarray.cmo: camlinternalBigarray.ml
+	$OCAMLC $OCAMLFLAGS `{../tools/Compflags.rc camlinternalBigarray.cmi} camlinternalBigarray.ml
+
+%.cmi: %.mli
+	$OCAMLC $OCAMLFLAGS `{../tools/Compflags.rc $stem.cmi} $stem.mli
+
+%.cmo: %.ml
+	$OCAMLC $OCAMLFLAGS `{../tools/Compflags.rc $stem.cmo} $stem.ml
+
+clean:V:
+	rm -f *.cm[io] sys.ml
+
+<.depend

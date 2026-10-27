@@ -1,0 +1,6 @@
+Ocaml build from the people's front of cat-v.org
+
+The mkfile is self-explanatory. Amd64 and 386 build is currentlyy supported;
+cross-compilation is currently NOT supported.
+
+In the works: arm build, cross-compilation.

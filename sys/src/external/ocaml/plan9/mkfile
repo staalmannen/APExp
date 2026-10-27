@@ -1,0 +1,230 @@
+<config/mkfile
+BIN=/$objtype/bin
+OCAMLRUN=boot/ocamlrun
+OCAMLC=$OCAMLRUN boot/ocamlc -g -nostdlib -I boot -use-prims byterun/primitives
+OCAMLYACC=boot/ocamlyacc
+OCAMLLEX=$OCAMLRUN boot/ocamllex
+LIBDIR=/sys/lib/ocaml
+STDLIB=boot/stdlib.cma
+
+INCLUDES=\
+	-I utils -I parsing -I typing -I bytecomp -I middle_end\
+	-I middle_end/base_types -I asmcomp -I asmcomp/debug\
+	-I driver -I toplevel
+OCAMLFLAGS=\
+	-strict-sequence -principal -absname -w +a-4-9-41-42-44-45-48\
+	-warn-error A\
+	-bin-annot -safe-string -strict-formats $INCLUDES -c
+YACCFLAGS=-v --strict
+
+all:V: ocamlc $STDLIB byterun/$O.out yacc/$O.out tools/ocamldep tools/ocamlmklib
+
+install:V: ocamlc.install stdlib.install ocamlrun.install ocamlyacc.install ocamllex.install ocamldep.install ocamlmklib.install libunix.install ocaml.install libstr.install
+
+boot:V: $OCAMLRUN $STDLIB $OCAMLYACC tools
+
+$OCAMLRUN: otherlibs/unix/libunix.a otherlibs/str/libstr.a
+	cd byterun
+	objtype=$cputype mk install
+
+byterun/$O.out: $OCAMLRUN
+	cd byterun
+	mk
+
+ocamlrun.install:V: byterun/$O.out
+	cp byterun/$O.out $BIN/ocamlrun
+
+$STDLIB: $OCAMLRUN
+	cd stdlib
+	mk install
+
+stdlib.install:V: $STDLIB
+	cp boot/stdlib.cma $LIBDIR/stdlib.cma &&\
+	cp boot/std_exit.cmo $LIBDIR/std_exit.cmo &&\
+	cp boot/camlheader $LIBDIR/camlheader &&\
+	cp boot/camlheader_ur $LIBDIR/camlheader_ur &&\
+	cp boot/*.cmi $LIBDIR
+
+$OCAMLYACC:
+	cd yacc
+	objtype=$cputype mk install
+
+yacc/$O.out: $OCAMLYACC
+	cd yacc
+	mk
+
+ocamlyacc.install: yacc/$O.out
+	cp yacc/$O.out $BIN/ocamlyacc
+
+ocamllex.install: lex/ocamllex
+	cp lex/ocamllex /rc/bin/ocamllex
+
+lex/ocamllex: $OCAMLYACC $OCAMLRUN $STDLIB
+	cd lex
+	mk ocamllex
+
+utils/config.ml: utils/config.mlp config/mkfile
+	tools/make-config.rc config/mkfile utils/config.mlp > utils/config.ml
+
+tools/ocamldep: $OCAMLRUN $STDLIB compilerlibs/ocamlbytecomp.cma
+	cd tools
+	mk ocamldep
+
+ocamldep.install: tools/ocamldep
+	cp tools/ocamldep /rc/bin/ocamldep
+
+tools/ocamlmklib: $OCAMLRUN $STDLIB utils/config.cmo utils/misc.cmo
+	cd tools
+	mk ocamlmklib
+
+ocamlmklib.install: tools/ocamlmklib
+	cp tools/ocamlmklib $BIN/ocamlmklib
+
+libunix.install: otherlibs/unix/unix.cma
+	cp otherlibs/unix/unix.cma $LIBDIR/unix.cma
+	cp otherlibs/unix/unix.cmi $LIBDIR/unix.cmi
+
+otherlibs/unix/unix.cma: $OCAMLRUN $STDLIB
+	cd otherlibs/unix
+	mk unix.cma
+
+otherlibs/unix/libunix.a:
+	cd otherlibs/unix
+	mk libunix.a
+
+libstr.install: otherlibs/str/str.cma
+	cp otherlibs/str/str.cma $LIBDIR/str.cma
+	cp otherlibs/str/str.cmi $LIBDIR/str.cmi
+
+otherlibs/str/str.cma: $OCAMLRUN $STDLIB
+	cd otherlibs/str
+	mk str.cma
+
+otherlibs/str/libstr.a:
+	cd otherlibs/str
+	mk libstr.a
+
+tools:V: $OCAMLRUN $STDLIB
+	cd tools
+	mk
+
+get_%:VQ:
+	echo $$stem
+
+UTILS=\
+	utils/config.cmo utils/misc.cmo\
+	utils/identifiable.cmo utils/numbers.cmo utils/arg_helper.cmo\
+	utils/clflags.cmo utils/tbl.cmo utils/profile.cmo\
+	utils/terminfo.cmo utils/ccomp.cmo utils/warnings.cmo\
+	utils/consistbl.cmo\
+	utils/strongly_connected_components.cmo\
+	utils/targetint.cmo
+
+PARSING=\
+	parsing/location.cmo parsing/longident.cmo\
+	parsing/docstrings.cmo parsing/syntaxerr.cmo\
+	parsing/ast_helper.cmo parsing/parser.cmo\
+	parsing/lexer.cmo parsing/parse.cmo parsing/printast.cmo\
+	parsing/pprintast.cmo\
+	parsing/ast_mapper.cmo parsing/ast_iterator.cmo parsing/attr_helper.cmo\
+	parsing/builtin_attributes.cmo parsing/ast_invariants.cmo parsing/depend.cmo
+
+TYPING=\
+	typing/ident.cmo typing/path.cmo\
+	typing/primitive.cmo typing/types.cmo\
+	typing/btype.cmo typing/oprint.cmo\
+	typing/subst.cmo typing/predef.cmo\
+	typing/datarepr.cmo typing/cmi_format.cmo typing/env.cmo\
+	typing/typedtree.cmo typing/printtyped.cmo typing/ctype.cmo\
+	typing/printtyp.cmo typing/includeclass.cmo\
+	typing/mtype.cmo typing/envaux.cmo typing/includecore.cmo\
+	typing/typedtreeIter.cmo typing/typedtreeMap.cmo\
+	typing/tast_mapper.cmo\
+	typing/cmt_format.cmo typing/untypeast.cmo\
+	typing/includemod.cmo typing/typetexp.cmo typing/parmatch.cmo\
+	typing/stypes.cmo typing/typedecl.cmo typing/typeopt.cmo typing/typecore.cmo\
+	typing/typeclass.cmo\
+	typing/typemod.cmo
+
+COMP=\
+	bytecomp/lambda.cmo bytecomp/printlambda.cmo\
+	bytecomp/semantics_of_primitives.cmo\
+	bytecomp/switch.cmo bytecomp/matching.cmo\
+	bytecomp/translobj.cmo bytecomp/translattribute.cmo\
+	bytecomp/translcore.cmo\
+	bytecomp/translclass.cmo bytecomp/translmod.cmo\
+	bytecomp/simplif.cmo bytecomp/runtimedef.cmo\
+	bytecomp/meta.cmo bytecomp/opcodes.cmo\
+	bytecomp/bytesections.cmo bytecomp/dll.cmo\
+	bytecomp/symtable.cmo\
+	driver/pparse.cmo driver/main_args.cmo\
+	driver/compenv.cmo driver/compmisc.cmo\
+	driver/compdynlink.cmo driver/compplugin.cmo driver/makedepend.cmo
+
+BYTECOMP=\
+	bytecomp/instruct.cmo bytecomp/bytegen.cmo\
+	bytecomp/printinstr.cmo bytecomp/emitcode.cmo\
+	bytecomp/bytelink.cmo bytecomp/bytelibrarian.cmo bytecomp/bytepackager.cmo\
+	driver/errors.cmo driver/compile.cmo
+
+TOPLEVEL=toplevel/genprintval.cmo toplevel/toploop.cmo\
+	toplevel/trace.cmo toplevel/topdirs.cmo toplevel/topmain.cmo\
+	toplevel/topstart.cmo
+
+OFILES=$UTILS $PARSING $TYPING $COMP $BYTECOMP
+
+BYTESTART=driver/main.cmo
+
+compilerlibs/ocamlbytecomp.cma: $OFILES
+	$OCAMLC -a -o compilerlibs/ocamlbytecomp.cma $OFILES
+
+ocamlc: compilerlibs/ocamlbytecomp.cma $BYTESTART $OCAMLRUN $STDLIB
+	$OCAMLC -compat-32 -o ocamlc compilerlibs/ocamlbytecomp.cma $BYTESTART
+
+ocamlc.install: ocamlc
+	cp ocamlc /rc/bin/ocamlc
+
+ocaml: $TOPLEVEL $OCAMLRUN compilerlibs/ocamlbytecomp.cma
+	$OCAMLC -compat-32 -o ocaml compilerlibs/ocamlbytecomp.cma $TOPLEVEL
+
+ocaml.install: ocaml
+	cp ocaml /rc/bin/ocaml
+
+bytecomp/opcodes.ml: byterun/caml/instruct.h boot
+	$OCAMLRUN tools/make_opcodes -opcodes <byterun/caml/instruct.h >bytecomp/opcodes.ml
+
+bytecomp/runtimedef.ml: boot
+	>bytecomp/runtimedef.ml{
+		echo 'let builtin_exceptions = [|'
+		cat byterun/caml/fail.h | tr -d '' |
+		sed -n -e 's|.*/\* ("[A-Za-z_]*") \*/$|  \1;|p';
+		echo '|]'
+		echo 'let builtin_primitives = [|'
+		sed -e 's/.*/  "&";/' byterun/primitives
+		echo '|]'
+	}
+
+parsing/parser.mli parsing/parser.ml: parsing/parser.mly $OCAMLYACC
+	$OCAMLYACC $YACCFLAGS parsing/parser.mly
+
+parsing/lexer.ml: parsing/lexer.mll $OCAMLRUN
+	$OCAMLLEX parsing/lexer.mll
+
+DYNLINK_DIR=otherlibs/dynlink
+
+driver/compdynlink.mli: $DYNLINK_DIR/dynlink.mli
+	cp $DYNLINK_DIR/dynlink.mli driver/compdynlink.mli
+
+driver/compdynlink.mlbyte: $DYNLINK_DIR/dynlink.ml driver/compdynlink.mli
+	grep -v 'REMOVE_ME for ../../debugger/dynlink.ml' $DYNLINK_DIR/dynlink.ml > driver/compdynlink.mlbyte
+
+driver/compdynlink.cmo: driver/compdynlink.mlbyte driver/compdynlink.cmi
+	$OCAMLC $OCAMLFLAGS -c -impl driver/compdynlink.mlbyte
+
+%.cmi: %.mli $OCAMLRUN $STDLIB
+	$OCAMLC $OCAMLFLAGS $stem.mli
+
+%.cmo: %.ml $OCAMLRUN $STDLIB
+	$OCAMLC $OCAMLFLAGS $stem.ml
+
+<.depend

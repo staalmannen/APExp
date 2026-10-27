@@ -1,0 +1,9 @@
+<../config/mkfile
+TARG=ocamlrun
+BIN=../boot
+OFILES=main.$O
+LIB=libcamlrun.a ../otherlibs/unix/libunix.a ../otherlibs/str/libstr.a
+</sys/src/cmd/mkone
+
+libcamlrun.a:
+	mk -f mklib

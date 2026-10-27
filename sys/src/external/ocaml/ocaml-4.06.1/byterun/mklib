@@ -1,0 +1,73 @@
+<../config/mkfile
+LIB=libcamlrun.a
+OFILES=\
+	prims.$O\
+	interp.$O\
+	misc.$O\
+	stacks.$O\
+	fix_code.$O\
+	startup_aux.$O\
+	startup.$O\
+	freelist.$O\
+	major_gc.$O\
+	minor_gc.$O\
+	memory.$O\
+	alloc.$O\
+	roots.$O\
+	globroots.$O\
+	fail.$O\
+	signals.$O\
+	signals_byt.$O\
+	printexc.$O\
+	backtrace_prim.$O\
+	backtrace.$O\
+	compare.$O\
+	ints.$O\
+	floats.$O\
+	str.$O\
+	array.$O\
+	io.$O\
+	extern.$O\
+	intern.$O\
+	hash.$O\
+	sys.$O\
+	meta.$O\
+	parsing.$O\
+	gc_ctrl.$O\
+	terminfo.$O\
+	md5.$O\
+	obj.$O\
+	lexing.$O\
+	callback.$O\
+	debugger.$O\
+	weak.$O\
+	compact.$O\
+	finalise.$O\
+	custom.$O\
+	dynlink.$O\
+	spacetime.$O\
+	afl.$O\
+	unix.$O\
+	bigarray.$O
+HFILES=caml/version.h caml/jumptbl.h
+CLEANFILES=caml/version.h caml/jumptbl.h prims.c
+</sys/src/cmd/mklib
+
+caml/version.h: ../VERSION
+	../tools/make-version-header.rc ../VERSION > caml/version.h
+
+caml/jumptbl.h: caml/instruct.h
+	sed -n -e '/^  /s/ ([A-Z])/ \&\&lbl_\1/gp' -e '/^}/q' caml/instruct.h > caml/jumptbl.h
+
+PRIMS=\
+	alloc.c array.c compare.c extern.c floats.c gc_ctrl.c hash.c\
+	intern.c interp.c ints.c io.c lexing.c md5.c meta.c obj.c parsing.c\
+	signals.c str.c sys.c terminfo.c callback.c weak.c finalise.c stacks.c\
+	dynlink.c backtrace_prim.c backtrace.c spacetime.c afl.c
+
+primitives: $PRIMS
+	sed -n -e 's/CAMLprim value ([a-z_][a-z0-9_]*).*/\1/p' -e 's/^#define [A-Z_]+ (caml_unix_[a-z0-9_]+).*/\1/p' $PRIMS ../otherlibs/unix/*.c ../otherlibs/str/*.c |
+	sort | uniq > primitives
+
+prims.c: primitives
+	../tools/make-prims.rc primitives > prims.c

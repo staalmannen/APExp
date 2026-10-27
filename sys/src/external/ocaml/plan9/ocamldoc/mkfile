@@ -1,0 +1,69 @@
+OCAMLRUN=../boot/ocamlrun
+OCAMLC=$OCAMLRUN ../boot/ocamlc -nostdlib -I ../boot\
+	-use-prims ../byterun/primitives -I ..
+TARG=ocamldoc
+CMOFILES=\
+	odoc_config.cmo\
+	odoc_messages.cmo\
+	odoc_global.cmo\
+	odoc_types.cmo\
+	odoc_misc.cmo\
+	odoc_text_parser.cmo\
+	odoc_text_lexer.cmo\
+	odoc_text.cmo\
+	odoc_name.cmo\
+	odoc_parameter.cmo\
+	odoc_value.cmo\
+	odoc_type.cmo\
+	odoc_extension.cmo\
+	odoc_exception.cmo\
+	odoc_class.cmo\
+	odoc_module.cmo\
+	odoc_print.cmo\
+	odoc_str.cmo\
+	odoc_comments_global.cmo\
+	odoc_parser.cmo\
+	odoc_lexer.cmo\
+	odoc_see_lexer.cmo\
+	odoc_env.cmo\
+	odoc_merge.cmo\
+	odoc_sig.cmo\
+	odoc_ast.cmo\
+	odoc_control.cmo\
+	odoc_inherit.cmo\
+	odoc_search.cmo\
+	odoc_scan.cmo\
+	odoc_cross.cmo\
+	odoc_comments.cmo\
+	odoc_dep.cmo\
+	odoc_analyse.cmo\
+	odoc_info.cmo
+TARGCMOFILES=
+	$CMOFILES\
+	odoc_dag2html.cmo\
+	odoc_to_text.cmo\
+	odoc_ocamlhtml.cmo\
+	odoc_html.cmo\
+	odoc_man.cmo\
+	odoc_latex_style.cmo\
+	odoc_latex.cmo\
+	odoc_texi.cmo\
+	odoc_dot.cmo\
+	odoc_gen.cmo\
+	odoc_args.cmo\
+	odoc.cmo
+INCLUDES=\
+	-I ../parsing\
+	-I ../utils\
+	-I ../typing\
+	-I ../driver\
+	-I ../bytecomp\
+	-I ../toplevel\
+	-I ../stdlib\
+	-I ../compilerlibs\
+	-I ../otherlibs/str\
+	-I ../otherlibs/dynlink\
+	-I ../otherlibs/unix
+
+$TARG: $TARGCMOFILES
+	$OCAMLC -o $@ -linkall $(LINKFLAGS) $(OCAMLDOC_BCLIBRARIES) $TARGCMOFILES

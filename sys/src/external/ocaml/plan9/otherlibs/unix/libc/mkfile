@@ -1,0 +1,7 @@
+</$objtype/mkfile
+CC=pcc
+LD=pcc
+CFLAGS=-D_BSD_EXTENSION -c
+OFILES=getprotobynumber.$O
+LIB=libc.a
+</sys/src/cmd/mklib

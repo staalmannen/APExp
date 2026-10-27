@@ -1,0 +1,77 @@
+One of the main problems for the lexer is to know when to stop.
+There are a few terminating conditions:
+
+- the lexer may match some rule (including default rule ``*``) and come to a
+  final state
+- the lexer may fail to match any rule and come to a default state
+- the lexer may reach the end of input
+
+The first two conditions terminate the lexer in a "natural" way: it comes to a
+state with no outgoing transitions, and the matching automatically stops. The
+third condition, end of input, is different: it may happen in any state, and the
+lexer should be able to handle it. Checking for the end of input interrupts the
+normal lexer workflow and adds conditional branches to the generated program,
+therefore it is necessary to minimize the number of such checks. |re2c| supports
+a few different methods for handling the end of input. Which one to use depends
+on the complexity of regular expressions, the need for buffering, performance
+considerations and other factors. Here is a list of methods:
+
+- **Sentinel.**
+  This method eliminates the need for the end of input checks altogether. It is
+  simple and efficient, but limited to the case when there is a natural
+  "sentinel" character that can never occur in valid input. This character may
+  still occur in invalid input, but it should not be allowed by the regular
+  expressions, except perhaps as the last character of a rule. The sentinel is
+  appended at the end of input and serves as a stop signal: when the lexer reads
+  this character, it is either a syntax error or the end of input. In both
+  cases the lexer should stop. This method is used if ``YYFILL`` is disabled
+  with ``re2c:yyfill:enable = 0;`` and ``re2c:eof`` has the default value
+  ``-1``.
+  
+  |
+
+- **Sentinel with bounds checks.**
+  This method is generic: it allows one to handle any input without restrictions on
+  the regular expressions. The idea is to reduce the number of end of input
+  checks by performing them only on certain characters. Similar to the
+  "sentinel" method, one of the characters is chosen as a "sentinel" and
+  appended at the end of input. However, there is no restriction on where the
+  sentinel may occur (in fact, any character can be chosen for a sentinel).
+  When the lexer reads this character, it additionally performs a bounds check.
+  If the current position is within bounds, the lexer resumes matching and
+  handles the sentinel as a regular character. Otherwise it invokes ``YYFILL``
+  (unless it is disabled). If more input is supplied, the lexer will rematch the
+  last character and continue as if the sentinel wasn't there. Otherwise it must
+  be the real end of input, and the lexer stops. This method is used when
+  ``re2c:eof`` has non-negative value (it should be set to the numeric value of
+  the sentinel). ``YYFILL`` is optional.
+  
+  |
+
+- **Bounds checks with padding.**
+  This method is generic, and it may be faster than the "sentinel with bounds
+  checks" method, but it is also more complex. The idea is to partition DFA
+  states into strongly connected components (SCCs) and generate a single check
+  per SCC for enough characters to cover the longest non-looping path in this
+  SCC. This reduces the number of checks, but there is a problem with short
+  lexemes at the end of input, as the check requires enough characters to cover
+  the longest lexeme. This can be fixed by padding the input with a few fake
+  characters that do not form a valid lexeme suffix (so that the lexer cannot
+  match them). The length of padding should be ``YYMAXFILL``, generated with
+  a ``max`` block. If there is not enough input, the lexer invokes ``YYFILL``
+  which should supply at least the required number of characters or not return.
+  This method is used if ``YYFILL`` is enabled and ``re2c:eof`` is ``-1``
+  (this is the default configuration).
+  
+  |
+
+- **Custom checks.**
+  Generic API allows one to override basic operations like reading a character,
+  which makes it possible to include the end-of-input checks as part of them.
+  This approach is error-prone and should be used with caution. To use a custom
+  method, enable generic API with ``--api custom`` or ``re2c:api = custom;`` and
+  disable default bounds checks with ``re2c:yyfill:enable = 0;`` or
+  ``re2c:yyfill:check = 0;``.
+
+
+The following subsections contain an example of each method.

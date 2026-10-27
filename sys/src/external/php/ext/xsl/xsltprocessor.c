@@ -1,0 +1,869 @@
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Christian Stocker <chregu@php.net>                          |
+   |          Rob Richards <rrichards@php.net>                            |
+   +----------------------------------------------------------------------+
+*/
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include "php.h"
+#include "php_xsl.h"
+#include <libxslt/variables.h>
+#include "ext/libxml/php_libxml.h"
+#include "ext/dom/namespace_compat.h"
+
+
+static zend_result php_xsl_xslt_apply_params(xsltTransformContextPtr ctxt, HashTable *params)
+{
+	zend_string *string_key;
+	zval *value;
+
+	ZEND_HASH_MAP_FOREACH_STR_KEY_VAL(params, string_key, value) {
+		ZEND_ASSERT(string_key != NULL);
+		/* Already a string because of setParameter() */
+		ZEND_ASSERT(Z_TYPE_P(value) == IS_STRING);
+
+		int result = xsltQuoteOneUserParam(ctxt, (const xmlChar *) ZSTR_VAL(string_key), (const xmlChar *) Z_STRVAL_P(value));
+		if (result < 0) {
+			php_error_docref(NULL, E_WARNING, "Could not apply parameter \"%s\"", ZSTR_VAL(string_key));
+			return FAILURE;
+		}
+	} ZEND_HASH_FOREACH_END();
+
+	return SUCCESS;
+}
+
+static void xsl_proxy_factory(xmlNodePtr node, zval *child, dom_object *intern, xmlXPathParserContextPtr ctxt)
+{
+	ZEND_ASSERT(node->type != XML_NAMESPACE_DECL);
+
+	/**
+	 * Upon freeing libxslt's context, every document that is not the *main* document will be freed by libxslt.
+	 * If a node of a document that is *not the main* document gets returned to userland, we'd free the node twice:
+	 * first by the cleanup of the xslt context, and then by our own refcounting mechanism.
+	 * To prevent this, we'll take a copy if the node is not from the main document.
+	 * It is important that we do not copy the node unconditionally, because that means that:
+	 *  - modifications to the node will only modify the copy, and not the original
+	 *  - accesses to the parent, path, ... will not work
+	 */
+	xsltTransformContextPtr transform_ctxt = (xsltTransformContextPtr) ctxt->context->extra;
+	if (node->doc != transform_ctxt->document->doc) {
+		node = xmlDocCopyNode(node, intern->document->ptr, 1);
+	}
+	php_dom_create_object(node, child, intern);
+}
+
+static xsl_object *xsl_ext_fetch_intern(xmlXPathParserContextPtr ctxt)
+{
+	if (UNEXPECTED(!zend_is_executing())) {
+		xsltGenericError(xsltGenericErrorContext,
+		"xsltExtFunctionTest: Function called from outside of PHP\n");
+		return NULL;
+	}
+
+	xsltTransformContextPtr tctxt = xsltXPathGetTransformContext(ctxt);
+	if (UNEXPECTED(tctxt == NULL)) {
+		xsltGenericError(xsltGenericErrorContext,
+		"xsltExtFunctionTest: failed to get the transformation context\n");
+		return NULL;
+	}
+
+	xsl_object *intern = (xsl_object *) tctxt->_private;
+	if (UNEXPECTED(intern == NULL)) {
+		xsltGenericError(xsltGenericErrorContext,
+		"xsltExtFunctionTest: failed to get the internal object\n");
+		return NULL;
+	}
+	return intern;
+}
+
+static void xsl_ext_function_php(xmlXPathParserContextPtr ctxt, int nargs, php_dom_xpath_nodeset_evaluation_mode evaluation_mode) /* {{{ */
+{
+	xsl_object *intern = xsl_ext_fetch_intern(ctxt);
+	if (!intern) {
+		php_dom_xpath_callbacks_clean_argument_stack(ctxt, nargs);
+	} else {
+		php_dom_xpath_callbacks_call_php_ns(&intern->xpath_callbacks, ctxt, nargs, evaluation_mode, (dom_object *) intern->doc, xsl_proxy_factory);
+	}
+}
+/* }}} */
+
+void xsl_ext_function_string_php(xmlXPathParserContextPtr ctxt, int nargs) /* {{{ */
+{
+	xsl_ext_function_php(ctxt, nargs, PHP_DOM_XPATH_EVALUATE_NODESET_TO_STRING);
+}
+/* }}} */
+
+void xsl_ext_function_object_php(xmlXPathParserContextPtr ctxt, int nargs) /* {{{ */
+{
+	xsl_ext_function_php(ctxt, nargs, PHP_DOM_XPATH_EVALUATE_NODESET_TO_NODESET);
+}
+/* }}} */
+
+static void xsl_ext_function_trampoline(xmlXPathParserContextPtr ctxt, int nargs)
+{
+	xsl_object *intern = xsl_ext_fetch_intern(ctxt);
+	if (!intern) {
+		php_dom_xpath_callbacks_clean_argument_stack(ctxt, nargs);
+	} else {
+		php_dom_xpath_callbacks_call_custom_ns(&intern->xpath_callbacks, ctxt, nargs, PHP_DOM_XPATH_EVALUATE_NODESET_TO_NODESET, (dom_object *) intern->doc, xsl_proxy_factory);
+	}
+}
+
+static void xsl_add_ns_def(xmlNodePtr node)
+{
+	if (node->type == XML_ELEMENT_NODE) {
+		for (xmlAttrPtr attr = node->properties; attr; attr = attr->next) {
+			if (php_dom_ns_is_fast((const xmlNode *) attr, php_dom_ns_is_xmlns_magic_token)) {
+				xmlNsPtr ns = xmlMalloc(sizeof(*ns));
+				if (!ns) {
+					return;
+				}
+
+				bool should_free;
+				xmlChar *attr_value = php_libxml_attr_value(attr, &should_free);
+
+				memset(ns, 0, sizeof(*ns));
+				ns->type = XML_LOCAL_NAMESPACE;
+				ns->href = should_free ? attr_value : xmlStrdup(attr_value);
+				ns->prefix = attr->ns->prefix ? xmlStrdup(attr->name) : NULL;
+				ns->next = node->nsDef;
+				node->nsDef = ns;
+			}
+		}
+	}
+}
+
+static void xsl_add_ns_defs(xmlDocPtr doc)
+{
+	xmlNodePtr base = (xmlNodePtr) doc;
+	xmlNodePtr node = base->children;
+	while (node != NULL) {
+		xsl_add_ns_def(node);
+		node = php_dom_next_in_tree_order(node, base);
+	}
+}
+
+/* {{{ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#
+Since:
+*/
+PHP_METHOD(XSLTProcessor, importStylesheet)
+{
+	zval *id, *docp = NULL;
+	xmlDoc *newdoc = NULL;
+	xsltStylesheetPtr sheetp;
+	bool clone_docu = false;
+	xmlNode *nodep = NULL;
+	zval *cloneDocu, rv, clone_zv, owner_zv;
+	zend_string *member;
+
+	id = ZEND_THIS;
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "o", &docp) == FAILURE) {
+		RETURN_THROWS();
+	}
+
+	xsl_object *intern = Z_XSL_P(id);
+	if (UNEXPECTED(intern->transform_depth > 0)) {
+		zend_throw_error(NULL, "Cannot call XSLTProcessor::importStylesheet() while a transformation is in progress");
+		RETURN_THROWS();
+	}
+
+	nodep = php_libxml_import_node(docp);
+	if (nodep == NULL) {
+		zend_argument_type_error(1, "must be a valid XML node");
+		RETURN_THROWS();
+	}
+
+	if (Z_OBJ_HANDLER_P(docp, clone_obj) == NULL) {
+		zend_argument_type_error(1, "must be a cloneable node");
+		RETURN_THROWS();
+	}
+
+	ZVAL_UNDEF(&owner_zv);
+
+	/* For non-document nodes, resolve the ownerDocument and clone that
+	 * instead as xsltParseStylesheetProcess may free nodes in the document. */
+	if (nodep->type != XML_DOCUMENT_NODE && nodep->type != XML_HTML_DOCUMENT_NODE) {
+		if (nodep->doc == NULL) {
+			zend_argument_value_error(1, "must be part of a document");
+			RETURN_THROWS();
+		}
+
+		/* See dom_import_simplexml_common */
+
+		dom_object *nodeobj = (dom_object *) ((char *) Z_OBJ_P(docp) - Z_OBJ_HT_P(docp)->offset);
+
+		php_dom_create_object((xmlNodePtr) nodep->doc, &owner_zv, nodeobj);
+		docp = &owner_zv;
+	}
+
+	/* libxslt uses _private, so we must copy the imported
+	 * stylesheet document otherwise the node proxies will be a mess.
+	 * We will clone the object and detach the libxml internals later. */
+	zend_object *clone = Z_OBJ_HANDLER_P(docp, clone_obj)(Z_OBJ_P(docp));
+	zval_ptr_dtor(&owner_zv);
+	if (!clone) {
+		RETURN_THROWS();
+	}
+
+	ZVAL_OBJ(&clone_zv, clone);
+	nodep = php_libxml_import_node(&clone_zv);
+
+	if (nodep) {
+		newdoc = nodep->doc;
+	}
+	if (newdoc == NULL) {
+		OBJ_RELEASE(clone);
+		zend_argument_type_error(1, "must be a valid XML node");
+		RETURN_THROWS();
+	}
+
+	php_libxml_node_object *clone_lxml_obj = Z_LIBXML_NODE_P(&clone_zv);
+
+	if (GC_REFCOUNT(clone) > 1 || clone_lxml_obj->document->refcount > 1) {
+		OBJ_RELEASE(clone);
+		zend_argument_value_error(1, "must not have its clone retained by __clone()");
+		RETURN_THROWS();
+	}
+
+	PHP_LIBXML_SANITIZE_GLOBALS(parse);
+	ZEND_DIAGNOSTIC_IGNORED_START("-Wdeprecated-declarations")
+	xmlSubstituteEntitiesDefault(1);
+	xmlLoadExtDtdDefaultValue = XML_DETECT_IDS | XML_COMPLETE_ATTRS;
+	ZEND_DIAGNOSTIC_IGNORED_END
+
+	if (clone_lxml_obj->document->class_type == PHP_LIBXML_CLASS_MODERN) {
+		xsl_add_ns_defs(newdoc);
+	}
+
+	sheetp = xsltParseStylesheetDoc(newdoc);
+	PHP_LIBXML_RESTORE_GLOBALS(parse);
+
+	if (!sheetp) {
+		OBJ_RELEASE(clone);
+		RETURN_FALSE;
+	}
+
+	/* Detach object */
+	clone_lxml_obj->document->ptr = NULL;
+	/* The namespace mappings need to be kept alive.
+	 * This is stored in the ref obj outside of libxml2, but that means that the sheet won't keep it alive
+	 * unlike with namespaces from old DOM. */
+	if (intern->sheet_ref_obj) {
+		php_libxml_decrement_doc_ref_directly(intern->sheet_ref_obj);
+	}
+	intern->sheet_ref_obj = clone_lxml_obj->document;
+	intern->sheet_ref_obj->refcount++;
+	OBJ_RELEASE(clone);
+
+	member = ZSTR_INIT_LITERAL("cloneDocument", 0);
+	cloneDocu = zend_std_read_property(Z_OBJ_P(id), member, BP_VAR_R, NULL, &rv);
+	clone_docu = zend_is_true(cloneDocu);
+	zend_string_release_ex(member, 0);
+	if (!clone_docu) {
+		/* Check if the stylesheet is using xsl:key, if yes, we have to clone the document _always_ before a transformation.
+		 * xsl:key elements may only occur at the top level. Furthermore, all elements at the top level must be in a
+		 * namespace (if not, then the stylesheet is not well-formed and this function will have returned false earlier). */
+		nodep = xmlDocGetRootElement(sheetp->doc);
+		if (nodep && (nodep = nodep->children)) {
+			while (nodep) {
+				ZEND_ASSERT(nodep->ns != NULL);
+				if (nodep->type == XML_ELEMENT_NODE && xmlStrEqual(nodep->name, (const xmlChar *) "key") && xmlStrEqual(nodep->ns->href, XSLT_NAMESPACE)) {
+					intern->hasKeys = true;
+					break;
+				}
+				nodep = nodep->next;
+			}
+		}
+	} else {
+		intern->hasKeys = true;
+	}
+
+	xsl_free_sheet(intern);
+
+	php_xsl_set_object(id, sheetp);
+	RETVAL_TRUE;
+}
+/* }}} end XSLTProcessor::importStylesheet */
+
+static void php_xsl_delayed_lib_registration(void *ctxt, const zend_string *ns, const zend_string *name)
+{
+	xsltTransformContextPtr xsl = (xsltTransformContextPtr) ctxt;
+	xsltRegisterExtFunction(xsl, (const xmlChar *) ZSTR_VAL(name), (const xmlChar *) ZSTR_VAL(ns), xsl_ext_function_trampoline);
+}
+
+static xmlDocPtr php_xsl_apply_stylesheet(zval *id, xsl_object *intern, xsltStylesheetPtr style, zval *docp) /* {{{ */
+{
+	xmlDocPtr newdocp = NULL;
+	xmlDocPtr doc = NULL;
+	xmlNodePtr node = NULL;
+	xsltTransformContextPtr ctxt;
+	php_libxml_node_object *object;
+	zval *doXInclude, rv;
+	zend_string *member;
+	FILE *f;
+	int secPrefsError = 0;
+	xsltSecurityPrefsPtr secPrefs = NULL;
+
+	node = php_libxml_import_node(docp);
+
+	if (node) {
+		doc = node->doc;
+	}
+
+	if (doc == NULL) {
+		zend_argument_type_error(1, "must be a valid XML node");
+		return NULL;
+	}
+
+	if (style == NULL) {
+		zend_string *name = get_active_function_or_method_name();
+		zend_throw_error(NULL, "%s() can only be called after a stylesheet has been imported",
+			ZSTR_VAL(name));
+		zend_string_release(name);
+		return NULL;
+	}
+
+	intern->transform_depth++;
+
+	if (intern->profiling) {
+		if (php_check_open_basedir(ZSTR_VAL(intern->profiling))) {
+			f = NULL;
+		} else {
+			f = VCWD_FOPEN(ZSTR_VAL(intern->profiling), "w");
+		}
+	} else {
+		f = NULL;
+	}
+
+	intern->doc = emalloc(sizeof(php_libxml_node_object));
+	memset(intern->doc, 0, sizeof(php_libxml_node_object));
+
+	if (intern->hasKeys) {
+		doc = xmlCopyDoc(doc, 1);
+	} else {
+		object = Z_LIBXML_NODE_P(docp);
+		intern->doc->document = object->document;
+	}
+
+	php_libxml_increment_doc_ref(intern->doc, doc);
+
+	ctxt = xsltNewTransformContext(style, doc);
+	ctxt->_private = (void *) intern;
+
+	if (intern->parameter) {
+		zend_result status = php_xsl_xslt_apply_params(ctxt, intern->parameter);
+		if (UNEXPECTED(status != SUCCESS) && EG(exception)) {
+			goto out;
+		}
+	}
+
+	member = ZSTR_INIT_LITERAL("doXInclude", 0);
+	doXInclude = zend_std_read_property(Z_OBJ_P(id), member, BP_VAR_R, NULL, &rv);
+	ctxt->xinclude = zend_is_true(doXInclude);
+	zend_string_release_ex(member, 0);
+
+	zval *max_template_depth = xsl_prop_max_template_depth(Z_OBJ_P(id));
+	ZEND_ASSERT(Z_TYPE_P(max_template_depth) == IS_LONG);
+	ctxt->maxTemplateDepth = Z_LVAL_P(max_template_depth);
+
+	zval *max_template_vars = xsl_prop_max_template_vars(Z_OBJ_P(id));
+	ZEND_ASSERT(Z_TYPE_P(max_template_vars) == IS_LONG);
+	ctxt->maxTemplateVars = Z_LVAL_P(max_template_vars);
+
+	zend_long secPrefsValue = intern->securityPrefs;
+
+	/* if securityPrefs is set to NONE, we don't have to do any checks, but otherwise... */
+	if (secPrefsValue != XSL_SECPREF_NONE) {
+		secPrefs = xsltNewSecurityPrefs();
+		if (secPrefsValue & XSL_SECPREF_READ_FILE ) {
+			if (0 != xsltSetSecurityPrefs(secPrefs, XSLT_SECPREF_READ_FILE, xsltSecurityForbid)) {
+				secPrefsError = 1;
+			}
+		}
+		if (secPrefsValue & XSL_SECPREF_WRITE_FILE ) {
+			if (0 != xsltSetSecurityPrefs(secPrefs, XSLT_SECPREF_WRITE_FILE, xsltSecurityForbid)) {
+				secPrefsError = 1;
+			}
+		}
+		if (secPrefsValue & XSL_SECPREF_CREATE_DIRECTORY ) {
+			if (0 != xsltSetSecurityPrefs(secPrefs, XSLT_SECPREF_CREATE_DIRECTORY, xsltSecurityForbid)) {
+				secPrefsError = 1;
+			}
+		}
+		if (secPrefsValue & XSL_SECPREF_READ_NETWORK) {
+			if (0 != xsltSetSecurityPrefs(secPrefs, XSLT_SECPREF_READ_NETWORK, xsltSecurityForbid)) {
+				secPrefsError = 1;
+			}
+		}
+		if (secPrefsValue & XSL_SECPREF_WRITE_NETWORK) {
+			if (0 != xsltSetSecurityPrefs(secPrefs, XSLT_SECPREF_WRITE_NETWORK, xsltSecurityForbid)) {
+				secPrefsError = 1;
+			}
+		}
+
+		if (0 != xsltSetCtxtSecurityPrefs(secPrefs, ctxt)) {
+			secPrefsError = 1;
+		}
+	}
+
+	php_dom_xpath_callbacks_delayed_lib_registration(&intern->xpath_callbacks, ctxt, php_xsl_delayed_lib_registration);
+
+	if (secPrefsError == 1) {
+		php_error_docref(NULL, E_WARNING, "Can't set libxslt security properties, not doing transformation for security reasons");
+	} else {
+		newdocp = xsltApplyStylesheetUser(style, doc, /* params (handled manually) */ NULL, /* output */ NULL, f, ctxt);
+	}
+
+out:
+	if (f) {
+		fclose(f);
+	}
+
+	xsltFreeTransformContext(ctxt);
+	if (secPrefs) {
+		xsltFreeSecurityPrefs(secPrefs);
+	}
+
+	php_dom_xpath_callbacks_clean_node_list(&intern->xpath_callbacks);
+
+	php_libxml_decrement_doc_ref(intern->doc);
+	efree(intern->doc);
+	intern->doc = NULL;
+
+	intern->transform_depth--;
+
+	return newdocp;
+
+}
+/* }}} */
+
+/* {{{ URL: http://www.w3.org/TR/2003/WD-DOM-Level-3-Core-20030226/DOM3-Core.html#
+Since:
+*/
+PHP_METHOD(XSLTProcessor, transformToDoc)
+{
+	zval *id, *docp = NULL;
+	xmlDoc *newdocp;
+	xsltStylesheetPtr sheetp;
+	zend_class_entry *ret_class = NULL;
+	xsl_object *intern;
+
+	id = ZEND_THIS;
+	intern = Z_XSL_P(id);
+	sheetp = (xsltStylesheetPtr) intern->ptr;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "o|C!", &docp, &ret_class) == FAILURE) {
+		RETURN_THROWS();
+	}
+
+	newdocp = php_xsl_apply_stylesheet(id, intern, sheetp, docp);
+
+	if (newdocp) {
+		if (ret_class) {
+			zend_string *curclass_name;
+			zend_class_entry *curce;
+			php_libxml_node_object *interndoc;
+
+			curce = Z_OBJCE_P(docp);
+			curclass_name = curce->name;
+			while (curce->parent != NULL) {
+				curce = curce->parent;
+			}
+
+			if (!instanceof_function(ret_class, curce)) {
+				xmlFreeDoc(newdocp);
+				zend_argument_type_error(2, "must be a class name compatible with %s, %s given",
+					ZSTR_VAL(curclass_name), ZSTR_VAL(ret_class->name)
+				);
+				RETURN_THROWS();
+			}
+
+			object_init_ex(return_value, ret_class);
+
+			interndoc = Z_LIBXML_NODE_P(return_value);
+			php_libxml_increment_doc_ref(interndoc, newdocp);
+			php_libxml_increment_node_ptr(interndoc, (xmlNodePtr)newdocp, (void *)interndoc);
+		} else {
+			php_dom_create_object((xmlNodePtr) newdocp, return_value, NULL);
+		}
+	} else {
+		RETURN_FALSE;
+	}
+}
+/* }}} end XSLTProcessor::transformToDoc */
+
+/* {{{ */
+PHP_METHOD(XSLTProcessor, transformToUri)
+{
+	zval *id, *docp = NULL;
+	xmlDoc *newdocp;
+	xsltStylesheetPtr sheetp;
+	int ret;
+	size_t uri_len;
+	char *uri;
+	xsl_object *intern;
+
+	id = ZEND_THIS;
+	intern = Z_XSL_P(id);
+	sheetp = (xsltStylesheetPtr) intern->ptr;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "op", &docp, &uri, &uri_len) == FAILURE) {
+		RETURN_THROWS();
+	}
+
+	newdocp = php_xsl_apply_stylesheet(id, intern, sheetp, docp);
+
+	ret = -1;
+	if (newdocp) {
+		ret = xsltSaveResultToFilename(uri, newdocp, sheetp, 0);
+		xmlFreeDoc(newdocp);
+	}
+
+	RETVAL_LONG(ret);
+}
+/* }}} end XSLTProcessor::transformToUri */
+
+/* {{{ */
+PHP_METHOD(XSLTProcessor, transformToXml)
+{
+	zval *id, *docp = NULL;
+	xmlDoc *newdocp;
+	xsltStylesheetPtr sheetp;
+	int ret;
+	xmlChar *doc_txt_ptr;
+	int doc_txt_len;
+	xsl_object *intern;
+
+	id = ZEND_THIS;
+	intern = Z_XSL_P(id);
+	sheetp = (xsltStylesheetPtr) intern->ptr;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "o", &docp) == FAILURE) {
+		RETURN_THROWS();
+	}
+
+	newdocp = php_xsl_apply_stylesheet(id, intern, sheetp, docp);
+
+	ret = -1;
+	if (newdocp) {
+		ret = xsltSaveResultToString(&doc_txt_ptr, &doc_txt_len, newdocp, sheetp);
+		if (doc_txt_ptr && doc_txt_len) {
+			RETVAL_STRINGL((char *) doc_txt_ptr, doc_txt_len);
+			xmlFree(doc_txt_ptr);
+		}
+		xmlFreeDoc(newdocp);
+	}
+
+	if (ret < 0) {
+		RETURN_FALSE;
+	}
+}
+/* }}} end XSLTProcessor::transformToXml */
+
+static zend_string *xsl_create_parameter_key(uint32_t arg_num, const zend_string *namespace, zend_string *name)
+{
+	if (ZSTR_LEN(namespace) == 0) {
+		return zend_string_copy(name);
+	}
+
+	/* Clark notation already sets the namespace and we cannot have a double namespace declaration. */
+	if (ZSTR_VAL(name)[0] == '{') {
+		zend_argument_value_error(arg_num, "must not use clark notation when argument #1 ($namespace) is not empty");
+		return NULL;
+	}
+
+	/* Cannot be a QName as that would cause a namespace lookup in the document. */
+	if (ZSTR_VAL(name)[0] != ':' && strchr(ZSTR_VAL(name), ':')) {
+		zend_argument_value_error(arg_num, "must not be a QName when argument #1 ($namespace) is not empty");
+		return NULL;
+	}
+
+	zend_string *clark_str = zend_string_safe_alloc(1, ZSTR_LEN(name), 2 + ZSTR_LEN(namespace), false);
+	ZSTR_VAL(clark_str)[0] = '{';
+	memcpy(ZSTR_VAL(clark_str) + 1, ZSTR_VAL(namespace), ZSTR_LEN(namespace));
+	ZSTR_VAL(clark_str)[ZSTR_LEN(namespace) + 1] = '}';
+	memcpy(ZSTR_VAL(clark_str) + 2 + ZSTR_LEN(namespace), ZSTR_VAL(name), ZSTR_LEN(name) + 1 /* include '\0' */);
+	return clark_str;
+}
+
+/* {{{ */
+PHP_METHOD(XSLTProcessor, setParameter)
+{
+
+	zval *id = ZEND_THIS;
+	zval *entry, new_string;
+	HashTable *array_value;
+	xsl_object *intern;
+	zend_string *namespace, *string_key, *name, *value = NULL;
+
+	ZEND_PARSE_PARAMETERS_START(2, 3)
+		Z_PARAM_PATH_STR(namespace)
+		Z_PARAM_ARRAY_HT_OR_STR(array_value, name)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_PATH_STR_OR_NULL(value)
+	ZEND_PARSE_PARAMETERS_END();
+
+	intern = Z_XSL_P(id);
+
+	if (array_value) {
+		if (value) {
+			zend_argument_value_error(3, "must be null when argument #2 ($name) is an array");
+			RETURN_THROWS();
+		}
+
+		ZEND_HASH_FOREACH_STR_KEY_VAL(array_value, string_key, entry) {
+			zval tmp;
+			zend_string *str;
+
+			if (string_key == NULL) {
+				zend_argument_type_error(2, "must contain only string keys");
+				RETURN_THROWS();
+			}
+
+			if (UNEXPECTED(zend_str_has_nul_byte(string_key))) {
+				zend_argument_value_error(3, "must not contain keys with any null bytes");
+				RETURN_THROWS();
+			}
+
+			zend_string *ht_key = xsl_create_parameter_key(2, namespace, string_key);
+			if (!ht_key) {
+				RETURN_THROWS();
+			}
+
+			str = zval_try_get_string(entry);
+			if (UNEXPECTED(!str)) {
+				zend_string_release_ex(ht_key, false);
+				RETURN_THROWS();
+			}
+
+			if (UNEXPECTED(zend_str_has_nul_byte(str))) {
+				zend_string_release(str);
+				zend_string_release_ex(ht_key, false);
+				zend_argument_value_error(3, "must not contain values with any null bytes");
+				RETURN_THROWS();
+			}
+
+			ZVAL_STR(&tmp, str);
+			zend_hash_update(intern->parameter, ht_key, &tmp);
+			zend_string_release_ex(ht_key, false);
+		} ZEND_HASH_FOREACH_END();
+		RETURN_TRUE;
+	} else {
+		if (!value) {
+			zend_argument_value_error(3, "cannot be null when argument #2 ($name) is a string");
+			RETURN_THROWS();
+		}
+
+		if (UNEXPECTED(zend_str_has_nul_byte(name))) {
+			zend_argument_value_error(2, "must not contain any null bytes");
+			RETURN_THROWS();
+		}
+
+		zend_string *key = xsl_create_parameter_key(2, namespace, name);
+		if (!key) {
+			RETURN_THROWS();
+		}
+
+		ZVAL_STR_COPY(&new_string, value);
+
+		zend_hash_update(intern->parameter, key, &new_string);
+		zend_string_release_ex(key, false);
+		RETURN_TRUE;
+	}
+}
+/* }}} end XSLTProcessor::setParameter */
+
+/* {{{ */
+PHP_METHOD(XSLTProcessor, getParameter)
+{
+	zval *id = ZEND_THIS;
+	zval *value;
+	zend_string *namespace, *name;
+	xsl_object *intern;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "PP", &namespace, &name) == FAILURE) {
+		RETURN_THROWS();
+	}
+	zend_string *key = xsl_create_parameter_key(2, namespace, name);
+	if (!key) {
+		RETURN_THROWS();
+	}
+	intern = Z_XSL_P(id);
+	value = zend_hash_find(intern->parameter, key);
+	zend_string_release_ex(key, false);
+	if (value != NULL) {
+		RETURN_STR_COPY(Z_STR_P(value));
+	} else {
+		RETURN_FALSE;
+	}
+}
+/* }}} end XSLTProcessor::getParameter */
+
+/* {{{ */
+PHP_METHOD(XSLTProcessor, removeParameter)
+{
+	zval *id = ZEND_THIS;
+	zend_string *namespace, *name;
+	xsl_object *intern;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "PP", &namespace, &name) == FAILURE) {
+		RETURN_THROWS();
+	}
+	zend_string *key = xsl_create_parameter_key(2, namespace, name);
+	if (!key) {
+		RETURN_THROWS();
+	}
+	intern = Z_XSL_P(id);
+	if (zend_hash_del(intern->parameter, key) == SUCCESS) {
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
+	}
+	zend_string_release_ex(key, false);
+}
+/* }}} end XSLTProcessor::removeParameter */
+
+/* {{{ */
+PHP_METHOD(XSLTProcessor, registerPHPFunctions)
+{
+	xsl_object *intern = Z_XSL_P(ZEND_THIS);
+
+	zend_string *name = NULL;
+	HashTable *callable_ht = NULL;
+
+	ZEND_PARSE_PARAMETERS_START(0, 1)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_ARRAY_HT_OR_STR_OR_NULL(callable_ht, name)
+	ZEND_PARSE_PARAMETERS_END();
+
+	php_dom_xpath_callbacks_update_method_handler(
+		&intern->xpath_callbacks,
+		NULL,
+		NULL,
+		name,
+		callable_ht,
+		PHP_DOM_XPATH_CALLBACK_NAME_VALIDATE_NULLS,
+		NULL
+	);
+}
+/* }}} end XSLTProcessor::registerPHPFunctions(); */
+
+PHP_METHOD(XSLTProcessor, registerPHPFunctionNS)
+{
+	xsl_object *intern = Z_XSL_P(ZEND_THIS);
+
+	zend_string *namespace, *name;
+	zend_fcall_info fci;
+	zend_fcall_info_cache fcc;
+
+	ZEND_PARSE_PARAMETERS_START(3, 3)
+		Z_PARAM_PATH_STR(namespace)
+		Z_PARAM_PATH_STR(name)
+		Z_PARAM_FUNC_NO_TRAMPOLINE_FREE(fci, fcc)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if (zend_string_equals_literal(namespace, "http://php.net/xsl")) {
+		zend_release_fcall_info_cache(&fcc);
+		zend_argument_value_error(1, "must not be \"http://php.net/xsl\" because it is reserved by PHP");
+		RETURN_THROWS();
+	}
+
+	if (php_dom_xpath_callbacks_update_single_method_handler(
+		&intern->xpath_callbacks,
+		NULL,
+		namespace,
+		name,
+		&fcc,
+		PHP_DOM_XPATH_CALLBACK_NAME_VALIDATE_NCNAME,
+		NULL
+	) != SUCCESS) {
+		zend_release_fcall_info_cache(&fcc);
+	}
+}
+
+/* {{{ */
+PHP_METHOD(XSLTProcessor, setProfiling)
+{
+	zval *id = ZEND_THIS;
+	xsl_object *intern;
+	zend_string *filename = NULL;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "P!", &filename) == FAILURE) {
+		RETURN_THROWS();
+	}
+
+	intern = Z_XSL_P(id);
+	if (intern->profiling) {
+		zend_string_release(intern->profiling);
+	}
+	if (filename != NULL) {
+		intern->profiling = zend_string_copy(filename);
+	} else {
+		intern->profiling = NULL;
+	}
+
+	RETURN_TRUE;
+}
+/* }}} end XSLTProcessor::setProfiling */
+
+/* {{{ */
+PHP_METHOD(XSLTProcessor, setSecurityPrefs)
+{
+	zval *id = ZEND_THIS;
+	xsl_object *intern;
+	zend_long securityPrefs, oldSecurityPrefs;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l", &securityPrefs) == FAILURE) {
+		RETURN_THROWS();
+	}
+	intern = Z_XSL_P(id);
+	oldSecurityPrefs = intern->securityPrefs;
+	intern->securityPrefs = securityPrefs;
+	RETURN_LONG(oldSecurityPrefs);
+}
+/* }}} end XSLTProcessor::setSecurityPrefs */
+
+/* {{{ */
+PHP_METHOD(XSLTProcessor, getSecurityPrefs)
+{
+	zval *id = ZEND_THIS;
+	xsl_object *intern;
+
+	if (zend_parse_parameters_none() == FAILURE) {
+		RETURN_THROWS();
+	}
+
+	intern = Z_XSL_P(id);
+
+	RETURN_LONG(intern->securityPrefs);
+}
+/* }}} end XSLTProcessor::getSecurityPrefs */
+
+/* {{{ */
+PHP_METHOD(XSLTProcessor, hasExsltSupport)
+{
+	if (zend_parse_parameters_none() == FAILURE) {
+		RETURN_THROWS();
+	}
+
+#ifdef HAVE_XSL_EXSLT
+	RETURN_TRUE;
+#else
+	RETURN_FALSE;
+#endif
+}
+/* }}} end XSLTProcessor::hasExsltSupport(); */

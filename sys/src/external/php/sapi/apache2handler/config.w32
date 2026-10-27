@@ -1,0 +1,24 @@
+// vim:ft=javascript
+
+ARG_ENABLE('apache2handler', 'Build Apache 2 handler', 'no');
+ARG_ENABLE('apache2-4handler', 'Build Apache 2 handler (alias for --enable--apache2handler)', 'no');
+
+if(PHP_APACHE2_4HANDLER != "no" && PHP_APACHE2HANDLER == "no") {
+	PHP_APACHE2HANDLER="yes";
+}
+
+if (PHP_APACHE2HANDLER != "no") {
+	if (PHP_ZTS == "no") {
+		WARNING("Apache module requires an --enable-zts build of PHP on windows");
+	} else if (CHECK_HEADER_ADD_INCLUDE("httpd.h", "CFLAGS_APACHE2HANDLER", PHP_PHP_BUILD + "\\include\\apache2_4") &&
+			CHECK_LIB("libhttpd.lib", "apache2handler", PHP_PHP_BUILD + "\\lib\\apache2_4") &&
+			CHECK_LIB("libapr-1.lib", "apache2handler", PHP_PHP_BUILD + "\\lib\\apache2_4") &&
+			CHECK_LIB("libaprutil-1.lib", "apache2handler", PHP_PHP_BUILD + "\\lib\\apache2_4")
+			) {
+		SAPI('apache2handler', 'mod_php.c sapi_apache2.c apache_config.c php_functions.c',
+				'php' + PHP_VERSION + 'apache2_4.dll',
+				'/D PHP_APACHE2_EXPORTS /DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
+	} else {
+		WARNING("Could not find Apache libraries/headers");
+	}
+}

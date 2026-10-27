@@ -1,0 +1,29 @@
+<../config/mkfile
+OCAMLRUN=../boot/ocamlrun
+OCAMLYACC=../boot/ocamlyacc
+OCAMLC=$OCAMLRUN ../boot/ocamlc -strict-sequence -nostdlib -I ../boot -use-prims ../byterun/primitives
+OCAMLFLAGS=-absname -w +a-4-9-41-42-44-45-48 -warn-error A\
+	-safe-string -strict-sequence -strict-formats -bin-annot
+LINKFLAGS=
+YACCFLAGS=-v
+OCAMLLEX=$OCAMLRUN ../boot/ocamllex
+
+OFILES=cset.cmo syntax.cmo parser.cmo lexer.cmo table.cmo lexgen.cmo\
+	compact.cmo common.cmo output.cmo outputbis.cmo main.cmo
+
+ocamllex: $OFILES
+	$OCAMLC -compat-32 -o ocamllex $OFILES
+
+parser.ml parser.mli: parser.mly
+	$OCAMLYACC $YACCFLAGS parser.mly
+
+lexer.ml: lexer.mll
+	$OCAMLLEX lexer.mll
+
+%.cmi: %.mli
+	$OCAMLC $OCAMLFLAGS -c $stem.mli
+
+%.cmo: %.ml
+	$OCAMLC $OCAMLFLAGS -c $stem.ml
+
+<.depend

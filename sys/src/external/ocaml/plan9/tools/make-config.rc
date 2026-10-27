@@ -1,0 +1,15 @@
+#!/bin/rc
+mkfile = $1
+mlp = $2
+
+>sed_script{
+	echo '#!/bin/sed -f'
+	awk -F'=' '/^[A-Z_]+/{print $1}' $mkfile|
+	while(var=`{read}){
+		val = `{mk get_$var}
+		echo 's|%%'$var'%%|'$"val'|'
+	}
+}
+chmod +x sed_script
+sed_script $mlp
+rm sed_script

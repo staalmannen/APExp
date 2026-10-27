@@ -1,0 +1,17 @@
+// vim:ft=javascript
+
+ARG_ENABLE("ftp", "ftp support", "no");
+
+if (PHP_FTP != "no") {
+
+	EXTENSION("ftp", "php_ftp.c ftp.c");
+
+	var ret = SETUP_OPENSSL("ftp", PHP_FTP);
+
+	if (ret >= 2) {
+		MESSAGE("Enabling SSL support for ext\\ftp");
+		AC_DEFINE('HAVE_FTP_SSL', 1, 'Define to 1 if FTP over SSL is enabled.');
+	}
+
+	AC_DEFINE('HAVE_FTP', 1, "Define to 1 if the PHP extension 'ftp' is available.");
+}

@@ -1,0 +1,38 @@
+--TEST--
+executing a code with -R
+--SKIPIF--
+<?php
+include "skipif.inc";
+if (substr(PHP_OS, 0, 3) == 'WIN') {
+    die ("skip not for Windows");
+}
+?>
+--FILE--
+<?php
+
+$php = getenv('TEST_PHP_EXECUTABLE_ESCAPED');
+
+$filename_txt = __DIR__."/010.test.txt";
+$filename_txt_escaped = escapeshellarg($filename_txt);
+
+$txt = '
+test
+hello
+';
+
+file_put_contents($filename_txt, $txt);
+
+var_dump(shell_exec(<<<SHELL
+cat $filename_txt_escaped | $php -n -R "var_dump(1);"
+SHELL));
+
+@unlink($filename_txt);
+
+echo "Done\n";
+?>
+--EXPECT--
+string(21) "int(1)
+int(1)
+int(1)
+"
+Done

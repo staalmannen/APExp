@@ -1,0 +1,14 @@
+Sentinel
+--------
+
+This example uses a sentinel character to handle the end of input. The program
+counts space-separated words in a null-terminated string. The sentinel is null:
+it is the last character of each input string, and it is not allowed in the
+middle of a lexeme by any of the rules (in particular, it is not included in
+character ranges where it is easy to overlook). If a null occurs in the middle
+of a string, it is a syntax error and the lexer will match default rule ``*``,
+but it won't read past the end of input or crash (use
+`-Wsentinel-in-midrule <https://re2c.org/manual/basics/warnings/warnings.html#wsentinel-in-midrule>`_
+warning and ``re2c:sentinel`` configuration to verify this). Configuration
+``re2c:yyfill:enable = 0;`` suppresses the generation of bounds checks and
+``YYFILL`` invocations.

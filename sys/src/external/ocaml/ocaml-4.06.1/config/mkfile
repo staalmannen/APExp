@@ -1,0 +1,69 @@
+</$objtype/mkfile
+
+CC=pcc
+LD=pcc
+CFLAGS=\
+	-I$objtype\
+	-D_PLAN9_SOURCE\
+	-D_BSD_EXTENSION\
+	-D_C99_SNPRINTF_EXTENSION\
+	-D_POSIX_SOURCE\
+	-DCAML_NAME_SPACE\
+	-Bc
+
+AFL_INSTRUMENT=false
+ARCH=$objtype
+ARCMD=ar
+ASM_CFI_SUPPORTED=false
+BINDIR=/$objtype/bin
+BYTERUN=/bin/ocamlrun
+CC=pcc
+CCOMPTYPE=pcc
+CC_PROFILE=-p
+OUTPUTOBJ=-o
+EXT_LIB=.a
+EXT_OBJ=.$O
+FLAMBDA=false
+HOST=plan9-$cputype
+LIBDIR=/sys/lib/ocaml
+LIBUNWIND_AVAILABLE=false
+MKEXE=$CC $CFLAGS
+MODEL=default
+OCAMLC_CFLAGS=$CFLAGS
+PROFILING=false
+PROFINFO_WIDTH=0
+FORCE_SAFE_STRING=false
+DEFAULT_SAFE_STRING=true
+WINDOWS_UNICODE=0
+RPATH=''
+MKSHAREDLIBRPATH=''
+TOOLPREF=''
+SUPPORTS_SHARED_LIBRARIES=false
+SYSTEM=unknown
+SYSTHREAD_SUPPORT=false
+TARGET=plan9-$objtype
+WITH_FRAME_POINTERS=false
+WITH_PROFINFO=false
+WITH_SPACETIME=false
+ENABLE_CALL_COUNTS=false
+FLAT_FLOAT_ARRAY=false
+ASM=''
+BYTECCLIBS=''
+EXE=''
+EXT_ASM=''
+EXT_DLL=''
+FLEXDLL_DIR=''
+FLEXLINK_FLAGS=''
+FLEXLINK_LDFLAGS=''
+LIBUNWIND_LINK_FLAGS=''
+NATIVECCLIBS=''
+OCAMLC_CPPFLAGS=''
+OCAMLOPT_CFLAGS=''
+OCAMLOPT_CPPFLAGS=''
+PACKLD=''
+RANLIBCMD=''
+MKDLL=''
+MKMAINDLL=''
+### How to build a static library
+#ml let mklib out files opts =      (* "" *)
+#ml   Printf.sprintf "ar r %s %s %s" out opts files;;

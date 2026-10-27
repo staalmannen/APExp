@@ -1,0 +1,37 @@
+<../config/mkfile
+
+OCAMLRUN=../boot/ocamlrun
+OCAMLC=$OCAMLRUN ../boot/ocamlc -nostdlib -I ../boot\
+	-use-prims ../byterun/primitives -I ..
+OCAMLLEX=$OCAMLRUN ../boot/ocamllex
+INCLUDES=\
+	-I ../utils -I ../parsing -I ../typing -I ../bytecomp -I ../asmcomp\
+	-I ../middle_end -I ../middle_end/base_types -I ../driver\
+	-I ../toplevel
+
+all:V: make_opcodes
+
+make_opcodes.ml: make_opcodes.mll
+	$OCAMLLEX make_opcodes.mll
+
+make_opcodes: make_opcodes.ml
+	$OCAMLC -o make_opcodes make_opcodes.ml
+
+ocamldep: ../compilerlibs/ocamlbytecomp.cma ocamldep.ml
+	$OCAMLC -o ocamldep $INCLUDES ../compilerlibs/ocamlbytecomp.cma ocamldep.ml
+
+ocamlmklib: ocamlmklibconfig.cmo ../utils/config.cmo ../utils/misc.cmo
+	$OCAMLC -o ocamlmklib $INCLUDES ocamlmklibconfig.cmo ../utils/config.cmo ../utils/misc.cmo ocamlmklib.ml
+
+ocamlmklibconfig.ml: ../config/mkfile
+	{
+		echo 'let bindir = "'$BINDIR"
+		echo 'let supports_shared_libraries = '$SUPPORTS_SHARED_LIBRARIES
+		echo 'let default_rpath = "'$"RPATH"
+		echo 'let mksharedlibrpath = "'$"MKSHAREDLIBRPATH"
+		echo 'let toolpref = "'$"TOOLPREF"
+		sed -n -e 's/^#ml //p' ../config/mkfile
+	} > ocamlmklibconfig.ml
+
+%.cmo: %.ml
+	$OCAMLC $OCAMLFLAGS $stem.ml

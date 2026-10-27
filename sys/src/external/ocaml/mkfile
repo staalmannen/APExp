@@ -1,0 +1,33 @@
+VERSION=4.06.1
+
+install:V: ocaml-$VERSION/ocamlc
+	cd ocaml-$VERSION
+	mk install
+
+fetch:V: ocaml-$VERSION.tgz
+
+unpack:V: ocaml-$VERSION/Makefile
+
+prepare:V: ocaml-$VERSION/mkfile
+
+all:V: ocaml-$VERSION/ocamlc
+
+cleandir:V:
+	rm -rf ocaml-$VERSION/*
+
+clean:V:
+	rm -rf ocaml-$VERSION ocaml-$VERSION.tgz pax_global_header
+
+ocaml-$VERSION.tgz:
+	hget https://github.com/ocaml/ocaml/archive/$VERSION.tar.gz > ocaml-$VERSION.tgz
+
+ocaml-$VERSION/Makefile: ocaml-$VERSION.tgz
+	tar xf ocaml-$VERSION.tgz
+
+ocaml-$VERSION/mkfile: ocaml-$VERSION/Makefile
+	dircp plan9 ocaml-$VERSION
+	touch ocaml-$VERSION/mkfile
+
+ocaml-$VERSION/ocamlc: ocaml-$VERSION/mkfile
+	cd ocaml-$VERSION
+	mk all

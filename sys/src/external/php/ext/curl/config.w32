@@ -1,0 +1,37 @@
+// vim:ft=javascript
+
+ARG_WITH("curl", "cURL support", "no");
+
+if (PHP_CURL != "no") {
+	var curl_location;
+	if ((curl_location = CHECK_LIB("libcurl_a.lib;libcurl.lib", "curl", PHP_CURL)) &&
+		CHECK_HEADER_ADD_INCLUDE("curl/easy.h", "CFLAGS_CURL") &&
+		SETUP_OPENSSL("curl", PHP_CURL) >= 2 &&
+		CHECK_LIB("winmm.lib", "curl", PHP_CURL) &&
+		CHECK_LIB("wldap32.lib", "curl", PHP_CURL) &&
+		SETUP_ZLIB_LIB("curl", PHP_CURL) &&
+		(CHECK_LIB("normaliz.lib", "curl", PHP_CURL) &&
+		 CHECK_LIB("libssh2.lib", "curl", PHP_CURL) &&
+		 CHECK_LIB("nghttp2.lib", "curl", PHP_CURL))
+		) {
+		if (!(CHECK_HEADER_ADD_INCLUDE("brotli/decode.h", "CFLAGS_CURL") &&
+			CHECK_LIB("brotlidec.lib;brotlidec-static.lib", "curl", PHP_CURL) &&
+			CHECK_LIB("brotlicommon.lib;brotlicommon-static.lib", "curl", PHP_CURL)
+		)) {
+			WARNING("brotli in curl not enabled; libraries or headers not found");
+		}
+		if (!(CHECK_LIB("libzstd.lib;libzstd_a.lib", "curl", PHP_CURL)
+		)) {
+			WARNING("zstd in curl not enabled; library not found");
+		}
+		EXTENSION("curl", "interface.c multi.c share.c curl_file.c");
+		AC_DEFINE('HAVE_CURL', 1, "Define to 1 if the PHP extension 'curl' is available.");
+		ADD_FLAG("CFLAGS_CURL", "/D PHP_CURL_EXPORTS=1");
+		if (curl_location.match(/libcurl_a\.lib$/)) {
+			ADD_FLAG("CFLAGS_CURL", "/D CURL_STATICLIB");
+		}
+		PHP_INSTALL_HEADERS("ext/curl", "php_curl.h");
+	} else {
+		WARNING("curl not enabled; libraries and headers not found");
+	}
+}
