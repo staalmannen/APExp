@@ -356,8 +356,18 @@ compiled. 386 has one now. *The other seven are left out deliberately:
 a cross build stops at the first thing missing and there will be more,
 so the next should be found by a build rather than guessed.*
 **And a recipe that runs a binary it just built cannot cross-compile** —
-`cmd/perl/mkfile:86` (`./miniperl`) and `cmd/muon/mkfile:192`
-(`./embedder`) are the two outside `mk test`.
+`cmd/perl/mkfile:86` (`./miniperl`), `cmd/muon/mkfile:192`
+(`./embedder`) and **`cmd/objc`**, whose stage 1 builds `objc1` for the
+target and whose stage 2 runs it, are the three outside `mk test`.
+**Its companion is `$objtype` where `$cputype` was meant**, which is
+the same confusion one level down: a tool that is EXECUTED takes
+`$cputype` and only the things it reads or writes take `$objtype`.
+`bash/mkfile`'s `LD` was `$objtype/bin/pcc` and answered `exec header
+invalid` — a 386 binary handed to an amd64 kernel. *`BIN=` is the
+counter-example and is right as it stands*: that is an install
+destination, not something the build runs. So is
+`cmd/pax/mkfile:189`'s `PAX_SAFE_PATH`, which is a path the finished
+binary uses **on the target**.
 ***THE FIRST CROSS BLOCKER IS FIXED AND IT WAS A TYPE TABLE.***
 `objtype=386 mk install` got past `mount-include` and stopped on
 `8c -FTVw ar.c`: `ar.c:586 bad in naddr: REGPAIR`, which is

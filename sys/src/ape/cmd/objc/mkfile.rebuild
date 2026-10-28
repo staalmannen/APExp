@@ -298,14 +298,28 @@ PLINKOBJS=postlink.$O
 # of regenerating.
 CLEANFILES=yacc.m yacc.h lex.m
 
-OBJC=$APEXPROOT/$objtype/bin/ape/sh $APEXPROOT/rc/bin/ape/objc
-OBJCBIN=$APEXPROOT/$objtype/bin/ape
+# ***$cputype FOR THE FOUR THAT ARE EXECUTED, $objtype FOR THE TWO
+# THAT ARE NOT.*** `sh', `objc1' (which OBJCBIN points the driver at),
+# `bison' and `flex' all RUN, so they live under the architecture this
+# build runs on; OBJCLIB is linked against and OBJCINC is included, so
+# those stay $objtype. On a native build every one of those strings is
+# the same and nothing could have shown the difference -- bash's `LD'
+# is where it finally did.
+#
+# **This does NOT make objc cross-compile**, and saying so here is the
+# point: stage 1 builds `objc1' FOR the target and stage 2 RUNS it, so
+# objc joins `cmd/perl/mkfile:86' (./miniperl) and
+# `cmd/muon/mkfile:192' (./embedder) on the list of recipes that run a
+# binary they just built. The variables are corrected because they
+# were wrong, not because correcting them is sufficient.
+OBJC=$APEXPROOT/$cputype/bin/ape/sh $APEXPROOT/rc/bin/ape/objc
+OBJCBIN=$APEXPROOT/$cputype/bin/ape
 OBJCLIB=$APEXPROOT/$objtype/lib/ape
 OBJCINC=$APEXPROOT/sys/include/ape
 CC=pcc
 LD=pcc
-YACC=$APEXPROOT/$objtype/bin/ape/bison
-LEX=$APEXPROOT/$objtype/bin/ape/flex
+YACC=$APEXPROOT/$cputype/bin/ape/bison
+LEX=$APEXPROOT/$cputype/bin/ape/flex
 CFLAGS=-c -DNDEBUG -D_POSIX_SOURCE
 
 # Include flags, per directory, from upstream's configure.in:498-502.
