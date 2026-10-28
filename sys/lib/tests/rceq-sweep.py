@@ -68,6 +68,31 @@ ASSIGN = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*\s*=')
 LEADING = re.compile(r"(^|[;&|{}()]|\|\||&&)\s*[A-Za-z_][A-Za-z0-9_]*\s*=")
 
 
+BACKQ = re.compile(r'`\{([^}]*)\}')
+
+
+def backquote_rc(line):
+    """The rc source inside a mk backquote, if any.
+
+    ***A RECIPE IS NOT THE ONLY PLACE mk HANDS TEXT TO rc.***  A
+    top-level assignment whose value is `` `{...} `` is rc source too,
+    evaluated when mk parses the file -- and this sweep read only
+    tab-indented recipe lines until `lib/onig/mkfile' proved that was
+    not enough:
+
+        ONIG64=`{if(~ $objtype amd64 arm64 power64) echo -DSIZEOF_VOIDP=8}
+
+    `echo' is handed a bare `=' as an ARGUMENT, rc answered
+    `/rc/lib/rcmain:24 *eval*:1: token '=': syntax error' twice, and
+    **this sweep reported 0**.  `lib/chicken/mkfile''s identical-looking
+    line is safe only because `-DC_SIXTY_FOUR -DC_LLP' contains no `='.
+    *The sweep was clean and the tree was broken*, which is the one
+    failure mode a gating sweep must not have.
+    """
+    m = BACKQ.search(line)
+    return m.group(1) if m else None
+
+
 def recipe_lines(path):
     """Yield (lineno, text) for every line rc will be handed.
 
@@ -75,6 +100,9 @@ def recipe_lines(path):
     lines of an ASSIGNMENT are also tab-indented and are not recipes --
     that distinction is what kept `mkcont-sweep' honest and it is needed
     here for the same 83-hits-of-noise reason.
+
+    PLUS the rc inside any `` `{...} `` backquote, wherever it appears:
+    see `backquote_rc' above for the line that made that necessary.
     """
     try:
         text = open(path, encoding='utf-8', errors='replace').read()
@@ -125,6 +153,19 @@ def main():
             for lineno, line in recipe_lines(path):
                 nlines += 1
                 if bare_eq(line):
+                    hits.append((rel, lineno, line.strip()))
+            # and every backquote, recipe or not
+            try:
+                src = open(path, encoding='utf-8',
+                           errors='replace').read()
+            except OSError:
+                continue
+            for lineno, line in enumerate(src.split('\n'), 1):
+                rc = backquote_rc(line)
+                if rc is None:
+                    continue
+                nlines += 1
+                if bare_eq(rc):
                     hits.append((rel, lineno, line.strip()))
 
     for rel, lineno, line in hits:

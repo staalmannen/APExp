@@ -836,6 +836,36 @@ sigillhand(int signum)
 	siglongjmp(sigill_jmpbuf, 1);
 }
 
+#if defined(APEXP_PLAN9_HOST)
+
+// APExp: no cpuid, and the answer is upstream's own.
+//
+// `__cpuid' below is GCC EXTENDED inline assembly -- output operands,
+// constraints, clobbers -- which kencc cannot parse at all.  It is the
+// same wall libressl's `crypto/arch/*/crypto_cpu_caps.c' hit, and the
+// same shape of answer: there is no cpuid here, so say so.
+//
+// ***THE VALUE IS NOT A GUESS: `plan9.c:757' IS THIS FUNCTION FOR
+// NATIVE PLAN 9 AND IT RETURNS 0***, with the comment "if we had
+// access to cpuid, could answer this question less conservatively".
+// `build.c:119' reads it to choose `GO386=sse2' or `GO386=387', so 0
+// is the conservative arm upstream already chose for this platform.
+// *Copying upstream's answer for the platform beats inventing one.*
+//
+// `cansse2' is `__cpuid''s ONLY caller, so guarding the pair together
+// keeps the extended asm out of the compiler's sight entirely rather
+// than relying on cpp to skip it -- see the note in
+// `docs/notes/ports.md' about why that distinction turned out to
+// matter here.
+
+bool
+cansse2(void)
+{
+	return 0;
+}
+
+#else
+
 static void
 __cpuid(int dst[4], int ax)
 {
@@ -864,6 +894,8 @@ cansse2(void)
 	__cpuid(info, 1);
 	return (info[3] & (1<<26)) != 0;	// SSE2
 }
+
+#endif // APEXP_PLAN9_HOST
 
 #endif // PLAN9
 #endif // __WINDOWS__
