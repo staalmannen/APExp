@@ -298,14 +298,39 @@ PLINKOBJS=postlink.$O
 # of regenerating.
 CLEANFILES=yacc.m yacc.h lex.m
 
-OBJC=$APEXPROOT/$objtype/bin/ape/sh $APEXPROOT/rc/bin/ape/objc
-OBJCBIN=$APEXPROOT/$objtype/bin/ape
+# BARE NAMES FOR THE THINGS THAT ARE RUN, A PATH ONLY WHERE ONE IS
+# ACTUALLY NEEDED.
+#
+# `sh', `bison' and `flex' all used to be spelled
+# `$APEXPROOT/$objtype/bin/ape/<name>' -- residue from early APExp,
+# when nothing stopped the HOST's copy answering first. `apexp-sh'
+# binds `$cputype/bin' and `$cputype/bin/ape' over `/bin' now, so a
+# bare name is already this tree's own, and it has no architecture in
+# it to get wrong. (`$objtype' there was a live bug and not just
+# redundant: it names binaries built FOR the target, which on a cross
+# build cannot run. bash's `LD' is where that finally surfaced, as
+# `exec header invalid'.)
+#
+# OBJCBIN is different and keeps a path: the driver reads it as a
+# DIRECTORY to find stage 1's `objc1' in, not as a command to look up.
+# It takes `$cputype' because `objc1' is EXECUTED. OBJCLIB and OBJCINC
+# keep `$objtype' and `sys/include' respectively -- linked against and
+# included, never run.
+#
+# **None of this makes objc cross-compile**, and saying so here is the
+# point: stage 1 builds `objc1' FOR the target and stage 2 RUNS it, so
+# objc joins `cmd/perl/mkfile:86' (./miniperl) and
+# `cmd/muon/mkfile:192' (./embedder) on the list of recipes that run a
+# binary they just built. These names were wrong on their own terms;
+# fixing them is not the same as making the port portable.
+OBJC=sh $APEXPROOT/rc/bin/ape/objc
+OBJCBIN=$APEXPROOT/$cputype/bin/ape
 OBJCLIB=$APEXPROOT/$objtype/lib/ape
 OBJCINC=$APEXPROOT/sys/include/ape
 CC=pcc
 LD=pcc
-YACC=$APEXPROOT/$objtype/bin/ape/bison
-LEX=$APEXPROOT/$objtype/bin/ape/flex
+YACC=bison
+LEX=flex
 CFLAGS=-c -DNDEBUG -D_POSIX_SOURCE
 
 # Include flags, per directory, from upstream's configure.in:498-502.
