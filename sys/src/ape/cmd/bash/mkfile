@@ -231,13 +231,24 @@ BI_REAL_C=bi-common.$O bi-evalfile.$O bi-evalstring.$O \
 # `$objtype' and `$cputype' are the same string, so none of the four
 # could ever have been shown by the build that was being run.
 #
-# The leading assignment is legal rc: an assignment IN FRONT of a
-# command is local to it, which is the same form as the
-# `objtype=386 mk install' that found this. (An assignment used as an
-# ARGUMENT -- `mk objtype=$objtype install' -- is the parse error
-# `rceq-sweep.py' gates on. The two look alike and only one works.)
+# `hostcc' IS THE RULE, and it is `rc/bin/ape/hostcc': one line of rc
+# that sets `objtype=$cputype' and execs `pcc'. Use it for any program
+# this build RUNS rather than ships; everything else stays on `$CC'.
+#
+# It is a command and not a `HOSTCC=objtype=$cputype pcc' variable for
+# two reasons, both about the `=': a variable holding an assignment is
+# invisible to `rceq-sweep.py', which reads the mkfile TEXT and not
+# what mk expands it to; and an assignment is legal only LEADING, so
+# such a variable used anywhere but the start of a recipe line is a
+# parse error in a mkfile that looks fine. A command name has neither
+# problem.
+#
+# `mount-include' had to change with it: during a cross build nothing
+# put APExp's HOST headers where a host compile looks, so `hostcc'
+# would have read stock 9front's APE -- silently. It now binds
+# `$cputype/include/ape' and `$cputype/lib/ape' when the two differ.
 $MKBUILTINS: $BASHSRC/builtins/mkbuiltins.c
-	objtype=$cputype pcc -I$BASHSRC -I$BASHSRC/include -o $target $prereq
+	hostcc -I$BASHSRC -I$BASHSRC/include -o $target $prereq
 
 # Every file produced by the mkbuiltins invocation below — the extern
 # header, the dispatch struct file, and one .c per .def. All are

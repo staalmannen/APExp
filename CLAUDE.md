@@ -275,6 +275,13 @@ standalone, plus a TOGETHER case for collisions only a combination can
 show), `rceq-sweep.py` (**gates**: a bare `=` in an mkfile recipe cannot
 parse), `mkcont-sweep.py` (**gates**: a comment ending a continuation),
 `ishadow-sweep.py` (does NOT gate — most hits are deliberate),
+`hosthelper-sweep.py` (**does NOT gate, on purpose**: which mkfile
+recipes run a binary the same mkfile builds, and whether it was built
+with `hostcc`. A `no` is a QUESTION — a build-time helper should use
+`hostcc`, a bootstrap stage cannot — so a gate would demand a change
+that must not be made. Its first run **missed its own positive
+control**, because it expanded `NAME=./thing` in recipes and not in
+targets, and bash's rule is `$MKBUILTINS:`),
 `bfmove-sweep.py` (which bit-field groups the sharing rule moves; a
 LOWER bound, with an UNKNOWN column it reports rather than counts).
 
@@ -366,11 +373,21 @@ binary it runs *is* the product being built: `cmd/perl/mkfile:86`
 whose stage 1 builds `objc1` for the target and whose stage 2 runs it.
 Those three are the real list; `mkbuiltins` was a fourth and is fixed.
 *Ask which kind it is before deciding the port cannot cross-compile.*
-**The leading assignment is legal rc** — `objtype=$cputype pcc …`, the
-same form as the `objtype=386 mk install` that finds these — while an
-assignment used as an ARGUMENT (`mk objtype=$objtype install`) is the
-parse error `rceq-sweep.py` gates on. *The two look alike and only one
-works.*
+**THE RULE IS `hostcc`**, `rc/bin/ape/hostcc`: one line of rc that
+sets `objtype=$cputype` and execs `pcc`. Use it for anything the build
+RUNS rather than ships. It is a command and not a
+`HOSTCC=objtype=$cputype pcc` variable for two reasons, both about the
+`=`: **a variable holding an assignment is invisible to
+`rceq-sweep.py`**, which reads the mkfile TEXT and not what mk expands
+it to; and an assignment is legal only LEADING, so such a variable
+used anywhere but the start of a recipe line is a parse error in a
+mkfile that reads fine. `hosthelper-sweep.py` reports who uses it.
+**`mount-include` had to change with it**: every bind there is for
+`$objtype`, including one over `/sys/include/ape`, so a host compile
+during a cross build would have read **stock 9front's APE** — or the
+target's `stddef_arch.h` — and said nothing. It now also binds
+`$cputype/include/ape` and `$cputype/lib/ape` when the two differ, and
+the header-order invariant is what makes that enough.
 **Its companion is `$objtype` where `$cputype` was meant**, which is
 the same confusion one level down: a tool that is EXECUTED takes
 `$cputype` and only the things it reads or writes take `$objtype`.
