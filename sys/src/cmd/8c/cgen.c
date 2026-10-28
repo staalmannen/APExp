@@ -81,6 +81,24 @@ cgen(Node *n, Node *nn)
 	switch(o) {
 	default:
 		diag(n, "unknown op in cgen: %O", o);
+		/*
+		 * Same idiom, and for the same reason, as `prtree(n,
+		 * "naddr")' in `txt.c': the message names the VICTIM and
+		 * the tree names the cause.  `unknown op in cgen: CONST'
+		 * from chicken's `runtime.c' is a whole afternoon of
+		 * reading that one printed tree would have answered,
+		 * because an OCONST is supposed to be handled by the
+		 * `addable >= INDEXED' arm above and the interesting
+		 * question is why this one was not addable.
+		 *
+		 * Unconditional, not behind a debug letter, for the two
+		 * reasons set out at length beside the `naddr' one: this
+		 * arm only runs once the compile has already failed, so
+		 * there is nothing to spam and nothing downstream to
+		 * disturb -- and a new debug letter is the trap
+		 * `ARGBEGIN's default arm has already sprung here once.
+		 */
+		prtree(n, "cgen");
 		break;
 
 	case ONEG:
