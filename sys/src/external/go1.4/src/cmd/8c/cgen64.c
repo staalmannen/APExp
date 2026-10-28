@@ -440,13 +440,13 @@ enum
 /*
  * _testv:
  * 	CMPL	lo,$0
- * 	JNE	true
+ * 	JNE	istrue
  * 	CMPL	hi,$0
- * 	JNE	true
+ * 	JNE	istrue
  * 	GOTO	false
  * false:
  * 	GOTO	code
- * true:
+ * istrue:
  * 	GOTO	patchme
  * code:
  */
@@ -1216,7 +1216,7 @@ static uchar	HSargs[]	= { OHI, OHS };
 
 /* Big Generator */
 static void
-biggen(Node *l, Node *r, Node *t, int true, uchar code[][VLEN], uchar *a)
+biggen(Node *l, Node *r, Node *t, int istrue, uchar code[][VLEN], uchar *a)
 {
 	int i, j, g, oc, op, lo, ro, to, xo, *xp;
 	Type *lt;
@@ -1461,11 +1461,11 @@ biggen(Node *l, Node *r, Node *t, int true, uchar code[][VLEN], uchar *a)
 				break;
 
 			case VT:
-				g = true;
+				g = istrue;
 				i++;
 				break;
 			case VF:
-				g = !true;
+				g = !istrue;
 				i++;
 				break;
 
@@ -1593,7 +1593,7 @@ cgen64(Node *n, Node *nn)
 {
 	Type *dt;
 	uchar *args, (*cp)[VLEN], (**optab)[VLEN];
-	int li, ri, lri, dr, si, m, op, sh, cmp, true;
+	int li, ri, lri, dr, si, m, op, sh, cmp, istrue;
 	Node *c, *d, *l, *r, *t, *s, nod1, nod2, nod3, nod4, nod5;
 
 	if(debug['g']) {
@@ -2115,40 +2115,40 @@ twoop:
 			break;
 		}
 
-		true = 1;
+		istrue = 1;
 		optab = cmptab;
 		switch(op) {
 		case OEQ:
 			optab = NEtab;
-			true = 0;
+			istrue = 0;
 			break;
 		case ONE:
 			optab = NEtab;
 			break;
 		case OLE:
 			args = GTargs;
-			true = 0;
+			istrue = 0;
 			break;
 		case OGT:
 			args = GTargs;
 			break;
 		case OLS:
 			args = HIargs;
-			true = 0;
+			istrue = 0;
 			break;
 		case OHI:
 			args = HIargs;
 			break;
 		case OLT:
 			args = GEargs;
-			true = 0;
+			istrue = 0;
 			break;
 		case OGE:
 			args = GEargs;
 			break;
 		case OLO:
 			args = HSargs;
-			true = 0;
+			istrue = 0;
 			break;
 		case OHS:
 			args = HSargs;
@@ -2160,7 +2160,7 @@ twoop:
 
 		switch(lri) {
 		case IMM(0, 0):
-			biggen(l, r, Z, true, optab[T0i], args);
+			biggen(l, r, Z, istrue, optab[T0i], args);
 			break;
 		case IMM(0, 1):
 		case IMM(1, 0):
@@ -2169,14 +2169,14 @@ twoop:
 				diag(l, "bad whatof\n");
 				break;
 			case WCONST:
-				biggen(l, r, Z, true, optab[T0i], args);
+				biggen(l, r, Z, istrue, optab[T0i], args);
 				break;
 			case WHARD:
 				reglcgen(&nod2, r, Z);
 				r = &nod2;
 				/* fall thru */
 			case WADDR:
-				biggen(l, r, Z, true, optab[T0i], args);
+				biggen(l, r, Z, istrue, optab[T0i], args);
 				if(ri == WHARD)
 					regfree(r);
 				break;
@@ -2191,7 +2191,7 @@ twoop:
 				reglcgen(&nod2, r, Z);
 				r = &nod2;
 			}
-			biggen(l, r, Z, true, optab[Tii], args);
+			biggen(l, r, Z, istrue, optab[Tii], args);
 			if(li == WHARD)
 				regfree(l);
 			if(ri == WHARD)
@@ -2624,7 +2624,7 @@ finished:
 }
 
 void
-testv(Node *n, int true)
+testv(Node *n, int istrue)
 {
 	Type *t;
 	Node *nn, nod;
@@ -2632,7 +2632,7 @@ testv(Node *n, int true)
 	switch(n->op) {
 	case OINDREG:
 	case ONAME:
-		biggen(n, Z, Z, true, testi, nil);
+		biggen(n, Z, Z, istrue, testi, nil);
 		break;
 
 	default:
@@ -2643,14 +2643,14 @@ testv(Node *n, int true)
 			reglcgen(&nod, n, Z);
 			n->type = t;
 			n = &nod;
-			biggen(n, Z, Z, true, testi, nil);
+			biggen(n, Z, Z, istrue, testi, nil);
 			if(n == &nod)
 				regfree(n);
 		}
 		else {
 			nn = regpair(Z, n);
 			sugen(n, nn, 8);
-			biggen(nn, Z, Z, true, testi, nil);
+			biggen(nn, Z, Z, istrue, testi, nil);
 			freepair(nn);
 		}
 	}

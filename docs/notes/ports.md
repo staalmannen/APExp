@@ -1899,6 +1899,50 @@ this is the whole record, including the wrong turns.*
   reached) -- *and the likeliest outcome by this port's own history is
   a FIFTH wall one file further in, which would be progress rather
   than refutation.* Still out of the default build.
+  ***AND IT WAS A FIFTH, A SIXTH AND A SEVENTH, each one file further
+  in, exactly as predicted.*** `mkdtemp(/var/tmp/...)` (Plan 9 has
+  `/tmp` and no `/var`, and `plan9.c:486` already said so); then a
+  GOROOT that was RELATIVE, which survived `cd $GOSRC/src` only
+  because `cmd/go` and `go1.4/src` both sit five levels below the root
+  and broke at `src/lib9`, six levels down, reporting a `missing file`
+  whose path carried `sys/` twice; and now **stage 2**, where dist
+  drives NATIVE `6c` over `cmd/gc` and answers
+  `go.h:1093 syntax error, last name: true`.
+  **`go.h:1093` is `void complexbool(..., int true, ...)` -- a
+  PARAMETER NAMED `true`**, which was ordinary C in 2014 and is a C23
+  keyword in APExp's kencc. *This is the FIRST wall all over again*
+  (`dist`'s own `a.h` had `typedef int bool`), and it is the same
+  shape as the `true` -> `cond` rename this tree already carries in its
+  OWN `8c`, `kc` and `vc`.
+  **130 occurrences across 11 files**, and they are nearly all
+  `cgen.c`: go1.4 ships its own forks of the Plan 9 compilers, so this
+  is our rename applied to a vendored copy of the same code.
+  ***THE OBVIOUS NAME WAS THE WRONG ONE, AND THE COUNT SAID SO.***
+  Renaming to `cond` -- for consistency with our own tree -- made the
+  per-file count RISE in three files (6c/cgen.c 19->21, 8c/cgen.c
+  20->21, 8c/cgen64.c 21->23), because **`cond` is already a FUNCTION
+  there** (`6c/cgen.c:2025`, `8c/cgen64.c:246`) called from those same
+  files. A parameter named `cond` shadows it. *A rename that changes
+  the occurrence count has merged two names*, which is the cheapest
+  possible check and it fired before anything was committed.
+  `istrue` is the name: zero occurrences anywhere in go's C sources
+  beforehand, and every per-file count after the rename is identical
+  to the count of `true` before it, with all three `cond()` functions
+  intact.
+  **THE DESIGN QUESTION UNDERNEATH IS BIGGER THAN go**, and is
+  recorded rather than acted on: *kencc installs `true` and `false`
+  into the keyword table unconditionally* (`cc/lex.c:1770`, in
+  `lexinit`, with no flag), so **every pre-C23 codebase that uses
+  either as an identifier breaks**, and that is a direct cost against
+  this tree's stated goal of building UNIX C with minimal
+  modification. go is the first large port to meet it and will not be
+  the last. A `-std`-like switch suppressing the two keywords would be
+  about five lines in `cc/lex.c` and would replace 130 edits in
+  vendored code with one flag -- *but it cannot be tested on the build
+  host, and `dist` emits the `6c` command line itself, so go would
+  need patching either way.* Taken as a rename now, loudly, so the
+  flag can be decided deliberately instead of under a build failure.
+  Still out of the default build.
   **A go1.4 patch from the 9fans list was offered and the answer is NOT
   YET, for two independent reasons.** It rewrites
   `src/syscall/exec_plan9.go`: `forkAndExecInChild` stops taking a

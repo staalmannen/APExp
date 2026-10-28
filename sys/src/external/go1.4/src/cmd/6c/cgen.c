@@ -1238,17 +1238,17 @@ lcgen(Node *n, Node *nn)
 }
 
 void
-bcgen(Node *n, int true)
+bcgen(Node *n, int istrue)
 {
 
 	if(n->type == T)
 		gbranch(OGOTO);
 	else
-		boolgen(n, true, Z);
+		boolgen(n, istrue, Z);
 }
 
 void
-boolgen(Node *n, int true, Node *nn)
+boolgen(Node *n, int istrue, Node *nn)
 {
 	int o;
 	Prog *p1, *p2, *p3;
@@ -1256,7 +1256,7 @@ boolgen(Node *n, int true, Node *nn)
 	int32 curs;
 
 	if(debug['g']) {
-		print("boolgen %d\n", true);
+		print("boolgen %d\n", istrue);
 		prtree(nn, "boolgen lhs");
 		prtree(n, "boolgen");
 	}
@@ -1267,7 +1267,7 @@ boolgen(Node *n, int true, Node *nn)
 
 	default:
 		o = ONE;
-		if(true)
+		if(istrue)
 			o = OEQ;
 		/* bad, 13 is address of external that becomes constant */
 		if(n->addable >= INDEXED && n->addable != 13) {
@@ -1294,7 +1294,7 @@ boolgen(Node *n, int true, Node *nn)
 
 	case OCONST:
 		o = vconst(n);
-		if(!true)
+		if(!istrue)
 			o = !o;
 		gbranch(OGOTO);
 		if(o) {
@@ -1306,22 +1306,22 @@ boolgen(Node *n, int true, Node *nn)
 
 	case OCOMMA:
 		cgen(l, Z);
-		boolgen(r, true, nn);
+		boolgen(r, istrue, nn);
 		break;
 
 	case ONOT:
-		boolgen(l, !true, nn);
+		boolgen(l, !istrue, nn);
 		break;
 
 	case OCOND:
 		bcgen(l, 1);
 		p1 = p;
-		bcgen(r->left, true);
+		bcgen(r->left, istrue);
 		p2 = p;
 		gbranch(OGOTO);
 		patch(p1, pc);
 		p1 = p;
-		bcgen(r->right, !true);
+		bcgen(r->right, !istrue);
 		patch(p2, pc);
 		p2 = p;
 		gbranch(OGOTO);
@@ -1330,13 +1330,13 @@ boolgen(Node *n, int true, Node *nn)
 		goto com;
 
 	case OANDAND:
-		if(!true)
+		if(!istrue)
 			goto caseor;
 
 	caseand:
-		bcgen(l, true);
+		bcgen(l, istrue);
 		p1 = p;
-		bcgen(r, !true);
+		bcgen(r, !istrue);
 		p2 = p;
 		patch(p1, pc);
 		gbranch(OGOTO);
@@ -1344,13 +1344,13 @@ boolgen(Node *n, int true, Node *nn)
 		goto com;
 
 	case OOROR:
-		if(!true)
+		if(!istrue)
 			goto caseand;
 
 	caseor:
-		bcgen(l, !true);
+		bcgen(l, !istrue);
 		p1 = p;
-		bcgen(r, !true);
+		bcgen(r, !istrue);
 		p2 = p;
 		gbranch(OGOTO);
 		patch(p1, pc);
@@ -1368,7 +1368,7 @@ boolgen(Node *n, int true, Node *nn)
 	case OLO:
 	case OLS:
 		o = n->op;
-		if(true && typefd[l->type->etype] && (o == OEQ || o == ONE)) {
+		if(istrue && typefd[l->type->etype] && (o == OEQ || o == ONE)) {
 			// Cannot rewrite !(l == r) into l != r with float64; it breaks NaNs.
 			// Jump around instead.
 			boolgen(n, 0, Z);
@@ -1377,7 +1377,7 @@ boolgen(Node *n, int true, Node *nn)
 			patch(p1, pc);
 			goto com;
 		}
-		if(true)
+		if(istrue)
 			o = comrel[relindex(o)];
 		if(l->complex >= FNX && r->complex >= FNX) {
 			regret(&nod, r, 0, 0);
@@ -1387,7 +1387,7 @@ boolgen(Node *n, int true, Node *nn)
 			regfree(&nod);
 			nod = *n;
 			nod.right = &nod1;
-			boolgen(&nod, true, nn);
+			boolgen(&nod, istrue, nn);
 			break;
 		}
 		if(immconst(l)) {

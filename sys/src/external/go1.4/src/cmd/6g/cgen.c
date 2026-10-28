@@ -1021,10 +1021,10 @@ igen(Node *n, Node *a, Node *res)
 
 /*
  * generate:
- *	if(n == true) goto to;
+ *	if(n == istrue) goto to;
  */
 void
-bgen(Node *n, int true, int likely, Prog *to)
+bgen(Node *n, int istrue, int likely, Prog *to)
 {
 	int et, a;
 	Node *nl, *nr, *l, *r;
@@ -1070,7 +1070,7 @@ bgen(Node *n, int true, int likely, Prog *to)
 		nodconst(&n2, n->type, 0);
 		gins(optoas(OCMP, n->type), &n1, &n2);
 		a = AJNE;
-		if(!true)
+		if(!istrue)
 			a = AJEQ;
 		patch(gbranch(a, n->type, likely), to);
 		regfree(&n1);
@@ -1078,7 +1078,7 @@ bgen(Node *n, int true, int likely, Prog *to)
 
 	case OLITERAL:
 		// need to ask if it is bool?
-		if(!true == !n->val.u.bval)
+		if(!istrue == !n->val.u.bval)
 			patch(gbranch(AJMP, T, likely), to);
 		goto ret;
 
@@ -1088,33 +1088,33 @@ bgen(Node *n, int true, int likely, Prog *to)
 		nodconst(&n1, n->type, 0);
 		gins(optoas(OCMP, n->type), n, &n1);
 		a = AJNE;
-		if(!true)
+		if(!istrue)
 			a = AJEQ;
 		patch(gbranch(a, n->type, likely), to);
 		goto ret;
 
 	case OANDAND:
-		if(!true)
+		if(!istrue)
 			goto caseor;
 
 	caseand:
 		p1 = gbranch(AJMP, T, 0);
 		p2 = gbranch(AJMP, T, 0);
 		patch(p1, pc);
-		bgen(n->left, !true, -likely, p2);
-		bgen(n->right, !true, -likely, p2);
+		bgen(n->left, !istrue, -likely, p2);
+		bgen(n->right, !istrue, -likely, p2);
 		p1 = gbranch(AJMP, T, 0);
 		patch(p1, to);
 		patch(p2, pc);
 		goto ret;
 
 	case OOROR:
-		if(!true)
+		if(!istrue)
 			goto caseand;
 
 	caseor:
-		bgen(n->left, true, likely, to);
-		bgen(n->right, true, likely, to);
+		bgen(n->left, istrue, likely, to);
+		bgen(n->right, istrue, likely, to);
 		goto ret;
 
 	case OEQ:
@@ -1137,7 +1137,7 @@ bgen(Node *n, int true, int likely, Prog *to)
 	switch(n->op) {
 
 	case ONOT:
-		bgen(nl, !true, likely, to);
+		bgen(nl, !istrue, likely, to);
 		goto ret;
 
 	case OEQ:
@@ -1147,7 +1147,7 @@ bgen(Node *n, int true, int likely, Prog *to)
 	case OLE:
 	case OGE:
 		a = n->op;
-		if(!true) {
+		if(!istrue) {
 			if(isfloat[nr->type->etype]) {
 				// brcom is not valid on floats when NaN is involved.
 				p1 = gbranch(AJMP, T, 0);
@@ -1162,7 +1162,7 @@ bgen(Node *n, int true, int likely, Prog *to)
 				goto ret;
 			}				
 			a = brcom(a);
-			true = !true;
+			istrue = !istrue;
 		}
 
 		// make simplest on right
@@ -1206,7 +1206,7 @@ bgen(Node *n, int true, int likely, Prog *to)
 			break;
 		}
 		if(iscomplex[nl->type->etype]) {
-			complexbool(a, nl, nr, true, likely, to);
+			complexbool(a, nl, nr, istrue, likely, to);
 			break;
 		}
 
