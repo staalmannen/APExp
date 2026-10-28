@@ -260,3 +260,15 @@ tkImgPhInstance.$O: $TKSRC/generic/tkImgPhInstance.c
 clean:V:
 	rm -f $LIB
 	rm -f *.$O
+
+# tkConfig.sh -- the Tk half of what a TEA configure reads.  See
+# ../tcl/mkfile for the idiom and the proto for the reasoning.
+TKCONFIG=$APEXPROOT/$objtype/lib/ape/tkConfig.sh
+
+install:V: $TKCONFIG
+
+$TKCONFIG: tkConfig.sh.proto
+	root=`{cd $APEXPROOT && pwd}
+	sed 's|@ROOT@|'^$root^'|g; s|@OBJTYPE@|'^$objtype^'|g; s|@TKVER@|9.0|g; s|@TKMAJOR@|9|g; s|@TKMINOR@|0|g; s|@TKPATCH@|9.0.3|g' tkConfig.sh.proto >$target
+
+CLEANFILES=$CLEANFILES $TKCONFIG

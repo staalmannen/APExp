@@ -1863,8 +1863,72 @@ this is the whole record, including the wrong turns.*
   **Building under `sys/src/cmd` with native `6c` is the other option
   and buys nothing**: it would make stage 1 compile, and dist's whole
   job is to drive stage 2, which is a separate question from where
-  dist itself lives. **NOT STARTED, and out of the default build for
-  0.6.**
+  dist itself lives.
+  ***THE FOURTH WALL IS NOW ADDRESSED, AND IT WAS THE TWO EDITS THE
+  ANALYSIS ABOVE PREDICTED.*** `-DPLAN9` is `-DAPEXP_PLAN9_HOST` in
+  `mkfile.bootstrap`, and `unix.c`'s `#elif` chain has one new arm
+  setting `gohostos = "plan9"`. **Two macros, one question each**: the
+  compile-time one picks which portability file is real, the run-time
+  string says which OS dist is building FOR -- and `build.c`'s seven
+  `"plan9"` comparisons, including the `-DPLAN9` it emits for the
+  stage-2 toolchain, go on working because that flag is correct there.
+  *The Go runtime's C really is native; dist's is not.*
+  **All three compile-time `PLAN9` uses wanted it undefined**, which is
+  why renaming is safe rather than merely convenient: `plan9.c:10`
+  compiles its 764 lines of `<u.h>` under it, `unix.c:11` switches the
+  POSIX file off under it, and **`a.h:37` suppresses `USED` because
+  native `<libc.h>` already has one** -- under APE none of those is
+  true, and the third is a thing we now gain rather than lose.
+  **The arm is at the HEAD of the chain rather than beside `__sun`**:
+  it is declared by our build, not sniffed from the host, so it should
+  win over any compiler macro that happens to be set.
+  ***MEASURED ON THE HOST, with a control***: `gcc -fsyntax-only` is
+  clean both with and without the macro, and `gcc -E` finds
+  `gohostos = "plan9"` **once** with it and **zero** times without --
+  so the arm is SELECTED and not merely parsed. *(`-DHAVE_C_BOOL` has
+  to come off for the gcc check: it suppresses dist's own
+  `typedef int bool;`, which kencc needs because `bool` is a keyword
+  there and this gcc does not. Identical failure with and without the
+  change, so it is orthogonal -- but a first run that left it on would
+  have reported a wall that is not one.)*
+  **What is NOT measured is a build.** The prediction for the next VM
+  run: `plan9.c` compiles to nothing, `unix.c` compiles, dist links,
+  and it no longer says `unknown operating system`. **Refuted if** it
+  still stops in `plan9.c` (the flag did not reach every compile), or
+  dist calls `fatal("unknown operating system")` (the arm is not
+  reached) -- *and the likeliest outcome by this port's own history is
+  a FIFTH wall one file further in, which would be progress rather
+  than refutation.* Still out of the default build.
+  **A go1.4 patch from the 9fans list was offered and the answer is NOT
+  YET, for two independent reasons.** It rewrites
+  `src/syscall/exec_plan9.go`: `forkAndExecInChild` stops taking a
+  precomputed `fdsToClose` (built by an `init()` that snapshots `#d`
+  into `startupFds`) and instead walks `#d` **in the child, after the
+  fork**, with bounds-checked 9P directory parsing (`gdirname`,
+  `gstringb`) in `//go:nosplit` code. *That is a real fix* -- an
+  init-time snapshot is stale for anything opened later, and the old
+  parse did arithmetic on a length it had not range-checked.
+  **But it is GO source, and our blocker is C.** `cmd/dist` is stage 1;
+  `src/syscall/` is the standard library the stage-2 toolchain
+  compiles. Nothing in this patch can affect `plan9.c` or `unix.c`.
+  **And it does not apply**: `git apply --check` fails at
+  `exec_plan9.go:215`, because the patch's base has
+  `r1, _, _ = RawSyscall(SYS_CLOSE, ...)` with an `if int32(r1) == -1`
+  check and **our vendored copy has a bare `RawSyscall(SYS_CLOSE, ...)`
+  with no check at all**. `git log` on that file shows only the import,
+  so *the divergence is VINTAGE rather than ours* -- our go1.4 predates
+  the patch's base.
+  **So: take it when go builds, port it by hand rather than by
+  `apply`, and judge nothing about a built go until it is in** -- the
+  bootstrap toolchain itself runs subprocesses, so this is a path it
+  exercises rather than a corner.
+  ***AND THE FIRST CHECK OF THAT SAID THE OPPOSITE.*** The shell line
+  was `git apply --check ... | head -5 && echo "APPLIES CLEANLY"`, and
+  `head` exits 0 whatever the check did, so it printed APPLIES CLEANLY
+  under the words `patch does not apply`. *A check that passes for the
+  wrong reason*, in the instrument rather than in the tree, which is
+  the rule this file already carries -- and the only reason it was
+  caught is that the real message was on screen beside the false one.
 
 **Ports built but never exercised**, which is a different and cheaper
 item -- *a port that builds and has never run is not a port*:

@@ -667,7 +667,33 @@ main(int argc, char **argv)
 	
 	slash = "/";
 
-#if defined(__APPLE__)
+#if defined(APEXP_PLAN9_HOST)
+	// APExp: Plan 9 through the APE POSIX layer.
+	//
+	// ***THE MACRO IS NOT `PLAN9' AND THAT IS THE WHOLE POINT.***
+	// `PLAN9' in this program asks a COMPILE-TIME question -- "is this
+	// native Plan 9 C?" -- and it has exactly three uses, all of them
+	// that question: `plan9.c:10' compiles its 764 lines of <u.h> and
+	// <libc.h> under it, `unix.c:11' switches THIS file off under it,
+	// and `a.h:37' suppresses `USED' because native <libc.h> already
+	// has one.  Under APE every one of those answers is NO: there is
+	// no <u.h>, this file is the right one, and nothing else defines
+	// `USED'.
+	//
+	// But `gohostos' answers a RUN-TIME question -- "which operating
+	// system is dist building for?" -- and there the answer IS plan9,
+	// in seven places in `build.c', including the one that emits
+	// `-DPLAN9' for the stage-2 toolchain, where it is correct because
+	// the Go runtime's C really is native.
+	//
+	// *The port had those two claims on one flag*, which is why
+	// dropping `-DPLAN9' was never free and why adding it was never
+	// right: with it, `plan9.c' compiles under a compiler with no
+	// <libc.h>; without it, dist builds but thinks it is on an unknown
+	// operating system and calls `fatal' below.  Two macros, one
+	// question each.
+	gohostos = "plan9";
+#elif defined(__APPLE__)
 	gohostos = "darwin";
 	// Even on 64-bit platform, darwin uname -m prints i386.
 	run(&b, nil, 0, "sysctl", "machdep.cpu.extfeatures", nil);

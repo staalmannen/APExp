@@ -123,3 +123,22 @@ CFLAGS=-c -I. -I$TCLSRC/generic -I$TCLSRC/unix -I$TCLSRC/minizip\
 clean:V:
 	rm -f $LIB
 	rm -f *.$O
+
+# tclConfig.sh -- what a TEA configure reads to find Tcl.
+#
+# `install:V:' costs one line because in Plan 9 mk EVERY `V:' rule for a
+# target runs, so this does not displace mksyslib's own `install:V: $LIB'.
+# That is the same idiom the tcltest note in CLAUDE.md records.
+#
+# Generated, never hand-maintained: see the long comment in the proto
+# for why, and for the Linux-flavoured tclConfig.sh already sitting in
+# `external/tcl/unix' that a configure would otherwise find first.
+TCLCONFIG=$APEXPROOT/$objtype/lib/ape/tclConfig.sh
+
+install:V: $TCLCONFIG
+
+$TCLCONFIG: tclConfig.sh.proto
+	root=`{cd $APEXPROOT && pwd}
+	sed 's|@ROOT@|'^$root^'|g; s|@OBJTYPE@|'^$objtype^'|g; s|@TCLVER@|9.0|g; s|@TCLMAJOR@|9|g; s|@TCLMINOR@|0|g; s|@TCLPATCH@|.3|g' tclConfig.sh.proto >$target
+
+CLEANFILES=$CLEANFILES $TCLCONFIG

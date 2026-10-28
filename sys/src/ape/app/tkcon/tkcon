@@ -1,0 +1,8 @@
+#!/bin/rc
+# tkcon -- launch the Tk console.
+#
+# `wish tkcon.tcl' works from the source directory and is how this was
+# first run.  This exists so it also works from anywhere, against the
+# INSTALLED copy, which is the thing `package require tkcon' would
+# load.  Installed by ../mkfile into /sys/lib/tcl/tkcon<version>.
+exec wish /sys/lib/tcl/tkcon2.8.1/tkcon.tcl $*
