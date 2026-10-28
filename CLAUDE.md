@@ -363,16 +363,21 @@ compiled. 386 has one now. *The other seven are left out deliberately:
 a cross build stops at the first thing missing and there will be more,
 so the next should be found by a build rather than guessed.*
 **And a recipe that runs a binary it just built cannot cross-compile**
-— but **there are two kinds and only one of them is hard.**
-*A BUILD-TIME HELPER can simply be built for the host*: bash's
-`mkbuiltins` reads `.def` files and writes `.c` files, nothing of it
-ends up in the product, and `objtype=$cputype pcc` in front of its one
-compile is the whole fix. **A BOOTSTRAP STAGE cannot**, because the
-binary it runs *is* the product being built: `cmd/perl/mkfile:86`
-(`./miniperl`), `cmd/muon/mkfile:192` (`./embedder`) and `cmd/objc`,
-whose stage 1 builds `objc1` for the target and whose stage 2 runs it.
-Those three are the real list; `mkbuiltins` was a fourth and is fixed.
-*Ask which kind it is before deciding the port cannot cross-compile.*
+— but **every such tool in this tree emits architecture-independent
+text, so the question is COST and not possibility.** `mkbuiltins`
+writes `.c` from `.def`; `embedder` prints a C header from `.meson`
+scripts; `objc1` writes the C that `$thecc` then compiles; `miniperl`
+writes `perlmain.c`. All four could run on the host. What differs:
+*`mkbuiltins` and `embedder` are SINGLE-FILE tools* — one `hostcc` and
+they are done, and both are. *`miniperl` and `objc1` ARE the port* —
+host-building them means building libperl, or objc's runtime, a second
+time, which is real work rather than one line.
+**This file twice said a "bootstrap stage" CANNOT be host-built
+because the binary it runs is the product. That is wrong**, and it is
+what kept `embedder` in the wrong group for a round: *it was
+classified from its position in a list instead of from reading
+`tools/embedder.c`.* **Open the tool before deciding which kind it
+is.**
 **THE RULE IS `hostcc`**, `rc/bin/ape/hostcc`: one line of rc that
 sets `objtype=$cputype` and execs `pcc`. Use it for anything the build
 RUNS rather than ships. It is a command and not a

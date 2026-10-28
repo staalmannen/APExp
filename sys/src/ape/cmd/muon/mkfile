@@ -185,8 +185,21 @@ EMBED_SCRIPT_FILES=\
 	$MUSRC/src/script/python/python_info.py\
 	$MUSRC/src/script/runtime/dependencies.meson
 
+# `hostcc', because the recipe below RUNS this. `embedder' reads the
+# .meson scripts and PRINTS a C header on stdout -- `{ .name = "...",
+# .src = (char []){ 1, 2, 3 ... } }' -- so its output is
+# architecture-independent text and nothing of the tool itself ends up
+# in muon. **A build-time helper, not a bootstrap stage**, and the
+# difference is what makes `hostcc' the whole fix rather than a start.
+#
+# *These notes called it a bootstrap stage and that was wrong*: the
+# claim was that the binary being run IS the product, and `embedder'
+# lives in muon's `tools/' and is not muon. `./miniperl' and `objc1'
+# are the real ones. **Reading `tools/embedder.c' is what settled it**
+# -- it was classified from its position in a list, not from what it
+# does.
 embedder: $MUSRC/tools/embedder.c
-	$CC -I$MUSRC/include -o $target $MUSRC/tools/embedder.c
+	hostcc -I$MUSRC/include -o $target $MUSRC/tools/embedder.c
 
 embedded_files.h: embedder $EMBED_SCRIPT_FILES
 	./embedder \

@@ -6,21 +6,30 @@
 #   python3 sys/lib/tests/hosthelper-sweep.py
 #
 # IT DOES NOT GATE, and the reason is the whole point of the sweep:
-# **two different things look identical here and only one is fixable.**
+# **two different things look identical here and they cost wildly
+# different amounts to fix.**
 #
-#   * A BUILD-TIME HELPER produces source and ships nothing.  bash's
-#     `mkbuiltins' reads the .def files and writes .c files.  Built with
-#     a bare `pcc' it comes out for `$objtype', and the next recipe
-#     answers `exec header invalid'.  `rc/bin/ape/hostcc' is the fix and
-#     it is one line.
-#   * A BOOTSTRAP STAGE runs the product itself.  `miniperl' IS perl,
-#     `objc1' IS objc, muon's `embedder' is muon's.  Building those for
-#     the host means building the port twice, which is a different and
-#     much larger piece of work -- `hostcc' is the WRONG answer for
-#     them, so a gate here would demand a change that must not be made.
+#   * A SINGLE-FILE HELPER.  bash's `mkbuiltins' reads the .def files
+#     and writes .c files; muon's `embedder' reads .meson scripts and
+#     prints a C header.  Built with a bare `pcc' each comes out for
+#     `$objtype' and the next recipe answers `exec header invalid'.
+#     `rc/bin/ape/hostcc' is the fix and it is one word.
+#   * A HELPER THAT IS THE PORT.  `miniperl' writes `perlmain.c' and
+#     `objc1' writes the C that `$thecc' then compiles, so **their
+#     output is architecture-independent too** and `hostcc' is the
+#     right SHAPE -- but building them for the host means building
+#     libperl, or objc's runtime, a second time.  Real work, not one
+#     line.
 #
-# So this reports.  A `no' in the `hostcc' column is a question -- which
-# kind is it? -- and not a defect.
+# ***An earlier version of this header said the second group CANNOT be
+# host-built because "the binary it runs is the product".  That is
+# wrong*** -- all four emit architecture-independent text -- **and it
+# is what made `embedder' sit in the second group for a round when it
+# belongs in the first.**  It was classified from its position in a
+# list rather than from reading `tools/embedder.c'.
+#
+# So this reports.  A `no' in the `hostcc' column is a question --
+# which kind is it, and open the tool to find out -- not a defect.
 #
 # WHY IT EXISTS.  `objtype=386 mk install' found bash's `mkbuiltins' the
 # expensive way, four blockers into a cross build, and the comment
@@ -167,9 +176,11 @@ def main():
     print()
     print('---- %d executed-in-tree binaries, %d not built with hostcc'
           % (len(rows), n_no))
-    print('A `no\' is a QUESTION, not a defect: a build-time helper '
-          'should use')
-    print('hostcc, a bootstrap stage cannot.  See the header.')
+    print('A `no\' is a QUESTION, not a defect.  Open the tool: if it '
+          'is a')
+    print('single file it wants hostcc; if it IS the port (miniperl, '
+          'objc1)')
+    print('that needs the port built twice.  See the header.')
     return 0
 
 
