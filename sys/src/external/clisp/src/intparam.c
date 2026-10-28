@@ -422,9 +422,32 @@ void main5(void) {
 }
 
 void main6(void) {
+/* APExp: compare against the WIDEST integer type, not against `long'.
+ *
+ * This check asked `sizeof(type) > sizeof(long)' and so emitted
+ *	#error "Type char * does not fit into a long!!"
+ * on APExp/9front, where kencc is LLP64: a pointer is 8 bytes and
+ * `long' is 4.  **The same would fire on Win64**, which is also LLP64,
+ * so this is the probe's own LP64/ILP32 assumption rather than a
+ * portability limit of CLISP.
+ *
+ * CLISP itself does not require a pointer to fit in a `long'.  Its
+ * object representation is `uintP', which lispbibl.d:1611 derives from
+ * `pointer_bitsize' through the `uintN' family -- `uint64' is
+ * `ULONGLONG' (lispbibl.d:1534), i.e. `unsigned long long' -- and
+ * `aint' comes from `oint_addr_len' the same way (lispbibl.d:2924).
+ * There is no `(long)' cast of a pointer in lispbibl.d or spvw.d.
+ * *The question the check should ask is whether a pointer fits in the
+ * widest integer available*, which is what it asks now.
+ */
+#ifdef HAVE_LONG_LONG_INT
+#define widest_int_t  long long
+#else
+#define widest_int_t  long
+#endif
 #define check_sizeof_pointer(type,typestr)                              \
-  { if (sizeof(type) > sizeof(long))                                    \
-      printf("#error \"Type %s does not fit into a long!!\"\n",typestr); \
+  { if (sizeof(type) > sizeof(widest_int_t))                            \
+      printf("#error \"Type %s does not fit into the widest integer!!\"\n",typestr); \
   }
   check_sizeof_pointer(char*,"char *");
   check_sizeof_pointer(long*,"long *");
