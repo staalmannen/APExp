@@ -1026,6 +1026,20 @@
 #elif defined(MICROSOFT)
   #define nonreturning_function(storclass,funname,arguments)  \
     __declspec(noreturn) storclass void funname arguments
+#elif defined(_PLAN9_SOURCE)
+  /* APExp: kencc has C11 `_Noreturn', and the fallback below is not
+     merely a missed optimisation here -- it is a hard ERROR.  kencc's
+     type signatures record NORET, and 9front builds with `-FTVw', so
+     a declaration without it collides with the system header's:
+       unix.d:155 external redeclaration of: exit
+         EXTERN FUNC(INT) VOID
+         EXTERN FUNC(INT) NORET VOID  /sys/include/ape/stdlib.h:71
+     APE's <stdlib.h> declares `exit' and `abort' with `__ape_Noreturn',
+     which is `_Noreturn'.  Spelling it the same way here agrees with
+     the header instead of fighting it, and does so for every
+     nonreturning_function in CLISP rather than for `exit' alone. */
+  #define nonreturning_function(storclass,funname,arguments)  \
+    storclass _Noreturn void funname arguments
 #else
   #define nonreturning_function(storclass,funname,arguments)  \
     storclass void funname arguments
@@ -1074,9 +1088,21 @@
 #elif defined(HAVE_ALLOCA_H)
   #include <alloca.h>
   #ifndef alloca /* some define 'alloca' as macro... */
-    #if !(defined(UNIX_OSF) || defined(UNIX_DEC_ULTRIX))
+    #if !(defined(UNIX_OSF) || defined(UNIX_DEC_ULTRIX) || defined(_PLAN9_SOURCE))
       /* OSF/1 V3 declares `alloca' as returning char*, but in OSF/1 V4
        it returns void*. I don't know how to distinguish the two. */
+      /* APExp: _PLAN9_SOURCE joins this list, which is upstream's own
+         register of platforms whose <alloca.h> is to be trusted rather
+         than re-declared.  Here it is not a style point: APE declares
+         `void *alloca(size_t)' and this line says `int', and on kencc
+         amd64 (LLP64) size_t is 64-bit while int is 32, so the
+         redeclaration is a genuine ABI disagreement about the argument
+         and kencc rejects it:
+           lispbibl.d:1080 function inconsistently declared: alloca
+             EXTERN FUNC(INT) IND VOID
+             EXTERN FUNC(UVLONG) IND VOID  /sys/include/ape/alloca.h:3
+         Letting <alloca.h> declare it is both the fix and the correct
+         prototype. */
       extern_C void* alloca (int size); /* see MALLOC(3V) */
     #endif
   #endif
