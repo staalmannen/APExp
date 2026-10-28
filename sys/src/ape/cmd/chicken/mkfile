@@ -32,6 +32,18 @@ CHOFILES=\
 
 CC=pcc
 LD=pcc
+# ON A 64-BIT TARGET -DC_SIXTY_FOUR IS NOT OPTIONAL AND `-DC_LLP'
+# ALONE IS WORSE THAN NEITHER -- and the leading clause is what was
+# missing until the 386 cross build.  Everything below is an argument
+# about kencc's LLP64 targets, and the flags were passed
+# UNCONDITIONALLY.  `$WORD64' is the fix; the LLP64 set is amd64,
+# arm64 and power64, MEASURED: `SZ_IND' is 8 in exactly `6c/gc.h',
+# `7c/gc.h' and `9c/gc.h'.  ***`sparc64' is not in it*** -- `kc/gc.h'
+# has `SZ_IND 4', so the target whose name says 64 has 32-bit
+# pointers under kencc.  The same note is on `lib/chicken/mkfile',
+# which carries its own copy of these flags.
+#
+# (original note follows)
 # -DC_SIXTY_FOUR IS NOT OPTIONAL AND `-DC_LLP' ALONE IS WORSE THAN
 # NEITHER.  `chicken.h:81' is
 #
@@ -72,8 +84,9 @@ LD=pcc
 # word.  **They are defined and never used** -- zero uses anywhere in
 # the tree -- so it is latent rather than live, and upstream carries
 # the same latent bug on MinGW64.  Recorded, not patched.
+WORD64=`{if(~ $objtype amd64 arm64 power64) echo -DC_SIXTY_FOUR -DC_LLP}
 CFLAGS= -c -D_POSIX_SOURCE -I$CHCSRC -DHAVE_CHICKEN_CONFIG_H -DHAVE_ALLOCA_H -DC_BUILDING_CHICKEN\
-	-DC_SIXTY_FOUR -DC_LLP
+	$WORD64
 
 %.$O: $CHCSRC/%.c
     $CC $CFLAGS $CHCSRC/$stem.c

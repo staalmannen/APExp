@@ -36,8 +36,22 @@ OFILES=\
 
 CC=pcc
 LD=pcc
-# -DC_SIXTY_FOUR IS NOT OPTIONAL AND `-DC_LLP' ALONE IS WORSE THAN
-# NEITHER.  `chicken.h:81' is
+# ON A 64-BIT TARGET -DC_SIXTY_FOUR IS NOT OPTIONAL AND `-DC_LLP'
+# ALONE IS WORSE THAN NEITHER -- and the leading clause is the part
+# that was missing until the 386 cross build.  The reasoning below is
+# an argument about kencc's LLP64 targets from beginning to end, and
+# the flags were passed UNCONDITIONALLY, so on 386 they made `C_word'
+# a 64-bit type on a 32-bit machine.
+#
+# `$WORD64' below is the fix: the LLP64 set is amd64, arm64 and
+# power64, which is **measured rather than listed** -- `SZ_IND' is 8
+# in exactly `6c/gc.h', `7c/gc.h' and `9c/gc.h' and 4 in the other
+# seven.  It is the same three that have a `stddef_arch.h'.
+# ***`sparc64' IS NOT IN IT***: `kc/gc.h' has `SZ_IND 4', so under
+# kencc the target whose NAME says 64 has 32-bit pointers.  *A name is
+# not a word size.*
+#
+# `chicken.h:81' is
 #
 #	#if defined(__LP64__) || defined(_LP64) || \
 #	    defined(__MINGW64__) || defined(_WIN64)
@@ -76,8 +90,9 @@ LD=pcc
 # word.  **They are defined and never used** -- zero uses anywhere in
 # the tree -- so it is latent rather than live, and upstream carries
 # the same latent bug on MinGW64.  Recorded, not patched.
+WORD64=`{if(~ $objtype amd64 arm64 power64) echo -DC_SIXTY_FOUR -DC_LLP}
 CFLAGS= -c -I$CHCSRC -DHAVE_CHICKEN_CONFIG_H -DHAVE_ALLOCA_H -DC_BUILDING_LIBCHICKEN\
-	-UPIC -DC_ENABLE_PTABLES -DC_SIXTY_FOUR -DC_LLP -DSIGIO=SIGURG
+	-UPIC -DC_ENABLE_PTABLES $WORD64 -DSIGIO=SIGURG
 
 %.$O: $CHCSRC/%.c
 	$CC $CFLAGS $CHCSRC/$stem.c
