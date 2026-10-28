@@ -300,9 +300,16 @@ the compiler itself), `edgtuoff-probe`, `edgscope-probe`, `tarhdr-probe`,
 `tarblock-probe` (**must be built with tar's own `-I` flags**),
 `chickenword-probe`, `vtparse-probe`, `vtlayout-probe`,
 `cppelif-probe` and `cppskip-probe` (**`pcc -c`, result is whether
-they COMPILE** — does kencc's cpp skip the arms it should, and does it
-LEX what it skips? ***`cppskip-probe` is measured and the answer is
-that cpp tokenises skipped blocks***: an unterminated quote or a bare
+they COMPILE**, and BOTH are measured now. ***`cppelif-probe` passes:
+cpp's skipping is FINE*** — `#elif` after `#ifdef`, after
+`#if defined()`, and `asm volatile` with extended operands in a
+skipped arm are all skipped correctly, so *the mechanism it was built
+to catch does not exist* and `unix.c:851` had another cause, still
+unexplained and no longer live. **The clue it was built on did not
+hold either**: two `[stdin:N]` numbers ten apart were read as proving
+cpp emitted the skipped arms, and they prove nothing, because cpp
+removes lines AND inserts `#line` directives. ***`cppskip-probe` is
+the one that found something***: cpp tokenises skipped blocks: an unterminated quote or a bare
 apostrophe inside `#if 0` is a hard error under kencc and a warning
 under gcc, *so prose containing `don't` inside an untaken arm will not
 compile here*. **They are two files because one killed the other**:

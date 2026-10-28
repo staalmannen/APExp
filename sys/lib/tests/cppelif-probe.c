@@ -3,8 +3,38 @@
  *
  *	pcc -c cppelif-probe.c
  *
- * ***RUN 1 ANSWERED NOTHING ABOUT THESE CASES, AND SAYING SO IS THE
- * POINT.***  It answered
+ * ***RUN 2 ANSWERED, AND THE ANSWER IS THAT cpp IS FINE.***
+ *
+ *	pcc -c cppelif-probe.c
+ *
+ * compiles clean.  All three cases pass:
+ *
+ *   1. `#elif' after `#ifdef'   -- skipped correctly
+ *   2. `#elif' after `#if defined()' -- skipped correctly
+ *   4. `asm volatile' with GCC extended operands in a skipped arm --
+ *      skipped correctly
+ *
+ * which is candidate 3 from the list below: **nothing is wrong with
+ * cpp's skipping and `unix.c:851' had another cause.**  *The probe
+ * killed the mechanism it was built to catch*, which is the outcome
+ * these notes say to expect about seven times in eight.
+ *
+ * AND THE CLUE I BUILT IT ON DID NOT HOLD EITHER.  The go diagnostic
+ * reported `unix.c:851[stdin:4361]' and `unix.c:841[stdin:4351]' --
+ * ten apart in both -- and I read that as proving cpp had emitted the
+ * skipped arms rather than removing them.  **It proves nothing of the
+ * kind**: cpp removes content lines AND inserts `#line' directives, so
+ * the physical count can advance either way.  *An arithmetic
+ * coincidence read as evidence*, and the probe is what stopped it
+ * becoming a bug report against cpp.
+ *
+ * The construct is guarded out of `unix.c' now, so the original
+ * observation is no longer live and stays unexplained.  **What IS
+ * measured, and stands, is `cppskip-probe'**: cpp lexes blocks it
+ * skips, so an unterminated quote or a bare apostrophe inside `#if 0'
+ * is a hard error here.  That one is real and this one is not.
+ *
+ * (Run 1 answered nothing about these cases and the file said so:  It answered
  *
  *	cpp: cppelif-probe.c:126 Unterminated string or char const
  *
