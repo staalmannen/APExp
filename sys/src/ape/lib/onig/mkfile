@@ -113,13 +113,31 @@ HFILES=config.h
 %.$O: $ONIGSRC/%.c
 	$CC $CFLAGS $ONIGSRC/$stem.c
 
-# The two public headers.  `onigposix.h' is deliberately NOT here --
-# see the note above about its unguarded `#define regcomp'.
-install:V: $APEXPROOT/sys/include/ape/oniguruma.h\
-	$APEXPROOT/sys/include/ape/oniggnu.h
-
-$APEXPROOT/sys/include/ape/oniguruma.h: $ONIGSRC/oniguruma.h
-	cp $prereq $target
-
-$APEXPROOT/sys/include/ape/oniggnu.h: $ONIGSRC/oniggnu.h
-	cp $prereq $target
+# NO HEADER INSTALL RULE, AND THAT IS THE CONVENTION RATHER THAN AN
+# OMISSION.
+#
+# This mkfile used to `cp' the two public headers into
+# `sys/include/ape' at install time, and that answered
+#
+#	cp: cannot create regular file
+#	    '.../sys/include/ape/oniguruma.h': Operation not permitted
+#
+# -- because `mount-include' binds that directory over
+# `/sys/include/ape' and the build was writing through the bind.  *It
+# also made `mk install' need running TWICE*: the first pass archived
+# every object and then died on the copy, so the second pass found the
+# library up to date and only had the copy left to fail at.
+#
+# **Every other library here avoids it by not writing at all.**
+# `sys/include/ape' holds its headers IN GIT -- `tcl.h', `chicken.h',
+# `bzlib.h', `zlib.h' are all committed copies -- each carrying
+# `#pragma lib "/$M/lib/ape/lib<name>.a"' so that including the header
+# is enough to link the library.  `oniguruma.h' and `oniggnu.h' are
+# there now on the same terms.
+#
+# `onigposix.h' is still deliberately absent; see the note above about
+# its unguarded `#define regcomp'.
+#
+# THE COST, named because nothing checks it: the committed copies can
+# drift from `$ONIGSRC'.  Re-copy them by hand when oniguruma is
+# updated, and put the banner and the pragma back.
