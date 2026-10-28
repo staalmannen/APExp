@@ -1,0 +1,87 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libonig.a
+ONIGSRC=$APEXPROOT/sys/src/external/oniguruma/src
+
+# oniguruma 6.9.10 -- the regex engine PHP's mbstring needs for mb_ereg*.
+#
+# **The object list is `src/Makefile.am's `libonig_la_SOURCES', not a
+# glob**, and the difference is real: `koi8.c' and `mktable.c' are in
+# `EXTRA_DIST' and are NOT part of the library (`koi8_r.c' is), and the
+# five `unicode_*_data.c' files are `#include'd by `unicode.c' rather
+# than compiled on their own.  *A glob of `src/*.c' would have built
+# three files upstream does not and duplicated five it does.*
+#
+# ***THE POSIX API IS OFF, AND THAT IS A DECISION RATHER THAN AN
+# OMISSION.***  `regposix.c' and `regposerr.c' are upstream's
+# `ENABLE_POSIX_API' arm -- a supported configure option, so leaving
+# them out is not a fork.  Two reasons:
+#
+#   * Nothing here wants it.  PHP's mbstring calls the NATIVE API
+#     (`onig_new', `onig_search'); the POSIX one is for programs that
+#     want oniguruma to impersonate <regex.h>.
+#   * `onigposix.h' ends with **unconditional** aliases --
+#     `#define regcomp onig_posix_regcomp', and the same for `regexec',
+#     `regfree', `regerror', `regex_t', `regmatch_t', `regoff_t'.
+#     There is no guard on them.  **This tree has its own <regex.h>
+#     with real `regcomp'**, so installing that header into
+#     `sys/include/ape' would mean any file including both gets its
+#     regex calls silently redirected depending on include ORDER --
+#     exactly the blast radius CLAUDE.md's rule about public APE
+#     headers is about.  *The link is safe (the symbols really are
+#     prefixed); the header is not.*
+#
+# Turning it on is `+ regposix.$O regposerr.$O' and `-DUSE_POSIX_API'
+# below -- but then do NOT install `onigposix.h' alongside the others.
+
+ONIG64=`{if(~ $objtype amd64 arm64 power64) echo -DSIZEOF_VOIDP=8}
+ONIG32=`{if(! ~ $objtype amd64 arm64 power64) echo -DSIZEOF_VOIDP=4}
+
+# SIZEOF_VOIDP arrives here and NOT in config.h on purpose: see that
+# file.  The LLP64 set is measured -- `SZ_IND' is 8 in exactly
+# `6c/gc.h', `7c/gc.h' and `9c/gc.h' and 4 in the other seven -- and is
+# the same set `lib/chicken/mkfile' uses.  config.h `#error's if this
+# does not arrive, so a typo here is a failed compile rather than a
+# silently wrong pointer size.
+CFLAGS=-c -I. -I$ONIGSRC -I$APEXPROOT/sys/src/external/oniguruma\
+	-DHAVE_CONFIG_H $ONIG64 $ONIG32
+
+OFILES=\
+	regparse.$O regcomp.$O regexec.$O\
+	regenc.$O regerror.$O regext.$O regsyntax.$O regtrav.$O\
+	regversion.$O st.$O reggnu.$O\
+	unicode.$O\
+	unicode_unfold_key.$O\
+	unicode_fold1_key.$O unicode_fold2_key.$O unicode_fold3_key.$O\
+	ascii.$O utf8.$O\
+	utf16_be.$O utf16_le.$O\
+	utf32_be.$O utf32_le.$O\
+	euc_jp.$O euc_jp_prop.$O\
+	sjis.$O sjis_prop.$O\
+	iso8859_1.$O iso8859_2.$O iso8859_3.$O iso8859_4.$O\
+	iso8859_5.$O iso8859_6.$O iso8859_7.$O iso8859_8.$O\
+	iso8859_9.$O iso8859_10.$O iso8859_11.$O iso8859_13.$O\
+	iso8859_14.$O iso8859_15.$O iso8859_16.$O\
+	euc_tw.$O euc_kr.$O big5.$O\
+	gb18030.$O koi8_r.$O cp1251.$O\
+	onig_init.$O
+
+HFILES=config.h
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+%.$O: $ONIGSRC/%.c
+	$CC $CFLAGS $ONIGSRC/$stem.c
+
+# The two public headers.  `onigposix.h' is deliberately NOT here --
+# see the note above about its unguarded `#define regcomp'.
+install:V: $APEXPROOT/sys/include/ape/oniguruma.h\
+	$APEXPROOT/sys/include/ape/oniggnu.h
+
+$APEXPROOT/sys/include/ape/oniguruma.h: $ONIGSRC/oniguruma.h
+	cp $prereq $target
+
+$APEXPROOT/sys/include/ape/oniggnu.h: $ONIGSRC/oniggnu.h
+	cp $prereq $target
