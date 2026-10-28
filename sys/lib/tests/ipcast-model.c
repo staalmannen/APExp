@@ -90,11 +90,50 @@ rnd(void)
              ? "no #error emitted" : "#error WOULD BE EMITTED");        \
   }
 
+/*
+ * intparam.c:426's check_sizeof_pointer, which is the macro that
+ * ACTUALLY poisoned the generated header, and which this model did not
+ * cover on its first outing.
+ *
+ * ***THE FIRST VERSION OF THIS FILE ANSWERED THE WRONG QUESTION AND
+ * ANSWERED IT CORRECTLY.***  The native run printed eight
+ * `conversion of pointer to shorter integer' warnings naming lines 470
+ * and 471, so the model was built for the macro on those lines --
+ * `test_pointer_casts' -- and reported, rightly, that it emits no
+ * `#error'.  The header was poisoned anyway, by `check_sizeof_pointer'
+ * forty lines earlier, **which produces no warning at all**:
+ *
+ *	#error "Type char * does not fit into a long!!"
+ *	#error "Type long * does not fit into a long!!"
+ *	#error "Type function * does not fit into a long!!"
+ *
+ * *Following the warnings to the test they named was the whole
+ * mistake*: a diagnostic points at code that is noisy, not at code
+ * that is wrong, and nothing was asked about what ELSE in the file
+ * writes `#error'.  One `grep` of the generated header for `#error'
+ * found in a second what the model could not find at all -- which is
+ * this tree's rule about printing what the machine says, paid again.
+ * The model now covers both macros so that the next reading of it
+ * cannot repeat the omission.
+ */
+#define check_sizeof_pointer(ptrbytes, widestbytes, typestr, widestr)   \
+  printf("  %-22s sizeof=%d vs %s=%d  %s\n", typestr, ptrbytes,         \
+         widestr, widestbytes,                                          \
+         (ptrbytes > widestbytes) ? "#error EMITTED" : "no #error emitted")
+
 int
 main(void)
 {
 	printf("ipcast-model: pointer %zu bits, ulong %d bits (kencc's widths)\n",
 	       sizeof(char *) * 8, 32);
+
+	printf("\ncheck_sizeof_pointer (intparam.c:426) -- the one that fired:\n");
+	printf("  as upstream wrote it, against `long':\n");
+	check_sizeof_pointer(8, 4, "char * vs long", "sizeof(long)");
+	printf("  as patched, against the widest integer:\n");
+	check_sizeof_pointer(8, 8, "char * vs long long", "sizeof(long long)");
+
+	printf("\ntest_pointer_casts (intparam.c:439) -- the one that only warned:\n");
 	test_pointer_casts(char *, long *, "char * / long *", "long *");
 	test_pointer_casts(char *, function *, "char * / function *", "function *");
 	printf("  pointer_bitsize would be %ld (intparam.c:432, the value\n",

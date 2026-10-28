@@ -88,6 +88,30 @@ BUILD=build-$objtype
 # which is the recorded rule: a configuration that silently does
 # nothing produces a failure that looks like a different bug.
 #
+# ***`-DHAVE_LONG_LONG_INT' ON BOTH PROBES IS LOAD-BEARING, AND ITS
+# ABSENCE IS NOT VISIBLE WHERE IT IS CAUSED.***
+#
+# `intparam.c' gates its whole `long long' section on that macro being
+# defined AT ITS OWN COMPILE TIME -- twelve `#ifdef's -- so without the
+# `-D' it never emits `#define long_long_bitsize 64'.  And
+# `lispbibl.d:1173' takes the `long long' arm only
+# `#if defined(long_long_bitsize) && (long_long_bitsize==64)';
+# otherwise it `#undef's `HAVE_LONG_LONG_INT' again, which leaves
+# `uint64' undefined, and `uintP' is `uint64' here
+# (`lispbibl.d:1611', via `pointer_bitsize' 64).  **So one missing
+# `-D' on a probe removes the type CLISP represents every object
+# with**, and the failure would surface as an undefined type in a
+# generated file, a long way from this line.
+#
+# Upstream passes it the same way: `configure.in:76' runs
+# `AC_TYPE_LONG_LONG_INT' and hands the result down in `CPPFLAGS'.
+# *This is upstream's own mechanism supplied by hand, not a
+# workaround*, which is the same relation `config.h' has to it.
+#
+# **And it is measured rather than argued**: with the `-D' the host
+# run of `intparam.c' emits `long_long_bitsize 64' and without it the
+# line is absent.
+#
 # THE RECIPE BELOW CARRIES NO COMMENTS, and that is deliberate rather
 # than tidy: mk hands a recipe to rc verbatim, so a tab-indented `#'
 # line is rc source and its text -- apostrophes, backquotes, `=' --
@@ -140,9 +164,9 @@ configure:V:
 			echo '       Build clisp natively.'
 			exit 1
 		}
-		pcc -Fw -o intparam $srcroot/src/intparam.c
+		pcc -Fw -DHAVE_LONG_LONG_INT -o intparam $srcroot/src/intparam.c
 		./intparam intparam.h
-		pcc -Fw -o floatparam $srcroot/src/floatparam.c
+		pcc -Fw -DHAVE_LONG_LONG_INT -o floatparam $srcroot/src/floatparam.c
 		./floatparam floatparam.h
 	}
 
