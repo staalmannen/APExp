@@ -3,7 +3,26 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
 GOSRC=../../../external/go1.4
-GOSRCABS=$APEXPROOT/sys/src/external/go1.4
+
+# ***`GOSRCABS' WAS NOT ABSOLUTE, AND THE NAME SAID IT WAS.***
+# `$APEXPROOT' is `../../../../..', so this was a relative path with
+# `ABS' in its name -- and `$GOTOOLDIR' below is built from it and
+# handed to a program that chdir's.
+#
+# WHY IT SEEMED TO WORK.  `sys/src/ape/cmd/go' and
+# `sys/src/external/go1.4/src' are BOTH five levels below the
+# repository root, so `cd $GOSRC/src' leaves every `$APEXPROOT'-
+# relative path still resolving -- by coincidence, not by design.
+# **It breaks at any other depth**, which is what `src/lib9' (six
+# levels) hit:
+#
+#	go tool dist: missing file .../src/lib9/../../../../../sys/...
+#
+# with `sys/' appearing twice in the result.  *A path that works
+# because two unrelated directories happen to sit at the same depth is
+# a coincidence waiting for a third one.*
+GOROOTABS=`{cd $APEXPROOT && pwd}
+GOSRCABS=$GOROOTABS/sys/src/external/go1.4
 BIN=$APEXPROOT/$objtype/bin/ape
 GOARCH=$objtype
 GOTOOLDIR=$GOSRCABS/pkg/tool/plan9_$GOARCH

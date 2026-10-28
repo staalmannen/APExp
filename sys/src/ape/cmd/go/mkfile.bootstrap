@@ -94,7 +94,28 @@ LD=pcc
 #
 # Declared here rather than sniffed from a compiler macro, for the same
 # reason as -DHAVE_C_BOOL above.
-CFLAGS=-FTVwp+ -DAPEXP_PLAN9_HOST -DHAVE_C_BOOL -DGOROOT_FINAL="$APEXPROOT/sys/src/external/go1.4"
+# ***GOROOT HAS TO BE ABSOLUTE, AND `$APEXPROOT' IS NOT.***
+#
+# `APEXPROOT' is `../../../../..' -- correct relative to THIS
+# directory and baked into the binary as a literal.  **dist chdir's
+# into each library it builds**, so the moment it enters
+# `$GOROOT/src/lib9' that path means something else:
+#
+#	go tool dist: missing file
+#	  .../go1.4/src/lib9/../../../../../sys/src/external/go1.4/include/fmt.h
+#
+# and `include/fmt.h' is right there.  Count the `..' from `src/lib9'
+# -- five levels reaches `APExp/sys', and then `sys/src/...' is
+# appended to it, so the path has `sys/' TWICE.  *The file was never
+# missing; the root moved under it.*
+#
+# `pwd' at mk-parse time fixes it once.  The backquote runs where this
+# mkfile is, so `cd $APEXPROOT && pwd' is the repository root in
+# absolute form, and it contains no `=' and no `!' -- the two things
+# `lib/onig/mkfile' hit in consecutive rounds.
+GOROOTABS=`{cd $APEXPROOT && pwd}
+
+CFLAGS=-FTVwp+ -DAPEXP_PLAN9_HOST -DHAVE_C_BOOL -DGOROOT_FINAL="$GOROOTABS/sys/src/external/go1.4"
 
 # make.rc generates the Plan 9 libc declarations before compiling dist.
 libc_plan9.h:V:
