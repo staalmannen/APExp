@@ -466,7 +466,25 @@ xworkdir(void)
 
 	xgetenv(&b, "TMPDIR");
 	if(b.len == 0)
+#if defined(APEXP_PLAN9_HOST)
+		// APExp: Plan 9 has /tmp and no /var at all, so the
+		// fallback below answers
+		//
+		//   go tool dist: mkdtemp(/var/tmp/go-cbuild-XXXXXX):
+		//                 No such file or directory
+		//
+		// ***AND plan9.c:486 ALREADY SAYS /tmp*** for this exact
+		// directory, by the same name -- `go-cbuild-' -- so this
+		// is upstream's own answer for the platform rather than a
+		// choice of mine.  Second time in this file: `cansse2'
+		// was the first.
+		//
+		// `$TMPDIR' is still consulted FIRST, above, so this only
+		// changes what happens when nothing sets it.
+		bwritestr(&b, "/tmp");
+#else
 		bwritestr(&b, "/var/tmp");
+#endif
 	if(b.p[b.len-1] != '/')
 		bwrite(&b, "/", 1);
 	bwritestr(&b, "go-cbuild-XXXXXX");

@@ -299,11 +299,17 @@ deliberate break; `bitinit-model` is the only one with an EXTERNAL oracle
 the compiler itself), `edgtuoff-probe`, `edgscope-probe`, `tarhdr-probe`,
 `tarblock-probe` (**must be built with tar's own `-I` flags**),
 `chickenword-probe`, `vtparse-probe`, `vtlayout-probe`,
-`cppelif-probe` (**`pcc -c`, result is whether it COMPILES** — does
-kencc's cpp actually SKIP the arms it should? Four cases separating
-`#elif`-after-`#ifdef` from `#elif`-after-`#if`, from a lexer upset by
-a skipped arm's contents. **gcc is the control and compiles it with
-one expected warning**; its macros are INVENTED because the first
+`cppelif-probe` and `cppskip-probe` (**`pcc -c`, result is whether
+they COMPILE** — does kencc's cpp skip the arms it should, and does it
+LEX what it skips? ***`cppskip-probe` is measured and the answer is
+that cpp tokenises skipped blocks***: an unterminated quote or a bare
+apostrophe inside `#if 0` is a hard error under kencc and a warning
+under gcc, *so prose containing `don't` inside an untaken arm will not
+compile here*. **They are two files because one killed the other**:
+cpp aborted on that line and `6c` never ran, so the other three cases
+were unreported rather than cleared — a case that can kill the
+preprocessor belongs in its own file, the same rule this tree has
+about cases that can hang. The macros are INVENTED because the first
 draft used `__x86_64__`, which gcc defines, so the arm meant to be
 skipped was compiled),
 `regpair-probe` and `regpair-min` (**native, and their result is
