@@ -1863,8 +1863,42 @@ this is the whole record, including the wrong turns.*
   **Building under `sys/src/cmd` with native `6c` is the other option
   and buys nothing**: it would make stage 1 compile, and dist's whole
   job is to drive stage 2, which is a separate question from where
-  dist itself lives. **NOT STARTED, and out of the default build for
-  0.6.**
+  dist itself lives.
+  ***THE FOURTH WALL IS NOW ADDRESSED, AND IT WAS THE TWO EDITS THE
+  ANALYSIS ABOVE PREDICTED.*** `-DPLAN9` is `-DAPEXP_PLAN9_HOST` in
+  `mkfile.bootstrap`, and `unix.c`'s `#elif` chain has one new arm
+  setting `gohostos = "plan9"`. **Two macros, one question each**: the
+  compile-time one picks which portability file is real, the run-time
+  string says which OS dist is building FOR -- and `build.c`'s seven
+  `"plan9"` comparisons, including the `-DPLAN9` it emits for the
+  stage-2 toolchain, go on working because that flag is correct there.
+  *The Go runtime's C really is native; dist's is not.*
+  **All three compile-time `PLAN9` uses wanted it undefined**, which is
+  why renaming is safe rather than merely convenient: `plan9.c:10`
+  compiles its 764 lines of `<u.h>` under it, `unix.c:11` switches the
+  POSIX file off under it, and **`a.h:37` suppresses `USED` because
+  native `<libc.h>` already has one** -- under APE none of those is
+  true, and the third is a thing we now gain rather than lose.
+  **The arm is at the HEAD of the chain rather than beside `__sun`**:
+  it is declared by our build, not sniffed from the host, so it should
+  win over any compiler macro that happens to be set.
+  ***MEASURED ON THE HOST, with a control***: `gcc -fsyntax-only` is
+  clean both with and without the macro, and `gcc -E` finds
+  `gohostos = "plan9"` **once** with it and **zero** times without --
+  so the arm is SELECTED and not merely parsed. *(`-DHAVE_C_BOOL` has
+  to come off for the gcc check: it suppresses dist's own
+  `typedef int bool;`, which kencc needs because `bool` is a keyword
+  there and this gcc does not. Identical failure with and without the
+  change, so it is orthogonal -- but a first run that left it on would
+  have reported a wall that is not one.)*
+  **What is NOT measured is a build.** The prediction for the next VM
+  run: `plan9.c` compiles to nothing, `unix.c` compiles, dist links,
+  and it no longer says `unknown operating system`. **Refuted if** it
+  still stops in `plan9.c` (the flag did not reach every compile), or
+  dist calls `fatal("unknown operating system")` (the arm is not
+  reached) -- *and the likeliest outcome by this port's own history is
+  a FIFTH wall one file further in, which would be progress rather
+  than refutation.* Still out of the default build.
 
 **Ports built but never exercised**, which is a different and cheaper
 item -- *a port that builds and has never run is not a port*:

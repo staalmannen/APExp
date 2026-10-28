@@ -67,7 +67,34 @@ LD=pcc
 # variable -- which is why every `-DFOO=1' in this tree is safe through
 # $CFLAGS and why a literal `=' in a recipe is not.  So a bare `"' survives
 # into the argument exactly as written and no escape is wanted.
-CFLAGS=-FTVwp+ -DPLAN9 -DHAVE_C_BOOL -DGOROOT_FINAL="$APEXPROOT/sys/src/external/go1.4"
+# ***-DAPEXP_PLAN9_HOST AND NOT -DPLAN9, AND THAT WAS THE FOURTH WALL.***
+#
+# `-DPLAN9' was doing two unrelated jobs and only one of them was
+# wrong.  At COMPILE time it is `is this native Plan 9 C?' -- three
+# uses, all that question: `plan9.c:10' compiles 764 lines of <u.h>
+# and <libc.h> under it, `unix.c:11' switches the POSIX file off under
+# it, and `a.h:37' drops `USED' because native <libc.h> has one.
+# **Under APE all three answers are NO**, which is why the build died
+# at `plan9.c:13 Could not find include file <libc.h>': dist compiles
+# all three portability files and the flag had picked the one this
+# compiler cannot read, while `unix.c' -- 843 lines of POSIX whose
+# nine includes all exist here -- sat switched off.
+#
+# At RUN time `gohostos' is `which OS is dist BUILDING for?', and
+# there the answer is plan9, in seven places in `build.c' including
+# the one that emits `-DPLAN9' for the stage-2 toolchain, where it is
+# right because the Go runtime's C really is native.
+#
+# So the flag is renamed rather than removed, and `unix.c' gets one
+# `#elif' arm setting `gohostos = "plan9"'.  **Removing it alone would
+# have left dist calling `fatal("unknown operating system")'** -- the
+# `#elif' chain is compile-time and has no plan9 arm, and keying it on
+# `uname()' would not work either, since libap answers sysname `Plan9'
+# and that chain never reads it.  *Two macros, one question each.*
+#
+# Declared here rather than sniffed from a compiler macro, for the same
+# reason as -DHAVE_C_BOOL above.
+CFLAGS=-FTVwp+ -DAPEXP_PLAN9_HOST -DHAVE_C_BOOL -DGOROOT_FINAL="$APEXPROOT/sys/src/external/go1.4"
 
 # make.rc generates the Plan 9 libc declarations before compiling dist.
 libc_plan9.h:V:

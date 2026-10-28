@@ -1,0 +1,64 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+# tkcon -- a Tk console, and the first proof-of-concept Tcl/Tk APPLICATION
+# here rather than another library.  Not in any DIRS list: `app' is not
+# built by default (see ../README).
+#
+#	cd sys/src/ape/app/tkcon && mk install
+#	tkcon
+#
+# ***IT NEEDS NO configure, AND THAT IS THE WHOLE FINDING.***  Running
+# `./configure' answers
+#
+#	checking for Tcl configuration... configure: error: Can't find Tcl
+#	configuration definitions.  Use --with-tcl to specify a directory
+#	containing tclConfig.sh
+#
+# and the reflex is to go and produce a tclConfig.sh.  **But tkcon is
+# pure Tcl.**  Its `configure' compiles nothing; the only file TEA
+# generates for it is `pkgIndex.tcl', from a four-line
+# `pkgIndex.tcl.in' whose entire content after substitution is
+#
+#	package ifneeded tkcon 2.8.1 [list source [file join $dir tkcon.tcl]]
+#
+# with `@PACKAGE_NAME@' and `@PACKAGE_VERSION@' coming from
+# `AC_INIT([tkcon], [2.8.1])' and nothing else.  *A whole autoconf run,
+# a tclConfig.sh and a TEA dependency, to produce one line of Tcl.*
+# So this mkfile writes the line.
+#
+# (`tclConfig.sh'/`tkConfig.sh' ARE generated now, by `lib/tcl' and
+# `lib/tk' -- but for a real extension with C in it, which this is not.
+# They are not what unblocked tkcon and it would be wrong to record
+# them as such.)
+#
+# WHERE IT GOES.  Tcl scans one level below each `auto_path' entry for
+# a `pkgIndex.tcl', and `apexp-sh' sets `TCLPATH=/sys/lib/tcl', so
+# `/sys/lib/tcl/tkcon$VERSION/' is where `package require tkcon' can
+# find it.  `sys/lib' is bound over `/sys/lib' by `mount-include', so
+# installing into the repository's own `sys/lib/tcl' is installing into
+# the live location -- the same arrangement `cmd/perl' uses for
+# `sys/lib/perl'.
+
+VERSION=2.8.1
+TKCONSRC=$APEXPROOT/sys/src/external/tkcon
+PKGDIR=$APEXPROOT/sys/lib/tcl/tkcon$VERSION
+
+all:V: pkgIndex.tcl
+
+pkgIndex.tcl: $TKCONSRC/pkgIndex.tcl.in
+	sed 's|@PACKAGE_NAME@|tkcon|g; s|@PACKAGE_VERSION@|'^$VERSION^'|g' $prereq >$target
+
+install:V: pkgIndex.tcl
+	mkdir -p $PKGDIR
+	cp pkgIndex.tcl $PKGDIR/pkgIndex.tcl
+	cp $TKCONSRC/tkcon.tcl $PKGDIR/tkcon.tcl
+	cp tkcon $APEXPROOT/rc/bin/ape/tkcon
+	chmod +x $APEXPROOT/rc/bin/ape/tkcon
+
+clean:V:
+	rm -f pkgIndex.tcl
+
+nuke:V: clean
+	rm -rf $PKGDIR
