@@ -5,13 +5,10 @@ CLISPSRC=$APEXPROOT/sys/src/external/clisp/src
 BIN=$APEXPROOT/$objtype/bin/ape
 BUILD=build-$objtype
 
-# CLISP's non-assembly C inputs for the Unix configuration, adapted from
-# makemake.in. This port disables dynamic FFI, threads, and optional modules.
-CPARTS=\
-	spvw spvwtabf spvwtabs spvwtabo\
-	eval control encoding pathname stream socket io funarg\
-	array hashtabl list package record weak sequence charstrg debug\
-	error misc time predtype symbol lisparit i18n unixaux built
+# $CPARTS and $GLPARTS are shared with mkfile.runtime; see that file
+# for why they are not copied into both.
+<mkfile.cparts
+
 EVERY_INCLUDES=\
 	lispbibl fsubr subr pseudofun constsym constobj constobj_tl unix
 OTHER_INCLUDES=constpack avl sort subrkw bytecode

@@ -37,7 +37,38 @@
 # case whose answer is known is what makes the others readable* -- if
 # 5 fails, the probe itself is measuring something other than rc.
 
-all:V: t1 t2 t3 t4 t5 t6
+# CASES 7 AND 8: does a TRAILING BACKSLASH continue a recipe line?
+#
+# ***rc HAS NO BACKSLASH ESCAPE*** -- that is the usual statement of
+# it, and if it is right then a recipe line ending in `\' passes a
+# literal backslash as an argument and ENDS there, silently dropping
+# everything on the next line.  **But 78 recipe lines in this tree end
+# in one**, so either the statement is wrong, or mk joins them before
+# rc ever sees them, or those 78 lines are in rules nothing runs.
+#
+# *The third is live rather than theoretical*: the clearest example is
+# `external/f2c/lib/mkfile.plan9:137', a bare argument list continued
+# over three lines -- and it is an `xsum' checksum rule, which is
+# exactly the "an untriggered rule gets no diagnostic from anyone"
+# trap this tree has already paid for twice, on `lib/ap/mkfile:63' and
+# on the transpiler rules.  So the 78 are not evidence until one of
+# them is known to RUN.
+#
+# Case 7 is a bare continuation, case 8 is the `&&\' form that most of
+# the 78 actually use -- and they are separate because `&&' already
+# continues a command in rc, so case 8 could pass for a reason that
+# tells us nothing about case 7.
+#
+# **The output is what distinguishes them, not the exit status.**
+#   `ok 7 one two three'  -> mk or rc joined the lines; the construct
+#                            is safe and the 78 are fine.
+#   `ok 7 one'            -> the continuation was DROPPED silently,
+#                            which is the dangerous answer: no error,
+#                            just missing arguments.
+#   a syntax error        -> rc choked on the literal backslash.
+# *Two of those three are failures and only one of them says so*,
+# which is why the case echoes its arguments rather than a fixed word.
+all:V: t1 t2 t3 t4 t5 t6 t7 t8
 
 t1:V:
 	# a plain comment, nothing special in it
@@ -67,3 +98,11 @@ t6:V:
 		v=hello
 		echo ok 6 leading assignment inside a block $v
 	}
+
+t7:V:
+	echo ok 7 one \
+		two three
+
+t8:V:
+	echo ok 8 first && \
+		echo ok 8 second
