@@ -218,7 +218,19 @@ static initialiser must write the bit-field GROUP's bytes, not the
 container's).
 **`truefalse-test.c` is the one NATIVE test here** — `6c`/`6l`, not
 `pcc` — and has to be: APE's `<stdbool.h>` `#define`s `true`/`false`, so
-an APE build never reaches kencc's own C23 keywords.
+a TU that INCLUDES that header never reaches kencc's own C23 keywords.
+***THIS LINE USED TO SAY "an APE build" AND THAT WAS TOO STRONG***: the
+masking is a property of the translation unit, not of the driver, and
+go's C sources do not include `<stdbool.h>` while go's bootstrap IS
+`pcc` (`cmd/go/mkfile.bootstrap:44`) — so an APE build hit the keywords
+on `go.h:1093`, `int true` as a PARAMETER NAME, legal in C89.
+**A `-std`-style switch to turn the keywords off is NOT worth building,
+and that is measured rather than assumed**: `truefalse-sweep.py` reports
+**go1.4 as the only package** in 20471 vendored `.c`/`.h` files with the
+shape (311 mask the names themselves; the 3 remaining hits are prose and
+macro pastes), and *go1.4 is FROZEN* — the last C implementation of Go,
+which is why it is the bootstrap — so its 130 renamed sites are a cost
+paid once and not on every import.
 
 **libap** — `locale-test`, `sigset-test`, `posix-spawn-test`,
 `limits-test`, `format-arg-test`, `unget-pipe-test`, `isatty-test`,
@@ -283,7 +295,15 @@ that must not be made. Its first run **missed its own positive
 control**, because it expanded `NAME=./thing` in recipes and not in
 targets, and bash's rule is `$MKBUILTINS:`),
 `bfmove-sweep.py` (which bit-field groups the sharing rule moves; a
-LOWER bound, with an UNKNOWN column it reports rather than counts).
+LOWER bound, with an UNKNOWN column it reports rather than counts),
+`truefalse-sweep.py` (**does NOT gate**: which vendored TUs use
+`true`/`false` as an IDENTIFIER without defining the names themselves —
+the shape kencc's C23 keywords break. **Its positive control is
+EXTERNAL and has to be**, since the one package it found is already
+fixed: `--control` stages the pre-rename `go.h` out of git and fires on
+it. *Its pattern was widened twice before any number was written down* —
+8148 hits when `return true;` matched, 379 when block-comment
+continuation lines did, 3 once comments and literals are blanked).
 
 **Models** — `clitzero-model.py`, `sualign-model.py`, `bitinit-model.py`.
 They exist because **kencc's own sources need Plan 9's `<u.h>`, so the

@@ -906,10 +906,10 @@ igen(Node *n, Node *a, Node *res)
 
 /*
  * branch gen
- *	if(n == true) goto to;
+ *	if(n == istrue) goto to;
  */
 void
-bgen(Node *n, int true, int likely, Prog *to)
+bgen(Node *n, int istrue, int likely, Prog *to)
 {
 	int et, a;
 	Node *nl, *nr, *r;
@@ -949,7 +949,7 @@ bgen(Node *n, int true, int likely, Prog *to)
 	nr = N;
 
 	if(nl != N && isfloat[nl->type->etype]) {
-		bgen_float(n, true, likely, to);
+		bgen_float(n, istrue, likely, to);
 		return;
 	}
 
@@ -961,7 +961,7 @@ bgen(Node *n, int true, int likely, Prog *to)
 		nodconst(&n2, n->type, 0);
 		gins(optoas(OCMP, n->type), &n1, &n2);
 		a = AJNE;
-		if(!true)
+		if(!istrue)
 			a = AJEQ;
 		patch(gbranch(a, n->type, likely), to);
 		regfree(&n1);
@@ -969,7 +969,7 @@ bgen(Node *n, int true, int likely, Prog *to)
 
 	case OLITERAL:
 		// need to ask if it is bool?
-		if(!true == !n->val.u.bval)
+		if(!istrue == !n->val.u.bval)
 			patch(gbranch(AJMP, T, 0), to);
 		return;
 
@@ -979,33 +979,33 @@ bgen(Node *n, int true, int likely, Prog *to)
 		nodconst(&n1, n->type, 0);
 		gins(optoas(OCMP, n->type), n, &n1);
 		a = AJNE;
-		if(!true)
+		if(!istrue)
 			a = AJEQ;
 		patch(gbranch(a, n->type, likely), to);
 		return;
 
 	case OANDAND:
-		if(!true)
+		if(!istrue)
 			goto caseor;
 
 	caseand:
 		p1 = gbranch(AJMP, T, 0);
 		p2 = gbranch(AJMP, T, 0);
 		patch(p1, pc);
-		bgen(n->left, !true, -likely, p2);
-		bgen(n->right, !true, -likely, p2);
+		bgen(n->left, !istrue, -likely, p2);
+		bgen(n->right, !istrue, -likely, p2);
 		p1 = gbranch(AJMP, T, 0);
 		patch(p1, to);
 		patch(p2, pc);
 		return;
 
 	case OOROR:
-		if(!true)
+		if(!istrue)
 			goto caseand;
 
 	caseor:
-		bgen(n->left, true, likely, to);
-		bgen(n->right, true, likely, to);
+		bgen(n->left, istrue, likely, to);
+		bgen(n->right, istrue, likely, to);
 		return;
 
 	case OEQ:
@@ -1026,7 +1026,7 @@ bgen(Node *n, int true, int likely, Prog *to)
 
 	switch(n->op) {
 	case ONOT:
-		bgen(nl, !true, likely, to);
+		bgen(nl, !istrue, likely, to);
 		break;
 
 	case OEQ:
@@ -1036,9 +1036,9 @@ bgen(Node *n, int true, int likely, Prog *to)
 	case OLE:
 	case OGE:
 		a = n->op;
-		if(!true) {
+		if(!istrue) {
 			a = brcom(a);
-			true = !true;
+			istrue = !istrue;
 		}
 
 		// make simplest on right
@@ -1083,7 +1083,7 @@ bgen(Node *n, int true, int likely, Prog *to)
 		}
 
 		if(iscomplex[nl->type->etype]) {
-			complexbool(a, nl, nr, true, likely, to);
+			complexbool(a, nl, nr, istrue, likely, to);
 			break;
 		}
 
