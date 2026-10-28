@@ -3,7 +3,13 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
 GOSRC=../../../external/go1.4
-GOSRCABS=$APEXPROOT/sys/src/external/go1.4
+# Absolute for the same reason as `mkfile.rebuild's copy: `$GOTOOLDIR'
+# below is built from this and the recipes `cd $GOSRC/src' before
+# running it, so a `$APEXPROOT'-relative path only resolves while the
+# cwd happens to sit five levels below the root.  See that file for
+# the `lib9' failure that showed it.
+GOROOTABS=`{cd $APEXPROOT && pwd}
+GOSRCABS=$GOROOTABS/sys/src/external/go1.4
 BIN=$APEXPROOT/$objtype/bin/ape
 GOARCH=$objtype
 GOTOOLDIR=$GOSRCABS/pkg/tool/plan9_$GOARCH
