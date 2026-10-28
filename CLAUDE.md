@@ -347,6 +347,17 @@ C++ proof-of-concept application.
 **`$objtype` is what you compile FOR; `$cputype` is what you run ON.**
 Headers and libraries take `$objtype` — they are compiled *against* —
 and binaries take `$cputype`, because they are *executed*.
+***386 CROSS-COMPILES: `objtype=386 mk install` COMPLETES.*** Ten
+blockers, and every one was a thing that stopped being true for
+everyone and was only ever checked on amd64. **perl is the only
+package still gated out**, for its amd64 `config.h` and not for
+anything to do with cross-compiling as such; the other ten
+architectures are untried. The walk is in `docs/releases/0.7.md`.
+**`tclConfig.sh`/`tkConfig.sh` are GENERATED** by `lib/tcl`/`lib/tk`'s
+mkfiles into `$objtype/lib/ape` — a TEA configure needs them, and the
+one already in the tree (`external/tcl/unix/tclConfig.sh`, tracked)
+is **somebody's Linux configure output**: `TCL_CC='cc'`, `-O2`,
+`NOTIFIER_EPOLL`, `.so`. *The answer was not missing, it was wrong.*
 `sys/src/ape/config` and `apexp-sh` were already right; **`mount-include`
 was not**, and bound the target's headers and libraries using
 `$cputype`. *On a native build the two strings are equal, so nothing
