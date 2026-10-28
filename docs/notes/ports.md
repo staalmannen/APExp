@@ -1899,6 +1899,36 @@ this is the whole record, including the wrong turns.*
   reached) -- *and the likeliest outcome by this port's own history is
   a FIFTH wall one file further in, which would be progress rather
   than refutation.* Still out of the default build.
+  **A go1.4 patch from the 9fans list was offered and the answer is NOT
+  YET, for two independent reasons.** It rewrites
+  `src/syscall/exec_plan9.go`: `forkAndExecInChild` stops taking a
+  precomputed `fdsToClose` (built by an `init()` that snapshots `#d`
+  into `startupFds`) and instead walks `#d` **in the child, after the
+  fork**, with bounds-checked 9P directory parsing (`gdirname`,
+  `gstringb`) in `//go:nosplit` code. *That is a real fix* -- an
+  init-time snapshot is stale for anything opened later, and the old
+  parse did arithmetic on a length it had not range-checked.
+  **But it is GO source, and our blocker is C.** `cmd/dist` is stage 1;
+  `src/syscall/` is the standard library the stage-2 toolchain
+  compiles. Nothing in this patch can affect `plan9.c` or `unix.c`.
+  **And it does not apply**: `git apply --check` fails at
+  `exec_plan9.go:215`, because the patch's base has
+  `r1, _, _ = RawSyscall(SYS_CLOSE, ...)` with an `if int32(r1) == -1`
+  check and **our vendored copy has a bare `RawSyscall(SYS_CLOSE, ...)`
+  with no check at all**. `git log` on that file shows only the import,
+  so *the divergence is VINTAGE rather than ours* -- our go1.4 predates
+  the patch's base.
+  **So: take it when go builds, port it by hand rather than by
+  `apply`, and judge nothing about a built go until it is in** -- the
+  bootstrap toolchain itself runs subprocesses, so this is a path it
+  exercises rather than a corner.
+  ***AND THE FIRST CHECK OF THAT SAID THE OPPOSITE.*** The shell line
+  was `git apply --check ... | head -5 && echo "APPLIES CLEANLY"`, and
+  `head` exits 0 whatever the check did, so it printed APPLIES CLEANLY
+  under the words `patch does not apply`. *A check that passes for the
+  wrong reason*, in the instrument rather than in the tree, which is
+  the rule this file already carries -- and the only reason it was
+  caught is that the real message was on screen beside the false one.
 
 **Ports built but never exercised**, which is a different and cheaper
 item -- *a port that builds and has never run is not a port*:
