@@ -46,9 +46,28 @@
 # itself.
 #
 # Only for helpers.  Anything that is part of the product is built for
-# `$objtype' like everything else, and a bootstrap stage -- `miniperl',
-# `objc1', muon's `embedder' -- is NOT a helper: the binary it runs is
-# the product, so building it for the host means building the port
-# twice.  See CLAUDE.md.
+# `$objtype' like everything else.
+#
+# WHICH THINGS ARE HELPERS, and the first version of this comment got
+# it wrong.  It said `miniperl', `objc1' and muon's `embedder' are
+# bootstrap stages that CANNOT be built this way because "the binary it
+# runs is the product".  **Reading the four tools refuted that.**
+# `embedder' reads .meson scripts and prints a C header; `objc1' reads
+# preprocessed .m and writes C for `$thecc' to compile; `miniperl'
+# writes `perlmain.c'.  ***Every one of them emits
+# architecture-independent text***, so every one of them COULD run on
+# the host.
+#
+# The real difference is COST, not possibility:
+#
+#   * `mkbuiltins' and `embedder' are single-file tools.  One `hostcc'
+#     and they are done.
+#   * `miniperl' and `objc1' ARE the port.  Host-building them means
+#     building libperl, or objc's runtime, a second time for the host
+#     -- real work, not one line.
+#
+# *`embedder' was classified from its position in a list rather than
+# from what it does*, and that is the mistake to avoid here: open the
+# tool before deciding which kind it is.  See CLAUDE.md.
 objtype=$cputype
 exec pcc $*
