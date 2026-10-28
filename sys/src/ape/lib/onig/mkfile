@@ -36,8 +36,24 @@ ONIGSRC=$APEXPROOT/sys/src/external/oniguruma/src
 # Turning it on is `+ regposix.$O regposerr.$O' and `-DUSE_POSIX_API'
 # below -- but then do NOT install `onigposix.h' alongside the others.
 
-ONIG64=`{if(~ $objtype amd64 arm64 power64) echo -DSIZEOF_VOIDP=8}
-ONIG32=`{if(! ~ $objtype amd64 arm64 power64) echo -DSIZEOF_VOIDP=4}
+# ***THE QUOTES ARE LOAD-BEARING AND THEIR ABSENCE COST A ROUND.***
+# `echo -DSIZEOF_VOIDP=8' hands rc a bare `=' as an ARGUMENT, which is
+# the parse error this tree has a rule and a sweep about:
+#
+#	/rc/lib/rcmain:24 *eval*:1: token '=': syntax error
+#
+# twice, once per line, and then `config.h''s #error because the flag
+# never arrived.  `lib/chicken/mkfile''s identical-looking `$WORD64'
+# works only because `-DC_SIXTY_FOUR -DC_LLP' happens to contain no
+# `='.  *Copying the shape of a working line is not copying the reason
+# it works.*
+#
+# **`rceq-sweep.py' did not catch it**, and that is a gap in the sweep
+# rather than bad luck: it reads tab-indented RECIPE lines, and this is
+# a top-level assignment whose VALUE mk hands to rc through a
+# backquote.  Fixed there too.
+ONIG64=`{if(~ $objtype amd64 arm64 power64) echo '-DSIZEOF_VOIDP=8'}
+ONIG32=`{if(! ~ $objtype amd64 arm64 power64) echo '-DSIZEOF_VOIDP=4'}
 
 # SIZEOF_VOIDP arrives here and NOT in config.h on purpose: see that
 # file.  The LLP64 set is measured -- `SZ_IND' is 8 in exactly
