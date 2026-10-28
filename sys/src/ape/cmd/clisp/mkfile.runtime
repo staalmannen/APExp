@@ -7,6 +7,9 @@ BIN=$APEXPROOT/$objtype/bin/ape
 LIBDIR=$APEXPROOT/$objtype/lib/ape
 BUILD=build-$objtype
 
+# $CPARTS and $GLPARTS, shared with mkfile.rebuild rather than copied.
+<mkfile.cparts
+
 # Upstream's configure and GNU make rules build lisp.run, compile the Lisp
 # sources into *.fas, construct the base linking set and memory image, and
 # build the clisp launcher. Run them natively in the 9front APE environment.
@@ -170,35 +173,81 @@ configure:V:
 		./floatparam floatparam.h
 	}
 
-# ***THE RUNTIME mkfile IS THE PIECE THAT IS NOT WRITTEN YET, AND THIS
-# TARGET SAYS SO RATHER THAN FAILING INSIDE GNU make.***
+# ***THE LINK OF `lisp.run', WHICH IS WHAT `makemake' EXISTED TO
+# EXPRESS.*** `configure:V:' above produces the three generated headers;
+# this produces the binary.  What it does NOT yet produce is the base
+# image, and that split is deliberate -- see `base:V:' below.
 #
-# `configure' above now produces the three files upstream's configure
-# would have produced -- `config.h' by hand, `intparam.h' and
-# `floatparam.h' by compiling and RUNNING upstream's own probes.  What
-# it does NOT produce is the Makefile, because that came from
-# `makemake', 4108 lines of shell whose output drives the compile of
-# `$CPARTS', the link of `lisp.run', the Lisp bootstrap that compiles
-# `*.lisp' into `*.fas', and the memory-image dump.
+# The command `makemake.in:2794' emits is
 #
-# The object list is not the hard part and is already known:
-# `mkfile.rebuild' enumerates `$CPARTS' and generates their `.c'.  **The
-# hard part is the second half** -- `lisp.run' is run to build the base
-# image, so the Lisp bootstrap is a stage that executes what it just
-# built, the one shape that cannot cross-compile and the reason the
-# `$objtype'/`$cputype' guard above is where it is.
+#	$(CC) $(CFLAGS) $(CLFLAGS) $(OBJECTS) modules.o $(LIBS) -o lisp
 #
-# *A target that invoked `$BIN/make -C $BUILD' would fail inside a
-# Makefile that configure no longer writes*, and the message would be
-# about a missing file rather than about the state of this port.
-build:V: configure
+# and every piece of it is now known rather than generated: `$OBJECTS'
+# is `$CPARTS' from `mkfile.cparts', `modules.c' is SHIPPED in `src/'
+# rather than generated (`--without-dynamic-modules' leaves it trivial),
+# and `$LIBS' reduces to `libgnu.a', which is four files.
+#
+# **`-D_PLAN9_SOURCE' IS LOAD-BEARING AND IT IS UPSTREAM'S OWN NAME.**
+# `lispbibl.d:1' tests a list of platform macros -- `__unix', `_AIX',
+# `__MACH__', `__NetBSD__' and, already there, `_PLAN9_SOURCE' -- and
+# defines `unix', which `:220' turns into `UNIX'.  *CLISP has
+# contemplated this platform since before this port existed*; without
+# the flag the file selects no operating system at all, the same shape
+# as `$ARCHDEF' selecting no CPU, and the failure would surface
+# somewhere unrelated.
+#
+# `-I$BUILD' comes FIRST because the three generated headers live there
+# and must shadow anything of the same name in the source tree.
+lisprun:V: configure
 	@{
-		echo 'clisp: configure output is in '$BUILD' --'
-		echo '       config.h (hand-answered), intparam.h, floatparam.h'
-		echo '       (measured by running upstream probes under pcc).'
-		echo '       The runtime mkfile that replaces makemake is the'
-		echo '       next step; see the comment above this target.'
+		root=`{cd $APEXPROOT; pwd}
+		srcroot=`{cd $CLISPSRC; pwd}
+		ARCHDEF=()
+		if (~ $objtype amd64)        ARCHDEF='-D__x86_64__'
+		if (~ $objtype 386)          ARCHDEF='-D__i386__'
+		if (~ $objtype arm)          ARCHDEF='-D__arm__'
+		if (~ $objtype mips)         ARCHDEF='-D__mips__'
+		if (~ $objtype sparc sparc64) ARCHDEF='-D__sparc__'
+		if (~ $objtype 68020)        ARCHDEF='-D__m68k__'
+		if (~ $objtype power power64) ARCHDEF='-D__powerpc__'
+		cd $BUILD
+		CDEFS='-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION'
+		INCS='-I. -I'^$srcroot^/src
+		GLINC='-I'^$srcroot^/src/gllib
+		for (f in $GLPARTS) {
+			pcc -Fw -c $CDEFS $INCS $GLINC -o gl-`{basename $f}^.$O $srcroot/src/gllib/$f^.c
+		}
+		ar vu libgnu.a gl-*.$O
+		for (f in $CPARTS) {
+			pcc -Fw -c $CDEFS $ARCHDEF $INCS -o $f.$O $f.c
+		}
+		pcc -Fw -c $CDEFS $ARCHDEF $INCS -o modules.$O $srcroot/src/modules.c
+		OBJS=()
+		for (f in $CPARTS) OBJS=($OBJS $f.$O)
+		pcc -o lisp.run $OBJS modules.$O libgnu.a
 	}
+
+# ***THE BASE IMAGE IS A SEPARATE TARGET BECAUSE IT RUNS WHAT IT JUST
+# BUILT.*** `lisp.run' reads `*.lisp', compiles them to `*.fas' and
+# dumps a memory image; that is the stage which cannot cross-compile,
+# and keeping it out of `lisprun:V:' means **a link failure and a
+# bootstrap failure are different targets rather than one log**.
+#
+# *A binary that links has not been shown to run*, which is the gap
+# `miniperl' had and `bacon' closed by making generation 2 do real
+# work.  Not written yet; `lisp.run' linking is the thing to measure
+# first, since a bootstrap driven by a broken binary reports nothing
+# about the bootstrap.
+base:V: lisprun
+	@{
+		echo 'clisp: lisp.run is built in '$BUILD'.'
+		echo '       The Lisp bootstrap (lisp.run compiles *.lisp to'
+		echo '       *.fas and dumps the base image) is the next step.'
+		echo '       Run ./lisp.run there by hand first: a binary that'
+		echo '       links has not been shown to run.'
+	}
+
+build:V: base
 
 install:V: build
 

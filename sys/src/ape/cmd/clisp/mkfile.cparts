@@ -1,0 +1,45 @@
+# CLISP's compiled translation units -- SHARED by mkfile.rebuild and
+# mkfile.runtime, and shared rather than copied on purpose.
+#
+# `mkfile.rebuild' turns `*.d' into `*.c'; `mkfile.runtime' compiles a
+# SUBSET of those `.c' and links them.  The subset is the point:
+# CLISP's build has 132 `.d' files and only the names below become
+# objects -- everything else (`lispbibl', every `spvw_*', every
+# `arilev*') is `#include'd INTO one of these, which is why the build
+# directory is full of `.c' files nothing compiles.
+#
+# **Two copies of this list would drift**, and the failure mode is not
+# a missing file: a name dropped from the runtime's copy is a
+# translation unit that is generated, never compiled, and shows up as
+# undefined symbols at the LINK with nothing nearby to say why.  *This
+# tree has paid for a hand-maintained list falling out of step with the
+# thing it describes four times* -- perl's `config.h' against its
+# `Config.pm', bash's `config.h', the six `SIZEOF_*' files -- so the
+# list lives in one file and both mkfiles read it with `<'.
+#
+# Adapted from `makemake.in'.  This port disables dynamic FFI, threads
+# and optional modules, which is why no `*_mod' name appears.
+
+CPARTS=\
+	spvw spvwtabf spvwtabs spvwtabo\
+	eval control encoding pathname stream socket io funarg\
+	array hashtabl list package record weak sequence charstrg debug\
+	error misc time predtype symbol lisparit i18n unixaux built
+
+# gnulib, and it is FOUR FILES rather than eleven.
+#
+# `gllib/Makefile.am' distinguishes `libgnu_a_SOURCES' (always built)
+# from `EXTRA_libgnu_a_SOURCES' (built only when the system lacks the
+# function).  **All eight of the EXTRA ones are in libap already** --
+# `alloca', `getpagesize', `gettimeofday', `mbrtowc', `mbsinit',
+# `mbsrtowcs', `memchr', `nl_langinfo' -- measured with
+# `sys/lib/tests/apfunc-sweep.py' rather than assumed, each reported
+# `defined' with the implementing file named.  What is left is the two
+# that are gnulib's own rather than libc's, plus the two Unicode
+# tables, which no libc has.
+#
+# *Adding one of the eight back would not be harmless*: it would give
+# the link two definitions of a libc function, which is the `f2c'
+# `redefinition: malloc' shape this tree already records.
+GLPARTS=\
+	localcharset strnlen1 uniname/uniname uniwidth/width
