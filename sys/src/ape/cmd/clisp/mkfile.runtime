@@ -214,8 +214,9 @@ lisprun:V: configure
 		CDEFS=(-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION)
 		INCS=(-I. '-I'^$srcroot^/src)
 		GLINC='-I'^$srcroot^/src/gllib
+		GLDEFS='-DLIBDIR="/'^$objtype^'/lib/ape"'
 		for (f in $GLPARTS) {
-			pcc -Fw -c $CDEFS $INCS $GLINC -o gl-`{basename $f}^.$O $srcroot/src/gllib/$f^.c
+			pcc -Fw -c $CDEFS $GLDEFS $INCS $GLINC -o gl-`{basename $f}^.$O $srcroot/src/gllib/$f^.c
 		}
 		ar vu libgnu.a gl-*.$O
 		for (f in $CPARTS) {
