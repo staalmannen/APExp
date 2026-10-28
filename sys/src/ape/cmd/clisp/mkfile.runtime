@@ -108,6 +108,7 @@ configure:V:
 	@{
 		root=`{cd $APEXPROOT; pwd}
 		srcroot=`{cd $CLISPSRC; pwd}
+		here=`{pwd}
 		if (~ $objtype arm64 spim) {
 			echo 'CLISP upstream does not support the 9front '$objtype' target yet'
 			exit 1
@@ -129,17 +130,53 @@ configure:V:
 		}
 		mkdir -p $BUILD
 		cd $BUILD
-		pfx=$root^/^$objtype
-		if (! test -f config.status) {
-			env 'CC=pcc' 'CPPFLAGS=-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION '^$ARCHDEF 'CFLAGS=-Fw -D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION '^$ARCHDEF sh $srcroot/configure . '--srcdir='^$srcroot '--prefix='^$pfx '--exec-prefix='^$pfx '--bindir='^$pfx^/bin/ape '--libdir='^$pfx^/lib/ape '--localedir='^$root^/sys/lib/ape/locale --ignore-absence-of-libsigsegv --without-ffcall --without-readline --without-dynamic-modules --disable-nls
+		cp $here/config.h config.h
+		if (! ~ $objtype $cputype) {
+			echo 'clisp: intparam/floatparam must RUN to answer, and a'
+			echo '       '$objtype' binary cannot run on a '$cputype' host.'
+			echo '       hostcc is NOT the way out here: it would measure'
+			echo '       the HOST compiler, and kencc is LLP64, so the'
+			echo '       answer would be a wrong width rather than none.'
+			echo '       Build clisp natively.'
+			exit 1
 		}
+		pcc -Fw -o intparam $srcroot/src/intparam.c
+		./intparam intparam.h
+		pcc -Fw -o floatparam $srcroot/src/floatparam.c
+		./floatparam floatparam.h
 	}
 
+# ***THE RUNTIME mkfile IS THE PIECE THAT IS NOT WRITTEN YET, AND THIS
+# TARGET SAYS SO RATHER THAN FAILING INSIDE GNU make.***
+#
+# `configure' above now produces the three files upstream's configure
+# would have produced -- `config.h' by hand, `intparam.h' and
+# `floatparam.h' by compiling and RUNNING upstream's own probes.  What
+# it does NOT produce is the Makefile, because that came from
+# `makemake', 4108 lines of shell whose output drives the compile of
+# `$CPARTS', the link of `lisp.run', the Lisp bootstrap that compiles
+# `*.lisp' into `*.fas', and the memory-image dump.
+#
+# The object list is not the hard part and is already known:
+# `mkfile.rebuild' enumerates `$CPARTS' and generates their `.c'.  **The
+# hard part is the second half** -- `lisp.run' is run to build the base
+# image, so the Lisp bootstrap is a stage that executes what it just
+# built, the one shape that cannot cross-compile and the reason the
+# `$objtype'/`$cputype' guard above is where it is.
+#
+# *A target that invoked `$BIN/make -C $BUILD' would fail inside a
+# Makefile that configure no longer writes*, and the message would be
+# about a missing file rather than about the state of this port.
 build:V: configure
-	$BIN/make -C $BUILD clisp base
+	@{
+		echo 'clisp: configure output is in '$BUILD' --'
+		echo '       config.h (hand-answered), intparam.h, floatparam.h'
+		echo '       (measured by running upstream probes under pcc).'
+		echo '       The runtime mkfile that replaces makemake is the'
+		echo '       next step; see the comment above this target.'
+	}
 
 install:V: build
-	$BIN/make -C $BUILD install-bin
 
 installall:V:
 	for (objtype in $CPUS) @{
