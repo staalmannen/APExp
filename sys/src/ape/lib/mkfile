@@ -23,6 +23,12 @@ _OPTIONAL_LIBS=\
 	lua\
 	lz4\
 	lzma\
+# oniguruma -- the regex engine PHP's mbstring needs for mb_ereg*.\
+# NEVER BUILT BY pcc: gcc syntax-checks its seven core files clean\
+# against our config.h, which is a different claim.  One failing entry\
+# aborts the whole tree's mk, so this line is what to delete if it\
+# stops a rebuild.\
+	onig\
 	pascal\
 	pcre2\
 	png\
