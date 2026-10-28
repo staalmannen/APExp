@@ -369,9 +369,22 @@ writes `.c` from `.def`; `embedder` prints a C header from `.meson`
 scripts; `objc1` writes the C that `$thecc` then compiles; `miniperl`
 writes `perlmain.c`. All four could run on the host. What differs:
 *`mkbuiltins` and `embedder` are SINGLE-FILE tools* — one `hostcc` and
-they are done, and both are. *`miniperl` and `objc1` ARE the port* —
-host-building them means building libperl, or objc's runtime, a second
-time, which is real work rather than one line.
+they are done, and both are. *`miniperl` and `objc1` ARE the port*, so
+they need more than one word — **but "building the port twice" was an
+overstatement and the cheaper route is to USE THE HOST BINARY THE TREE
+ALREADY REQUIRES.** `apexp-sh`'s own first line is "APExp must already
+have been built for `$cputype`", so after any native build
+`$cputype/bin/ape/objc1` and `.../perl` exist and can do the
+translating. *`objc` is cheaper still than that*: its stage 1 is
+**147 files of Objective-C upstream has already translated to C**, so
+a host `objc1` builds from them with `hostcc` and nothing needs
+translating to get it. What a cross build then wants is stage 1's
+BINARIES for `$cputype` and its RUNTIME LIBRARIES for `$objtype` —
+the same split as everywhere else, applied inside a two-stage build,
+rather than two whole builds. **The cost is version skew**: a host
+binary left by an older native build generates from sources that have
+since moved, and `perlmain.c` lists the extensions, so it is the kind
+of staleness that compiles and is wrong.
 **This file twice said a "bootstrap stage" CANNOT be host-built
 because the binary it runs is the product. That is wrong**, and it is
 what kept `embedder` in the wrong group for a round: *it was

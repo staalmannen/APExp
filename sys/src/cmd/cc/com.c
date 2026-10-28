@@ -4,7 +4,46 @@ typedef struct Com Com;
 struct Com
 {
 	int	n;
-	Node	*t[500];
+/*
+ * 500 UPSTREAM, AND THE MISMATCH IS OURS RATHER THAN THE NUMBER BEING
+ * WRONG.  Upstream's `cc' has no compound-literal lowering; APExp's
+ * `dcl.c:clitzero()' has, and it emits **one assignment per uncovered
+ * pointer-sized word** of the hidden auto -- a comma chain whose length
+ * is the literal's SIZE IN WORDS.  We added the thing that feeds this
+ * array and left the array as it was.
+ *
+ * `objtype=386 mk install' is what finally showed it, in muon:
+ *
+ *	parser.c:1228 comma list overflow
+ *
+ * which is the `};' of `*p = (struct parser){ .wk = wk, ... }'.
+ * `struct parser' carries a `char msg[2048]', and `clitzero's body
+ * stores one word at a time:
+ *
+ *	zt = ewidth[TIND] > ewidth[TLONG]? types[TVLONG]: types[TLONG];
+ *
+ * **8 bytes on amd64 and 4 on 386** -- so the same source needs about
+ * 300 nodes on amd64 and about 600 on 386.  *One fits under 500 and
+ * the other does not*, which is why this compiled for years on the
+ * only target anyone built.  `clitzero's own comment predicted the
+ * shape ("THE COST IS LINEAR ... recorded rather than capped") and
+ * guessed the literals here were small; `struct parser' is not.
+ *
+ * The array is a STACK local in `comma()', which `commas()' re-enters,
+ * so this costs per frame: 2000 pointers is 8K on a 32-bit target and
+ * 16K on a 64-bit one, and the nesting depth is an expression's, not a
+ * program's.  That is the reason it is 2000 and not 20000.
+ *
+ * **THIS IS A CAP RAISE AND NOT THE FIX.**  600 straight-line stores
+ * for one compound literal is bad code on 386 and 300 is bad code on
+ * amd64; the cap only stops it being a fatal.  The real repair is for
+ * `clitzero' to stop emitting per-word stores for a large uncovered
+ * region -- assigning a zeroed static of the same type is ONE node and
+ * `sugen' already knows how to copy a struct.  Not done here because a
+ * `cc/' change cannot be tested on the build host, and this round was
+ * unblocking a cross build rather than rewriting the lowering.
+ */
+	Node	*t[2000];
 };
 
 int compar(Node*, int);
