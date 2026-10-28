@@ -62,6 +62,20 @@ CLEANFILES=*.c *.tmp
 # *The message names the victim*, after the `lock.h' shadow and
 # `cmd/mkfile:96'.
 
+# `End of comment outside comment in line 5699' IS EXPECTED AND IS
+# COSMETIC.  It comes from `utils/varbrace.c:1123' on `lispbibl.d's
+# `arrayflags_dispoffset_bit', a comment opened inside a `#define' and
+# closed two lines later: varbrace's `#' arm takes the raw line with
+# `next_line()' and never enters its comment scanner, so the `*/' looks
+# orphaned.  It then falls through to `goto separator', which is what a
+# `*' does anyway.  **Measured, not argued**: varbrace's input and
+# output both balance braces and parens at 0, are 17841 lines each, and
+# differ on 8 lines, none near 5699.  `docs/notes/ports.md' has the
+# host commands and the two reading errors it cost.
+#
+# *It also appears in the log AFTER the last `mv', which does not run
+# varbrace at all* -- varbrace writes to stderr and the rest goes to
+# stdout, so its POSITION in the log is not its position in the run.
 all:V: sources
 
 sources:V:

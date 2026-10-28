@@ -211,8 +211,8 @@ lisprun:V: configure
 		if (~ $objtype 68020)        ARCHDEF='-D__m68k__'
 		if (~ $objtype power power64) ARCHDEF='-D__powerpc__'
 		cd $BUILD
-		CDEFS='-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION'
-		INCS='-I. -I'^$srcroot^/src
+		CDEFS=(-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION)
+		INCS=(-I. '-I'^$srcroot^/src)
 		GLINC='-I'^$srcroot^/src/gllib
 		for (f in $GLPARTS) {
 			pcc -Fw -c $CDEFS $INCS $GLINC -o gl-`{basename $f}^.$O $srcroot/src/gllib/$f^.c

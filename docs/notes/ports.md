@@ -2844,3 +2844,66 @@ API.
 `__call_ctors`, so a translated program's file-scope constructors do not
 run. unrar has tables that may be built that way. *That is a second,
 independent criterion and it is cheaper to check than to debug.*
+
+### clisp: `End of comment outside comment in line 5699`
+
+`mk -f mkfile.rebuild sources` prints, once, from `utils/varbrace.c:1123`
+
+	End of comment outside comment in line 5699
+
+and it is **COSMETIC, measured rather than argued.**
+
+*What it is.* `lispbibl.d` has
+
+	#define arrayflags_dispoffset_bit  4 /* set, if there is space for the
+	                                        displaced-offset
+	                                        (<==> array adjustable or displaced) */
+
+-- a comment OPENED inside a preprocessor directive and closed two
+lines later.  `varbrace`'s `case '#'` arm swallows a directive with
+`next_line()`, taking the raw line and never entering its comment
+scanner, so the `/*` is never seen and the `*/` on the third line
+looks orphaned.  `case '*'` then prints this and falls through to
+`goto separator`, which is what a `*` does anyway: **the message is
+emitted on a path that changes nothing.**
+
+*Why that is a measurement and not a reading of the source.*  The whole
+pipeline is three plain C programs, so it runs on the BUILD HOST:
+
+	gcc -w -o comment5  sys/src/external/clisp/utils/comment5.c
+	gcc -w -o gctrigger sys/src/external/clisp/utils/gctrigger.c
+	gcc -w -o varbrace  sys/src/external/clisp/utils/varbrace.c
+	./comment5 src/lispbibl.d | sed -e 's/^%% .*//' | ./gctrigger >in.c
+	./varbrace <in.c >out.c
+
+Then `in.c` against `out.c`: **brace delta 0 and paren delta 0 on both
+sides**, 17841 lines each, and **8 differing lines** -- 15674, 15677,
+15678, 15680, 17810 and three more, which is `varbrace` doing its
+actual job of turning `var` declarations into braced blocks.  *The
+reported region is byte-identical between input and output.*  Since
+the only way this warning could matter is `varbrace` mis-tracking
+nesting and inserting a brace in the wrong place, and nesting balances
+and that region is untouched, it does not matter.
+
+**Two reading errors on the way, both mine.**
+
+*(1) The first host run used the wrong pipeline and produced an extra,
+scarier message.*  Run without `sed -e 's/^%% .*//'` it also says
+
+	No opening delimiter for closing delimiter ')' in line 5831
+
+and line 5831 is inside a `%%` block, where a `sprintf(` is closed
+several lines later across an `#ifdef`.  **`mkfile.rebuild:71` pipes
+`lispbibl` through that `sed` and no other file**, so those lines are
+blanked before `varbrace` ever sees them and the message cannot occur
+in the real build -- which the corrected run confirms, one message and
+not two.  *An instrument that does not reproduce the build's own
+command measures a different program*, and this one invented a defect
+rather than missing one.
+
+*(2) The message appears in the log AFTER `mv ... gen.lispbibl.c`,
+which is the LAST step and does not run `varbrace` at all.*  It comes
+from the loop above it.  `varbrace` writes to stderr and everything
+else goes to stdout, and the two are buffered differently -- so the
+line's POSITION in the log is not its position in the run.  This tree's
+oldest rule, in a new place.

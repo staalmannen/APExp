@@ -1086,6 +1086,20 @@ in the topic file.
   and a round trip to the VM costs a full rebuild.
 - **A Tcl list literal has to survive rc first.** `{}` is a block, `()`
   is a list, only `''` quotes.
+  ***AND THAT RULE IS NOT ABOUT TCL***, which is how it was filed and
+  how it got misread. **rc does NOT word-split a quoted string**, so
+  `CDEFS='-D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION'` is ONE
+  word, and `pcc $CDEFS` hands cpp a single `-D` argument holding all
+  three: `cpp: <cmdarg>:1 Illegal -D or -U argument -D_POSIX_SOURCE
+  -D_BSD_EXTENSION`. A list of flags built in a recipe takes `()`, and
+  `'-I'^$srcroot^/src` is the way to get ONE word with a path in it.
+  *The sh habit is the trap*: there `"$CDEFS"` quotes and bare
+  `$CDEFS` splits, so the quoting reflex is backwards for rc. **Not
+  swept for and deliberately**: after the two in `cmd/clisp` were
+  fixed the shape occurs 0 times in 253 mkfiles, so a standing sweep
+  would have no positive control and nothing to find. `rc/bin/ape/
+  install:34`'s `*=($1 $2)` is the working precedent for the `()`
+  form.
 - **And `=` is a SYNTAX CHARACTER in rc**, legal only as an assignment
   at the start of a command or inside quotes. `awk -v name=$name` is
   not an argument, it is a parse error -- `token '=': syntax error` --
