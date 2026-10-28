@@ -95,27 +95,33 @@ HFILES=../../../external/bash/config.h ../../../external/bash/config-top.h ../..
 
 <$APEXPROOT/sys/src/cmd/mkone
 
-#during building from scratch, the system pcc may predate patches
-#(e.g. C23 bool keyword, include_next behaviour) that bash needs.
-#Use the APExp-local pcc that just got rebuilt.
+# `LD' USED TO SPELL OUT AN ABSOLUTE PATH AND NO LONGER NEEDS TO.
 #
-# ***$cputype AND NOT $objtype, BECAUSE THIS ONE IS EXECUTED.*** It had
-# been `$objtype' and `objtype=386 mk install' answered
+# The comment it carried -- "during building from scratch the system
+# pcc may predate patches (C23 `bool', include_next) that bash needs,
+# so use the APExp-local pcc that just got rebuilt" -- described a real
+# hazard from early APExp, when there was nothing to stop the HOST's
+# pcc answering. **That is what the union mounts in `apexp-sh' now do**:
+# it binds `$cputype/bin' and `$cputype/bin/ape' over `/bin' and sets
+# `LD=pcc' itself, so a bare `pcc' is already the local one. The
+# absolute path is residue.
+#
+# AND IT WAS A LIVE BUG, not merely redundant: the path read
+# `$objtype/bin/pcc', and `objtype=386 mk install' answered
 #
 #	../../../../../386/bin/pcc -o 8.out shell.8 ...
 #	/rc/lib/rcmain:24 *eval*:1: ...386/bin/pcc: exec header invalid
 #
-# -- a 386 binary handed to an amd64 kernel. The intent in the comment
-# above is right and the variable was wrong: a compiler is RUN on
-# $cputype and only its output is FOR $objtype. On a native build the
-# two strings are equal, so nothing could ever have shown it. *Fourth
-# instance of that shape, after mount-include, chicken's word-size
-# flags and LibreSSL's arch directory.*
+# -- a 386 binary handed to an amd64 kernel. *A compiler is RUN on
+# `$cputype' and only its output is FOR `$objtype'*, and on a native
+# build the two strings are equal so nothing could ever have shown it.
+# `$cputype' would have fixed it; a bare name is better still, because
+# it has no architecture in it to get wrong.
 #
 # `BIN' above keeps `$objtype' and is correct: that is where the built
 # bash is INSTALLED, not something this build runs.
 CC=pcc
-LD=$APEXPROOT/$cputype/bin/pcc
+LD=pcc
 YACC=bison
 
 DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\

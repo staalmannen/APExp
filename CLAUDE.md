@@ -368,6 +368,15 @@ counter-example and is right as it stands*: that is an install
 destination, not something the build runs. So is
 `cmd/pax/mkfile:189`'s `PAX_SAFE_PATH`, which is a path the finished
 binary uses **on the target**.
+**But for a TOOL the right answer is usually no path at all.** The
+absolute paths on `LD`, `YACC` and `LEX` are residue from early APExp,
+when nothing stopped the host's copy answering first; **`apexp-sh`
+binds `$cputype/bin` and `$cputype/bin/ape` over `/bin` and sets
+`LD=pcc` itself**, so a bare name is already this tree's own — and a
+bare name has no architecture in it to get wrong. `LD=pcc`,
+`YACC=bison`, `LEX=flex`. *A path is for something read as a
+DIRECTORY*, like `objc`'s `OBJCBIN`, which is where the driver looks
+for stage 1's `objc1` and so takes `$cputype`.
 ***THE FIRST CROSS BLOCKER IS FIXED AND IT WAS A TYPE TABLE.***
 `objtype=386 mk install` got past `mount-include` and stopped on
 `8c -FTVw ar.c`: `ar.c:586 bad in naddr: REGPAIR`, which is
