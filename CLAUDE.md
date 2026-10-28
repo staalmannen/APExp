@@ -355,10 +355,22 @@ copy is a failure at the first `#include <stddef.h>` in the first file
 compiled. 386 has one now. *The other seven are left out deliberately:
 a cross build stops at the first thing missing and there will be more,
 so the next should be found by a build rather than guessed.*
-**And a recipe that runs a binary it just built cannot cross-compile** —
-`cmd/perl/mkfile:86` (`./miniperl`), `cmd/muon/mkfile:192`
-(`./embedder`) and **`cmd/objc`**, whose stage 1 builds `objc1` for the
-target and whose stage 2 runs it, are the three outside `mk test`.
+**And a recipe that runs a binary it just built cannot cross-compile**
+— but **there are two kinds and only one of them is hard.**
+*A BUILD-TIME HELPER can simply be built for the host*: bash's
+`mkbuiltins` reads `.def` files and writes `.c` files, nothing of it
+ends up in the product, and `objtype=$cputype pcc` in front of its one
+compile is the whole fix. **A BOOTSTRAP STAGE cannot**, because the
+binary it runs *is* the product being built: `cmd/perl/mkfile:86`
+(`./miniperl`), `cmd/muon/mkfile:192` (`./embedder`) and `cmd/objc`,
+whose stage 1 builds `objc1` for the target and whose stage 2 runs it.
+Those three are the real list; `mkbuiltins` was a fourth and is fixed.
+*Ask which kind it is before deciding the port cannot cross-compile.*
+**The leading assignment is legal rc** — `objtype=$cputype pcc …`, the
+same form as the `objtype=386 mk install` that finds these — while an
+assignment used as an ARGUMENT (`mk objtype=$objtype install`) is the
+parse error `rceq-sweep.py` gates on. *The two look alike and only one
+works.*
 **Its companion is `$objtype` where `$cputype` was meant**, which is
 the same confusion one level down: a tool that is EXECUTED takes
 `$cputype` and only the things it reads or writes take `$objtype`.
