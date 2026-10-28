@@ -296,6 +296,18 @@ control**, because it expanded `NAME=./thing` in recipes and not in
 targets, and bash's rule is `$MKBUILTINS:`),
 `bfmove-sweep.py` (which bit-field groups the sharing rule moves; a
 LOWER bound, with an UNKNOWN column it reports rather than counts),
+`apfunc-sweep.py` (**does NOT gate**: for each name, does libap
+DEFINE it, only DECLARE it, or neither — **three states, and the
+middle one is the point**, since a `config.h` claiming a
+declared-only name link-fails far from the claim. `dlopen` and
+`dlerror` are that state. Written for clisp's hand-answered
+`config.h`; **its control caught two faults in two runs** — a `ROOT`
+three `dirname`s deep where `sys/lib/tests` needs four, which made
+every answer a confident `absent`, and a missing `\b` that reported
+`setenv` as defined in `fenv/fenv.c` by eating the `fe` of
+`fesetenv`. *The second is the worse shape: a hit, naming a real
+file.* The control checks WHERE and not just whether, for that
+reason),
 `truefalse-sweep.py` (**does NOT gate**: which vendored TUs use
 `true`/`false` as an IDENTIFIER without defining the names themselves —
 the shape kencc's C23 keywords break. **Its positive control is
@@ -570,14 +582,30 @@ built by hand has not been measured in that position*.
   unrelated jobs. The fourth is structural (`plan9.c` wants `<u.h>`; the
   portable `unix.c` arm is written and satisfied and simply switched
   off). **Out of the default build for 0.6.**
-- **clisp** — `configure` runs and reaches `C compiler cannot create
-  executables`, with hundreds of `5: Bad file descriptor` around it. The
-  fd mechanism is **cleared** (`execfd-test.sh`, 11 sections, 0 failures
-  on 9front, self-re-exec and 300 forks included), so that verdict is a
-  configure that could not write its own log and not a statement about
-  `pcc`. The plan is a hand-answered `config.h` plus an mkfile, as perl
-  and bash already have. **Out of the default build for 0.6; it is its
-  own release.**
+- **clisp** — `configure` reaches `C compiler cannot create executables`
+  under hundreds of `5: Bad file descriptor`, and the fd mechanism is
+  **cleared** (`execfd-test.sh`, 11 sections, 0 failures), so that is a
+  configure that could not write its own log. **`config.h` is
+  hand-answered now** (`cmd/clisp/config.h`), and `configure:V:` builds
+  and RUNS upstream's own `intparam`/`floatparam` probes for the other
+  two generated headers — *those must not be hand-answered and must not
+  use `hostcc`*, because they measure the compiler and kencc is LLP64,
+  so a host run reports the wrong widths rather than none.
+  ***AND THE STRONGER REASON TO HAND-ANSWER IS THAT A WORKING CONFIGURE
+  WOULD GET THIS MACHINE WRONG.*** `mman.c:44`'s `mprotect` is
+  `return 0` — a stub answering SUCCESS — so a configure probe passes
+  and sets `HAVE_WORKING_MPROTECT`, which `lispbibl.d:3013` reads to
+  switch on the GENERATIONAL GC, whose write barrier is page protection
+  plus SIGSEGV. *The barrier would never fire and the collector would
+  free live objects.* The memory model is forced the same way and is
+  not a preference: `p9_mmap_impl` refuses `MAP_FIXED` to an address,
+  so `SINGLEMAP_MEMORY` is impossible, and a mapping cannot grow in
+  place, so `TRIVIALMAP` is too — `lispbibl.d:4259` then selects the
+  malloc-backed `SPVW_BLOCKS`/`SPVW_MIXED`, a supported upstream mode.
+  **What is left is the runtime mkfile replacing `makemake`** (4108
+  lines); `$CPARTS` is already enumerated in `mkfile.rebuild`, and the
+  hard half is the Lisp bootstrap, which RUNS `lisp.run` to build the
+  base image. **Out of the default build; it is its own release.**
 
 **Ports built and running**, each with what is NOT measured:
 - **EDG** — `cpfe` builds, runs, and translates: `c++ -v -K /tmp/t.cpp`
