@@ -25,7 +25,6 @@ _OPTIONAL_LIBS=\
 	lzma\
 	pascal\
 	pcre2\
-	perl\
 	png\
 	readline\
 		history\
@@ -51,10 +50,29 @@ _TLS_LIBS=\
 _ZIP_LIBS=\
 	zip\
 
+# PACKAGES WHOSE HAND-ANSWERED `config.h' IS AN amd64 ANSWER SHEET.
+# perl's says `PTRSIZE 8' and `IVSIZE 8' with `IVTYPE long long', and
+# on 386 that is a lie about the machine AND more 64-bit arithmetic
+# than `8c' has registers for: `regcomp.c:288' (the end of
+# `edit_distance', whose inner line is a `MIN' of two subscripted
+# 64-bit expressions) answers `out of fixed registers', repeatedly,
+# then `too many errors'.
+#
+# **This is a deferral and not a fix.**  Making perl 32-bit-correct
+# means `PTRSIZE', `IVSIZE', `IVTYPE', `UVTYPE' and their limits, and
+# `Config.pm' kept in step by hand -- and *half a config.h is worse
+# than either end*, which is the trap written up at length on
+# `lib/chicken/mkfile'.  A target that cannot run perl cannot check
+# the answers either, so it is deferred rather than guessed.
+# `docs/releases/0.6.md' has the entry, and the other five files with
+# the same shape.
+_LLP64_ONLY_LIBS=`{if(~ $objtype amd64 arm64 power64) echo perl}
+
 DIRS=\
 	$_CORE_LIBS\
 	$_CORE_APP_DEPENDENCIES\
 	$_OPTIONAL_LIBS\
+	$_LLP64_ONLY_LIBS\
 	$_TLS_LIBS\
 	$_ZIP_LIBS\
 
