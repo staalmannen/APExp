@@ -41,5 +41,37 @@ CPARTS=\
 # *Adding one of the eight back would not be harmless*: it would give
 # the link two definitions of a libc function, which is the `f2c'
 # `redefinition: malloc' shape this tree already records.
+#
+# ***WHY NOT THE SHARED gnulib, WHICH THIS TREE ALREADY BUILDS?***  It
+# is a fair question -- `cmd/gnulib' builds a `libgnu.a' that bison,
+# tar, m4, sed, grep and base all link -- and the answer is measured
+# rather than conservative.
+#
+# **The two gnulibs are SIXTEEN YEARS apart**: `external/gnulib's
+# `localcharset.c' is Copyright 2000-2026, clisp's bundled copy is
+# 2000-2010, and they are structurally different rather than drifted --
+# 1120 lines against 548, and `uniwidth/width.c' is 95 against 359.
+# `strnlen1.c' differs on 18 of its 35 lines.  **And the shared tree
+# does not have `uniname/uniname.c' at all**, while `localcharset.c'
+# and `uniwidth/width.c' are present as sources that its mkfile never
+# builds; only `strnlen1' is actually in that `libgnu.a'.  So the
+# shared library supplies one of these four today.
+#
+# *The deciding reason is not the line counts, it is the HEADERS.*
+# gnulib's `.c' files are written against the `*.in.h' replacement
+# headers and the `config.h' of their OWN vintage, and clisp ships
+# `gllib/alloca.in.h', `langinfo.in.h', `stdbool.in.h', `stddef.in.h'
+# and `stdint.in.h' for exactly that reason.  Those pair with
+# `cmd/clisp/config.h', which is hand-answered.  **Compiling a 2026
+# `localcharset.c' against 2010 headers and a hand-written `config.h'
+# is the "half a config.h is worse than either end" trap** that
+# `lib/chicken/mkfile' writes up at length.
+#
+# The distinction that makes this consistent with the rest of the tree:
+# *bison, tar, m4, sed, grep and base take gnulib as a DEPENDENCY, so
+# they should share one.  clisp VENDORS a pinned subset as part of its
+# own source*, and four files is a small price for not mixing vintages.
+# If the bundled copy ever causes trouble, the shared tree is the
+# escape hatch and this comment is where to start.
 GLPARTS=\
 	localcharset strnlen1 uniname/uniname uniwidth/width
