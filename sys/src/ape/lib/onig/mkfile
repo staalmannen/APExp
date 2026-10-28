@@ -52,8 +52,30 @@ ONIGSRC=$APEXPROOT/sys/src/external/oniguruma/src
 # rather than bad luck: it reads tab-indented RECIPE lines, and this is
 # a top-level assignment whose VALUE mk hands to rc through a
 # backquote.  Fixed there too.
-ONIG64=`{if(~ $objtype amd64 arm64 power64) echo '-DSIZEOF_VOIDP=8'}
-ONIG32=`{if(! ~ $objtype amd64 arm64 power64) echo '-DSIZEOF_VOIDP=4'}
+# ***THE BACKQUOTE EMITS A NUMBER, NOT A FLAG, AND THAT IS THE SECOND
+# FIX TO THIS ONE LINE.***
+#
+# Round one was `echo -DSIZEOF_VOIDP=8' -- a bare `=' handed to rc as
+# an ARGUMENT, which answered `token '=': syntax error' twice.
+# Quoting it silenced rc and then **mk** objected instead:
+#
+#	mk: mkfile:56: syntax error; unknown attribute '-'
+#
+# *I have not settled exactly what mk disliked* -- that message is its
+# RULE parser complaining about `target:attr:', and there is no colon
+# on the line -- so this fix removes both candidates rather than
+# guessing between them: the backquote now contains no `=' and no `!'.
+# It emits `8' or `4', and the `-D' is assembled in `CFLAGS', where a
+# `=' is safe and has precedent (`lib/chicken/mkfile' carries
+# `-DSIGIO=SIGURG' in exactly that position).  **mk expands `$CFLAGS'
+# into the recipe and rc never re-lexes the CONTENTS of an expanded
+# variable**, which is the same fact that makes every `-DFOO=1' in this
+# tree fine and a literal one in a recipe fatal.
+#
+# *Two rounds on one line, and both were the `=' rule from a different
+# direction.*  `lib/chicken/mkfile''s `$WORD64' survives only because
+# `-DC_SIXTY_FOUR -DC_LLP' happens to contain neither character.
+ONIGPTR=`{if(~ $objtype amd64 arm64 power64) echo 8; if not echo 4}
 
 # SIZEOF_VOIDP arrives here and NOT in config.h on purpose: see that
 # file.  The LLP64 set is measured -- `SZ_IND' is 8 in exactly
@@ -62,7 +84,7 @@ ONIG32=`{if(! ~ $objtype amd64 arm64 power64) echo '-DSIZEOF_VOIDP=4'}
 # does not arrive, so a typo here is a failed compile rather than a
 # silently wrong pointer size.
 CFLAGS=-c -I. -I$ONIGSRC -I$APEXPROOT/sys/src/external/oniguruma\
-	-DHAVE_CONFIG_H $ONIG64 $ONIG32
+	-DHAVE_CONFIG_H -DSIZEOF_VOIDP=$ONIGPTR
 
 OFILES=\
 	regparse.$O regcomp.$O regexec.$O\

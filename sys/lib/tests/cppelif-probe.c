@@ -3,6 +3,20 @@
  *
  *	pcc -c cppelif-probe.c
  *
+ * ***RUN 1 ANSWERED NOTHING ABOUT THESE CASES, AND SAYING SO IS THE
+ * POINT.***  It answered
+ *
+ *	cpp: cppelif-probe.c:126 Unterminated string or char const
+ *
+ * which was the old case 3 -- now `cppskip-probe.c', because **cpp
+ * ABORTED there and `6c' never ran**.  Cases 1, 2 and 4 are detected
+ * by the COMPILER choking on text cpp should not have emitted, so a
+ * run that stops inside cpp reports nothing about them.  *Reading
+ * "cases 1 and 2 got past" out of that would have been reading an
+ * abort as a pass*, which is this tree's oldest rule wearing a new
+ * hat.  The fatal case is in its own file now and these three are
+ * unmeasured.
+ *
  * ***A PROBE, NOT A TEST.*** Nobody has promised an answer; report what
  * it prints. The result is whether it COMPILES, like `regpair-min'.
  *
@@ -83,7 +97,7 @@
  * probe's.
  */
 
-int ok1, ok2, ok3, ok4;
+int ok1, ok2, ok4;
 
 /* CASE 1: `#ifdef' then `#elif'.  This is unix.c's exact shape. */
 void
@@ -114,21 +128,6 @@ case2(int *dst, int ax)
 	ok2 = 1;
 }
 
-/* CASE 3: a skipped arm holding an apostrophe and an unbalanced quote.
- * A skipped block still has to be tokenised far enough to find the
- * `#endif', and that is where a lexer gets it wrong if it does. */
-void
-case3(int *dst, int ax)
-{
-#ifdef APEXP_PROBE_NEVER_A
-	dst[0] = ax;
-#elif defined(APEXP_PROBE_NEVER_B)
-	don't "start a string that never ends
-#else
-	dst[0] = ax;
-#endif
-	ok3 = 1;
-}
 
 /* CASE 4: the actual construct -- `asm volatile' with GCC extended
  * operands -- sitting in a skipped arm.  If only this one fails, the
