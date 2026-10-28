@@ -91,6 +91,25 @@ BUILD=build-$objtype
 # which is the recorded rule: a configuration that silently does
 # nothing produces a failure that looks like a different bug.
 #
+# ***`uniname.h', `uniwidth.h' AND `unitypes.h' ARE GENERATED FILES,
+# AND GENERATING THEM IS A COPY.***
+#
+# gllib ships them as `*.in.h', gnulib's template form, and the
+# Makefile turns each into a `.h' by substituting `@NAME@'
+# placeholders.  **All three contain ZERO placeholders** -- 26, 65 and
+# 45 lines, no `@' anywhere -- so for these the substitution is the
+# identity and `cp' is the whole of it.  *That is measured rather than
+# assumed*, because the same statement is false for most of gnulib's
+# `.in.h' files and would have silently produced a header full of
+# unsubstituted `@HAVE_...@'.
+#
+# They go in `$BUILD' and are found through `-I.'.  `uniname.c' lives
+# in `gllib/uniname/' and includes `"uniname.h"', so the quote-include
+# search looks in its own directory first, finds nothing -- that
+# directory has only `uninames.h' -- and falls through to `-I.'.
+# `cjk.h' is the counter-example and needs no help: it really is beside
+# `width.c' in `gllib/uniwidth/'.
+#
 # ***`-DHAVE_LONG_LONG_INT' ON BOTH PROBES IS LOAD-BEARING, AND ITS
 # ABSENCE IS NOT VISIBLE WHERE IT IS CAUSED.***
 #
@@ -167,6 +186,8 @@ configure:V:
 			echo '       Build clisp natively.'
 			exit 1
 		}
+		for (h in unitypes uniwidth uniname)
+			cp $srcroot/src/gllib/$h^.in.h $h^.h
 		pcc -Fw -DHAVE_LONG_LONG_INT -o intparam $srcroot/src/intparam.c
 		./intparam intparam.h
 		pcc -Fw -DHAVE_LONG_LONG_INT -o floatparam $srcroot/src/floatparam.c

@@ -225,6 +225,46 @@
 /* #undef HAVE_LIBSIGSEGV */
 /* #undef HAVE_MACH_VM */
 
+/* ---- knobs read by gllib rather than by clisp's own *.d ---------- */
+/*
+ * ***THESE FOUR WERE MISSING FROM THE FIRST DRAFT, AND THE REASON IS A
+ * GAP IN HOW THE INVENTORY WAS TAKEN.***  The 166 knobs this file
+ * answers came from `config.h.in' filtered by "is this name read by
+ * clisp's own `*.d'".  **gllib's `.c' files read config knobs too**,
+ * and they are not `.d' files, so none of their names could ever have
+ * appeared in that list.  `localcharset.c:167' then answered
+ * `name not declared: HAVE_WORKING_O_NOFOLLOW'.  *A filter is also a
+ * blind spot in the shape of the thing it filtered on.*
+ *
+ * They are swept for now rather than found one per build round: the
+ * four `$GLPARTS' sources and their local headers name exactly these.
+ */
+
+/* ***MUST BE 0, AND IT IS THE STUB-ANSWERS-SUCCESS FAMILY AGAIN.***
+   Note the spelling of the use: `localcharset.c:167' is
+   `O_RDONLY | (HAVE_WORKING_O_NOFOLLOW ? O_NOFOLLOW : 0)' -- an
+   EXPRESSION, not an `#ifdef', which is why an unanswered knob is a
+   hard error here rather than a silently taken branch.
+   APE's `<fcntl.h>:35' is `#define O_NOFOLLOW 0', and its own comment
+   at `:30' says why: enforcing it would mean an `lstat' before the
+   `open'.  So the flag is literally zero and the `open' follows
+   symlinks.  **Claiming 1 would tell gnulib it has a protection that
+   does nothing** -- gnulib's comment at `:159' explains that the flag
+   is there to stop an attacker reading an arbitrary file through a
+   planted `charset.alias' symlink. */
+#define HAVE_WORKING_O_NOFOLLOW 0
+
+/* <langinfo.h>:86 defines CODESET and libap implements nl_langinfo
+   (locale/langinfo.c). */
+#define HAVE_LANGINFO_CODESET 1
+
+/* <stdio.h>:158. */
+#define HAVE_DECL_GETC_UNLOCKED 1
+
+/* gnulib's relocatable-install machinery is not used; with this unset,
+   `relocate(x)' is `(x)' (localcharset.c:72). */
+/* #undef ENABLE_RELOCATABLE */
+
 /* ---- the memory model: see the header comment -------------------- */
 /* mmap works; the ANON/DEVZERO spellings the memory model keys on are
    deliberately NOT claimed, so lispbibl.d:4259 selects the
