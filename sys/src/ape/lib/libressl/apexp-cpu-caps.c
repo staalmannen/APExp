@@ -28,6 +28,27 @@
  * If assembly is ever wanted, this is the file to replace: write the
  * cpuid sequence in Plan 9 amd64 assembly and set the same three
  * variables.
+ *
+ * ***THE VARIABLE NAME IS PER-ARCHITECTURE AND THIS FILE HARDCODES
+ * amd64's.*** `crypto/arch/i386/crypto_arch.h' declares
+ * `crypto_cpu_caps_i386', aarch64's declares `crypto_cpu_caps_aarch64',
+ * and the other eight arch headers declare no such variable at all --
+ * so on 386 this file defines a name nothing declares and leaves a
+ * declared name undefined.
+ *
+ * **It is a wart rather than a blocker, and that is measured rather
+ * than assumed**: the only referents of any `crypto_cpu_caps_*' name
+ * in the whole of LibreSSL are `aes_amd64.c', `gcm128_amd64.c',
+ * `sha1_amd64.c' and `sha256_amd64.c', and the mkfile builds the
+ * GENERIC implementations instead -- `aes_core.c' and `gcm128.c'. No
+ * object in this archive reads either variable, on any target.
+ *
+ * It is deliberately not fixed. Naming it per-architecture means a
+ * `-D' computed from `$objtype' in the mkfile, and **if that
+ * computation ever came out empty the variable would simply vanish
+ * with no diagnostic** -- a silent failure mode traded for a wart
+ * that has no measured cost. If a `*_amd64.c' is ever added to the
+ * object list, this becomes real, and the fix belongs here.
  */
 
 #include <stdint.h>

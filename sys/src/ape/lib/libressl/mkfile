@@ -698,6 +698,33 @@ HAVEFLAGS=-DHAVE_ENDIAN_H\
 # else it #include_next's the platform header, and without the define it
 # included nothing at all, leaving the names to be resolved as
 # functions. APE's <endian.h> has the full set.
+# ***LibreSSL's ARCHITECTURE NAMES ARE NOT PLAN 9's `$objtype'.***  The
+# comment far above already LISTED upstream's directories -- aarch64,
+# amd64, arm, i386, loongarch64, mips, mips64, powerpc, powerpc64,
+# riscv64, sparc64 -- and then every -I below used `$objtype' raw.
+# **On amd64 the two strings happen to be equal**, so nothing could
+# ever have shown it, and `objtype=386 mk install' answered
+#
+#	crypto_internal.h:25 Could not find include file "crypto_arch.h"
+#
+# because the -I pointed at `crypto/arch/386', which upstream calls
+# `i386'.  *The same shape as `mount-include's `$cputype', and as
+# chicken's word-size flags: right on amd64 by coincidence.*
+#
+# Four names differ and one is a judgement: `spim' is little-endian
+# MIPS32 and upstream's `mips' is the 32-bit MIPS directory (`mips64'
+# is separate), so they share it.  That is safe here because
+# `crypto/arch/mips/crypto_arch.h' declares nothing at all -- only
+# aarch64, amd64 and i386 declare a `crypto_cpu_caps_*' variable, and
+# the other eight headers are empty of declarations.
+#
+# `68020' and 32-bit `sparc' have no upstream directory under any
+# name, so they map to themselves and fail at cpp with the message
+# above.  That is left as is deliberately: nothing has ever built for
+# either, and a gate for a target no one has reached is work invented
+# rather than measured.
+SSLARCH=`{echo $objtype | sed 's/^386$/i386/; s/^arm64$/aarch64/; s/^power$/powerpc/; s/^power64$/powerpc64/; s/^spim$/mips/'}
+
 BASEFLAGS=-c -I$SSLSRC/include -I$SSLSRC/include/compat\
 	-DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS=\
 	-DOPENSSL_NO_ASM -DOPENSSL_NO_HW_PADLOCK\
@@ -764,7 +791,7 @@ CRYPTOFLAGS=$BASEFLAGS -DLIBRESSL_CRYPTO_INTERNAL\
 	-I$SSLSRC/crypto/txt_db\
 	-I$SSLSRC/crypto/ui\
 	-I$SSLSRC/crypto/x509\
-	-I$SSLSRC/crypto/arch/$objtype -I$SSLSRC/crypto/bn/arch/$objtype
+	-I$SSLSRC/crypto/arch/$SSLARCH -I$SSLSRC/crypto/bn/arch/$SSLARCH
 
 # ssl/Makefile.am adds crypto and crypto/bio to the base flags and
 # nothing else: bio_ssl.c reaches crypto/bio/bio_local.h for the BIO
@@ -772,13 +799,13 @@ CRYPTOFLAGS=$BASEFLAGS -DLIBRESSL_CRYPTO_INTERNAL\
 # plain crypto directory. It does NOT get crypto/hidden -- see above.
 SSLFLAGS=$BASEFLAGS -I$SSLSRC/ssl/hidden\
 	-I$SSLSRC/crypto -I$SSLSRC/crypto/bio\
-	-I$SSLSRC/crypto/arch/$objtype
+	-I$SSLSRC/crypto/arch/$SSLARCH
 
 TLSFLAGS=$BASEFLAGS -DTLS_DEFAULT_CA_FILE="/sys/lib/ape/ssl/cert.pem"
 
 CFLAGS=$CRYPTOFLAGS
 
-# crypto/arch/$objtype/crypto_cpu_caps.c is NOT built. On amd64 it is
+# crypto/arch/$SSLARCH/crypto_cpu_caps.c is NOT built. On amd64 it is
 # GCC extended inline assembly --
 #
 #   __asm__ ("cpuid": "+a"(eax), "+b"(ebx), "+c"(ecx), "+d"(edx));
@@ -786,6 +813,18 @@ CFLAGS=$CRYPTOFLAGS
 # which kencc cannot parse. apexp-cpu-caps.c stands in for it and
 # reports no capabilities, which is the right answer under
 # OPENSSL_NO_ASM: there is no assembly to dispatch to.
+#
+# apexp-cpu-caps.c defines `crypto_cpu_caps_amd64' by that name, and
+# i386's header declares `crypto_cpu_caps_i386' instead -- so on 386
+# the stand-in defines a variable nothing declares and leaves one
+# declared that nothing defines. **That is a wart and not a blocker,
+# and the difference is measured**: the only referents of either name
+# anywhere in LibreSSL are `aes_amd64.c', `gcm128_amd64.c',
+# `sha1_amd64.c' and `sha256_amd64.c', and this mkfile builds the
+# GENERIC files instead (`aes_core.$O', `gcm128.$O'), so nothing in
+# the archive reads either variable. Left alone on purpose: giving it
+# a per-arch name needs a flag whose own failure mode is silent, for
+# no measured gain. See the file's header.
 apexp-cpu-caps.$O: apexp-cpu-caps.c
 	$CC $CRYPTOFLAGS apexp-cpu-caps.c
 
