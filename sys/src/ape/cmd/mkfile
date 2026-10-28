@@ -68,7 +68,6 @@ _OPTIONAL_APPS=\
 #	clisp\
 	tclsh\
 	itclsh\
-	perl\
 # GUI \
 	wish\
 # transpilers \
@@ -92,9 +91,17 @@ _OPTIONAL_APPS=\
 	openssl\
 	curl\
 
+# perl is gated on the word size: its hand-answered `config.h' says
+# `PTRSIZE 8' and `IVSIZE 8', which on an ILP32 target is a lie about
+# the machine and more 64-bit arithmetic than `8c' has registers for.
+# The reasoning, and the five other files with the same shape, are on
+# `../lib/mkfile' and in `docs/releases/0.6.md'.  Deferred, not fixed.
+_LLP64_ONLY_APPS=`{if(~ $objtype amd64 arm64 power64) echo perl}
+
 DIRS=\
 	$_CORE_APPS\
 	$_OPTIONAL_APPS\
+	$_LLP64_ONLY_APPS\
 # always last :) \
 	celebrate_finish
 
