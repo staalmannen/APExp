@@ -1,0 +1,54 @@
+#!/bin/rc
+# hostcc -- compile a BUILD-TIME HELPER, for the machine doing the build.
+#
+#	hostcc -I... -o mkbuiltins mkbuiltins.c
+#
+# A build-time helper is a program the BUILD RUNS and does not ship:
+# bash's `mkbuiltins' reads the .def files and writes .c files, and
+# nothing of it ends up in the installed shell.  Compiled with a bare
+# `pcc' it comes out for `$objtype', and `objtype=386 mk install' on an
+# amd64 machine then answers
+#
+#	../../mkbuiltins: exec header invalid
+#
+# at the moment the next recipe tries to run it.  **On a native build
+# `$objtype' and `$cputype' are the same string, so nothing could ever
+# have shown it.**
+#
+# WHY THIS IS A SCRIPT RATHER THAN A VARIABLE
+#
+# The obvious form is `HOSTCC=objtype=$cputype pcc' in a mkfile, and it
+# works -- a leading assignment is local to the command in rc, which is
+# the same shape as the `objtype=386 mk install' that finds these bugs.
+# Two things argue against it:
+#
+#   * `$HOSTCC' would smuggle an `=' into a recipe where
+#     `rceq-sweep.py' cannot see it.  **That sweep reads the mkfile
+#     text, not what mk expands it to**, so a variable holding an
+#     assignment is outside what it can check.  Here the `=' would be
+#     legal, but the sweep could no longer say so.
+#   * An assignment is only legal LEADING.  `$HOSTCC' put anywhere but
+#     the start of a recipe line becomes a parse error, and the mkfile
+#     would look fine.
+#
+# A command name has neither problem and reads the same everywhere.
+#
+# WHAT IT DOES NOT SOLVE
+#
+# `mount-include' binds `$objtype's headers and libraries, including
+# over `/sys/include/ape' -- so during a cross build a host compile
+# would see the TARGET's `stddef_arch.h' through that path.  The
+# arch-dependent headers are searched in `/$cputype/include/ape' FIRST
+# (the header-order invariant), so `mount-include' now binds that
+# directory and `$cputype/lib/ape' as well whenever the two differ.
+# **Without that bind this script quietly compiles against stock
+# 9front's APE**, which is a wrong answer that does not announce
+# itself.
+#
+# Only for helpers.  Anything that is part of the product is built for
+# `$objtype' like everything else, and a bootstrap stage -- `miniperl',
+# `objc1', muon's `embedder' -- is NOT a helper: the binary it runs is
+# the product, so building it for the host means building the port
+# twice.  See CLAUDE.md.
+objtype=$cputype
+exec pcc $*

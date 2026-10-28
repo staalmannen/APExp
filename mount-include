@@ -39,6 +39,34 @@ if(! test -e /sys/include/ape/THIS_IS_APExp) {
     bind -b $objtype/lib/ape /$objtype/lib/ape
 	bind -b $objtype/lib /$objtype/lib
     bind -b sys/include/ape /sys/include/ape
+    #
+    # AND THE HOST'S OWN HEADERS AND LIBRARIES, WHEN CROSS COMPILING.
+    #
+    # Every bind above is for `$objtype' and is right.  But a build
+    # also compiles the occasional BUILD-TIME HELPER -- a program it
+    # RUNS rather than ships, like bash's `mkbuiltins' -- and that one
+    # is built for `$cputype' (`rc/bin/ape/hostcc').
+    #
+    # Nothing above puts APExp's own headers where such a compile
+    # looks.  `/$cputype/include/ape' would be **stock 9front's**, and
+    # `/sys/include/ape' now carries the TARGET's arch headers bound
+    # over it -- so a host helper would be compiled against 386's
+    # `stddef_arch.h' on an amd64 machine, or against stock APE, and
+    # *neither of those says anything in the message.*
+    #
+    # The header-order invariant is what makes this enough:
+    # `/$objtype/include/ape' is searched AHEAD of `/sys/include/ape',
+    # so binding the host's arch directory puts the right
+    # `stddef_arch.h', `float.h', `stdarg.h' and `stdint.h' in front of
+    # the target's for an `objtype=$cputype' compile.
+    #
+    # Guarded, because when the two are equal the binds above have
+    # already done it and repeating them is just two more union
+    # components to search.
+    if(! ~ $objtype $cputype) {
+        bind -b $cputype/include/ape /$cputype/include/ape
+        bind -b $cputype/lib/ape /$cputype/lib/ape
+    }
     bind -b $cputype/bin /bin
     bind -a $cputype/bin/ape /bin
     bind -a rc/bin/ape /bin
