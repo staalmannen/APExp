@@ -7350,8 +7350,21 @@ local maygc void directory_search_scandir (bool recursively, task_t next_task,
       var object direntry;
       {
         var uintL direntry_len;
-       #if defined(UNIX_CYGWIN32)
+       #if defined(UNIX_CYGWIN32) || defined(_PLAN9_SOURCE)
         /* Neither d_reclen nor d_namlen present in DIR structure. */
+        /* APExp: _PLAN9_SOURCE joins this arm because its CONDITION is
+           upstream's own comment above, and APE matches it exactly --
+           `struct dirent' in <dirent.h>:39 is `d_name' and `d_stat',
+           and neither `d_reclen' nor `d_namlen' appears anywhere in
+           sys/include/ape.  The `#elif' below reads
+           `!defined(HAVE_STRUCT_DIRENT_D_NAMLEN)' and then uses
+           `dp->d_reclen', i.e. it assumes that a dirent without
+           d_namlen has d_reclen; on a POSIX-only dirent, which has
+           NEITHER, that arm is taken and answers
+             pathname.d:7362 not a member of struct/union: d_reclen
+           Putting the platform in upstream's existing list is this
+           tree's rule -- the condition is the struct's shape rather
+           than the name of an operating system. */
         direntry_len = asciz_length(dp->d_name);
        #elif !defined(HAVE_STRUCT_DIRENT_D_NAMLEN) || defined(__USE_GNU)
         { /* On UNIX_LINUX direntry_len := dp->d_reclen was sufficient, but in
