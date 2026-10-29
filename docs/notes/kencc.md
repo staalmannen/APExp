@@ -2305,7 +2305,32 @@ there is silent; and the two init tables fit their bounds (`TOLD` 25 <
 **`y.tab.c` is NOT committed** -- `mkfile`'s `YFILES=cc.y` regenerates
 it -- so nothing generated needs to go with this.
 
-***WHAT IS NOT CHECKED IS THE COMPILE, AND IT CANNOT BE FROM HERE.***
+***BUILT AND MEASURED ON THE VM. The compilers rebuild and the
+backends behave exactly as recorded.***
+
+`regpair-min.c` compiles under **nine** backends with no output.
+`regpair-probe.c` compiles under seven and fails under **kc and vc**
+with `regpair-probe.c:242 unknown op in lcgen: CAST` -- *which is the
+pre-existing fault this file already records*, upstream's and not
+ours, on case 3. **Identical to the baseline, so the merge moved
+nothing.** `bool-test` prints `all bool cases passed`;
+`designated-init-test` prints `all ok`.
+
+***NINE, NOT TEN: `qc` WAS NOT RUN.*** The tree has ten
+(`1c 2c 5c 6c 7c 8c 9c kc qc vc`) and the run covered nine. *A name
+absent from a list is not a measurement until you have checked the
+name could have been present*, and `qc` could -- it is one of the two
+whose recorded `vlong`-return failure turned out to be the `typesuv`
+bug. The sweep is outstanding by exactly one command.
+
+**`compound-literal-test` reports `1 failure(s)` and it is NOT this
+merge's**; the mechanism is in 0.6's open-bug inventory, and the check
+that it is not ours is that the merge's entire `dcl.c` change is one
+hunk in `fndecls()` while `compoundlit()`, `adecl()` and
+`case OARRAY:` are untouched.
+
+***WHAT WAS NOT CHECKED BEFORE THE BUILD, AND COULD NOT BE FROM
+HERE.***
 The VM must run `mk install` in `sys/src/cmd`, and then the rule this
 tree already carries for any change to `cc/`'s type tables: **run
 `regpair-probe` and `regpair-min` against all ten `[1-9kqv]c`

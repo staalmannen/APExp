@@ -207,7 +207,12 @@ reach for whenever the thing being tested is a pure function of its
 input.
 
 **kencc** — `bool-test`, `bitfield-test`, `compound-assign-test`,
-`compound-literal-test`, `designated-init-test`, `charptr-test`,
+`compound-literal-test` (**1 known failure, and it is NOT the merge's**:
+an array literal's frame slot is reserved as ZERO bytes, because
+`dcl.c:261` leaves `t->width` 0 for a declarator with no dimension and
+`compoundlit()` calls `adecl()` before `doinit()` learns the size --
+`sizeof` is unaffected, which is why bison never saw it; 0.6's
+inventory has the mechanism), `designated-init-test`, `charptr-test`,
 `rol64-test`, `u64float-test`, `initzero-test` (a compound literal must
 zero the members its list omits — muon's crash), `longconst-test` (an
 `L` is a floor on a constant's type, not a ceiling), `switchcase-test`
