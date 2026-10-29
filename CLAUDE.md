@@ -1039,6 +1039,19 @@ in the topic file.
   propagates the failure up through every enclosing directory, **one
   missing file failed the whole tree's distclean**. The sweep (a `test`
   dir beside an mkfile, without one of its own) found exactly that one.
+- **`farith: double fp to single fp overflow` while building
+  `sys/src/cmd` means the HOST's `6l`, not APExp's, and there is
+  NOTHING TO FIX.** It comes with `ctime:` on the next line, out of
+  `ieeedtof` in `*l/obj.c`, and `sys/src/cmd/ki` is byte-identical to
+  upstream -- *the input is not the variable, the linker is*. APExp's
+  own `-0.0` guard is committed in **all ten** linkers
+  (`(e->h & ~0x80000000L) == 0`), so ours cannot print it. **The same
+  directory builds inside a working `apexp-sh`**; `docs/notes/kencc.md`
+  files it under *A free control for the `ieeedtof` -0.0 fix*, which is
+  not a heading anyone hunting the error would look under, which is why
+  it is repeated here. *Check which `6l` answers before reading
+  anything into it*, and see the bind rule immediately below for how a
+  window quietly acquires the host's.
 - **`rm -rf` on a directory something has BOUND does not unbind it.**
   The bind still names the removed directory, a recreated one has a new
   qid, and the union component silently falls through to whatever is
