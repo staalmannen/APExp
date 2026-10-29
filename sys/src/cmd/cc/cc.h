@@ -17,6 +17,7 @@ typedef	struct	Hist	Hist;
 typedef	struct	Term	Term;
 typedef	struct	Init	Init;
 typedef	struct	Bits	Bits;
+typedef	struct	Spec	Spec;
 
 #define	NHUNK		50000L
 #define	BUFSIZ		IOUNIT
@@ -47,6 +48,16 @@ typedef	struct	Bits	Bits;
 struct	Bits
 {
 	ulong	b[BITS];
+};
+
+/*
+ * 9front a68335214: the two halves of a declaration specifier,
+ * carried separately instead of OR'd into one long.
+ */
+struct	Spec
+{
+	ulong	type;
+	ulong	class;
 };
 
 struct	Node
@@ -344,19 +355,49 @@ enum
 	TCDOUBLE,			/* double _Complex (2 doubles, 16 bytes) */
 	NCTYPE,				/* total type codes including complex */
 
-	TAUTO	= NTYPE,
-	TEXTERN,
-	TSTATIC,
-	TTYPEDEF,
-	TTYPESTR,
-	TREGISTER,
-	TCONSTNT,
-	TVOLATILE,
-	TUNSIGNED,
+	/*
+	 * 9front a68335214, "cc: untangle class and type specifiers".
+	 *
+	 * ***THE CLASS AND GARB CODES USED TO LIVE HERE, SHARING THIS
+	 * NUMBERING WITH THE TYPES, AND THAT IS WHAT RAN OUT.*** Every
+	 * `B...' below is `1L<<T...', so one `long' had to hold the
+	 * types AND the storage classes AND the qualifiers; `BNORET'
+	 * had reached `1L<<31' and `cc.y' carries a note about it.
+	 * Upstream's fix is to number the classes separately (`CG...',
+	 * from 0) and to pass the two halves as a `Spec' rather than
+	 * one word.  **That is headroom APExp needs rather than
+	 * upstream hygiene**: `_Complex', `_Alignas' and `_Generic'
+	 * all want type codes.
+	 *
+	 * ***AND THE MERGE IS NOT UPSTREAM'S PATCH.*** Upstream puts
+	 * `TUNSIGNED' at `NTYPE'. APExp already put `TCFLOAT' there,
+	 * so before this commit `TCFLOAT' and `TAUTO' were THE SAME
+	 * NUMBER, as were `TCDOUBLE' and `TEXTERN'. That was harmless
+	 * only because the two never met: the complex codes are
+	 * `etype' values indexing `[NCTYPE]' arrays and never enter
+	 * the `B...' bit space -- `grep` for `BCFLOAT' finds nothing.
+	 * *A collision that is harmless because of how the values
+	 * happen to be used is one the next change can expose*, and
+	 * this is that change. The pseudo-types now start at `NCTYPE',
+	 * after the complex codes, so nothing aliases anything.
+	 */
+	TUNSIGNED = NCTYPE,
 	TSIGNED,
-	TNORET,
 	TOLD,
 	NALLTYPES,
+
+	/* Storage classes and qualifiers, in their OWN numbering. */
+	CGXXX	= 0,
+	CGAUTO,
+	CGEXTERN,
+	CGSTATIC,
+	CGTYPEDEF,
+	CGTYPESTR,
+	CGREGISTER,
+	CGCONSTNT,
+	CGVOLATILE,
+	CGNORET,
+	NCGTYPE,
 
 	TRUNE	= sizeof(Rune)==4? TUINT: TUSHORT,
 };
@@ -408,23 +449,29 @@ enum
 	BUNION		= 1L<<TUNION,
 	BENUM		= 1L<<TENUM,
 	BDOT		= 1L<<TDOT,
-	BCONSTNT	= 1L<<TCONSTNT,
-	BVOLATILE	= 1L<<TVOLATILE,
 	BUNSIGNED	= 1L<<TUNSIGNED,
 	BSIGNED		= 1L<<TSIGNED,
-	BAUTO		= 1L<<TAUTO,
-	BEXTERN		= 1L<<TEXTERN,
-	BSTATIC		= 1L<<TSTATIC,
-	BTYPEDEF	= 1L<<TTYPEDEF,
-	BTYPESTR	= 1L<<TTYPESTR,
-	BREGISTER	= 1L<<TREGISTER,
-	BNORET		= 1L<<TNORET,
+
+	/*
+	 * These live in `Spec.class', numbered from 0, and no longer
+	 * compete with the types above for room in a 32-bit long.
+	 * The comment that used to sit below BNUMBER -- "these can be
+	 * overloaded with complex types" -- described the aliasing
+	 * this commit removes, so it is gone with it.
+	 */
+	BAUTO		= 1L<<CGAUTO,
+	BEXTERN		= 1L<<CGEXTERN,
+	BSTATIC		= 1L<<CGSTATIC,
+	BTYPEDEF	= 1L<<CGTYPEDEF,
+	BTYPESTR	= 1L<<CGTYPESTR,
+	BREGISTER	= 1L<<CGREGISTER,
+	BCONSTNT	= 1L<<CGCONSTNT,
+	BVOLATILE	= 1L<<CGVOLATILE,
+	BNORET		= 1L<<CGNORET,
 
 	BINTEGER	= BCHAR|BUCHAR|BSHORT|BUSHORT|BINT|BUINT|
 				BLONG|BULONG|BVLONG|BUVLONG,
 	BNUMBER		= BINTEGER|BFLOAT|BDOUBLE,
-
-/* these can be overloaded with complex types */
 
 	BCLASS		= BAUTO|BEXTERN|BSTATIC|BTYPEDEF|BTYPESTR|BREGISTER,
 	BGARB		= BCONSTNT|BVOLATILE|BNORET
@@ -604,7 +651,8 @@ EXTERN	int	vlanest;	/* depth of VLA scopes in current function */
 EXTERN	long	vlaseq;		/* counter for unique _vla<N> hidden variable names */
 
 extern	char	*onames[], *tnames[], *gnames[];
-extern	char	*cnames[], *qnames[], *bnames[];
+extern	char	*cnames[], *qtnames[], *qcnames[];
+extern	char	*bnames[];
 extern	char	tab[NTYPE][NTYPE];
 extern	char	comrel[], invrel[], logrel[];
 extern	long	ncast[], tadd[], tand[];
@@ -793,10 +841,10 @@ void	prtree(Node*, char*);
 void	prtree1(Node*, int, int);
 void	relcon(Node*, Node*);
 int	relindex(int);
-int	simpleg(long);
-Type*	garbt(Type*, long);
-int	simplec(long);
-Type*	simplet(long);
+int	simpleg(Spec);
+Type*	garbt(Type*, Spec);
+int	simplec(Spec);
+Type*	simplet(Spec);
 int	stcompat(Node*, Type*, Type*, long[]);
 int	tcompat(Node*, Type*, Type*, long[]);
 void	tinit(void);
@@ -814,7 +862,7 @@ int	fpnegzero(double);
 double	fpnegzeroval(void);
 void	simplifyshift(Node*);
 void	rolor(Node*);
-long	typebitor(long, long);
+Spec	typebitor(Spec, Spec);
 void	diag(Node*, char*, ...);
 void	warn(Node*, char*, ...);
 void	yyerror(char*, ...);

@@ -2178,7 +2178,7 @@ since 2025-01-01, and what APExp does about each:
 | `9932a824a` | 2026-03-02 | include dir limit 20 -> 64 | **TAKEN** |
 | `b43ec1215` | 2026-04-11 | address of incomplete types | **TAKEN** |
 | `c144bcb6e` | 2026-06-01 | 5l `[F]HOREG` in `addpool` | **TAKEN** |
-| `a68335214` | 2026-06-10 | untangle class/type specifiers | *merge* |
+| `a68335214` | 2026-06-10 | untangle class/type specifiers | **TAKEN** |
 | `be2b95b7c` | 2026-07-25 | 9a/9l/tl unused declarations | *skip* |
 | `8e9bc0b69` | 2026-08-08 | 5l conditional return, profiling | **TAKEN** |
 
@@ -2257,7 +2257,63 @@ stands, but it is now a shape rather than an apprehension.
 - Divergence from the commit's own parent, for context: `cc.h` 148
   differing lines, `cc.y` 635, `dcl.c` 873, `lex.c` 682, `sub.c` 287.
 
-**It wants its own round for a reason that is not caution**: `cc.y`
+***DONE. And the merge was not upstream's patch.*** What was actually
+applied, by hand rather than by `patch`, because four of the hunks
+would otherwise have been placed by guess:
+
+- **`sub.c`, `lex.c` and `dcl.c` took upstream's change verbatim** --
+  82, 22 and 2 changed lines, matching upstream's own counts to the
+  digit, because APExp had never touched those four functions.
+- **`cc.h` is where the merge is**, and the conflict is APExp's own:
+  upstream puts `TUNSIGNED` at `NTYPE`, and APExp had already put
+  `TCFLOAT` there for `_Complex`. *Before this commit `TCFLOAT` and
+  `TAUTO` were THE SAME NUMBER, and `TCDOUBLE` and `TEXTERN` were
+  too* -- harmless only because the complex codes are `etype` values
+  indexing `[NCTYPE]` arrays and never enter the bit space (there is
+  no `BCFLOAT`; a grep finds nothing). The pseudo-types now start at
+  `NCTYPE`, after the complex codes.
+- **`cc.y` needed APExp's own productions carried across**: the eight
+  `complex`/`LCOMPLEXD`/`LCOMPLEXF` arms in `types:`, and the two
+  `LALIGNAS` arms in `gname:`, none of which exist upstream.
+
+**What the change BUYS is a number and not a tidy-up**, from
+`specbits-model.py --old` against the same model on the merged tree:
+
+| | before | after |
+|---|---|---|
+| `TCFLOAT` vs `TAUTO` | both 21, **alias** | distinct |
+| `TCDOUBLE` vs `TEXTERN` | both 22, **alias** | distinct |
+| highest type-bit shift | `1L<<31`, **0 spare** | 24, **7 spare** |
+| class bits | same space as types | own space, **22 spare** |
+
+*`long` is 32 bits under kencc*, so "0 spare" meant the next specifier
+APExp wanted would have shifted off the end -- and **shifting off the
+end is not a diagnostic, it is a wrong constant**, used to decide what
+a declaration means.
+
+**Checked on the host as far as the host can reach**: `bison -y` over
+the grammar before and after gives **22 shift/reduce and 6
+reduce/reduce both times, 0 errors**, so the refactor is type-only and
+disturbed no production; a sweep of `cc`, `cpp` and all ten
+`?a`/`?c`/`?l` finds **no surviving use** of the nine removed codes
+(`TAUTO`, `TEXTERN`, `TSTATIC`, `TTYPEDEF`, `TTYPESTR`, `TREGISTER`,
+`TCONSTNT`, `TVOLATILE`, `TNORET`); every `%Q` call site passes a
+`Spec`, which matters because `%Q` is VARIADIC and a wrong argument
+there is silent; and the two init tables fit their bounds (`TOLD` 25 <
+`NALLTYPES` 26, `CGNORET` 9 < `NCGTYPE` 10).
+
+**`y.tab.c` is NOT committed** -- `mkfile`'s `YFILES=cc.y` regenerates
+it -- so nothing generated needs to go with this.
+
+***WHAT IS NOT CHECKED IS THE COMPILE, AND IT CANNOT BE FROM HERE.***
+The VM must run `mk install` in `sys/src/cmd`, and then the rule this
+tree already carries for any change to `cc/`'s type tables: **run
+`regpair-probe` and `regpair-min` against all ten `[1-9kqv]c`
+backends.** That rule was written after the `typesuv` hunt, which is
+the same kind of table in the same file.
+
+**The entry below is kept for what it measured before the work**:
+`cc.y`
 means regenerating the parser, *kencc cannot be compiled on the build
 host at all* (its sources need Plan 9's `<u.h>`, which is why the
 models in `sys/lib/tests` exist), and the tree's own rule after any
