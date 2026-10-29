@@ -362,6 +362,15 @@ preprocessor belongs in its own file, the same rule this tree has
 about cases that can hang. The macros are INVENTED because the first
 draft used `__x86_64__`, which gcc defines, so the arm meant to be
 skipped was compiled),
+`cppaste-probe` (**`pcc -c`, result is whether it COMPILES**, and a
+LADDER: five cases from the plainest `##` to clisp's exact shape, so
+the FIRST failure names the construct. From `flo_rest.d:338 name not
+declared: TO_F_`, where `CONCAT(TO_F_,r)` with `r`=1 lost its right
+operand. ***Two mechanisms were read out of `cpp/macro.c` and both
+were refuted by the source itself*** — leading whitespace (it is a
+FIELD, and `normtokenrow` clears it) and a leading `NL` token
+(`gatherargs:331` deletes it) — which is why it is a probe and not a
+patch. gcc compiles all five and is the control),
 `regpair-probe` and `regpair-min` (**native, and their result is
 whether they COMPILE** — the bug they found is FIXED, so they are
 regression tests now, and **the only things here that ask a non-amd64
