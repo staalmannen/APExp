@@ -2,7 +2,13 @@
 #define __QLOCK_H_
 #pragma lib "/$M/lib/ape/libap.a"
 
-#include <u.h>
+/*
+ * `#include <u.h>' is gone from here too, and for the same reason it
+ * is gone from `<lock.h>': nothing below uses a single one of its
+ * type names -- `QLp', `QLock', `Rendez' and `RWLock' are built from
+ * `int', `Lock' and pointers.  The note in `<lock.h>' has the chain
+ * this was leaking into and the CLISP collision that found it.
+ */
 #include <lock.h>
 
 /*

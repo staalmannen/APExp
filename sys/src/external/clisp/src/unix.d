@@ -151,8 +151,35 @@ extern_C char* strerror (int errnum);
 /* used by SPVW */
 
 /* normal program end */
+#if defined(_PLAN9_SOURCE)
+  /* APExp: do not re-declare these; <stdlib.h> and <unistd.h> do, and
+     they disagree with each other in a way CLISP cannot express with
+     one macro.  APE declares
+         stdlib.h:71   extern __ape_Noreturn void exit(int);
+         unistd.h:102  extern void _exit(int);
+     -- `exit' noreturn and `_exit' NOT -- while
+     `nonreturning_function' is one macro applied to both.  So any
+     single spelling here is wrong for one of the two, and kencc
+     records NORET in its type signatures (9front builds `-FTVw'), so
+     a disagreement is an ERROR rather than a missed optimisation:
+         unix.d:155 external redeclaration of: exit
+           EXTERN FUNC(INT) VOID
+           EXTERN FUNC(INT) NORET VOID  /sys/include/ape/stdlib.h:71
+     Letting the system headers declare both is the fix, and it is the
+     same move `lispbibl.d' makes for `alloca'.
+     ***AND IT IS NOT MERELY THE CAUTIOUS CHOICE.***  A
+     `_PLAN9_SOURCE' arm was first added to `nonreturning_function'
+     itself, spelling it `_Noreturn' as APE's header does, and the
+     error did not move.  Why it did not is UNSETTLED --
+     `sys/lib/tests/noret-probe.c' is the one run that will say
+     whether kencc records NORET through a macro expansion.  That arm
+     is still there and is right for CLISP's own internal nonreturning
+     functions; it is only `exit' and `_exit', which collide with the
+     system headers, that are guarded out here. */
+#else
 nonreturning_function(extern_C, _exit, (int status)); /* EXIT(2V) */
 nonreturning_function(extern_C, exit, (int status)); /* EXIT(2V) */
+#endif
 /* used by SPVW, PATHNAME, STREAM */
 
 /* Immediate abnormal termination, jump into the debugger */
