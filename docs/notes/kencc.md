@@ -2224,11 +2224,32 @@ compiler tree**:
 | `a0e76f2c5` | 2026-09-04 | libmach: how thumb executables are detected | *n/a* |
 | `518d52dc2` | 2026-10-08 | libmach: set thumb pcquant to 2 | *n/a* |
 
-**All four are thumb, and APExp ships neither half of it**: there is no
-`sys/src/cmd/ta`, no `sys/src/cmd/tl` and no `sys/src/libmach`, and
-thumb is not in the eleven-architecture list. *Not applicable is a
-different answer from skipped*, and this is the first entry in this
-survey that is the former.
+**All four are thumb, and APExp ships no part of it**: upstream's
+toolchain is `sys/src/cmd/tc` and `sys/src/cmd/tl` -- *compiler and
+linker, and no assembler of its own*, Thumb being an ARM encoding --
+plus `sys/src/libmach`, and APExp has none of the three. Nor is
+`arm-thumb`, the name upstream uses for it, in the eleven-architecture
+list. *Not applicable is a different answer from skipped*, and this is
+the first entry in this survey that is the former.
+
+***AND IT IS WORTH IMPORTING ONE DAY, BECAUSE THE EXPENSIVE HALF IS
+ALREADY DONE.*** `tc/mkfile` is the ordinary backend shape --
+`cgen.$O enam.$O list.$O mul.$O ...` against the shared `cc.a` -- so
+**every C99/C11/C23 patch APExp has made lives in `cc/` and a thumb
+backend inherits all of it untouched**, the `Spec` refactor included.
+What would have to be written is the backend and the linker, and they
+are one existing target's worth: `tc` is 10 files and 6971 lines
+against `5c`'s 14 and 8219; `tl` is 11 and 9137 against `5l`'s 11 and
+7243. The rest is `$objtype` plumbing this tree already has a walk
+for -- a `stddef_arch.h` (32-bit, so 386's shape), the `_ARCHS` list,
+`mount-include`, and whatever a build stops on next, *which is how the
+386 cross-compile was done and the reason the other seven are left
+undone rather than guessed*.
+
+**The four commits above are the standing reason to remember this.**
+They are recorded as not applicable, and the moment `tc`/`tl` arrive
+they stop being that -- so a thumb import starts four commits behind
+upstream rather than level, and this table is where to look.
 
 ***THE FIRST RUN OF THIS RE-SURVEY REPORTED "NOTHING NEW" AND WAS
 WRONG.*** The query used git pathspecs `sys/src/cmd/[0-9kqv]c` and the
@@ -2305,7 +2326,35 @@ there is silent; and the two init tables fit their bounds (`TOLD` 25 <
 **`y.tab.c` is NOT committed** -- `mkfile`'s `YFILES=cc.y` regenerates
 it -- so nothing generated needs to go with this.
 
-***WHAT IS NOT CHECKED IS THE COMPILE, AND IT CANNOT BE FROM HERE.***
+***BUILT AND MEASURED ON THE VM. The compilers rebuild and the
+backends behave exactly as recorded.***
+
+`regpair-min.c` compiles under **nine** backends with no output.
+`regpair-probe.c` compiles under seven and fails under **kc and vc**
+with `regpair-probe.c:242 unknown op in lcgen: CAST` -- *which is the
+pre-existing fault this file already records*, upstream's and not
+ours, on case 3. **Identical to the baseline, so the merge moved
+nothing.** `bool-test` prints `all bool cases passed`;
+`designated-init-test` prints `all ok`.
+
+***AND `qc` CLOSES IT: ten of ten now, matching the baseline to the
+digit.*** The first run covered nine and `qc` was the gap -- *a name
+absent from a list is not a measurement until you have checked the
+name could have been present*, and it could, being one of the two
+whose recorded `vlong`-return failure turned out to be the `typesuv`
+bug. Run since: `qc regpair-probe.c` and `qc regpair-min.c` both
+compile silently. So **eight of ten compile the probe**
+(`1c 2c 5c 6c 7c 8c 9c qc`) and ten of ten compile `regpair-min`,
+which is exactly what this file recorded before the merge.
+
+**`compound-literal-test` reports `1 failure(s)` and it is NOT this
+merge's**; the mechanism is in 0.6's open-bug inventory, and the check
+that it is not ours is that the merge's entire `dcl.c` change is one
+hunk in `fndecls()` while `compoundlit()`, `adecl()` and
+`case OARRAY:` are untouched.
+
+***WHAT WAS NOT CHECKED BEFORE THE BUILD, AND COULD NOT BE FROM
+HERE.***
 The VM must run `mk install` in `sys/src/cmd`, and then the rule this
 tree already carries for any change to `cc/`'s type tables: **run
 `regpair-probe` and `regpair-min` against all ten `[1-9kqv]c`

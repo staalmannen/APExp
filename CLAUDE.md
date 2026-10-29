@@ -207,7 +207,12 @@ reach for whenever the thing being tested is a pure function of its
 input.
 
 **kencc** — `bool-test`, `bitfield-test`, `compound-assign-test`,
-`compound-literal-test`, `designated-init-test`, `charptr-test`,
+`compound-literal-test` (**1 known failure, and it is NOT the merge's**:
+an array literal's frame slot is reserved as ZERO bytes, because
+`dcl.c:261` leaves `t->width` 0 for a declarator with no dimension and
+`compoundlit()` calls `adecl()` before `doinit()` learns the size --
+`sizeof` is unaffected, which is why bison never saw it; 0.6's
+inventory has the mechanism), `designated-init-test`, `charptr-test`,
 `rol64-test`, `u64float-test`, `initzero-test` (a compound literal must
 zero the members its list omits — muon's crash), `longconst-test` (an
 `L` is a floor on a constant's type, not a ceiling), `switchcase-test`
@@ -1034,6 +1039,19 @@ in the topic file.
   propagates the failure up through every enclosing directory, **one
   missing file failed the whole tree's distclean**. The sweep (a `test`
   dir beside an mkfile, without one of its own) found exactly that one.
+- **`farith: double fp to single fp overflow` while building
+  `sys/src/cmd` means the HOST's `6l`, not APExp's, and there is
+  NOTHING TO FIX.** It comes with `ctime:` on the next line, out of
+  `ieeedtof` in `*l/obj.c`, and `sys/src/cmd/ki` is byte-identical to
+  upstream -- *the input is not the variable, the linker is*. APExp's
+  own `-0.0` guard is committed in **all ten** linkers
+  (`(e->h & ~0x80000000L) == 0`), so ours cannot print it. **The same
+  directory builds inside a working `apexp-sh`**; `docs/notes/kencc.md`
+  files it under *A free control for the `ieeedtof` -0.0 fix*, which is
+  not a heading anyone hunting the error would look under, which is why
+  it is repeated here. *Check which `6l` answers before reading
+  anything into it*, and see the bind rule immediately below for how a
+  window quietly acquires the host's.
 - **`rm -rf` on a directory something has BOUND does not unbind it.**
   The bind still names the removed directory, a recreated one has a new
   qid, and the union component silently falls through to whatever is
@@ -1077,6 +1095,21 @@ in the topic file.
 - **A macro's identity includes whether there is white space.** Copy an
   upstream spelling character for character, and guard it; and grep the
   mkfiles for `-D<name>=` before adding a name to an APE header.
+- **A hand-answered `config.h` macro whose body is an EXPRESSION over a
+  free variable is coupled to the VARIABLE NAME at its expansion site,
+  and that site is invisible from the `config.h`.** Almost every
+  autoconf macro is a type name or a constant, which is self-contained;
+  the exception is a PREDICATE spliced into a function body. clisp's
+  `VALID_FILENAME_CHAR` was written here as `(c != '/' && c != '\0')`
+  and upstream expands it inside `legal_namebyte (uintB ch)`, giving
+  `pathname.d:825 name not declared: c`. ***The warning beside it is
+  the tell***: `set and not used: ch`, a parameter reported unused in a
+  one-line function that exists to test it, which means the test never
+  mentioned it. **Grep for the macro's own name in the package before
+  writing its body** -- there was exactly one expansion site. This
+  tree hand-maintains four such files (perl, bash, clisp, chicken), so
+  the shape can recur; a sweep of clisp's found this the only `#define`
+  of that kind.
 - **Before adding ANY name to a public APE header, grep `external/`
   for the BARE WORD** -- not for `name(`, not for `extern int name`.
   A public header's blast radius is every package in the tree, and
