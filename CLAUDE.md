@@ -317,7 +317,13 @@ it. *Its pattern was widened twice before any number was written down* —
 8148 hits when `return true;` matched, 379 when block-comment
 continuation lines did, 3 once comments and literals are blanked).
 
-**Models** — `clitzero-model.py`, `sualign-model.py`, `bitinit-model.py`.
+**Models** — `clitzero-model.py`, `sualign-model.py`, `bitinit-model.py`,
+`specbits-model.py` (after the `a68335214` merge: do the specifier
+bits still fit a 32-bit `long`, and does anything alias? It READS the
+enum out of `cc.h` rather than transcribing it, and **`--old` replays
+the numbering the merge replaced**, which is what makes the headroom a
+number: `TNORET` was `1L<<31` with **0 shifts spare**, and `TCFLOAT`
+aliased `TAUTO` and `TCDOUBLE` aliased `TEXTERN`).
 They exist because **kencc's own sources need Plan 9's `<u.h>`, so the
 first build of any `cc/` change is the VM's**. Each extracts or
 transcribes the real function and checks it on the host.

@@ -8,6 +8,26 @@
  * `regpair-min' and `cppskip-probe'.  Nobody has promised an answer;
  * report what it prints.  Nothing is run and nothing is installed.
  *
+ * ***ANSWERED, AND IT REFUTES THE WHOLE FAMILY.***  `pcc -c
+ * noret-probe.c' compiles CLEAN: all four cases, including the
+ * two-level expansion where the storage class is itself a macro and
+ * the one with a named parameter.  **kencc records NORET through
+ * macro expansion correctly**, so the `_Noreturn' arm added to
+ * CLISP's `nonreturning_function' was right and the mechanism it
+ * relies on works.  *The cause of the `exit' redeclaration is
+ * therefore somewhere in CLISP's own configuration and is still
+ * unexplained*; `unix.d' guards the two declarations out under
+ * `_PLAN9_SOURCE', which is correct on its own terms -- APE declares
+ * `exit' noreturn and `_exit' NOT, so one macro cannot serve both --
+ * and is what makes the question moot for the build.
+ *
+ * **`pcc -o noret-probe noret-probe.c' is the WRONG command** and
+ * answers `_apemain: undefined: main in _apemain'.  There is no
+ * `main' here and there should not be: the result is whether the file
+ * COMPILES, so the flag is `-c'.  *A link error from a probe that was
+ * never meant to link is not a result*, and it is the first thing
+ * printed if the command is typed from habit.
+ *
  * WHERE THE QUESTION CAME FROM.  CLISP declares every nonreturning
  * function through one macro (`lispbibl.d:1008'):
  *

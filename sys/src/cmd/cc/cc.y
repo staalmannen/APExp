@@ -25,13 +25,13 @@ static Type *auto_deduct_type(Node*, Node*);
 		char*	s;
 		long	l;
 	} sval;
-	long	lval;
 	double	dval;
 	vlong	vval;
+	Spec	spec;
 }
 %type	<sym>	ltag
-%type	<lval>	gctname gcname cname gname tname
-%type	<lval>	gctnlist gcnlist zgnlist
+%type	<spec>	gctname gcname cname gname tname
+%type	<spec>	gctnlist gcnlist zgnlist
 %type	<type>	tlist sbody complex
 %type	<tycl>	types
 %type	<node>	zarglist arglist zcexpr
@@ -1203,7 +1203,7 @@ types:
 		$$.t = $1;
 		$$.c = simplec($2);
 		$$.t = garbt($$.t, $2);
-		if($2 & ~BCLASS & ~BGARB)
+		if($2.type)
 			diag(Z, "duplicate types given: %T and %Q", $1, $2);
 	}
 |	tname gctnlist
@@ -1238,7 +1238,7 @@ types:
 	{
 		$$.t = $2;
 		$$.c = simplec($1);
-		$$.t = garbt($$.t, $1|$3);
+		$$.t = garbt($$.t, typebitor($1, $3));
 	}
 |	gcnlist tname
 	{
@@ -1249,18 +1249,18 @@ types:
 |	gcnlist tname gctnlist
 	{
 		$$.t = simplet(typebitor($2, $3));
-		$$.c = simplec($1|$3);
-		$$.t = garbt($$.t, $1|$3);
+		$$.c = simplec(typebitor($1, $3));
+		$$.t = garbt($$.t, typebitor($1, $3));
 	}
 |	gcnlist tname gctnlist LCOMPLEXD
 	{
 		$$.t = types[TCDOUBLE];
-		$$.c = simplec($1|$3);
+		$$.c = simplec(typebitor($1, $3));
 	}
 |	gcnlist tname gctnlist LCOMPLEXF
 	{
 		$$.t = types[TCFLOAT];
-		$$.c = simplec($1|$3);
+		$$.c = simplec(typebitor($1, $3));
 	}
 |	gcnlist tname LCOMPLEXD
 	{
@@ -1500,7 +1500,7 @@ gctnlist:
 
 zgnlist:
 	{
-		$$ = 0;
+		$$ = (Spec){0, 0};
 	}
 |	zgnlist gname
 	{
@@ -1536,30 +1536,30 @@ enum:
 |	enum ',' enum
 
 tname:	/* type words */
-	LCHAR { $$ = BCHAR; }
-|	LSHORT { $$ = BSHORT; }
-|	LINT { $$ = BINT; }
-|	LLONG { $$ = BLONG; }
-|	LSIGNED { $$ = BSIGNED; }
-|	LUNSIGNED { $$ = BUNSIGNED; }
-|	LFLOAT { $$ = BFLOAT; }
-|	LDOUBLE { $$ = BDOUBLE; }
-|	LVOID { $$ = BVOID; }
+	LCHAR { $$ = (Spec){BCHAR, 0}; }
+|	LSHORT { $$ = (Spec){BSHORT, 0}; }
+|	LINT { $$ = (Spec){BINT, 0}; }
+|	LLONG { $$ = (Spec){BLONG, 0}; }
+|	LSIGNED { $$ = (Spec){BSIGNED, 0}; }
+|	LUNSIGNED { $$ = (Spec){BUNSIGNED, 0}; }
+|	LFLOAT { $$ = (Spec){BFLOAT, 0}; }
+|	LDOUBLE { $$ = (Spec){BDOUBLE, 0}; }
+|	LVOID { $$ = (Spec){BVOID, 0}; }
 
 cname:	/* class words */
-	LAUTO { $$ = BAUTO; }
-|	LSTATIC { $$ = BSTATIC; }
-|	LEXTERN { $$ = BEXTERN; }
-|	LTYPEDEF { $$ = BTYPEDEF; }
-|	LTYPESTR { $$ = BTYPESTR; }
-|	LREGISTER { $$ = BREGISTER; }
-|	LINLINE { $$ = 0; }
+	LAUTO { $$ = (Spec){0, BAUTO}; }
+|	LSTATIC { $$ = (Spec){0, BSTATIC}; }
+|	LEXTERN { $$ = (Spec){0, BEXTERN}; }
+|	LTYPEDEF { $$ = (Spec){0, BTYPEDEF}; }
+|	LTYPESTR { $$ = (Spec){0, BTYPESTR}; }
+|	LREGISTER { $$ = (Spec){0, BREGISTER}; }
+|	LINLINE { $$ = (Spec){0, 0}; }
 
 gname:	/* garbage words */
-	LCONSTNT { $$ = BCONSTNT; }
-|	LVOLATILE { $$ = BVOLATILE; }
-|	LRESTRICT { $$ = 0; }
-|	LNORET { $$ = BNORET; }
+	LCONSTNT { $$ = (Spec){0, BCONSTNT}; }
+|	LVOLATILE { $$ = (Spec){0, BVOLATILE}; }
+|	LRESTRICT { $$ = (Spec){0, 0}; }
+|	LNORET { $$ = (Spec){0, BNORET}; }
 |	LALIGNAS '(' cexpr ')'
 	{
 		/* _Alignas(constant-expression) */
@@ -1573,7 +1573,7 @@ gname:	/* garbage words */
 			else
 				alignasval = a;
 		}
-		$$ = 0;
+		$$ = (Spec){0, 0};
 	}
 |	LALIGNAS '(' tlist abdecor ')'
 	{
@@ -1581,7 +1581,7 @@ gname:	/* garbage words */
 		dodecl(NODECL, CXXX, $3, $4);
 		/* align(1, T, Ael1) is the Alignof formula from com.c OALIGNOF */
 		alignasval = align(1, lastdcl, Ael1);
-		$$ = 0;
+		$$ = (Spec){0, 0};
 	}
 
 name:
