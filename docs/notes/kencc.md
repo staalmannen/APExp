@@ -2211,6 +2211,61 @@ upstream only by APExp's own additions.
   the files APExp has changed most. **A merge, not a backport**, and it
   wants its own round.
 
+#### Re-surveyed 2026-10-29: four new upstream commits, none applicable
+
+The table above ended at `8e9bc0b69` (2026-08-08). Upstream has moved
+to 2026-10-27 since, 151 commits, and **four of them touch the
+compiler tree**:
+
+| commit | date | what | state |
+|---|---|---|---|
+| `d02451eda` | 2026-09-01 | tl: do not offset text symbols by INITDAT | *n/a* |
+| `dfff285be` | 2026-09-01 | tl: allow use of both `-D` and `-R` | *n/a* |
+| `a0e76f2c5` | 2026-09-04 | libmach: how thumb executables are detected | *n/a* |
+| `518d52dc2` | 2026-10-08 | libmach: set thumb pcquant to 2 | *n/a* |
+
+**All four are thumb, and APExp ships neither half of it**: there is no
+`sys/src/cmd/ta`, no `sys/src/cmd/tl` and no `sys/src/libmach`, and
+thumb is not in the eleven-architecture list. *Not applicable is a
+different answer from skipped*, and this is the first entry in this
+survey that is the former.
+
+***THE FIRST RUN OF THIS RE-SURVEY REPORTED "NOTHING NEW" AND WAS
+WRONG.*** The query used git pathspecs `sys/src/cmd/[0-9kqv]c` and the
+like, which matched **only the literal `cc`, `cpp` and `ld` paths** --
+the bracket globs matched nothing, so three quarters of the compiler
+tree was never looked at. The control caught it: run over the same
+paths since 2025-01-01 it found **4 commits where the table above has
+12**, and a table built by hand was the oracle that said so. *An empty
+result from a pathspec is not a measurement until the same pathspec has
+been shown to match something.* Re-run with 35 explicit directory
+names, the control reproduces all twelve and the new four appear.
+
+#### `a68335214` measured rather than feared: 28 hunks, 1 conflict
+
+The entry above calls it "a merge, not a backport" and that judgment
+stands, but it is now a shape rather than an apprehension.
+`git format-patch` of the commit against this tree:
+
+- **28 hunks across the five files; exactly ONE fails** -- `cc.y`
+  hunk 6, at upstream line 1132.
+- **Four apply only with fuzz** (`cc.h` 3, 5, 7; `cc.y` 4), and *those
+  are the hazard rather than the failure*: a failed hunk announces
+  itself, a fuzzy one is `patch` guessing a location. In `cc.h` and
+  `cc.y` a silently misplaced hunk lands in the type tables, which is
+  the exact class of bug that cost the eleven-round `typesuv` hunt.
+- Divergence from the commit's own parent, for context: `cc.h` 148
+  differing lines, `cc.y` 635, `dcl.c` 873, `lex.c` 682, `sub.c` 287.
+
+**It wants its own round for a reason that is not caution**: `cc.y`
+means regenerating the parser, *kencc cannot be compiled on the build
+host at all* (its sources need Plan 9's `<u.h>`, which is why the
+models in `sys/lib/tests` exist), and the tree's own rule after any
+change to `cc/`'s type tables is to run `regpair-probe` and
+`regpair-min` against **all ten** `[1-9kqv]c` backends. So the round
+ends with a VM build and ten compiles, and the four fuzzy hunks are
+placed by hand and read before any of that.
+
 **Two false alarms, both checked rather than assumed**: `5l/span.c`'s
 `Reloc` block looked missing and is merely placed elsewhere in our
 copy; and the uniform five-file difference in every `?c` directory
