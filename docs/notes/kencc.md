@@ -2316,12 +2316,15 @@ ours, on case 3. **Identical to the baseline, so the merge moved
 nothing.** `bool-test` prints `all bool cases passed`;
 `designated-init-test` prints `all ok`.
 
-***NINE, NOT TEN: `qc` WAS NOT RUN.*** The tree has ten
-(`1c 2c 5c 6c 7c 8c 9c kc qc vc`) and the run covered nine. *A name
+***AND `qc` CLOSES IT: ten of ten now, matching the baseline to the
+digit.*** The first run covered nine and `qc` was the gap -- *a name
 absent from a list is not a measurement until you have checked the
-name could have been present*, and `qc` could -- it is one of the two
+name could have been present*, and it could, being one of the two
 whose recorded `vlong`-return failure turned out to be the `typesuv`
-bug. The sweep is outstanding by exactly one command.
+bug. Run since: `qc regpair-probe.c` and `qc regpair-min.c` both
+compile silently. So **eight of ten compile the probe**
+(`1c 2c 5c 6c 7c 8c 9c qc`) and ten of ten compile `regpair-min`,
+which is exactly what this file recorded before the merge.
 
 **`compound-literal-test` reports `1 failure(s)` and it is NOT this
 merge's**; the mechanism is in 0.6's open-bug inventory, and the check
