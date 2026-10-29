@@ -45,8 +45,21 @@
  * WHAT EACH ANSWER MEANS:
  *
  *   all compile          the paste is fine and `flo_rest.d' fails for
- *                        some other reason -- go back to it with
- *                        `pcc -E' and read what the line became.
+ *                        some other reason. **`pcc -E' is the next
+ *                        step and it is supported** (`cmd/pcc.c:107'
+ *                        sets Eflag and cflag), so from
+ *                        `cmd/clisp/build-amd64', with that recipe's
+ *                        own flags:
+ *
+ *	S=../../../../../sys/src/external/clisp/src
+ *	pcc -E -D_PLAN9_SOURCE -D_POSIX_SOURCE -D_BSD_EXTENSION \
+ *	    -DENABLE_UNICODE -D__x86_64__ -I. -I$S -I$S/gllib \
+ *	    lisparit.c >/tmp/lisparit.i
+ *	grep -n TO_F_ /tmp/lisparit.i | head
+ *
+ *                        and read what the paste actually became.
+ *                        *That is the machine answering instead of
+ *                        another reading of `macro.c'.*
  *   1 fails              `##' is broken outright; nothing in this tree
  *                        that uses CONCAT can be trusted.
  *   2 fails, 1 passes    the two-level idiom is the problem: pasting a
@@ -100,6 +113,50 @@ int case5(void)
 {
 	return OUTER5(1,2,
 	              1);
+}
+
+/*
+ * ***CASES 1-5 ALL COMPILED, AND THAT REFUTED THE FAMILY RATHER THAN
+ * ANSWERING IT.*** `pcc -c cppaste-probe.c' produced `cppaste-probe.6'
+ * with no diagnostic, so kencc's `##' is fine for every shape above --
+ * including the two-level idiom, a numeric right operand, the operand
+ * arriving as an outer macro's parameter, a call spanning a newline,
+ * and the parameter used as a value as well as a pasted token.
+ *
+ * **So the ladder did not go far enough, and reading `flo_rest.d'
+ * again says which rung was missing.** In CLISP the paste is NOT in
+ * the outer macro's body. `GEN_F_op2' is built from `floatcase'
+ * (`flo_rest.d:7'), whose four statement arms are MACRO ARGUMENTS, and
+ * the arms are nested: `floatcase(arg1, {... floatcase(arg2, {...
+ * CONCAT(TO_F_,r) ...}) ...})'. So `r' is substituted into
+ * `GEN_F_op2's body, then carried as part of an ARGUMENT to
+ * `floatcase', then again as part of an argument to the inner
+ * `floatcase', and only then does the paste run.
+ *
+ * *Cases 1-5 all have the paste directly in the body.* Cases 6 and 7
+ * carry it through one and two levels of nested macro argument, which
+ * is the only structural difference left between the probe and the
+ * code that fails.
+ */
+
+/* CASE 6: the paste is inside a NESTED macro's argument, one level. */
+#define ARM1(stmt)  do { stmt; } while(0)
+#define OUTER6(r)   ARM1(v = CONCAT(step_a,r) ())
+int case6(void)
+{
+	int v = 0;
+	OUTER6(1);
+	return v;
+}
+
+/* CASE 7: TWO levels of nested argument -- CLISP's actual shape. */
+#define ARM2(a,b)   do { if (1) { a; } else { b; } } while(0)
+#define OUTER7(r)   ARM2(ARM2(v = CONCAT(step_a,r) (), v = 0), v = 0)
+int case7(void)
+{
+	int v = 0;
+	OUTER7(1);
+	return v;
 }
 
 int cppaste_probe_ok = 1;
