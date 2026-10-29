@@ -1095,6 +1095,21 @@ in the topic file.
 - **A macro's identity includes whether there is white space.** Copy an
   upstream spelling character for character, and guard it; and grep the
   mkfiles for `-D<name>=` before adding a name to an APE header.
+- **A hand-answered `config.h` macro whose body is an EXPRESSION over a
+  free variable is coupled to the VARIABLE NAME at its expansion site,
+  and that site is invisible from the `config.h`.** Almost every
+  autoconf macro is a type name or a constant, which is self-contained;
+  the exception is a PREDICATE spliced into a function body. clisp's
+  `VALID_FILENAME_CHAR` was written here as `(c != '/' && c != '\0')`
+  and upstream expands it inside `legal_namebyte (uintB ch)`, giving
+  `pathname.d:825 name not declared: c`. ***The warning beside it is
+  the tell***: `set and not used: ch`, a parameter reported unused in a
+  one-line function that exists to test it, which means the test never
+  mentioned it. **Grep for the macro's own name in the package before
+  writing its body** -- there was exactly one expansion site. This
+  tree hand-maintains four such files (perl, bash, clisp, chicken), so
+  the shape can recur; a sweep of clisp's found this the only `#define`
+  of that kind.
 - **Before adding ANY name to a public APE header, grep `external/`
   for the BARE WORD** -- not for `name(`, not for `extern int name`.
   A public header's blast radius is every package in the tree, and

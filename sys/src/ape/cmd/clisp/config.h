@@ -418,8 +418,39 @@
 /* #undef HAVE_RELIABLE_POLL */
 /* #undef HAVE_RELIABLE_FIONREAD */
 
-/* Plan 9 filenames exclude only '/' and NUL. */
-#define VALID_FILENAME_CHAR (c != '/' && c != '\0')
+/*
+ * Plan 9 filenames exclude only '/' and NUL.
+ *
+ * ***THE VARIABLE NAME IS NOT FREE, AND THE FIRST DRAFT CHOSE ITS
+ * OWN.*** This is not a value, it is a PREDICATE spliced into a
+ * function body -- `pathname.d:825' is
+ *
+ *	return VALID_FILENAME_CHAR || (ch=='*') || (ch=='?');
+ *
+ * inside `local inline bool legal_namebyte (uintB ch)'.  So the macro
+ * has to be written in terms of `ch', and writing it with `c' gave
+ *
+ *	pathname.d:825 name not declared: c
+ *	warning: pathname.d:823 set and not used: ch
+ *
+ * -- *and the warning is the tell*, because a parameter reported
+ * unused in a one-line function that exists to test it means the test
+ * never mentioned it.  **One `grep` for the macro's own name would
+ * have shown the expansion site**; there is exactly one, so the
+ * coupling is invisible from this file and total.
+ *
+ * *Everything else in this file is a type name or a constant*, which
+ * is what an autoconf `config.h' macro normally is and why the hazard
+ * does not recur: a sweep of the file finds this the only `#define'
+ * whose body is an expression over a bare identifier.
+ *
+ * WHY DEFINE IT AT ALL.  Undefined, `pathname.d:828' falls to
+ * `PATHNAME_UNIX's `((ch>=' ') && (ch<='~') && !(ch=='/'))' -- printable
+ * ASCII -- which would reject every byte of a UTF-8 filename at or
+ * above 0x80, and Plan 9 filenames are UTF-8.  `ch' is a `uintB', so
+ * the two exclusions below are the whole rule.
+ */
+#define VALID_FILENAME_CHAR (ch != '/' && ch != '\0')
 
 /* ELOOP exists in APE's errno table. */
 #define ELOOP_VALUE ELOOP
