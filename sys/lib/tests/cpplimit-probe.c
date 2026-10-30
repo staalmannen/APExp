@@ -1,64 +1,65 @@
 /*
- * cpplimit-probe.c -- at what SIZE does kencc's cpp stop expanding
- * macros on a line?  TWO SERIES, because the first one answered.
+ * cpplimit-probe.c -- why does kencc's cpp leave some `CONCAT(...)'
+ * calls unexpanded?  THREE SERIES, and the first two are negative.
  *
  *	pcc -E cpplimit-probe.c >/tmp/cpplimit.i
  *	grep -c 'CONCAT(' /tmp/cpplimit.i        # how many went unexpanded
  *	grep -n 'CONCAT(' /tmp/cpplimit.i        # and which case each is in
  *
  * ***NOT A COMPILE TEST.*** It is `-E', and the result is which cases
- * still contain the text `CONCAT(' afterwards.  A case that expanded
- * correctly contains `step_a1' instead.
+ * still contain the text `CONCAT(' afterwards.
  *
- * WHERE IT CAME FROM.  clisp's `lisparit.c' preprocesses with TWELVE
- * `CONCAT(TO_F_,1)' left UNEXPANDED and zero correct `TO_F_0/1/2'
- * anywhere, so `6c' reported `name not declared: TO_F_' for a name
- * inside an unexpanded macro call.  *The paste was never the bug* --
- * `cppaste-probe' puts the same construct through seven nestings,
- * clisp's own two-level one included, and kencc expands all of them.
- * In the preprocessed output the six lines holding an unexpanded
- * `CONCAT' are the SIX LONGEST LINES IN THE FILE, 22869 to 24043
- * characters and about 11536 tokens; the seventh longest, 19344
- * characters and about 9637 tokens, is clean.
+ * WHERE IT CAME FROM.  clisp's `lisparit.c' preprocesses with twelve
+ * `CONCAT(TO_F_,1)' left unexpanded, so `6c' reported `name not
+ * declared: TO_F_' for a name inside an unexpanded macro call.  *The
+ * paste itself is fine*: `cppaste-probe' puts the construct through
+ * seven nestings and kencc expands all of them.
  *
- * ***SERIES A IS MEASURED AND IT REFUTES A TOKEN LIMIT.***  Cases
- * `lim1'..`lim10' pad with one-character tokens, so characters and
- * tokens rise together, and they reach 16405 tokens -- well past the
- * 11536 that fails in clisp.  `grep -c CONCAT(' answers **0**: all ten
- * expand.  So the limit is not a token count.
+ * ***THE "SIX LONGEST LINES" CORRELATION THAT STARTED THIS FILE WAS AN
+ * ARTIFACT, AND SERIES A AND B ARE BOTH NEGATIVE BECAUSE OF IT.***
+ * The six failing lines ARE the six longest in `lisparit.i', and that
+ * looked like a size limit.  But **only six lines in the whole file
+ * contain `TO_F_' at all**, and they are those six: the comparison was
+ * against lines that never had the construct.  *A name absent from a
+ * list is not a measurement until you have checked the name could have
+ * been present*, and it could not.  Those lines are long BECAUSE they
+ * are the `GEN_F_op2' expansions, which is also the only place
+ * `CONCAT(TO_F_,...)' occurs.
  *
- * **But series A tops out at 16438 CHARACTERS and clisp fails at
- * 22869**, so it never entered the failing range on that axis.  *A
- * probe that does not reach the condition cannot clear it*, and the
- * two axes were confounded because one-character tokens make
- * characters and tokens the same number.
+ * Series A and B were built on that artifact and refute it anyway:
+ *   A  one-character padding, to 16405 TOKENS -- all ten expand, so it
+ *      is not a token count.
+ *   B  43-character identifier padding, to 135221 CHARACTERS, 5.6x
+ *      clisp's failing length -- all nine expand, so it is not a line
+ *      length either.
+ * Both are kept because a refuted axis is worth not re-testing.
  *
- * SERIES B SEPARATES THEM.  `big1'..`big9' pad with a 43-character
- * identifier, so characters rise about ten times faster than tokens:
+ * ***SERIES C IS THE REAL SHAPE, AND IT CAME FROM COUNTING.***
+ * `lisparit.c' uses `CONCAT' 76 times and **70 expand correctly** --
+ * so this is site-specific, not a blanket failure.  (Zero occurrences
+ * of `TO_F_0/1/2' in the output is what SUCCESS looks like: `TO_F_1
+ * (e,t)' is `t(e)', so the name vanishes.)  In `flo_rest.d' the six
+ * sites of `CONCAT(LFlen,s)' at lines 162, 200, 238, 252, 264 and 276
+ * are each followed immediately by a `CONCAT(TO_F_,r)' at 164, 202,
+ * 240, 254, 266 and 278 -- **six pairs, and exactly six failing
+ * lines** -- while every `CONCAT(TO_F_,r)' with no `CONCAT(LFlen,s)'
+ * before it in the same arm (141, 152, 177, 190, 215, 226, 303, 310)
+ * expands.
  *
- *	big1   2933 chars    277 tokens
- *	big2   5813 chars    533 tokens
- *	big3  11573 chars   1045 tokens
- *	big4  23093 chars   2069 tokens   <- clisp's failing LENGTH,
- *	big5  34613 chars   3093 tokens      a sixth of its tokens
- *	big6  46133 chars   4117 tokens
- *	big7  69173 chars   6165 tokens
- *	big8  92213 chars   8213 tokens
- *	big9 138293 chars  12309 tokens
+ * So the rule to test is: **a SECOND `CONCAT' in the same expansion
+ * does not expand.** Every probe written before this one had exactly
+ * one, which is why they all passed.
  *
- * **If `big4' fails, the limit is CHARACTERS**, somewhere near 22000,
- * and the constant to look at is one of `INS 32768' / `OBS 4096' /
- * `OUTS 16384' in `cpp.h' and `cpp.c'.
- * **If every `big' passes too, it is NEITHER length nor tokens**, and
- * what is left is structural: clisp's line is deeply nested macro
- * ARGUMENTS (`floatcase' inside `floatcase' inside `GEN_F_op2'),
- * which creates many distinct hidesets, while this padding is a flat
- * repetition that creates almost none.  `Token.hideset' is an
- * `unsigned short' fed from an unbounded `int' in `newhideset'.
+ *   c_one      fails -> something far more basic is wrong; stop here.
+ *   c_two      fails -> the second CONCAT in one expansion is the bug,
+ *                       and `CONCAT' is being left in the hideset of
+ *                       the tokens that follow the first one.
+ *   c_twonest  fails alone -> it needs the nesting as well.
+ *   all pass   -> the count is not it either, and what is left is the
+ *                 interaction with `GEN_F_op2's own parameters.
  *
- * All counts above are MEASURED with `gcc -E', not estimated from the
- * macro arithmetic.  **gcc leaves 0 unexpanded and compiles the file,
- * which is the control.**
+ * **gcc expands all three and compiles the file, which is the
+ * control.**  All sizes quoted above are measured with `gcc -E`.
  */
 
 #define CONCAT_(xxx,yyy)  xxx##yyy
@@ -134,5 +135,25 @@ int big8(void) { int x=0; Q3 Q3 Q3 Q3 x = CONCAT(step_a,1) (); return x; }
 
 /* big9: 138293 chars, 12309 tokens */
 int big9(void) { int x=0; Q3 Q3 Q3 Q3 Q3 Q3 x = CONCAT(step_a,1) (); return x; }
+
+/* ---- series C: how MANY CONCATs in one expansion ----------------- */
+#define LFlen0(a)  (a)
+#define LFlen1(a)  (a)
+#define TO_F_0(e,t) e
+#define TO_F_1(e,t) t(e)
+int neg(int v) { return -v; }
+
+/* c_one: ONE CONCAT -- the shape every earlier probe had. */
+#define ONE(r)       q = CONCAT(TO_F_,r) (q, neg);
+int c_one(void) { int q=1; ONE(1) return q; }
+
+/* c_two: TWO CONCATs in one expansion, clisp's LF arm exactly. */
+#define TWO(r,s)     q = CONCAT(LFlen,s)(q); q = CONCAT(TO_F_,r) (q, neg);
+int c_two(void) { int q=1; TWO(1,0) return q; }
+
+/* c_twonest: the same two inside a macro ARGUMENT, as floatcase does. */
+#define ARM(a)       do { a } while(0)
+#define TWONEST(r,s) ARM( q = CONCAT(LFlen,s)(q); q = CONCAT(TO_F_,r) (q, neg); )
+int c_twonest(void) { int q=1; TWONEST(1,0); return q; }
 
 int cpplimit_probe_ok = 1;
