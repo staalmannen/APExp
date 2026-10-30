@@ -874,3 +874,78 @@ already failed.
 *An instrument that answers a question about ONE BUG is scaffolding;
 one that asks a question the tree will keep having is a test. `8cu`
 was the first kind and `regpair-min` turned out to be the second.*
+
+## `cpp-xcheck/` — the real preprocessor, on the build host
+
+**The cheapest instrument in this tree, and it should have existed from
+the first cpp question rather than the fourth.**
+
+`sys/lib/tests/cpp-xcheck/cpp-xcheck.sh` builds `sys/src/cmd/cpp` with
+gcc and diffs it against `gcc -E`. Everything else about kencc needs the
+VM — `cc/` and the ten backends want Plan 9's `<u.h>`, which is why
+`clitzero-model.py`, `sualign-model.py`, `bitinit-model.py` and
+`specbits-model.py` transcribe or extract functions instead of compiling
+them. **`cpp` is the exception.** A survey of every Plan 9-ism in its
+nine source files finds eleven names — `uchar`/`ushort`/`uint`/`ulong`/
+`vlong`/`uvlong`, `nil`, `exits`, `ARGBEGIN`/`ARGC`, `chartorune`,
+`create`, `getwd`, a Plan 9 `dup(old,new)`, Plan 9's `ctime(long)` and
+`dirfstat` — and `p9/u.h`, `p9/libc.h` and `p9/shim.c` are about sixty
+lines in total. *The only thing standing between this tree and a local
+preprocessor was nobody checking which sources actually needed `<u.h>`.*
+
+**What it is not.** The binary is gcc's, so it is ILP64 where kencc is
+LLP64. Sound for TOKEN questions; **not** for `#if` arithmetic or the
+width of an integer constant, which stay the VM's. The `uvlong` cast in
+`hideset.c`'s hash is commented for exactly this reason.
+
+**The reference is gcc and a case gcc REJECTS cannot discriminate
+anything.** The first `R7` in `hideset-cases.c` was
+`f(1 paren(2)` with the closing `)` arriving from a macro — which closes
+nothing, because `gatherargs` reads raw tokens — and gcc answered
+`unterminated argument list invoking macro "id2"` and swallowed the rest
+of the file. The harness prints a warning of its own when gcc writes to
+stderr, and says not to read anything below it.
+
+**The comparison is by TOKEN, not by line**, and that was not foresight:
+the first run reported eight differences and every one was a space
+(`V1((7)+1)` against `V1 ((7)+1)`, `{1,23,` against `{ 1, 23,`). The
+standard fixes the token sequence and leaves inter-token white space to
+the implementation, so a line comparison is *a check that can FAIL for
+the wrong reason*. Stripping all white space is the opposite error —
+`int i` becomes `inti` — so the normaliser keeps one space exactly where
+removing it would merge two identifier characters.
+
+**`hideset-cases.c` holds the cases and `R8`–`R11` are C99 6.10.3.5
+EXAMPLE 3 verbatim**, which is here rather than invented because the
+standard writes its expected output down. The one line the standard
+leaves UNSPECIFIED is deliberately left out: a case where two conforming
+implementations may differ would report a fault that is not one.
+
+***AND ITS ROOT GUARD FIRED ON ITS OWN FIRST RUN, FOR THE FOURTH
+TIME.*** `cpp-xcheck` is FOUR levels below the root and I wrote three,
+copying the count from `ishadow-sweep`, `rceq-sweep` and `apfunc-sweep`
+— which are one level shallower and each of which shipped with that same
+count wrong. *A wrong root makes every answer a confident one about
+nothing*, which is why the guard is the first thing in the file.
+
+**`--regress A B` is the mode that found something**: it builds cpp from
+two source directories and diffs them over real files, which is the
+question "did this change anything else" that a case file cannot ask.
+The corpus was clisp's 31 translation units — generated locally, since
+`utils/comment5`, `gctrigger` and `varbrace` all build with gcc — plus
+every `.c` under `sys/src/ape/lib/ap`. One header has to be shadowed:
+`$objtype/include/ape/stddef_arch.h` includes
+`"/sys/include/ape/stddef.h"` by absolute path, so a copy with that one
+line made relative goes earlier on `-I`. Nothing else in APExp's headers
+needed help.
+
+`cppclisp-probe.c` is the PROBE that reproduced the bug and is now a
+regression case: `GEN_F_op2`, `floatcase`, `GEN_LF_op2_0/_1`, `LFlen0/1`
+and `TO_F_0/1/2` copied out of `flo_rest.d` character for character with
+only the leaves stubbed. **It reproduced on the first run, after
+`cppaste-probe` (7 cases), `cpplimit-probe` series A (token count) and
+series B (line length) had each come back negative** — three probes built
+*upward* from guesses against one built *downward* from the real text.
+`docs/notes/kencc.md`'s *The hideset* has the bug, the fix, the hang the
+first half of the fix caused, and the 27x speedup that came out of the
+cost it exposed.

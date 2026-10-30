@@ -280,6 +280,18 @@ printed.
 header, so it renames the SOURCE with `sed`), and `strerror-xcheck.py`,
 which has to be a script because **APE's errno NUMBERS are its own**, so
 only the NAMES line up.
+***AND `cpp-xcheck/` IS THE CHEAPEST INSTRUMENT IN THIS TREE***:
+`cpp-xcheck.sh` builds kencc's OWN `cpp` with gcc on the build host and
+diffs it against `gcc -E`. **`cpp` needs eleven Plan 9 names in total**
+— about sixty lines in `p9/` — so preprocessor questions do not need the
+VM, which *three probes and five refuted readings were spent not knowing*.
+`hideset-cases.c` holds the cases and `R8`-`R11` are **C99 6.10.3.5
+EXAMPLE 3 verbatim**; `--regress A B` diffs two builds of cpp over real
+files (clisp's 31 TUs, and all 1128 `.c` under `lib/ap`). *Sound for
+TOKEN questions only* — the binary is gcc's, so ILP64 where kencc is
+LLP64, and `#if` arithmetic stays the VM's. Its root guard fired on its
+own first run, for the FOURTH time: this directory is four levels below
+the root, not three.
 ***Several of these need TWO compiles*** and the reason is the same every
 time: a `-D` that renames libap's function out of the reference's way
 applies to the CHECKER as well, and the sweep then compares libap against
@@ -362,33 +374,18 @@ preprocessor belongs in its own file, the same rule this tree has
 about cases that can hang. The macros are INVENTED because the first
 draft used `__x86_64__`, which gcc defines, so the arm meant to be
 skipped was compiled),
-`cppaste-probe` (**`pcc -c`, result is whether it COMPILES**, and a
-LADDER: five cases from the plainest `##` to clisp's exact shape, so
-the FIRST failure names the construct. From `flo_rest.d:338 name not
-declared: TO_F_`, where `CONCAT(TO_F_,r)` with `r`=1 lost its right
-operand. ***Two mechanisms were read out of `cpp/macro.c` and both
-were refuted by the source itself*** — leading whitespace (it is a
-FIELD, and `normtokenrow` clears it) and a leading `NL` token
-(`gatherargs:331` deletes it) — which is why it is a probe and not a
-patch. gcc compiles all five and is the control),
-`cpplimit-probe` (**`pcc -E`, and the result is WHICH CASES still
-contain `CONCAT(` afterwards** — not whether it compiles. THREE
-series, and ***the first two are negative because the correlation
-that started the file was an ARTIFACT***. The six failing lines in
-`lisparit.i` are its six longest, which looked like a size limit —
-but **only six lines in the file contain `TO_F_` at all**, and they
-are those six, so the comparison was against lines that never had the
-construct. *A name absent from a list is not a measurement until you
-have checked it could have been present.* A refutes a TOKEN limit
-(16405 tokens, all expand); B refutes a LENGTH limit (135221 chars,
-5.6x clisp's, all expand). **C is the real shape and came from
-counting**: clisp uses `CONCAT` 76 times and 70 expand, and in
-`flo_rest.d` the six `CONCAT(LFlen,s)` sites are each followed by a
-`CONCAT(TO_F_,r)` — six pairs, six failures — while every
-`CONCAT(TO_F_,r)` without one before it expands. So the rule under
-test is **a SECOND `CONCAT` in one expansion does not expand**, which
-every earlier probe missed by having exactly one. gcc expands all
-three and is the control),
+`cppaste-probe` and `cpplimit-probe` (**BOTH ANSWERED AND BOTH
+NEGATIVE, kept as regression ladders.** `cppaste` is 7 paste shapes,
+`cpplimit` is a token limit (16405), a length limit (135221 chars) and
+two-CONCATs-per-expansion — *three probes built UPWARD from guesses,
+three negative results.* The fault was the HIDESET and
+`cppclisp-probe` — the real `GEN_F_op2` copied character for character,
+built DOWNWARD from the source — reproduced it on the first run.
+**And the correlation these files were built on was an ARTIFACT TWICE
+OVER**: the twelve residual `CONCAT`s are at `flo_rest.d:303`/`:310`
+inside `GEN_LF_op2_0`, two per `s=0` call site, not at the six sites
+these notes named — *six pairs cannot make twelve, and twelve was
+already written down*),
 `regpair-probe` and `regpair-min` (**native, and their result is
 whether they COMPILE** — the bug they found is FIXED, so they are
 regression tests now, and **the only things here that ask a non-amd64
@@ -620,7 +617,32 @@ built by hand has not been measured in that position*.
   unrelated jobs. The fourth is structural (`plan9.c` wants `<u.h>`; the
   portable `unix.c` arm is written and satisfied and simply switched
   off). **Out of the default build for 0.6.**
-- **clisp** — `configure` reaches `C compiler cannot create executables`
+- **clisp** — ***THE NEXT STOP WAS A KENCC PREPROCESSOR BUG AFFECTING
+  EVERY PACKAGE IN THE TREE, AND IT IS FIXED.*** `lisparit.c` answered
+  `flo_rest.d:338 name not declared: TO_F_`: `cpp/expand()` painted a
+  macro's expansion with `HS(name) | {macro}` where Prosser's algorithm
+  specifies `(HS(name) & HS(')')) | {macro}` for a CALL, so **a macro
+  whose NAME was manufactured by `##` carried the paste machinery's own
+  hideset into its body** and any macro that helped build the name
+  stayed hidden there for good — clisp's two-level `CONCAT`, twelve
+  times. **The first half of the fix HANGS**: with the intersection but
+  the old NAME-only painting, a `)` written in a macro body has hideset
+  0, so mutually recursive `a(x)->b(x)`/`b(x)->a(x)` preprocesses for
+  ever; the loop now paints `NAME` and `RP`, which are the only two
+  types whose hideset is ever read. ***AND THE FIX CAME WITH A 27x
+  SPEEDUP***, because painting RP made an EXISTING cost visible —
+  `newhideset` compared its candidate against every hideset seen so far,
+  quadratic per file — so it is hash-interned now: `spvw.c` 15429ms ->
+  579ms. *A correctness fix whose cost exposed a bigger win than the fix
+  itself.* **The instrument matters more than the bug**: see
+  `cpp-xcheck/` above, which was available for the whole campaign while
+  these notes said kencc "cannot be compiled on the build host at all" —
+  true of `cc/` and the backends, generalised to a directory it did not
+  cover. *Check which sources actually need `<u.h>` before accepting
+  that a question needs the VM.*
+  `config.h` is hand-answered, `ARCHDEF` covers every `$objtype`, and
+  what is left is the Lisp bootstrap.
+  Historically: `configure` reaches `C compiler cannot create executables`
   under hundreds of `5: Bad file descriptor`, and the fd mechanism is
   **cleared** (`execfd-test.sh`, 11 sections, 0 failures), so that is a
   configure that could not write its own log. **`config.h` is
@@ -1427,7 +1449,10 @@ it wrote**; `poll()`'s three POSIX violations and `select()` on a
 regular file; itcl's
 four `sfbug`s; kencc's `false` keyword, the `L`-suffix width cap, the
 wide case label, the compound-literal zero fill, and both bit-field
-rules with the static initialiser underneath them.
+rules with the static initialiser underneath them; **cpp's missing
+hideset INTERSECTION, which stopped a macro expanding inside the body
+of any macro whose name was built by `##`** — and the hash-interning
+underneath it, which made cpp 27x faster on clisp's biggest file.
 
 **The ABI move of this release is `-J`, conforming struct layout, on by
 default in `pcc`.** `pcc -9` is the way back and exists for the

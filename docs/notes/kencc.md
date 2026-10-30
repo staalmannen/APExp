@@ -1369,7 +1369,8 @@ deliberately -- C23 does not deduce them.
 
 **Measured with bison, since kencc's own sources cannot be compiled on
 the host** (they need Plan 9's `<u.h>` and `<libc.h>`, so the first
-build is the VM's -- the same weaker position `-J` shipped from):
+build is the VM's -- the same weaker position `-J` shipped from;
+**`cpp` is the exception, see *The hideset* below**):
 
 ```
                       before   after
@@ -2363,9 +2364,12 @@ the same kind of table in the same file.
 
 **The entry below is kept for what it measured before the work**:
 `cc.y`
-means regenerating the parser, *kencc cannot be compiled on the build
-host at all* (its sources need Plan 9's `<u.h>`, which is why the
-models in `sys/lib/tests` exist), and the tree's own rule after any
+means regenerating the parser, *kencc's `cc/` and its backends cannot
+be compiled on the build host* (their sources need Plan 9's `<u.h>`,
+which is why the models in `sys/lib/tests` exist -- **`cpp` is the
+exception and `cpp-xcheck` builds it with gcc**; this line said "kencc"
+and the overgeneralisation cost a whole campaign, see *The hideset*
+below), and the tree's own rule after any
 change to `cc/`'s type tables is to run `regpair-probe` and
 `regpair-min` against **all ten** `[1-9kqv]c` backends. So the round
 ends with a VM build and ten compiles, and the four fuzzy hunks are
@@ -2379,3 +2383,177 @@ copy; and the uniform five-file difference in every `?c` directory
 
 `tc` and `tl` -- arm-thumb -- exist upstream and not here at all. Not a
 gap: arm-thumb is not in `_ARCHS`.
+
+## The hideset: `CONCAT` inside a macro whose name was pasted
+
+**clisp's `flo_rest.d:338` answered `name not declared: TO_F_`**, and the
+hunt that followed cost three probes, five mechanisms read out of
+`cpp/macro.c` and refuted by it, and two reading errors — and then was
+settled in one run by an instrument that should have existed from the
+start.
+
+### The bug
+
+`cpp/expand()` painted the expansion like this:
+
+```c
+hs = newhideset(trp->tp->hideset, np);
+for (tp=ntr.bp; tp<ntr.lp; tp++)
+	if (tp->type==NAME) { ... tp->hideset = hs ... }
+```
+
+that is, `HS(name) | {macro}`. **Prosser's algorithm — which the rest of
+this file implements — specifies `(HS(name) & HS(')')) | {macro}` for a
+function-like macro**, and the intersection is not decoration. It is the
+only thing that stops a hideset outliving the expansion that created it.
+
+It shows only when a macro's NAME is a token manufactured by `##`. Such
+a token carries the hideset of the paste machinery that built it, so with
+the union every name in the pasted macro's body inherited it — and any
+macro that helped build the name stayed hidden inside that body for
+good. clisp hits it through `lispbibl.d`'s ordinary two-level idiom:
+
+```c
+#define CONCAT_(a,b)  a##b
+#define CONCAT(a,b)   CONCAT_(a,b)
+```
+
+`flo_rest.d:289` is `CONCAT(GEN_LF_op2_,s)(...)`, so `GEN_LF_op2_0`
+arrives holding `{CONCAT_, CONCAT, GEN_F_op2, floatcase}` — and its body
+contains `CONCAT(TO_F_,r)` at `:303` and `:310`, which therefore never
+expanded. The `)` closing the `GEN_LF_op2_0(...)` call comes from
+`GEN_F_op2`'s own body and was never part of `CONCAT`'s expansion, so
+the intersection drops `CONCAT` and keeps everything genuinely still
+being replaced.
+
+**The machine printed the set rather than the mechanism being argued**,
+with one `fprintf` in `expand()`:
+
+```
+expand CONCAT: callsite hs=
+expand CONCAT_: callsite hs=CONCAT
+expand TO_1: callsite hs=CONCAT_ CONCAT
+expand OUTER: callsite hs=
+expand CONCAT: callsite hs=OUTER
+expand CONCAT_: callsite hs=CONCAT OUTER
+expand INNER_0: callsite hs=CONCAT_ CONCAT OUTER
+```
+
+`TO_1` gets the same paint and does not care, because its body contains
+no `CONCAT`. That is why the `direct` case always worked, and why seven
+cases of `cppaste-probe.c` all passed.
+
+Five lines reproduce it, and they are `V1`/`V2` in
+`sys/lib/tests/cpp-xcheck/hideset-cases.c`:
+
+```c
+#define CONCAT_(a,b)  a##b
+#define CONCAT(a,b)   CONCAT_(a,b)
+#define TO_1(x)       ((x)+1)
+#define INNER_0(x)    CONCAT(TO_,1)(x)
+#define OUTER(s,v)    CONCAT(INNER_,s)(v)
+V1 CONCAT(TO_,1)(7)   /* ((7)+1) everywhere */
+V2 OUTER(0,7)         /* ((7)+1) under gcc, CONCAT(TO_,1)(7) under kencc */
+```
+
+### The fix is in two halves and the first half alone HANGS
+
+`intersecthideset()` in `cpp/hideset.c`, and `chs` in `expand()`. With
+only that, **`a(2)` for mutually recursive `a(x)->b(x)`, `b(x)->a(x)`
+preprocesses for ever** — because the distribution loop painted NAME
+tokens only, so a `)` written in a macro body carried hideset 0, every
+intersection was empty, and each expansion forgot the other. The loop
+now paints `NAME` and `RP`. Only those two types' hidesets are ever
+read — `expandrow` tests a NAME, and the intersection reads
+`trp->tp[ntokc-1]`, which `gatherargs` guarantees is the `)` — so two
+types is the whole algorithm.
+
+*The recursion cases existed before the fix was written and are what
+caught it*, which is the one time in this hunt that writing the
+refutation condition down first paid immediately.
+
+### And the fix made an existing cost visible, which turned into a 27x speedup
+
+With RP painted as well, clisp's `spvw.c` went from sixteen seconds to
+minutes. **The cost was not new.** `newhideset()` compared its candidate
+against *every* existing hideset, so one expansion cost O(nhidesets) and
+a file cost quadratic in it — the unpatched cpp already spent most of
+those sixteen seconds there. `hideset.c` now interns through a 4096-bucket
+hash over the set's contents, which is sound because `inserths` keeps
+every set sorted and deduplicated, so at most one entry can match and the
+first match is the answer exactly as the linear scan's was.
+
+Measured on the host, `spvw.c` with clisp's real flags and APExp's own
+headers:
+
+| | misc.c | spvw.c |
+|---|---|---|
+| before | 478 ms | 15429 ms |
+| after (fix + hashed interning) | 94 ms | 579 ms |
+
+**27x on `spvw.c`.** *A correctness fix that arrives with a large
+speedup is unusual enough to be worth saying plainly: the slowdown is
+what made anybody look at `newhideset` at all.*
+
+The pointer is hashed as `uvlong` and not `ulong`, because kencc is
+LLP64 and a `ulong` cast drops the top half of every `Nlist *` on amd64;
+and not as `uintptr`, because that is a recent addition to 9front's
+`<u.h>` and this file is built by whatever host cpp the bootstrap starts
+from.
+
+### The measurement
+
+`sys/lib/tests/cpp-xcheck/` — see `docs/notes/instruments.md`. Numbers:
+
+- `hideset-cases.c`: PASS, kencc cpp agrees with gcc on every line,
+  including **C99 6.10.3.5 EXAMPLE 3 verbatim**, whose expected output
+  the standard writes down.
+- the real `lisparit.c`, generated locally with clisp's own
+  `comment5|gctrigger|varbrace` and preprocessed with APExp's own
+  headers: **12 residual `CONCAT` before, 0 after** — and 12 is what the
+  VM's `lisparit.i` had shown, to the digit.
+- regression, clisp's 31 translation units: **29 byte-identical, plus
+  `lisparit` (the fix) and `spvw`, whose two differing lines are
+  `__TIME__` fifteen seconds apart because the old binary took fifteen
+  seconds.**
+- regression, every `.c` under `sys/src/ape/lib/ap`: **1128 files, 1128
+  byte-identical, 0 differ.**
+
+### Three reading errors, each of which cost a round
+
+1. **The failing sites were not where these notes said.** They are
+   `flo_rest.d:303` and `:310`, inside `GEN_LF_op2_0`, two per `s=0`
+   call site — six call sites, twelve failures. They had been keyed to
+   164/202/240/254/266/278, and a correlation built on top of that
+   ("six `CONCAT(LFlen,s)`/`CONCAT(TO_F_,r)` pairs, six failures").
+   *There is no such correlation.* The residue was identified from its
+   text, and `LF_shorten_LF_1`/`_2` appear at 303 and 310 and nowhere
+   else — the line numbers were assigned from the shape of the arm
+   instead of from the only part of the text that names a line. **Six
+   pairs cannot make twelve, and twelve was already written down.**
+2. **Three probes were built upward from guesses and all three came back
+   negative.** `cppaste-probe` (7 cases, paste constructs),
+   `cpplimit-probe` series A (token count, 16405) and series B (line
+   length, 135221 chars). Reducing DOWNWARD from the real macro text —
+   `cppclisp-probe.c`, `GEN_F_op2` copied character for character —
+   reproduced it immediately. *The rule this tree already has about
+   replicating the code in front of you rather than the code you
+   remember, applied to a preprocessor.*
+3. **Two mechanisms were read out of `macro.c` and refuted by `macro.c`**
+   (leading whitespace is a field `normtokenrow` clears; a leading `NL`
+   is deleted by `gatherargs:331`), and the real cause was in
+   `expand()`'s last five lines the whole time — a line nobody read
+   because it looked like bookkeeping.
+
+### The correction that outlives the bug
+
+**This file said kencc "cannot be compiled on the build host at all",
+and for `cpp` that is wrong.** The claim is true of `cc/` and the
+backends, which is why the models in `sys/lib/tests` transcribe
+functions instead of compiling them — but `cpp` uses eleven Plan 9 names
+in total and about sixty lines of shim make it build with gcc. *The
+instrument that answered this in one run was available for the whole
+campaign and nobody looked, because a true statement about the compiler
+had been generalised to a directory it did not cover.* Check which
+sources actually need `<u.h>` before accepting that a question needs the
+VM.
