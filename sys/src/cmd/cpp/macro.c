@@ -221,12 +221,13 @@ expandrow(Tokenrow *trp, char *flag)
 void
 expand(Tokenrow *trp, Nlist *np)
 {
-	int ntokc, narg, nparam, i, hs;
+	int ntokc, narg, nparam, i, hs, chs;
 	Tokenrow *atr[NARG+1];
 	Tokenrow ntr;
 	Token *tp;
 
 	copytokenrow(&ntr, np->vp);		/* copy macro value */
+	chs = trp->tp->hideset;
 	if (np->ap==NULL) {			/* parameterless */
 		ntokc = 1;
 		atr[0] = nil;
@@ -253,6 +254,27 @@ expand(Tokenrow *trp, Nlist *np)
 			trp->tp += ntokc;
 			return;
 		}
+		/*
+		 * For a macro CALL the hideset carried into the expansion is
+		 * the INTERSECTION of the name token's hideset and the closing
+		 * parenthesis's, not the name token's alone -- gatherargs has
+		 * restored trp->tp to the name, so the ')' is trp->tp[ntokc-1].
+		 *
+		 * This is the half of the algorithm that was missing, and it
+		 * only ever shows when a macro's NAME was manufactured by `##'.
+		 * Such a token carries the hideset of the paste machinery that
+		 * built it, so with the union every name in the pasted macro's
+		 * body inherited it and any macro that helped build the name
+		 * stayed hidden for good.  clisp's CONCAT(GEN_LF_op2_,s) is
+		 * exactly that: the pasted GEN_LF_op2_0 arrived holding
+		 * {CONCAT_, CONCAT, ...}, so the CONCAT(TO_F_,r) inside its
+		 * body never expanded and `flo_rest.d:338' answered
+		 * `name not declared: TO_F_'.  The ')' comes from the calling
+		 * macro's own body and was never part of CONCAT's expansion,
+		 * so the intersection drops CONCAT and keeps everything that
+		 * is genuinely still being replaced.
+		 */
+		chs = intersecthideset(trp->tp->hideset, trp->tp[ntokc-1].hideset);
 		substargs(np, &ntr, atr, trp->tp->hideset, nparam);	/* put args into replacement */
 		for (i=0; i<narg; i++) {
 			dofree(atr[i]->bp);
@@ -260,9 +282,20 @@ expand(Tokenrow *trp, Nlist *np)
 		}
 	}
 
-	hs = newhideset(trp->tp->hideset, np);
-	for (tp=ntr.bp; tp<ntr.lp; tp++) {	/* distribute hidesets */
-		if (tp->type==NAME) {
+	hs = newhideset(chs, np);
+	/*
+	 * Distribute hidesets.  This used to paint NAME tokens only, which
+	 * is why the intersection above could not simply be switched on: the
+	 * ')’ of a call written in a macro body carried hideset 0, so for
+	 * mutually recursive `a(x)->b(x)' and `b(x)->a(x)' the intersection
+	 * was always empty and each expansion forgot the other -- `a(2)'
+	 * preprocessed for ever.  Only NAME and RP hidesets are ever READ
+	 * (expandrow tests a NAME, and the intersection reads trp->tp[ntokc-1],
+	 * which gatherargs guarantees is the ')'), so painting those two types
+	 * is the whole algorithm at the cost of the one extra type.
+	 */
+	for (tp=ntr.bp; tp<ntr.lp; tp++) {
+		if (tp->type==NAME || tp->type==RP) {
 			if (tp->hideset==0)
 				tp->hideset = hs;
 			else

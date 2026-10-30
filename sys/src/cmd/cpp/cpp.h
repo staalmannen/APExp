@@ -166,6 +166,7 @@ int	checkhideset(int, Nlist *);
 void	prhideset(int);
 int	newhideset(int, Nlist *);
 int	unionhideset(int, int);
+int	intersecthideset(int, int);
 void	iniths(void);
 void	setobjname(char *);
 void	clearwstab(void);

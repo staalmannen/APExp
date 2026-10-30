@@ -1369,7 +1369,8 @@ deliberately -- C23 does not deduce them.
 
 **Measured with bison, since kencc's own sources cannot be compiled on
 the host** (they need Plan 9's `<u.h>` and `<libc.h>`, so the first
-build is the VM's -- the same weaker position `-J` shipped from):
+build is the VM's -- the same weaker position `-J` shipped from;
+**`cpp` is the exception, see *The hideset* below**):
 
 ```
                       before   after
@@ -2363,9 +2364,12 @@ the same kind of table in the same file.
 
 **The entry below is kept for what it measured before the work**:
 `cc.y`
-means regenerating the parser, *kencc cannot be compiled on the build
-host at all* (its sources need Plan 9's `<u.h>`, which is why the
-models in `sys/lib/tests` exist), and the tree's own rule after any
+means regenerating the parser, *kencc's `cc/` and its backends cannot
+be compiled on the build host* (their sources need Plan 9's `<u.h>`,
+which is why the models in `sys/lib/tests` exist -- **`cpp` is the
+exception and `cpp-xcheck` builds it with gcc**; this line said "kencc"
+and the overgeneralisation cost a whole campaign, see *The hideset*
+below), and the tree's own rule after any
 change to `cc/`'s type tables is to run `regpair-probe` and
 `regpair-min` against **all ten** `[1-9kqv]c` backends. So the round
 ends with a VM build and ten compiles, and the four fuzzy hunks are
@@ -2379,3 +2383,331 @@ copy; and the uniform five-file difference in every `?c` directory
 
 `tc` and `tl` -- arm-thumb -- exist upstream and not here at all. Not a
 gap: arm-thumb is not in `_ARCHS`.
+
+## The hideset: `CONCAT` inside a macro whose name was pasted
+
+**clisp's `flo_rest.d:338` answered `name not declared: TO_F_`**, and the
+hunt that followed cost three probes, five mechanisms read out of
+`cpp/macro.c` and refuted by it, and two reading errors — and then was
+settled in one run by an instrument that should have existed from the
+start.
+
+### The bug
+
+`cpp/expand()` painted the expansion like this:
+
+```c
+hs = newhideset(trp->tp->hideset, np);
+for (tp=ntr.bp; tp<ntr.lp; tp++)
+	if (tp->type==NAME) { ... tp->hideset = hs ... }
+```
+
+that is, `HS(name) | {macro}`. **Prosser's algorithm — which the rest of
+this file implements — specifies `(HS(name) & HS(')')) | {macro}` for a
+function-like macro**, and the intersection is not decoration. It is the
+only thing that stops a hideset outliving the expansion that created it.
+
+It shows only when a macro's NAME is a token manufactured by `##`. Such
+a token carries the hideset of the paste machinery that built it, so with
+the union every name in the pasted macro's body inherited it — and any
+macro that helped build the name stayed hidden inside that body for
+good. clisp hits it through `lispbibl.d`'s ordinary two-level idiom:
+
+```c
+#define CONCAT_(a,b)  a##b
+#define CONCAT(a,b)   CONCAT_(a,b)
+```
+
+`flo_rest.d:289` is `CONCAT(GEN_LF_op2_,s)(...)`, so `GEN_LF_op2_0`
+arrives holding `{CONCAT_, CONCAT, GEN_F_op2, floatcase}` — and its body
+contains `CONCAT(TO_F_,r)` at `:303` and `:310`, which therefore never
+expanded. The `)` closing the `GEN_LF_op2_0(...)` call comes from
+`GEN_F_op2`'s own body and was never part of `CONCAT`'s expansion, so
+the intersection drops `CONCAT` and keeps everything genuinely still
+being replaced.
+
+**The machine printed the set rather than the mechanism being argued**,
+with one `fprintf` in `expand()`:
+
+```
+expand CONCAT: callsite hs=
+expand CONCAT_: callsite hs=CONCAT
+expand TO_1: callsite hs=CONCAT_ CONCAT
+expand OUTER: callsite hs=
+expand CONCAT: callsite hs=OUTER
+expand CONCAT_: callsite hs=CONCAT OUTER
+expand INNER_0: callsite hs=CONCAT_ CONCAT OUTER
+```
+
+`TO_1` gets the same paint and does not care, because its body contains
+no `CONCAT`. That is why the `direct` case always worked, and why seven
+cases of `cppaste-probe.c` all passed.
+
+Five lines reproduce it, and they are `V1`/`V2` in
+`sys/lib/tests/cpp-xcheck/hideset-cases.c`:
+
+```c
+#define CONCAT_(a,b)  a##b
+#define CONCAT(a,b)   CONCAT_(a,b)
+#define TO_1(x)       ((x)+1)
+#define INNER_0(x)    CONCAT(TO_,1)(x)
+#define OUTER(s,v)    CONCAT(INNER_,s)(v)
+V1 CONCAT(TO_,1)(7)   /* ((7)+1) everywhere */
+V2 OUTER(0,7)         /* ((7)+1) under gcc, CONCAT(TO_,1)(7) under kencc */
+```
+
+### The fix is in two halves and the first half alone HANGS
+
+`intersecthideset()` in `cpp/hideset.c`, and `chs` in `expand()`. With
+only that, **`a(2)` for mutually recursive `a(x)->b(x)`, `b(x)->a(x)`
+preprocesses for ever** — because the distribution loop painted NAME
+tokens only, so a `)` written in a macro body carried hideset 0, every
+intersection was empty, and each expansion forgot the other. The loop
+now paints `NAME` and `RP`. Only those two types' hidesets are ever
+read — `expandrow` tests a NAME, and the intersection reads
+`trp->tp[ntokc-1]`, which `gatherargs` guarantees is the `)` — so two
+types is the whole algorithm.
+
+*The recursion cases existed before the fix was written and are what
+caught it*, which is the one time in this hunt that writing the
+refutation condition down first paid immediately.
+
+### And the fix made an existing cost visible, which turned into a 27x speedup
+
+With RP painted as well, clisp's `spvw.c` went from sixteen seconds to
+minutes. **The cost was not new.** `newhideset()` compared its candidate
+against *every* existing hideset, so one expansion cost O(nhidesets) and
+a file cost quadratic in it — the unpatched cpp already spent most of
+those sixteen seconds there. `hideset.c` now interns through a 4096-bucket
+hash over the set's contents, which is sound because `inserths` keeps
+every set sorted and deduplicated, so at most one entry can match and the
+first match is the answer exactly as the linear scan's was.
+
+Measured on the host, `spvw.c` with clisp's real flags and APExp's own
+headers:
+
+| | misc.c | spvw.c |
+|---|---|---|
+| before | 478 ms | 15429 ms |
+| after (fix + hashed interning) | 94 ms | 579 ms |
+
+**27x on `spvw.c`.** *A correctness fix that arrives with a large
+speedup is unusual enough to be worth saying plainly: the slowdown is
+what made anybody look at `newhideset` at all.*
+
+The pointer is hashed as `uvlong` and not `ulong`, because kencc is
+LLP64 and a `ulong` cast drops the top half of every `Nlist *` on amd64;
+and not as `uintptr`, because that is a recent addition to 9front's
+`<u.h>` and this file is built by whatever host cpp the bootstrap starts
+from.
+
+### The measurement
+
+`sys/lib/tests/cpp-xcheck/` — see `docs/notes/instruments.md`. Numbers:
+
+- `hideset-cases.c`: PASS, kencc cpp agrees with gcc on every line,
+  including **C99 6.10.3.5 EXAMPLE 3 verbatim**, whose expected output
+  the standard writes down.
+- the real `lisparit.c`, generated locally with clisp's own
+  `comment5|gctrigger|varbrace` and preprocessed with APExp's own
+  headers: **12 residual `CONCAT` before, 0 after** — and 12 is what the
+  VM's `lisparit.i` had shown, to the digit.
+- regression, clisp's 31 translation units: **29 byte-identical, plus
+  `lisparit` (the fix) and `spvw`, whose two differing lines are
+  `__TIME__` fifteen seconds apart because the old binary took fifteen
+  seconds.**
+- regression, every `.c` under `sys/src/ape/lib/ap`: **1128 files, 1128
+  byte-identical, 0 differ.**
+
+### Three reading errors, each of which cost a round
+
+1. **The failing sites were not where these notes said.** They are
+   `flo_rest.d:303` and `:310`, inside `GEN_LF_op2_0`, two per `s=0`
+   call site — six call sites, twelve failures. They had been keyed to
+   164/202/240/254/266/278, and a correlation built on top of that
+   ("six `CONCAT(LFlen,s)`/`CONCAT(TO_F_,r)` pairs, six failures").
+   *There is no such correlation.* The residue was identified from its
+   text, and `LF_shorten_LF_1`/`_2` appear at 303 and 310 and nowhere
+   else — the line numbers were assigned from the shape of the arm
+   instead of from the only part of the text that names a line. **Six
+   pairs cannot make twelve, and twelve was already written down.**
+2. **Three probes were built upward from guesses and all three came back
+   negative.** `cppaste-probe` (7 cases, paste constructs),
+   `cpplimit-probe` series A (token count, 16405) and series B (line
+   length, 135221 chars). Reducing DOWNWARD from the real macro text —
+   `cppclisp-probe.c`, `GEN_F_op2` copied character for character —
+   reproduced it immediately. *The rule this tree already has about
+   replicating the code in front of you rather than the code you
+   remember, applied to a preprocessor.*
+3. **Two mechanisms were read out of `macro.c` and refuted by `macro.c`**
+   (leading whitespace is a field `normtokenrow` clears; a leading `NL`
+   is deleted by `gatherargs:331`), and the real cause was in
+   `expand()`'s last five lines the whole time — a line nobody read
+   because it looked like bookkeeping.
+
+### The correction that outlives the bug
+
+**This file said kencc "cannot be compiled on the build host at all",
+and for `cpp` that is wrong.** The claim is true of `cc/` and the
+backends, which is why the models in `sys/lib/tests` transcribe
+functions instead of compiling them — but `cpp` uses eleven Plan 9 names
+in total and about sixty lines of shim make it build with gcc. *The
+instrument that answered this in one run was available for the whole
+campaign and nobody looked, because a true statement about the compiler
+had been generalised to a directory it did not cover.* Check which
+sources actually need `<u.h>` before accepting that a question needs the
+VM.
+
+## Building kencc on the build host
+
+**All ten C compilers build with gcc on Linux and run there**, from
+APExp's own `sys/src/cmd/cc` and `sys/src/cmd/[1-9kqv]c`. The harness is
+`sys/lib/tests/hostkencc/`; read that script before trusting a number
+from it, because its fidelity limits are the point.
+
+This follows `cpp-xcheck` and the correction it forced: this file used to
+say kencc "cannot be compiled on the build host at all", which is true of
+nothing in particular. **cpp needed eleven Plan 9 names; the compilers
+need a vendored library that was already in the tree.**
+
+### What it is built from
+
+| piece | where |
+|---|---|
+| the compilers | `sys/src/cmd/cc`, `sys/src/cmd/[1-9kqv]c` — **the shipped sources, unforked** |
+| Plan 9 API on Unix | `sys/src/external/go1.4/{include,src/lib9,src/libbio}` |
+| the Unix half of `cc/compat.h` | `hostkencc/compat-unix.c` |
+| three name renames | `hostkencc/prelude.h` |
+| `cc/mkenam` without `ed` | `hostkencc/mkenam.sh` |
+| stand-in native headers | `hostkencc/plan9/{u.h,libc.h}` |
+
+**go1.4's `lib9` compiled with gcc on the first attempt — 89 objects, no
+diagnostics** — which is unsurprising once you look: it is plan9port's
+library, with `run_unix.c`, `tempdir_unix.c` and `_p9dir.c`. It is the
+same lineage as `goken9cc` (which forked the Go repository in October
+2010 and has since replaced the libc and the build system) but newer and
+already here. *The portable layer this tree needed had been vendored for
+go's bootstrap all along.*
+
+`lib9/main.c` must be in the link: `go1.4/include/libc.h:366` is
+`#define main p9main`, and GNU ld does not search archives for the entry
+point the way Plan 9's linkers do, so `cc/lex.o` is also named
+explicitly rather than pulled from `cc.a`.
+
+`compat-unix.c` is `cc/compat` with **two functions changed and eight
+verbatim**: lib9 implements Plan 9's `create`, `seek`, `dup`, `exec`,
+`getwd` and even `wait` returning a `Waitmsg*`, so only `systemtype()`
+and the allocator differ. Plan 9's `alloc` bump-allocates over `end[]`
+with `brk` and replaces `malloc`/`free` with never-freeing versions;
+go's own portable `cc` uses the host allocator (`go1.4
+src/cmd/cc/lex.c:1553`) and so does this. *That difference cuts in our
+favour*: a use-after-free in the compiler is invisible under a
+never-freeing bump allocator and may fault here, so the host build is
+strictly better at finding one — and can run under ASan or valgrind at
+all.
+
+### Three host flags, no source forks
+
+- `-fcommon`. Every backend's `gc.h` carries bare `int hintabsize;`-style
+  **tentative definitions**, which each including TU defines; Plan 9's
+  linkers merge them and gcc 10+ defaults to `-fno-common` and refuses.
+  Six of the ten fail to link without it.
+- `-include prelude.h`, for three collisions and nothing else: `IOUNIT`
+  (Plan 9's 9P I/O unit, used only to size a buffer) and kencc's own
+  `long round(long,int)` and `int log2(uvlong)` against glibc's
+  `<math.h>`. **The rename cannot be a plain `-D`**: glibc builds those
+  declarations through macros (`__MATHCALL_VEC (log2,, ...)`) and
+  renaming the name inside the invocation breaks the expansion —
+  measured, `expected ';' before 'extern'` on every file. So `<math.h>`
+  is included first with its real names and the renames apply after.
+- bison rather than Plan 9 yacc, and the harness **prints the conflict
+  counts** (22 shift/reduce, 6 reduce/reduce — the recorded baseline) so
+  a `cc.y` change that moves them is visible here instead of on the VM.
+
+### Two real tree defects it found immediately
+
+1. **`cc/cc.h:47`'s `NVAR` was `BITS*sizeof(ulong)*8` while `bits.c`
+   hardcodes 32** (`c.b[n/32] = 1L << (n%32)`). Those agree only where
+   `ulong` is 32 bits — every kennc target — so a 64-bit `ulong` makes
+   `NVAR` 320 against 160 addressable bits and `bsetc(319)` writes four
+   words past `Bits.b[5]`. It is `BITS*32` now, the same number on Plan 9
+   and therefore inert for every shipped compiler. *A latent
+   out-of-bounds write, not a bug anything had observed* — nothing in the
+   host build reached it, since only a function with more than 160
+   register candidates would.
+2. **`7c`, `9c` and `qc` declared `int swcmp(void*, void*)`** while the
+   shared `cc/pswt.c` defines `swcmp(const void*, const void*)` and the
+   other seven backends declare it that way. Harmless at runtime, a
+   straight declaration bug, and three of ten disagreeing is the kind of
+   thing a per-backend build never surfaces.
+
+### What is sound and what is not
+
+**kencc is LLP64; the host build is LP64.** The host `long` is 64 bits
+where every kencc target's is 32.
+
+- **Sound**: does it compile, does it crash, does it diagnose, what the
+  parser accepts, what the type machinery does — and above all A/B
+  between two builds of the *same* sources, where both sides share the
+  host's widths and the difference is the change under test.
+- **Unsound**: anything keyed on `long` being 32 bits. `specbits-model.py`
+  exists for exactly this — `TNORET` was `1L<<31` with zero shifts spare
+  on the target and 32 spare here, so an overflow that is real there
+  cannot appear at all. Constant folding of `long` expressions is the
+  other family.
+
+`-m32` is not the way out, and was checked: this host has no 32-bit
+runtime, and gcc `-m32` gives a 32-bit *pointer*, where kencc on amd64
+has a 32-bit `long` and a 64-bit pointer. **Neither host model matches;
+the LP64 one at least gets pointers right.**
+
+**The linkers are NOT built here and that is deliberate.**
+`[1-9]l/pass.c` uses `sizeof(long)` to lay out *target* data
+(`newdata(et, off, sizeof(long), D_EXTERN)`), which is 8 on the host
+where it must be 4. The compilers' `sizeof(long)` uses are host
+allocation sizes and merely over-allocate; the linkers' are the emitted
+image. Fixing that means deciding, per site, whether the constant is the
+host's word or the target's — real work, and not needed to answer a
+front-end question.
+
+### The fidelity evidence, and the one control still outstanding
+
+**`hostkencc.sh --probe` reproduces this tree's recorded ten-backend VM
+result exactly**: all ten compile `regpair-min.c`, eight compile
+`regpair-probe.c`, and the two failures are **`kc` and `vc` on case 3**,
+`regpair-probe.c:242`, `unknown op in lcgen: CAST`. That is an
+independently recorded pass/fail pattern across ten backends, matching in
+which backends fail and which construct does it. *It is the strongest
+fidelity evidence available without the VM, and it is still not codegen.*
+
+`hostkencc/agree.c` is the control that settles codegen and has to be run
+once on each side:
+
+```
+( VM )    6c -S agree.c > /tmp/vm.s
+( host )  out/bin/6c -S agree.c > /tmp/host.s
+```
+
+Until that has been run, **treat codegen output from this harness as
+indicative and not as the compiler's answer.**
+
+### And the first thing that looked like a host artifact was not one
+
+`6c -S` on `int f(int x){return x;}` answers `MOVL BP,AX`, which reads as
+a parameter register-allocated with nothing loading it. It is correct:
+**`6c/6.out.h:811` is `REGARG = D_BP`**, so kencc's amd64 convention
+passes the first word-sized argument in BP and `cc/pgen.c:57` spills it.
+*The output was called wrong, and `NVAR` was blamed for it, before the
+convention was looked up.* `-N` is what made it plain — it disables
+`regopt` (`cc/pgen.c:110`) and the prologue's `MOVL BP,x+0(FP)` is then
+visible as a spill rather than a mystery.
+
+### An instrument fault worth keeping
+
+**kencc's `diag()` writes to STDOUT, not stderr** — `Bprint(&diagbuf, ...)`
+goes to fd 1. The first version of the `--probe` sweep captured
+`2>&1 >/dev/null` and reported **all ten backends passing
+`regpair-probe`**, the two that fail included. *A check that passes for
+the wrong reason*, and it was caught only because this tree had already
+written down that the answer is eight of ten. A harness for a Plan 9
+compiler must capture stdout.

@@ -186,3 +186,24 @@ int case7(void)
 }
 
 int cppaste_probe_ok = 1;
+
+/*
+ * ***ANSWERED, AND NOT BY THIS FILE.*** The fault was the HIDESET, not
+ * the paste: `cpp/expand()' painted every name in a macro's expansion
+ * with `HS(name) | {macro}' where Prosser's algorithm specifies
+ * `(HS(name) & HS(')')) | {macro}' for a call, so a macro whose NAME
+ * was manufactured by `##' passed the paste machinery's own hideset
+ * down into its body and `CONCAT' stayed hidden there for good. All
+ * seven cases here paste correctly because in none of them is the
+ * paste inside a macro reached THROUGH a paste -- which is the one
+ * structural axis this ladder never had, after five readings of
+ * `macro.c' and three probes.
+ *
+ * **The five-line form is `V1'/`V2' in `cpp-xcheck/hideset-cases.c'**,
+ * and `cpp-xcheck.sh' is why: it builds kencc's own cpp with gcc on the
+ * build host, so the question stopped needing a VM. *The lesson this
+ * file paid for is not about `##' at all -- it is that the unit under
+ * test was runnable here the whole time.*
+ *
+ * Kept as a regression ladder: all seven must still compile.
+ */

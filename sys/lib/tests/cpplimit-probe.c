@@ -157,3 +157,31 @@ int c_two(void) { int q=1; TWO(1,0) return q; }
 int c_twonest(void) { int q=1; TWONEST(1,0); return q; }
 
 int cpplimit_probe_ok = 1;
+
+/*
+ * ***ANSWERED, AND ALL THREE SERIES STAY NEGATIVE.*** There is no token
+ * limit, no length limit and no two-CONCATs-per-expansion rule. The
+ * fault was the HIDESET: `cpp/expand()' used `HS(name) | {macro}' where
+ * Prosser's algorithm specifies `(HS(name) & HS(')')) | {macro}' for a
+ * call, so a macro whose NAME came out of `##' carried the paste
+ * machinery's hideset into its body and hid `CONCAT' there permanently.
+ *
+ * `c_twonest' above is the closest this file came, and it passes for a
+ * reason worth keeping: `TWONEST's own name is not pasted, so its body
+ * is painted with `{TWONEST}' and nothing else. *The axis was never
+ * how many CONCATs there are, it was where the enclosing macro's name
+ * came from.*
+ *
+ * **And series C's shape -- six `CONCAT(LFlen,s)'/`CONCAT(TO_F_,r)'
+ * pairs, six failures -- was an artifact of a second reading error.**
+ * The twelve residual CONCATs are at `flo_rest.d:303' and `:310',
+ * inside `GEN_LF_op2_0', two per `s=0' call site; they were keyed to
+ * 164/202/... from the shape of the arm instead of from
+ * `LF_shorten_LF_1'/`_2', the only text in the residue that names a
+ * line. Six pairs cannot make twelve, and twelve was already written
+ * down. *This is the third time in one hunt that a correlation was
+ * written before the thing being correlated was checked.*
+ *
+ * `sys/lib/tests/cpp-xcheck/' is the instrument that settled it, and
+ * it settled it in one run.
+ */
