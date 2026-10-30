@@ -698,9 +698,22 @@ built by hand has not been measured in that position*.
   own fallback). *The prose beside the macro already said "vfork is not
   provided"* — the hand-answered-capability shape again, after
   `VALID_FILENAME_CHAR`.
-  **All 31 TUs now compile clean under `hostkencc` (`6c -J -p`)**;
-  the link is untested and the local `intparam.h` is a MODEL, so the
-  VM is still the measurement. What is left is the Lisp bootstrap.
+  **All 31 TUs now compile clean under `hostkencc` (`6c -J -p`)**, and
+  ***`lisp.run` LINKS***. `base:V:` is now the three-stage bootstrap
+  from `makemake.in:2870-2920` — `interpreted.mem`, then
+  `compiler.fas`+`halfcompiled.mem` (*the same command as stage 1
+  re-run*: `LOAD` prefers a `.fas`, so the image comes back with a
+  compiled compiler), then `lispinit.mem` from `init.fas`.
+  **Nothing needs installing first**: `init.lisp` loads by BARE NAME,
+  so `-lp <srcdir>` plus the build dir as cwd resolves everything and
+  `-o ./` lands the `.fas`; *the one file that must be created* is
+  `config.lisp`, a copy of `cfgunix.lisp`. **The 86-name list is
+  DERIVED from `makemake.in`'s own shell, not transcribed** — run with
+  this port's settings and diffed against the mkfile, 86 and 86,
+  identical including order, and each feature test matches a `#+`
+  guard at the end of `init.lisp`. ***NOT YET RUN***: stage 1 is the
+  cheapest thing that separates "links" from "runs", and there is no
+  `rc` on the build host, so the recipe is swept and not executed.
   ***AND `-J` IS NOT OPTIONAL WHEN `6c` STANDS IN FOR `pcc`***: without
   it `stream.d:17311` answers `duplicate cases in switch 8`, because
   `sizeof(ffloatjanus)` is 4 under `-J` and 8 under the 9front rule.

@@ -331,13 +331,109 @@ lisprun:V: configure
 # work.  Not written yet; `lisp.run' linking is the thing to measure
 # first, since a bootstrap driven by a broken binary reports nothing
 # about the bootstrap.
+# ***THE LISP BOOTSTRAP, AND IT IS THREE STAGES WITH A REAL
+# CIRCULARITY.***  `makemake.in:2870-2920' is the whole of it, and the
+# shape is worth having in front of you before reading the recipe:
+#
+#   1. `interpreted.mem'   -- `lisp.run' with NO image loads `init.lisp'
+#                             from the SOURCE tree, INTERPRETED, and
+#                             dumps.  *This stage is also the first
+#                             measurement that `lisp.run' runs at all.*
+#   2. `compiler.fas'      -- compiled by stage 1's image.
+#      `halfcompiled.mem'  -- the SAME command as stage 1, re-run.  The
+#                             only difference is that `compiler.fas' now
+#                             exists in the build directory, and CLISP's
+#                             `LOAD' prefers a `.fas' to a `.lisp' of
+#                             the same name, so the image comes back
+#                             with a COMPILED compiler in it.
+#      the other 85 `.fas' -- compiled by `halfcompiled.mem'.
+#   3. `lispinit.mem'      -- `lisp.run' with no image loads `init.fas'
+#                             and dumps the base image.
+#
+# `init.lisp' loads by BARE NAME (`(LOAD "dribble")'), so what resolves
+# a name is `-lp' plus the current directory -- which is why stage 2
+# needs no flag to pick up the compiled compiler, and why the build
+# directory is the cwd throughout.
+#
+# ***NOTHING HAS TO BE INSTALLED OR COPIED FIRST, AND THAT WAS WORTH
+# CHECKING RATHER THAN ASSUMING.***  The 86 `.lisp' sources stay where
+# they are and are reached through `-lp'; the `.fas' land in the build
+# directory through `-o ./'.  The ONE file that must be created is
+# `config.lisp', and `makemake.in:2812' says what it is: a copy of
+# `cfg${TOS}.lisp', i.e. `cfgunix.lisp'.  `init.lisp's last `LOAD' is
+# `"config"', so without it stage 1 fails at the very end.
+#
+# **THE FILE LIST IS DERIVED FROM `makemake.in', NOT TRANSCRIBED.**
+# `$LPARTS' there is built by twenty lines of shell with five feature
+# tests in them; running those lines with this port's settings
+# (`TOS=unix', `with_threads=no', `with_dynamic_ffi=no',
+# `with_unicode=yes', `with_gettext=no') gives the 86 names below, and
+# all 86 exist.  *This tree has been bitten by a hand-copied list
+# before, which is why `mkfile.cparts' is shared rather than
+# duplicated.*  The four feature tests that MATTER here, each matching
+# a `#+' guard at the end of `init.lisp': no `timezone' (TOS is unix),
+# no `threads', no `foreign1' (`#+FFI'), and none of
+# `danish german french spanish dutch russian'
+# (`#+(and GETTEXT UNICODE)', and `config.h:386' has `ENABLE_NLS'
+# undefined).  *A list that disagrees with `init.lisp's own `#+' guards
+# would compile files the image never loads, or miss ones it does.*
+#
+# `$RUN' is `makemake.in:2843' with this port's flags resolved:
+# `-B ./' because there is no gettext, and
+# `-E UTF-8 -Epathname 1:1 -Emisc 1:1' because there IS unicode.
+# `-m 2MW' is upstream's `MEMOPT' and its comment explains the number:
+# the strict minimum for stage 1 is between 1400KW and 1500KW.
+#
+# ***NOT YET RUN.  WHAT THIS TARGET IS, IS THE SEQUENCE WRITTEN DOWN.***
+# `lisp.run' links; a binary that links has not been shown to run, which
+# is the gap `miniperl' had.  Stage 1 is the cheapest thing that
+# separates the two, so each stage announces itself before it starts:
+# *a fault, a kill and a clean finish all give the prompt back*, so a
+# silent stop has to be distinguishable from a finished one.
 base:V: lisprun
 	@{
-		echo 'clisp: lisp.run is built in '$BUILD'.'
-		echo '       The Lisp bootstrap (lisp.run compiles *.lisp to'
-		echo '       *.fas and dumps the base image) is the next step.'
-		echo '       Run ./lisp.run there by hand first: a binary that'
-		echo '       links has not been shown to run.'
+		root=`{cd $APEXPROOT; pwd}
+		srcroot=`{cd $CLISPSRC; pwd}
+		cd $BUILD
+		LPARTS=(init defseq backquote defmacro macros1 macros2 defs1 \
+			lambdalist places floatprint defpackage type subtypep \
+			clos-package clos-macros clos-class0 clos-metaobject1 \
+			clos-slotdef1 clos-stablehash1 clos-specializer1 \
+			clos-class1 clos-class2 clos-class3 defstruct format \
+			international savemem functions trace cmacros compiler \
+			defs2 loop clos clos-stablehash2 clos-specializer2 \
+			clos-specializer3 clos-class4 clos-class5 clos-class6 \
+			clos-slotdef2 clos-slotdef3 clos-slots1 clos-slots2 \
+			clos-method1 clos-method2 clos-method3 clos-method4 \
+			clos-methcomb1 clos-methcomb2 clos-methcomb3 \
+			clos-methcomb4 clos-genfun1 clos-genfun2a clos-genfun2b \
+			clos-genfun3 clos-genfun4 clos-genfun5 clos-dependent \
+			clos-print clos-custom documentation fill-out disassem \
+			condition loadform gstream xcharin keyboard screen \
+			runprog query reploop dribble complete pprint describe \
+			room edit macros3 clhs inspect gray case-sensitive \
+			exporting deprecated)
+		RUN=(./lisp.run -B ./ -E UTF-8 -Epathname 1:1 -Emisc 1:1 -norc)
+		MEMOPT=(-m 2MW)
+		SRC=$srcroot/src/
+		cp $SRC^cfgunix.lisp config.lisp
+		echo 'clisp: stage 1/3 -- interpreted.mem'
+		$RUN $MEMOPT -lp $SRC -x '(and (load "'^$SRC^'init.lisp") (sys::%saveinitmem) (ext::exit)) (ext::exit t)'
+		mv lispimag.mem interpreted.mem
+		echo 'clisp: stage 2/3 -- compiler.fas, then halfcompiled.mem'
+		$RUN $MEMOPT -M interpreted.mem -q -c $SRC^compiler.lisp -o ./
+		$RUN $MEMOPT -lp $SRC -x '(and (load "'^$SRC^'init.lisp") (sys::%saveinitmem) (ext::exit)) (ext::exit t)'
+		mv lispimag.mem halfcompiled.mem
+		for (f in $LPARTS) {
+			if (! ~ $f compiler) {
+				echo 'clisp:   compiling '$f
+				$RUN $MEMOPT -M halfcompiled.mem -q -c $SRC^$f^.lisp -o ./
+			}
+		}
+		$RUN $MEMOPT -M halfcompiled.mem -q -c config.lisp
+		echo 'clisp: stage 3/3 -- lispinit.mem'
+		$RUN -x '(and (load "init.fas") (ext::saveinitmem) (ext::exit)) (ext::exit t)'
+		echo 'clisp: base image built in '$BUILD'.'
 	}
 
 build:V: base
