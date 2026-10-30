@@ -3010,3 +3010,45 @@ hand-answered `config.h` entry contradicted its own comment, after
 to match kencc — and `floatparam.h` is gcc's untouched. The link is
 untested, since the linkers are deliberately not host-built. Next is a
 VM run of `mk -f mkfile.runtime lisprun` and then the Lisp bootstrap.
+
+### clisp: the Lisp bootstrap, written down
+
+`lisp.run` links. `base:V:` in `mkfile.runtime` is now the three-stage
+bootstrap from `makemake.in:2870-2920`, and the shape is the point:
+
+1. **`interpreted.mem`** — `lisp.run` with *no* image loads `init.lisp`
+   from the source tree, interpreted, and dumps.
+2. **`compiler.fas`** compiled by that image; then **`halfcompiled.mem`**,
+   which is *the same command as stage 1 re-run*. The only difference is
+   that `compiler.fas` now exists in the build directory and CLISP's
+   `LOAD` prefers a `.fas` to a `.lisp` of the same name, so the image
+   comes back with a compiled compiler in it. Then the other 85 `.fas`.
+3. **`lispinit.mem`** — `lisp.run` loads `init.fas` and dumps.
+
+**Nothing has to be installed or copied first**, which was worth
+checking rather than assuming: `init.lisp` loads by bare name
+(`(LOAD "dribble")`), so `-lp <srcdir>` plus the build directory as cwd
+resolves everything, and `-o ./` puts the `.fas` in the build directory.
+*The one file that must be created* is `config.lisp`, a copy of
+`cfgunix.lisp` (`makemake.in:2812`) — `init.lisp`'s last `LOAD` is
+`"config"`, so without it stage 1 fails at the very end.
+
+**The 86-name file list is derived, not transcribed.** `$LPARTS` is
+built by twenty lines of shell with five feature tests; those lines were
+run with this port's settings (`TOS=unix`, `with_threads=no`,
+`with_dynamic_ffi=no`, `with_unicode=yes`, `with_gettext=no`) and the
+result compared against what went into the mkfile — **86 and 86,
+identical including order.** All 86 `.lisp` exist. The four tests that
+matter each match a `#+` guard at the end of `init.lisp`: no `timezone`,
+no `threads`, no `foreign1` (`#+FFI`), and none of the six message
+catalogues (`#+(and GETTEXT UNICODE)`; `config.h:386` leaves
+`ENABLE_NLS` undefined). *A list disagreeing with `init.lisp`'s own
+guards would compile files the image never loads, or miss ones it does.*
+
+**NOT YET RUN.** A binary that links has not been shown to run — the
+`miniperl` gap — and **stage 1 is the cheapest thing that separates the
+two**, since it is `lisp.run` starting with no image at all. Each stage
+announces itself before it starts, because a fault, a kill and a clean
+finish all give the prompt back. The recipe passes `rceq-sweep` and
+`mkcont-sweep`, but there is no `rc` on the build host, so its quoting
+has been swept and not executed.
