@@ -2557,3 +2557,157 @@ campaign and nobody looked, because a true statement about the compiler
 had been generalised to a directory it did not cover.* Check which
 sources actually need `<u.h>` before accepting that a question needs the
 VM.
+
+## Building kencc on the build host
+
+**All ten C compilers build with gcc on Linux and run there**, from
+APExp's own `sys/src/cmd/cc` and `sys/src/cmd/[1-9kqv]c`. The harness is
+`sys/lib/tests/hostkencc/`; read that script before trusting a number
+from it, because its fidelity limits are the point.
+
+This follows `cpp-xcheck` and the correction it forced: this file used to
+say kencc "cannot be compiled on the build host at all", which is true of
+nothing in particular. **cpp needed eleven Plan 9 names; the compilers
+need a vendored library that was already in the tree.**
+
+### What it is built from
+
+| piece | where |
+|---|---|
+| the compilers | `sys/src/cmd/cc`, `sys/src/cmd/[1-9kqv]c` — **the shipped sources, unforked** |
+| Plan 9 API on Unix | `sys/src/external/go1.4/{include,src/lib9,src/libbio}` |
+| the Unix half of `cc/compat.h` | `hostkencc/compat-unix.c` |
+| three name renames | `hostkencc/prelude.h` |
+| `cc/mkenam` without `ed` | `hostkencc/mkenam.sh` |
+| stand-in native headers | `hostkencc/plan9/{u.h,libc.h}` |
+
+**go1.4's `lib9` compiled with gcc on the first attempt — 89 objects, no
+diagnostics** — which is unsurprising once you look: it is plan9port's
+library, with `run_unix.c`, `tempdir_unix.c` and `_p9dir.c`. It is the
+same lineage as `goken9cc` (which forked the Go repository in October
+2010 and has since replaced the libc and the build system) but newer and
+already here. *The portable layer this tree needed had been vendored for
+go's bootstrap all along.*
+
+`lib9/main.c` must be in the link: `go1.4/include/libc.h:366` is
+`#define main p9main`, and GNU ld does not search archives for the entry
+point the way Plan 9's linkers do, so `cc/lex.o` is also named
+explicitly rather than pulled from `cc.a`.
+
+`compat-unix.c` is `cc/compat` with **two functions changed and eight
+verbatim**: lib9 implements Plan 9's `create`, `seek`, `dup`, `exec`,
+`getwd` and even `wait` returning a `Waitmsg*`, so only `systemtype()`
+and the allocator differ. Plan 9's `alloc` bump-allocates over `end[]`
+with `brk` and replaces `malloc`/`free` with never-freeing versions;
+go's own portable `cc` uses the host allocator (`go1.4
+src/cmd/cc/lex.c:1553`) and so does this. *That difference cuts in our
+favour*: a use-after-free in the compiler is invisible under a
+never-freeing bump allocator and may fault here, so the host build is
+strictly better at finding one — and can run under ASan or valgrind at
+all.
+
+### Three host flags, no source forks
+
+- `-fcommon`. Every backend's `gc.h` carries bare `int hintabsize;`-style
+  **tentative definitions**, which each including TU defines; Plan 9's
+  linkers merge them and gcc 10+ defaults to `-fno-common` and refuses.
+  Six of the ten fail to link without it.
+- `-include prelude.h`, for three collisions and nothing else: `IOUNIT`
+  (Plan 9's 9P I/O unit, used only to size a buffer) and kencc's own
+  `long round(long,int)` and `int log2(uvlong)` against glibc's
+  `<math.h>`. **The rename cannot be a plain `-D`**: glibc builds those
+  declarations through macros (`__MATHCALL_VEC (log2,, ...)`) and
+  renaming the name inside the invocation breaks the expansion —
+  measured, `expected ';' before 'extern'` on every file. So `<math.h>`
+  is included first with its real names and the renames apply after.
+- bison rather than Plan 9 yacc, and the harness **prints the conflict
+  counts** (22 shift/reduce, 6 reduce/reduce — the recorded baseline) so
+  a `cc.y` change that moves them is visible here instead of on the VM.
+
+### Two real tree defects it found immediately
+
+1. **`cc/cc.h:47`'s `NVAR` was `BITS*sizeof(ulong)*8` while `bits.c`
+   hardcodes 32** (`c.b[n/32] = 1L << (n%32)`). Those agree only where
+   `ulong` is 32 bits — every kennc target — so a 64-bit `ulong` makes
+   `NVAR` 320 against 160 addressable bits and `bsetc(319)` writes four
+   words past `Bits.b[5]`. It is `BITS*32` now, the same number on Plan 9
+   and therefore inert for every shipped compiler. *A latent
+   out-of-bounds write, not a bug anything had observed* — nothing in the
+   host build reached it, since only a function with more than 160
+   register candidates would.
+2. **`7c`, `9c` and `qc` declared `int swcmp(void*, void*)`** while the
+   shared `cc/pswt.c` defines `swcmp(const void*, const void*)` and the
+   other seven backends declare it that way. Harmless at runtime, a
+   straight declaration bug, and three of ten disagreeing is the kind of
+   thing a per-backend build never surfaces.
+
+### What is sound and what is not
+
+**kencc is LLP64; the host build is LP64.** The host `long` is 64 bits
+where every kencc target's is 32.
+
+- **Sound**: does it compile, does it crash, does it diagnose, what the
+  parser accepts, what the type machinery does — and above all A/B
+  between two builds of the *same* sources, where both sides share the
+  host's widths and the difference is the change under test.
+- **Unsound**: anything keyed on `long` being 32 bits. `specbits-model.py`
+  exists for exactly this — `TNORET` was `1L<<31` with zero shifts spare
+  on the target and 32 spare here, so an overflow that is real there
+  cannot appear at all. Constant folding of `long` expressions is the
+  other family.
+
+`-m32` is not the way out, and was checked: this host has no 32-bit
+runtime, and gcc `-m32` gives a 32-bit *pointer*, where kencc on amd64
+has a 32-bit `long` and a 64-bit pointer. **Neither host model matches;
+the LP64 one at least gets pointers right.**
+
+**The linkers are NOT built here and that is deliberate.**
+`[1-9]l/pass.c` uses `sizeof(long)` to lay out *target* data
+(`newdata(et, off, sizeof(long), D_EXTERN)`), which is 8 on the host
+where it must be 4. The compilers' `sizeof(long)` uses are host
+allocation sizes and merely over-allocate; the linkers' are the emitted
+image. Fixing that means deciding, per site, whether the constant is the
+host's word or the target's — real work, and not needed to answer a
+front-end question.
+
+### The fidelity evidence, and the one control still outstanding
+
+**`hostkencc.sh --probe` reproduces this tree's recorded ten-backend VM
+result exactly**: all ten compile `regpair-min.c`, eight compile
+`regpair-probe.c`, and the two failures are **`kc` and `vc` on case 3**,
+`regpair-probe.c:242`, `unknown op in lcgen: CAST`. That is an
+independently recorded pass/fail pattern across ten backends, matching in
+which backends fail and which construct does it. *It is the strongest
+fidelity evidence available without the VM, and it is still not codegen.*
+
+`hostkencc/agree.c` is the control that settles codegen and has to be run
+once on each side:
+
+```
+( VM )    6c -S agree.c > /tmp/vm.s
+( host )  out/bin/6c -S agree.c > /tmp/host.s
+```
+
+Until that has been run, **treat codegen output from this harness as
+indicative and not as the compiler's answer.**
+
+### And the first thing that looked like a host artifact was not one
+
+`6c -S` on `int f(int x){return x;}` answers `MOVL BP,AX`, which reads as
+a parameter register-allocated with nothing loading it. It is correct:
+**`6c/6.out.h:811` is `REGARG = D_BP`**, so kencc's amd64 convention
+passes the first word-sized argument in BP and `cc/pgen.c:57` spills it.
+*The output was called wrong, and `NVAR` was blamed for it, before the
+convention was looked up.* `-N` is what made it plain — it disables
+`regopt` (`cc/pgen.c:110`) and the prologue's `MOVL BP,x+0(FP)` is then
+visible as a spill rather than a mystery.
+
+### An instrument fault worth keeping
+
+**kencc's `diag()` writes to STDOUT, not stderr** — `Bprint(&diagbuf, ...)`
+goes to fd 1. The first version of the `--probe` sweep captured
+`2>&1 >/dev/null` and reported **all ten backends passing
+`regpair-probe`**, the two that fail included. *A check that passes for
+the wrong reason*, and it was caught only because this tree had already
+written down that the answer is eight of ten. A harness for a Plan 9
+compiler must capture stdout.

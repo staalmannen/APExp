@@ -44,7 +44,36 @@ typedef	struct	Spec	Spec;
 #define	MASK(n)		(SIGN(n)|(SIGN(n)-1))
 
 #define	BITS	5
-#define	NVAR	(BITS*sizeof(ulong)*8)
+/*
+ * NVAR is 32 bits per word and NOT sizeof(ulong)*8, because `bits.c'
+ * hardcodes 32: `bsetc' is `c.b[n/32] = 1L << (n%32)' and `bset'/`bnum'
+ * match it. The two agree only where `ulong' is 32 bits wide, which is
+ * every kencc target -- so this was right by coincidence rather than by
+ * construction, and a `ulong' of any other width makes NVAR claim
+ * variables that `bits.c' cannot address. The register allocator then
+ * reads bits nothing ever set.
+ *
+ * ***A LATENT OUT-OF-BOUNDS WRITE, NOT A BUG ANYTHING HAS OBSERVED.***
+ * Found by reading, while building kencc with gcc
+ * (`sys/lib/tests/hostkencc/'), where `ulong' is 64 bits: NVAR was
+ * then 320 while `b[]' holds 5 words, so `bsetc(319)' writes `b[9]'
+ * -- four words past the end of the struct. Nothing in the host build
+ * reached it, because only a function with more than 160 register
+ * candidates would, and on Plan 9 the value is unchanged
+ * (5*4*8 == 5*32), so this is provably inert for every shipped
+ * compiler.
+ *
+ * **It is NOT the explanation for anything the host build printed**,
+ * and the thing it was first blamed for was not a fault at all:
+ * `6c -S' on `int f(int x){return x;}' answers `MOVL BP,AX', which
+ * looks like a parameter register-allocated with nothing loading it
+ * and is in fact correct -- `6.out.h:811' is `REGARG = D_BP', so
+ * kencc's amd64 convention passes the first word-sized argument in
+ * BP and `pgen.c:57' spills it. *The output was called wrong before
+ * the convention was looked up*, which is this tree's own rule about
+ * reading what the code does rather than what it looks like.
+ */
+#define	NVAR	(BITS*32)
 struct	Bits
 {
 	ulong	b[BITS];

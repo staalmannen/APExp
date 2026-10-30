@@ -949,3 +949,57 @@ series B (line length) had each come back negative** — three probes built
 `docs/notes/kencc.md`'s *The hideset* has the bug, the fix, the hang the
 first half of the fix caused, and the 27x speedup that came out of the
 cost it exposed.
+
+## `hostkencc/` — all ten C compilers, on the build host
+
+`sys/lib/tests/hostkencc/hostkencc.sh` builds APExp's own `cc/` and all
+ten `[1-9kqv]c` backends with gcc and leaves them in `out/bin`. **It is
+`cpp-xcheck`'s conclusion carried the rest of the way**, and the thing
+that made it cheap was already vendored: go1.4's `lib9`, `libbio` and
+`include` at `sys/src/external/go1.4`, which is plan9port's Plan 9 API on
+Unix and **compiled with gcc on the first attempt, 89 objects, no
+diagnostics.**
+
+Modes: no arguments builds all ten; naming backends builds those;
+`--probe` runs the ten-backend construct sweep; `--clean` removes `out`.
+
+**`--probe` is the mode that earns the harness.** This tree's rule after
+any change to `cc/`'s type tables is to run `regpair-probe` and
+`regpair-min` against all ten backends, which has meant a VM build and
+ten compiles. Locally it reproduces the recorded answer **exactly**: ten
+compile `regpair-min`, eight compile `regpair-probe`, failures `kc` and
+`vc` at `regpair-probe.c:242`, `unknown op in lcgen: CAST`.
+
+***ITS FIRST VERSION REPORTED ALL TEN PASSING.*** kencc's `diag()`
+writes to **stdout** (`Bprint(&diagbuf, ...)` is fd 1), and the sweep
+captured `2>&1 >/dev/null`. *A check that passes for the wrong reason*,
+caught only because the tree had already written down that the answer is
+eight of ten — so the recorded number was doing the work a control
+normally does. A harness for a Plan 9 compiler captures stdout.
+
+**And globbing the backend's `*.c` is wrong**: six of ten failed to link
+that way, because `1c`/`2c` do not use `cc/pgen.c`, `9c` has its own
+`bits.c`, and `1c` has no `1.out.h` at all — it sets `T=2` and shares
+`2c`'s object format. `ofiles()` reads `OFILES` out of the mkfile and
+`T` out of it too, which is what `mkfile.port` does. *Reading the build
+file is the difference between six failures and the truth.*
+
+Three host flags and no source forks: `-fcommon` (every `gc.h` has bare
+tentative definitions that Plan 9's linkers merge and gcc 10+ refuses),
+`-include prelude.h` (three name collisions), and bison with its
+conflict counts printed so a `cc.y` change that moves them shows up
+here. `plan9/{u.h,libc.h}` are a deliberately minimal stand-in for
+9front's native headers — this tree vendors only `sys/include/ape` — and
+are sized to what the native probes actually reference, so a pass means
+the construct compiles and **not** that it would compile against the
+real header.
+
+**The fidelity limits are in the script and in `docs/notes/kencc.md`,
+and they are the point**: LP64 host against an LLP64 target, so sound for
+"does it compile / crash / diagnose" and for A/B between two builds of
+the same sources, unsound for anything keyed on `long` being 32 bits.
+`agree.c` is the one control the harness cannot run — `6c -S agree.c` on
+each side — and until it has been run, codegen output from here is
+indicative rather than the compiler's answer. **The linkers are
+deliberately not built**: `[1-9]l/pass.c` uses `sizeof(long)` to size
+*target* data, which is the emitted image rather than a host allocation.

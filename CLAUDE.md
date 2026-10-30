@@ -280,6 +280,25 @@ printed.
 header, so it renames the SOURCE with `sed`), and `strerror-xcheck.py`,
 which has to be a script because **APE's errno NUMBERS are its own**, so
 only the NAMES line up.
+***AND `hostkencc/` BUILDS ALL TEN C COMPILERS WITH gcc***, from the
+shipped `sys/src/cmd/cc` and `[1-9kqv]c` plus go1.4's `lib9`/`libbio`,
+already vendored at `sys/src/external/go1.4` — which **compiled with gcc
+on the first attempt, 89 objects, no diagnostics.** `--probe` runs the
+ten-backend construct sweep this tree otherwise does on the VM and
+**reproduces the recorded answer exactly** (ten compile `regpair-min`,
+eight compile `regpair-probe`, `kc` and `vc` fail at `:242`). It found
+two real defects at once: `cc.h:47`'s `NVAR` (a latent out-of-bounds
+write once `ulong` is not 32 bits) and three backends declaring
+`swcmp(void*,void*)` against the shared definition's `const`. **LP64
+host against an LLP64 target**, so sound for compiles/crashes/diagnostics
+and for A/B of two builds of the same sources, UNSOUND for anything
+keyed on `long` being 32 bits — `specbits-model.py` still exists for
+that. `agree.c` is the codegen control it cannot run: *until `6c -S
+agree.c` has been diffed against the VM, codegen from it is indicative.*
+**The LINKERS are deliberately not built**: `[1-9]l/pass.c` uses
+`sizeof(long)` to size TARGET data. *Its first `--probe` reported all
+ten passing, because kencc's `diag()` writes to STDOUT* — a check that
+passed for the wrong reason, caught only by the recorded number.
 ***AND `cpp-xcheck/` IS THE CHEAPEST INSTRUMENT IN THIS TREE***:
 `cpp-xcheck.sh` builds kencc's OWN `cpp` with gcc on the build host and
 diffs it against `gcc -E`. **`cpp` needs eleven Plan 9 names in total**

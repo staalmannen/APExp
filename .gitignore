@@ -68,3 +68,6 @@ sys/src/ape/cmd/c++lib/*.c
 # which makes CPython write a __pycache__ beside them.
 __pycache__/
 *.pyc
+
+# host builds of kencc (sys/lib/tests/hostkencc) -- binaries and objects
+sys/lib/tests/hostkencc/out/
