@@ -2907,3 +2907,106 @@ from the loop above it.  `varbrace` writes to stderr and everything
 else goes to stdout, and the two are buffered differently -- so the
 line's POSITION in the log is not its position in the run.  This tree's
 oldest rule, in a new place.
+
+## clisp: the LLP64 bit masks, and three blockers past `lisparit`
+
+With cpp's hideset fixed, `lisparit.c` compiled and the build ran to the
+end of `$CPARTS`, stopping on `modules.c`. Three things were in the way,
+and the second is the one that mattered.
+
+### 1. `modules.c` wanted the generated `clisp.h`
+
+`modules.c:12 Could not find include file "clisp.h"`. That header is
+generated: `makemake.in:3202-3208` builds a `genclisph` binary from
+`genclisph.d`, **runs** it, and concatenates its output with
+`grep '^#'` over `config.h`, `intparam.h` and `floatparam.h`.
+
+**`makemake.in:2606` is where upstream decides**, and it takes the
+generated header only `if [ $HOS = unix -a $CROSS = false ]`; otherwise
+it passes `-DNO_CLISP_H`, which `modules.c:9` turns into
+`#include "lispbibl.c"` — exactly what every other `$CPARTS` file does.
+So every non-unix host and every cross build already takes that path.
+
+Two reasons it is right here rather than merely easy. **`clisp.h` exists
+for external module writers** — `LINKKIT="modules.c clisp.h
+modprep.lisp"` — and this port is `--without-dynamic-modules`. And
+**upstream ships a control for the hazard the header creates**:
+`:3209-3217` compiles `clisp-test.c` twice, `-DUSE_CLISP_H=1` and `=0`,
+runs both and `cmp`s the output, because `clisp.h` and `lispbibl.d` can
+disagree. Taking the `lispbibl.c` route removes the hazard rather than
+testing for it. It would also have needed `genclisph` to *run*, which is
+the `intparam`/`floatparam` rule a third time.
+
+### 2. `bit(n)` is 32 bits wide and the type tags live at bit 48
+
+***THIS WOULD HAVE BUILT AND NOT WORKED.***
+
+`lispbibl.d:1325` is `#define bit(n) (1UL<<(n))`, commented "0<=n<32".
+`wbit` — the *wide* family, for bit numbers at `oint` scale — falls back
+to it unless `WIDE_SOFT`/`WIDE_AUXI`:
+
+```c
+#else
+  #define wbit  bit
+```
+
+`WIDE_HARD` is defined for `AMD64` (`:552`), so `oint` is 64 bits, and
+`cons_bit_o` is `oint_type_shift+6` = **54**. On every other `WIDE_HARD`
+platform — DECALPHA, MIPS64, SPARC64, IA64, AMD64 under a Unix
+compiler — `unsigned long` is 64 bits too, so `1UL<<54` is a 64-bit
+expression and the fallback is correct. **Plan 9's kencc is the first
+LLP64 `WIDE_HARD` platform clisp has met**: 64-bit pointers, 32-bit
+`long`.
+
+**Measured with the host-built `6c`** (`sys/lib/tests/hostkencc`), not
+inferred:
+
+```
+int consp_broken(oint x) { return x & (1UL<<(6+48)); }
+	MOVL	$0,AX            /* the whole test folded to zero */
+int consp_fixed(oint x)  { return x & ((oint)1<<(6+48)); }
+	MOVQ	$18014398509481984,DI
+```
+
+So `consp()`, `atomp()` and `symbolp()` would all have been constant
+false, silently, in a garbage-collected Lisp.
+
+**The fix is at `bit()`/`bitm()`/`minus_bit()`/`minus_bitm()`, not at
+`wbit`**, and that is a measured choice rather than a tidier one: the
+first patch widened `wbit` alone and left two warnings behind, because
+`constant_var_p` reaches the same hazard through `header_flags` — a
+64-bit field — with `bit(var_bit0_hf)` where `var_bit0_hf` is 48, never
+going through `wbit` at all. Two families, one cause.
+
+Widening `bit()` under `defined(WIDE_HARD) && (long_bitsize < 64)`
+**makes kencc agree with the platform clisp is developed on** rather
+than inventing a third behaviour: under LP64 every `bit(n)` is already a
+64-bit unsigned expression. The other callers of `bit()` pass field
+*lengths* (`bitm(oint_type_len)-1`), which are small either way.
+
+Count of kencc's `stupid shift` warnings on `modules.c`: **10 → 0**, and
+the 54-bit mask appears in the generated code where it was absent.
+
+### 3. `config.h` claimed a `vfork` APExp has not got
+
+`stream.d` calls `vfork()` three times and the build answered `function
+not declared`. Autoconf's `AC_FUNC_FORK` emits `#define vfork fork` when
+vfork is missing and leaves the `#undef` commented out when it *works* —
+so our `/* #undef vfork */` was the "vfork exists" answer. APExp has no
+POSIX `vfork`; the only hit in the tree is a syscall-table adaptation in
+`ap/plan9/__p9_syscall.c:639`. Now `#define vfork fork`, which is
+autoconf's own fallback and the safe direction.
+
+***The tell was the prose beside the macro***, which already said "vfork
+is not provided; fork is" — the second time in this file a
+hand-answered `config.h` entry contradicted its own comment, after
+`VALID_FILENAME_CHAR`. `apfunc-sweep.py` exists for exactly this shape.
+
+### Where it stands
+
+**All 31 translation units compile clean** under the host toolchain
+(`6c -J -p`), modules.c included. *That is not the VM*: the local
+`intparam.h` is a MODEL — gcc's output with `long_bitsize` patched 64→32
+to match kencc — and `floatparam.h` is gcc's untouched. The link is
+untested, since the linkers are deliberately not host-built. Next is a
+VM run of `mk -f mkfile.runtime lisprun` and then the Lisp bootstrap.

@@ -455,8 +455,28 @@
 /* ELOOP exists in APE's errno table. */
 #define ELOOP_VALUE ELOOP
 
-/* vfork is not provided; fork is. */
-/* #undef vfork */
+/* vfork is not provided; fork is.
+ *
+ * ***AND THE COMMENT WAS RIGHT WHILE THE LINE SAID THE OPPOSITE.***
+ * Autoconf's `AC_FUNC_FORK' emits `#define vfork fork' when vfork is
+ * missing or broken and leaves the `#undef' in place when it WORKS, so
+ * a commented-out `#undef vfork' is the "vfork exists" answer.  APExp
+ * has no POSIX `vfork' -- the only hit in the tree is a syscall-table
+ * adaptation in `ap/plan9/__p9_syscall.c:639' -- and `stream.d' calls
+ * it three times (12879, 13118, 13272), so the build stopped with
+ * `function not declared: vfork'.
+ *
+ * `fork' for `vfork' is upstream autoconf's own fallback and is the
+ * safe direction: vfork shares the address space and requires the
+ * child to exec immediately, fork does not, so replacing vfork by fork
+ * can cost a copy and cannot break a correct caller.
+ *
+ * *This is the hand-answered-capability shape a seventh time*, and the
+ * tell was the same as clisp's `VALID_FILENAME_CHAR': the prose beside
+ * the macro already described the right answer.  `apfunc-sweep.py'
+ * exists for exactly this -- a name this file claims that libap does
+ * not define. */
+#define vfork fork
 
 /* libap has both, and they are not broken re-definitions. */
 /* #undef gmtime */

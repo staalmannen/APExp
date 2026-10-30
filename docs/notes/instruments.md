@@ -1003,3 +1003,21 @@ each side — and until it has been run, codegen output from here is
 indicative rather than the compiler's answer. **The linkers are
 deliberately not built**: `[1-9]l/pass.c` uses `sizeof(long)` to size
 *target* data, which is the emitted image rather than a host allocation.
+
+### `hostkencc` standing in for `pcc`: pass `-J`
+
+**`pcc` passes `-J` on every compile and bare `6c` does not**, so a host
+`6c` used to compile APE sources sees the 9front layout rule — every
+struct's size rounded up to 8 — where the real build sees conforming
+layout. Every struct size in the translation unit is then wrong.
+
+*Measured, and it cost a false accusation*: clisp's `stream.d:17311`
+switches on `sizeof(ffloatjanus)` and `sizeof(dfloatjanus)`, 4 and 8
+under `-J` and both 8 without it, and answered `duplicate cases in
+switch 8`. **That was written down as a clisp bug before the flag was
+checked.** The false positive is the visible half; the half that
+matters more is that a genuine size-dependent fault would be hidden the
+same way.
+
+Use `6c -J -p` for anything that `pcc` would build, and plain `6c` only
+for what `6c` would build (`cmd2/vts`, `vtwin`).

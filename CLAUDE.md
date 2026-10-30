@@ -293,8 +293,24 @@ write once `ulong` is not 32 bits) and three backends declaring
 host against an LLP64 target**, so sound for compiles/crashes/diagnostics
 and for A/B of two builds of the same sources, UNSOUND for anything
 keyed on `long` being 32 bits — `specbits-model.py` still exists for
-that. `agree.c` is the codegen control it cannot run: *until `6c -S
-agree.c` has been diffed against the VM, codegen from it is indicative.*
+that. ***`agree.c`, THE CODEGEN CONTROL, HAS BEEN RUN AND PAID FOR ITSELF ON
+THE FIRST DIFF***: 131 lines each, and `widecase` differed
+SEMANTICALLY — the host emitted `CMPQ BP,$4294967296`, **an immediate
+x86-64 does not have**, because `6c/cgen.c`'s `immconst()` tested
+`n->vconst == (vlong)v` with `long v`, a round trip that answers "fits
+in 32 bits" only where `long` IS 32 bits. `int v` now (same number on
+Plan 9), and `widecase` matches instruction for instruction. *The
+second member of the family `NVAR` opened, and the one that mattered.*
+**What remains is the ORDER of commutative terms** in two functions —
+identical multisets, same value — from `cc/scon.c`'s `acom2`, whose
+comparators tie-break on **the addresses of the array elements qsort is
+permuting**, so the order is whatever the host's qsort does. *Not
+fixed*: a stable tie-break would change every binary's code on Plan 9
+for no correctness. **So codegen from the harness is sound with one
+named exception**, and a diff showing anything beyond those two
+orderings is a finding. ***And the qsort mechanism was "refuted" first
+by a control that could not separate the hypotheses*** — an insertion
+sort agreed with glibc because both reverse runs of ties.
 **The LINKERS are deliberately not built**: `[1-9]l/pass.c` uses
 `sizeof(long)` to size TARGET data. *Its first `--probe` reported all
 ten passing, because kencc's `diag()` writes to STDOUT* — a check that
@@ -659,8 +675,36 @@ built by hand has not been measured in that position*.
   true of `cc/` and the backends, generalised to a directory it did not
   cover. *Check which sources actually need `<u.h>` before accepting
   that a question needs the VM.*
-  `config.h` is hand-answered, `ARCHDEF` covers every `$objtype`, and
-  what is left is the Lisp bootstrap.
+  `config.h` is hand-answered, `ARCHDEF` covers every `$objtype`.
+  ***PAST `lisparit` NOW, AND THE SECOND OF THE THREE BLOCKERS WOULD
+  HAVE BUILT AND NOT WORKED.*** (1) `modules.c` wanted the GENERATED
+  `clisp.h`; `makemake.in:2606` takes that only for
+  `unix && !cross` and otherwise passes **`-DNO_CLISP_H`**, which
+  includes `lispbibl.c` like every other `$CPARTS` file — upstream's
+  own route, and right here because `clisp.h` is for EXTERNAL MODULE
+  WRITERS and this port is `--without-dynamic-modules`. (2)
+  **`lispbibl.d`'s `bit(n)` is `(1UL<<(n))` and `wbit` falls back to
+  it**, while `WIDE_HARD` (defined for AMD64) puts the type tags at
+  bit 48+ — `cons_bit_o` is 54. On every other `WIDE_HARD` platform
+  `unsigned long` is 64 bits so the fallback is fine; **kencc is the
+  first LLP64 one**. *Measured*: `x & (1UL<<54)` folds to `MOVL $0,AX`,
+  so `consp`/`atomp`/`symbolp` were all constant false in a GC'd Lisp.
+  Widened at `bit`/`bitm`/`minus_bit` rather than at `wbit`, because
+  `constant_var_p` reaches the same hazard through `header_flags`
+  without touching `wbit` — two families, one cause — and because
+  widening there makes kencc agree with LP64, where `bit()` is already
+  64-bit. (3) `config.h` said `/* #undef vfork */`, which is autoconf's
+  "vfork WORKS" answer; APExp has none, so `#define vfork fork` (its
+  own fallback). *The prose beside the macro already said "vfork is not
+  provided"* — the hand-answered-capability shape again, after
+  `VALID_FILENAME_CHAR`.
+  **All 31 TUs now compile clean under `hostkencc` (`6c -J -p`)**;
+  the link is untested and the local `intparam.h` is a MODEL, so the
+  VM is still the measurement. What is left is the Lisp bootstrap.
+  ***AND `-J` IS NOT OPTIONAL WHEN `6c` STANDS IN FOR `pcc`***: without
+  it `stream.d:17311` answers `duplicate cases in switch 8`, because
+  `sizeof(ffloatjanus)` is 4 under `-J` and 8 under the 9front rule.
+  *That was written down as a clisp bug before the flag was checked.*
   Historically: `configure` reaches `C compiler cannot create executables`
   under hundreds of `5: Bad file descriptor`, and the fd mechanism is
   **cleared** (`execfd-test.sh`, 11 sections, 0 failures), so that is a

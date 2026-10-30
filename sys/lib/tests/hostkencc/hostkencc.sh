@@ -11,6 +11,23 @@
 #	out/bin/6c -S /tmp/t.c
 #	out/bin/6c -c ../regpair-min.c
 #
+# and, with `-p' and `out/bin' on PATH, against real APE sources:
+#
+#	PATH=$PWD/out/bin:$PATH out/bin/6c -J -p -c -D_POSIX_SOURCE \
+#	    -I$APEXP/amd64/include/ape -I$APEXP/sys/include/ape foo.c
+#
+# ***THE `-J' IS NOT OPTIONAL WHEN STANDING IN FOR `pcc', AND LEAVING
+# IT OUT MANUFACTURES FAILURES THAT DO NOT EXIST.*** `pcc' passes `-J'
+# (conforming struct layout) on every compile; bare `6c' keeps the
+# 9front rule that rounds EVERY struct's size up to 8.  So without it
+# every struct size in the translation unit differs from every APE
+# build.  *Measured*: clisp's `stream.d:17311' switches on
+# `sizeof(ffloatjanus)' and `sizeof(dfloatjanus)' -- 4 and 8 under
+# `-J', both 8 without it -- and answered `duplicate cases in switch 8'.
+# **That was reported as a clisp bug before the flag was checked.**  A
+# false POSITIVE is the visible half; the invisible half is that a real
+# size-dependent fault could equally be hidden.
+#
 # ***WHAT THIS IS FOR.*** `cpp-xcheck' showed that one third of kencc
 # runs on the host; this is the rest of the front end. The compilers are
 # the part of this tree where a round trip costs the most -- a `cc/'
@@ -75,18 +92,28 @@
 # `cc/pgen.c:57' spills it. *Checked after it had already been called a
 # bug*, which is the rule in CLAUDE.md about reading what the code does.
 #
-# **THE CONTROL THIS HARNESS CANNOT RUN, AND IT NEEDS RUNNING ONCE.**
-# Nothing here proves a host-built `6c' agrees with a VM-built one. The
-# diff is one command on each side over the same input:
+# **THE CONTROL THIS HARNESS CANNOT RUN ITSELF.** Nothing here proves a
+# host-built `6c' agrees with a VM-built one. The diff is one command on
+# each side over the same input:
 #
 #	( on the VM )   6c -S sys/lib/tests/hostkencc/agree.c > /tmp/vm.s
 #	( on the host ) out/bin/6c -S agree.c > /tmp/host.s
 #
-# and they should match instruction for instruction. **Until that has
-# been run, treat codegen output from this harness as indicative and
-# not as the compiler's answer** -- which is this tree's rule that a
-# measurement of a build that may not contain the change measures
-# nothing, pointed at a build that may not BE the compiler.
+# ***IT HAS BEEN RUN AND IT FOUND A REAL BUG ON THE FIRST DIFF***: the
+# host emitted `CMPQ BP,$4294967296', an immediate x86-64 does not have,
+# because `6c/cgen.c's `immconst()' decided "fits in 32 bits" with a
+# round trip through `long'. Fixed, and `widecase' now matches the VM
+# instruction for instruction.
+#
+# **What still differs is the ORDER of commutative terms** in two
+# functions -- identical instruction multisets, same value -- from
+# `cc/scon.c's `acom2', whose sort comparators tie-break on the
+# ADDRESSES of the array elements `qsort' is permuting. Not fixed on
+# purpose; `agree.c' and `docs/notes/kencc.md' have the reasoning.
+#
+# **So codegen from this harness is sound with ONE NAMED EXCEPTION.**
+# Re-run the diff after any change to `cc/' or `6c/': the two `acom2'
+# orderings are expected, and anything beyond them is a finding.
 
 set -e
 
@@ -156,6 +183,23 @@ if [ ! -f "$OUT/lib9.a" ]; then
 	rm -f "$OUT/lib9.a"
 	ar rc "$OUT/lib9.a" "$L"/*.o
 	echo "hostkencc: lib9.a = $(ar t "$OUT/lib9.a" | wc -l) objects"
+fi
+
+# ---- 1b. cpp, so the compilers can actually preprocess ----------------
+# **Without this the host compilers can compile only already-preprocessed
+# input.** `cc' runs an external preprocessor under `-p' and execs the
+# name `CPP' (cc/lex.c:4, an `#ifndef' hook); `prelude.h' sets that to
+# `kencc-cpp' rather than a bare `cpp', because `myexec' is `execvp' on
+# the host and a bare name would find GCC's and silently preprocess with
+# the wrong one. *That is the difference between a toolchain that can
+# answer a question about a real package and one that can only compile
+# toys.*
+if [ ! -x "$OUT/bin/kencc-cpp" ]; then
+	echo "hostkencc: building kencc-cpp"
+	mkdir -p "$OUT/bin"
+	$HOSTCC -w -O1 -fcommon -include "$HERE/prelude.h" \
+		-I"$CMD/cpp" -I"$GO14/include" \
+		-o "$OUT/bin/kencc-cpp" "$CMD"/cpp/*.c "$OUT/lib9.a" -lm
 fi
 
 # ---- 2. the parser ----------------------------------------------------
