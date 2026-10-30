@@ -1322,9 +1322,35 @@ typedef signed int  signean;
 /* Bit number n (0<=n<32)
  This is an unsigned expression, in order to avoid signed integer overflow
  in expressions like bit(31) or bit(31)-1. */
+#if defined(WIDE_HARD) && (long_bitsize < 64)
+  /* APExp: LLP64, which CLISP has not met before.
+     WIDE_HARD means an object pointer -- and so `oint' -- is 64 bits.
+     On every other WIDE_HARD platform (DECALPHA, MIPS64, SPARC64, IA64,
+     AMD64 under a Unix compiler) `unsigned long' is 64 bits as well, so
+     `1UL<<n' below is already a 64-bit expression there and bit numbers
+     at oint scale work.  Plan 9's kencc is LLP64 -- 64-bit pointers,
+     32-bit `long' -- so `1UL<<n' is computed in 32 bits while the type
+     tags sit at bit 48 and above: `cons_bit_o' is oint_type_shift+6,
+     i.e. 54, and `var_bit0_hf' is 48.
+     ***MEASURED, NOT INFERRED***: kencc folds `x & (1UL<<54)' to the
+     constant 0, so `consp()', `atomp()' and `symbolp()' all become
+     constant false and `constant_var_p()' constant true, silently.
+     Widening here rather than in `wbit' (which falls back to `bit')
+     because `constant_var_p' reaches the same hazard through
+     `header_flags', a 64-bit field, without going through `wbit' at
+     all -- two families, one cause.
+     **This makes kencc agree with the platform CLISP is developed on**
+     rather than inventing a third behaviour: under LP64 every `bit(n)'
+     is already a 64-bit unsigned expression.  Unsigned for the reason
+     the comment above gives; the minus_ forms stay signed as they are
+     below. */
+  #define bit(n)  (ULL(1)<<(n))
+  #define bitm(n)  (ULL(2)<<((n)-1))
+#else
 #define bit(n)  (1UL<<(n))
 /* Bit number n (0<n<=32) mod 2^32 */
 #define bitm(n)  (2UL<<((n)-1))
+#endif
 /* Bit-test of bit n in x, n constant, x an oint: */
 #if !defined(SPARC)
   #define bit_test(x,n)  ((x) & bit(n))
@@ -1353,9 +1379,17 @@ typedef signed int  signean;
   #endif
 #endif
 /* Minus bit number n (0<=n<32) */
+#if defined(WIDE_HARD) && (long_bitsize < 64)
+  /* APExp: see the bit()/bitm() comment above -- `minus_wbit' falls
+     back to `minus_bit', so the same LLP64 widening is needed here or
+     a negative oint mask is formed in 32 bits. */
+  #define minus_bit(n)  (-LL(1)<<(n))
+  #define minus_bitm(n)  (-LL(2)<<((n)-1))
+#else
 #define minus_bit(n)  (-1L<<(n))
 /* Minus bit number n (0<n<=32) mod 2^32 */
 #define minus_bitm(n)  (-2L<<((n)-1))
+#endif
 %% export_def(bit(n));
 %% #if notused
 %% export_def(bitm(n));

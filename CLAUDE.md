@@ -675,8 +675,36 @@ built by hand has not been measured in that position*.
   true of `cc/` and the backends, generalised to a directory it did not
   cover. *Check which sources actually need `<u.h>` before accepting
   that a question needs the VM.*
-  `config.h` is hand-answered, `ARCHDEF` covers every `$objtype`, and
-  what is left is the Lisp bootstrap.
+  `config.h` is hand-answered, `ARCHDEF` covers every `$objtype`.
+  ***PAST `lisparit` NOW, AND THE SECOND OF THE THREE BLOCKERS WOULD
+  HAVE BUILT AND NOT WORKED.*** (1) `modules.c` wanted the GENERATED
+  `clisp.h`; `makemake.in:2606` takes that only for
+  `unix && !cross` and otherwise passes **`-DNO_CLISP_H`**, which
+  includes `lispbibl.c` like every other `$CPARTS` file — upstream's
+  own route, and right here because `clisp.h` is for EXTERNAL MODULE
+  WRITERS and this port is `--without-dynamic-modules`. (2)
+  **`lispbibl.d`'s `bit(n)` is `(1UL<<(n))` and `wbit` falls back to
+  it**, while `WIDE_HARD` (defined for AMD64) puts the type tags at
+  bit 48+ — `cons_bit_o` is 54. On every other `WIDE_HARD` platform
+  `unsigned long` is 64 bits so the fallback is fine; **kencc is the
+  first LLP64 one**. *Measured*: `x & (1UL<<54)` folds to `MOVL $0,AX`,
+  so `consp`/`atomp`/`symbolp` were all constant false in a GC'd Lisp.
+  Widened at `bit`/`bitm`/`minus_bit` rather than at `wbit`, because
+  `constant_var_p` reaches the same hazard through `header_flags`
+  without touching `wbit` — two families, one cause — and because
+  widening there makes kencc agree with LP64, where `bit()` is already
+  64-bit. (3) `config.h` said `/* #undef vfork */`, which is autoconf's
+  "vfork WORKS" answer; APExp has none, so `#define vfork fork` (its
+  own fallback). *The prose beside the macro already said "vfork is not
+  provided"* — the hand-answered-capability shape again, after
+  `VALID_FILENAME_CHAR`.
+  **All 31 TUs now compile clean under `hostkencc` (`6c -J -p`)**;
+  the link is untested and the local `intparam.h` is a MODEL, so the
+  VM is still the measurement. What is left is the Lisp bootstrap.
+  ***AND `-J` IS NOT OPTIONAL WHEN `6c` STANDS IN FOR `pcc`***: without
+  it `stream.d:17311` answers `duplicate cases in switch 8`, because
+  `sizeof(ffloatjanus)` is 4 under `-J` and 8 under the 9front rule.
+  *That was written down as a clisp bug before the flag was checked.*
   Historically: `configure` reaches `C compiler cannot create executables`
   under hundreds of `5: Bad file descriptor`, and the fd mechanism is
   **cleared** (`execfd-test.sh`, 11 sections, 0 failures), so that is a

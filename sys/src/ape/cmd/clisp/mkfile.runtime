@@ -246,6 +246,39 @@ configure:V:
 # rather than generated (`--without-dynamic-modules' leaves it trivial),
 # and `$LIBS' reduces to `libgnu.a', which is four files.
 #
+# ***`-DNO_CLISP_H' ON `modules.c' IS UPSTREAM'S OWN ROUTE, NOT A
+# WORKAROUND.***  Without it the build stops at
+# `modules.c:12 Could not find include file "clisp.h"', and `clisp.h'
+# is GENERATED: `makemake.in:3202-3208' builds a `genclisph' binary
+# from `genclisph.d', RUNS it, and concatenates its output with
+# `grep '^#'' over `config.h', `intparam.h' and `floatparam.h'.
+#
+# **`makemake.in:2606' is where upstream decides**, and it takes the
+# generated header only `if [ $HOS = unix -a $CROSS = false ]';
+# otherwise it passes `-DNO_CLISP_H', which `modules.c:9' turns into
+# `#include "lispbibl.c"' -- exactly what every other `$CPARTS' file
+# does.  *So every non-unix host and every cross build already takes
+# this path.*
+#
+# Two reasons it is the right one here rather than merely the easy one.
+# **`clisp.h' exists for EXTERNAL MODULE WRITERS** -- it is
+# `LINKKIT="modules.c clisp.h modprep.lisp"' at `:3222' -- and this
+# port is `--without-dynamic-modules', so the header's whole reason to
+# exist is absent.  And **upstream ships a CONTROL for the hazard the
+# header creates**: `:3209-3217' compiles `clisp-test.c' twice, once
+# `-DUSE_CLISP_H=1' and once `=0', runs both and `cmp's the output,
+# because `clisp.h' and `lispbibl.d' CAN disagree.  Taking the
+# `lispbibl.c' route removes the hazard instead of testing for it.
+#
+# *It needs `genclisph' to RUN*, which is the `intparam'/`floatparam'
+# rule a third time -- so the generated-header route would also have
+# been one more thing a cross build cannot do.
+#
+# **Measured before it was written**, with the host-built `6c' from
+# `sys/lib/tests/hostkencc': without the flag it reproduces the VM's
+# `Could not find include file "clisp.h"' exactly, and with it
+# `modules.c' compiles to a 132KB object with no diagnostics.
+#
 # **`-D_PLAN9_SOURCE' IS LOAD-BEARING AND IT IS UPSTREAM'S OWN NAME.**
 # `lispbibl.d:1' tests a list of platform macros -- `__unix', `_AIX',
 # `__MACH__', `__NetBSD__' and, already there, `_PLAN9_SOURCE' -- and
@@ -281,7 +314,7 @@ lisprun:V: configure
 		for (f in $CPARTS) {
 			pcc -Fw -c $CDEFS $ARCHDEF $INCS -o $f.$O $f.c
 		}
-		pcc -Fw -c $CDEFS $ARCHDEF $INCS -o modules.$O $srcroot/src/modules.c
+		pcc -Fw -c $CDEFS $ARCHDEF $INCS -DNO_CLISP_H -o modules.$O $srcroot/src/modules.c
 		OBJS=()
 		for (f in $CPARTS) OBJS=($OBJS $f.$O)
 		pcc -o lisp.run $OBJS modules.$O libgnu.a

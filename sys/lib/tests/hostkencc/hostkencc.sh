@@ -11,6 +11,23 @@
 #	out/bin/6c -S /tmp/t.c
 #	out/bin/6c -c ../regpair-min.c
 #
+# and, with `-p' and `out/bin' on PATH, against real APE sources:
+#
+#	PATH=$PWD/out/bin:$PATH out/bin/6c -J -p -c -D_POSIX_SOURCE \
+#	    -I$APEXP/amd64/include/ape -I$APEXP/sys/include/ape foo.c
+#
+# ***THE `-J' IS NOT OPTIONAL WHEN STANDING IN FOR `pcc', AND LEAVING
+# IT OUT MANUFACTURES FAILURES THAT DO NOT EXIST.*** `pcc' passes `-J'
+# (conforming struct layout) on every compile; bare `6c' keeps the
+# 9front rule that rounds EVERY struct's size up to 8.  So without it
+# every struct size in the translation unit differs from every APE
+# build.  *Measured*: clisp's `stream.d:17311' switches on
+# `sizeof(ffloatjanus)' and `sizeof(dfloatjanus)' -- 4 and 8 under
+# `-J', both 8 without it -- and answered `duplicate cases in switch 8'.
+# **That was reported as a clisp bug before the flag was checked.**  A
+# false POSITIVE is the visible half; the invisible half is that a real
+# size-dependent fault could equally be hidden.
+#
 # ***WHAT THIS IS FOR.*** `cpp-xcheck' showed that one third of kencc
 # runs on the host; this is the rest of the front end. The compilers are
 # the part of this tree where a round trip costs the most -- a `cc/'
@@ -166,6 +183,23 @@ if [ ! -f "$OUT/lib9.a" ]; then
 	rm -f "$OUT/lib9.a"
 	ar rc "$OUT/lib9.a" "$L"/*.o
 	echo "hostkencc: lib9.a = $(ar t "$OUT/lib9.a" | wc -l) objects"
+fi
+
+# ---- 1b. cpp, so the compilers can actually preprocess ----------------
+# **Without this the host compilers can compile only already-preprocessed
+# input.** `cc' runs an external preprocessor under `-p' and execs the
+# name `CPP' (cc/lex.c:4, an `#ifndef' hook); `prelude.h' sets that to
+# `kencc-cpp' rather than a bare `cpp', because `myexec' is `execvp' on
+# the host and a bare name would find GCC's and silently preprocess with
+# the wrong one. *That is the difference between a toolchain that can
+# answer a question about a real package and one that can only compile
+# toys.*
+if [ ! -x "$OUT/bin/kencc-cpp" ]; then
+	echo "hostkencc: building kencc-cpp"
+	mkdir -p "$OUT/bin"
+	$HOSTCC -w -O1 -fcommon -include "$HERE/prelude.h" \
+		-I"$CMD/cpp" -I"$GO14/include" \
+		-o "$OUT/bin/kencc-cpp" "$CMD"/cpp/*.c "$OUT/lib9.a" -lm
 fi
 
 # ---- 2. the parser ----------------------------------------------------
