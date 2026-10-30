@@ -2680,16 +2680,99 @@ independently recorded pass/fail pattern across ten backends, matching in
 which backends fail and which construct does it. *It is the strongest
 fidelity evidence available without the VM, and it is still not codegen.*
 
-`hostkencc/agree.c` is the control that settles codegen and has to be run
-once on each side:
+`hostkencc/agree.c` is the control that settles codegen.
+
+### The control has been run, and it found a real bug on the first diff
+
+VM `6c -S agree.c` against host `out/bin/6c -S agree.c`, **131 lines
+each**.
+
+**`widecase` differed semantically.** The host emitted
 
 ```
-( VM )    6c -S agree.c > /tmp/vm.s
-( host )  out/bin/6c -S agree.c > /tmp/host.s
+CMPQ	BP,$4294967296
 ```
 
-Until that has been run, **treat codegen output from this harness as
-indicative and not as the compiler's answer.**
+— an immediate x86-64 does not have — where the VM materialises the
+constant:
+
+```
+MOVQ	$4294967296,SI
+CMPQ	BP,SI
+```
+
+The cause is `6c/cgen.c`'s `immconst()`, whose whole body was
+
+```c
+long v;
+...
+v = n->vconst;
+return n->vconst == (vlong)v;
+```
+
+a round trip that answers *"fits in 32 bits signed"* only because
+kencc's `long` **is** 32 bits. The comment above it says exactly that,
+so the intent was always the width and the implementation named a type.
+On the host, `long` is 64 bits, the round trip is lossless for every
+value, and `immconst()` returned 1 for everything. **`int v` now** — the
+same number on every kencc target, and it says what was meant. With it,
+`widecase` matches the VM instruction for instruction, PC offsets
+included.
+
+*This is the second member of the family `NVAR` opened*, and the more
+serious one: `NVAR` was latent, this one made a host-built compiler emit
+a nonexistent instruction. Only `6c` has the shape — a grep for the
+round-trip idiom across all ten backends finds this one site, which
+fits, since only amd64 has 64-bit immediates to decide about.
+
+**Identical from the start**: `s_size`, `b_size`, `widen`,
+`ulongshift`, `manylocals`, and every store in `bits`.
+
+### What remains, and why it is not fixed
+
+The order of commutative terms in `larith` and in `bits`'s final sum.
+**Identical instruction multisets, different accumulation order, same
+value.**
+
+It comes from `cc/scon.c`'s `acom2`, which sorts the terms of an add
+chain, and whose comparators `acomcmp1`/`acomcmp2` end
+
+```c
+if(t2 > t1)
+	return 1;
+return -1;
+```
+
+— comparing **the addresses of the array elements being sorted**, which
+`qsort` is permuting as it runs. So the permutation of equal terms is
+whatever the host's qsort does, and glibc's is not Plan 9's. **Measured
+with an instrumented `acom2`**: `larith`'s seven terms go in as
+`13,14,-60,59,3,88` and come out reversed, with every compared pair a
+tie on `mult`.
+
+*Not fixed, deliberately.* A stable tie-break would change generated
+code for every binary on Plan 9 and buy no correctness — both orders
+compute the same value, and C leaves the order of these operands
+unspecified. It is recorded because it is **the reason a host/VM diff
+can never be byte-exact**, and because compiler output that depends on
+qsort's tie-breaking is a reproducibility hazard in its own right. If
+anyone wants byte-exactness later, the change is one line in each
+comparator and a one-time codegen churn across the tree.
+
+***AND A CONTROL THAT CANNOT SEPARATE THE HYPOTHESES IS NOT A
+REFUTATION.*** The qsort mechanism was declared refuted first, because
+relinking the host `6c` against a hand-written insertion sort produced
+the **same** output as glibc's qsort. That proves nothing: both
+algorithms reverse a run of ties under this comparator, so the
+experiment could not tell the hypotheses apart. *This tree's own rule
+about a check whose negative result has two explanations*, met from the
+inside. The instrumented `acom2` is what settled it.
+
+### So the standing position on codegen
+
+**Sound, with one named exception.** A host/VM diff of `agree.c` should
+show the two `acom2` orderings and nothing else; anything further is a
+finding. Re-run it after any change to `cc/` or `6c/`.
 
 ### And the first thing that looked like a host artifact was not one
 

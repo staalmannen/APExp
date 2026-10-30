@@ -293,8 +293,24 @@ write once `ulong` is not 32 bits) and three backends declaring
 host against an LLP64 target**, so sound for compiles/crashes/diagnostics
 and for A/B of two builds of the same sources, UNSOUND for anything
 keyed on `long` being 32 bits — `specbits-model.py` still exists for
-that. `agree.c` is the codegen control it cannot run: *until `6c -S
-agree.c` has been diffed against the VM, codegen from it is indicative.*
+that. ***`agree.c`, THE CODEGEN CONTROL, HAS BEEN RUN AND PAID FOR ITSELF ON
+THE FIRST DIFF***: 131 lines each, and `widecase` differed
+SEMANTICALLY — the host emitted `CMPQ BP,$4294967296`, **an immediate
+x86-64 does not have**, because `6c/cgen.c`'s `immconst()` tested
+`n->vconst == (vlong)v` with `long v`, a round trip that answers "fits
+in 32 bits" only where `long` IS 32 bits. `int v` now (same number on
+Plan 9), and `widecase` matches instruction for instruction. *The
+second member of the family `NVAR` opened, and the one that mattered.*
+**What remains is the ORDER of commutative terms** in two functions —
+identical multisets, same value — from `cc/scon.c`'s `acom2`, whose
+comparators tie-break on **the addresses of the array elements qsort is
+permuting**, so the order is whatever the host's qsort does. *Not
+fixed*: a stable tie-break would change every binary's code on Plan 9
+for no correctness. **So codegen from the harness is sound with one
+named exception**, and a diff showing anything beyond those two
+orderings is a finding. ***And the qsort mechanism was "refuted" first
+by a control that could not separate the hypotheses*** — an insertion
+sort agreed with glibc because both reverse runs of ties.
 **The LINKERS are deliberately not built**: `[1-9]l/pass.c` uses
 `sizeof(long)` to size TARGET data. *Its first `--probe` reported all
 ten passing, because kencc's `diag()` writes to STDOUT* — a check that

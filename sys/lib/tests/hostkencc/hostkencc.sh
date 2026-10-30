@@ -75,18 +75,28 @@
 # `cc/pgen.c:57' spills it. *Checked after it had already been called a
 # bug*, which is the rule in CLAUDE.md about reading what the code does.
 #
-# **THE CONTROL THIS HARNESS CANNOT RUN, AND IT NEEDS RUNNING ONCE.**
-# Nothing here proves a host-built `6c' agrees with a VM-built one. The
-# diff is one command on each side over the same input:
+# **THE CONTROL THIS HARNESS CANNOT RUN ITSELF.** Nothing here proves a
+# host-built `6c' agrees with a VM-built one. The diff is one command on
+# each side over the same input:
 #
 #	( on the VM )   6c -S sys/lib/tests/hostkencc/agree.c > /tmp/vm.s
 #	( on the host ) out/bin/6c -S agree.c > /tmp/host.s
 #
-# and they should match instruction for instruction. **Until that has
-# been run, treat codegen output from this harness as indicative and
-# not as the compiler's answer** -- which is this tree's rule that a
-# measurement of a build that may not contain the change measures
-# nothing, pointed at a build that may not BE the compiler.
+# ***IT HAS BEEN RUN AND IT FOUND A REAL BUG ON THE FIRST DIFF***: the
+# host emitted `CMPQ BP,$4294967296', an immediate x86-64 does not have,
+# because `6c/cgen.c's `immconst()' decided "fits in 32 bits" with a
+# round trip through `long'. Fixed, and `widecase' now matches the VM
+# instruction for instruction.
+#
+# **What still differs is the ORDER of commutative terms** in two
+# functions -- identical instruction multisets, same value -- from
+# `cc/scon.c's `acom2', whose sort comparators tie-break on the
+# ADDRESSES of the array elements `qsort' is permuting. Not fixed on
+# purpose; `agree.c' and `docs/notes/kencc.md' have the reasoning.
+#
+# **So codegen from this harness is sound with ONE NAMED EXCEPTION.**
+# Re-run the diff after any change to `cc/' or `6c/': the two `acom2'
+# orderings are expected, and anything beyond them is a finding.
 
 set -e
 

@@ -1941,11 +1941,27 @@ layout(Node *f, Node *t, int c, int cv, Node *cn)
 
 /*
  * constant is not vlong or fits as 32-bit signed immediate
+ *
+ * `int v' and NOT `long v', and the comment above is why: the test is a
+ * ROUND TRIP, and it answers "fits in 32 bits signed" only for a type
+ * that IS 32 bits. kencc's `long' is 32 bits on every target, so the two
+ * spellings are the same number here -- but the intent is the width, not
+ * the type name, and `int' says so.
+ *
+ * ***MEASURED, AND THIS ONE IS NOT INERT WHERE `long' IS WIDER.***
+ * Built with gcc (`sys/lib/tests/hostkencc/'), where `long' is 64 bits,
+ * the round trip is lossless for every value, `immconst' returns 1 for
+ * everything, and `6c -S' on a `case 0x100000000LL:' emits
+ * `CMPQ BP,$4294967296' -- an immediate x86-64 does not have. The VM's
+ * own `6c' materialises it: `MOVQ $4294967296,SI; CMPQ BP,SI'. *The
+ * host-built compiler emitted an instruction that does not exist*, and
+ * it was found by diffing `hostkencc/agree.c' against the VM, which is
+ * the one control that harness cannot run itself.
  */
 int
 immconst(Node *n)
 {
-	long v;
+	int v;
 
 	if(n->op != OCONST || !typechlpv[n->type->etype])
 		return 0;
