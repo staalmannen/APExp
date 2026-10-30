@@ -139,6 +139,32 @@ int case5(void)
  * code that fails.
  */
 
+/*
+ * ***AND CASES 6 AND 7 COMPILED TOO, SO THE WHOLE PROBE IS NEGATIVE.***
+ * Seven cases, every nesting this file can construct, and kencc pastes
+ * all of them correctly.  **The paste is not the bug.**
+ *
+ * Four more readings were checked and each was refuted, which is
+ * recorded so nobody repeats them:
+ *
+ *   - *the generated `flo_rest.c' differs from the `.d'* -- no.
+ *     `comment5 | gctrigger | varbrace' leaves `GEN_F_op2' byte for
+ *     byte, comments on continuation lines included, which was worth
+ *     asking because this tree already has `mkcont-sweep' for a
+ *     comment ending a continuation.
+ *   - *`TO_F_0/1/2' are defined inside an untaken arm* -- no, they are
+ *     unconditional at `flo_rest.d:325-327'.
+ *   - *something `#undef's them* -- no, nothing does.
+ *   - *`TO_F_0/1/2' are defined AFTER the first use* -- no: defined at
+ *     325, first used at 338, and a macro body is expanded at the call
+ *     site anyway.
+ *
+ * So `pcc -E' is the remaining step, and the command is in the branch
+ * list at the top of this file.  *Six readings have now been refuted
+ * by the source or by this probe*, which is well past the point where
+ * the machine should be asked instead.
+ */
+
 /* CASE 6: the paste is inside a NESTED macro's argument, one level. */
 #define ARM1(stmt)  do { stmt; } while(0)
 #define OUTER6(r)   ARM1(v = CONCAT(step_a,r) ())
