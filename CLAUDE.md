@@ -372,21 +372,23 @@ FIELD, and `normtokenrow` clears it) and a leading `NL` token
 (`gatherargs:331` deletes it) — which is why it is a probe and not a
 patch. gcc compiles all five and is the control),
 `cpplimit-probe` (**`pcc -E`, and the result is WHICH CASES still
-contain `CONCAT(` afterwards** — not whether it compiles. **TWO
-SERIES, because the first one answered.** It exists because the clisp
-failures correlate exactly with LINE LENGTH: in `lisparit.i` the six
-lines holding an unexpanded `CONCAT` are the six LONGEST in the file,
-22869–24043 chars / ~11536 tokens, and the seventh longest at 19344 /
-~9637 is clean. ***Series A is MEASURED and refutes a TOKEN limit*** —
-one-character padding to 16405 tokens, well past clisp's 11536, and
-all ten expand. **But it tops out at 16438 CHARACTERS and clisp fails
-at 22869, so it never entered the failing range on that axis**: the
-two were confounded because one-character tokens make chars and
-tokens the same number. *A probe that does not reach the condition
-cannot clear it.* Series B pads with a 43-character identifier so
-chars rise ~10x faster — `big4` is 23093 chars at only 2069 tokens,
-clisp's failing LENGTH at a sixth of its tokens. gcc leaves 0
-unexpanded and is the control),
+contain `CONCAT(` afterwards** — not whether it compiles. THREE
+series, and ***the first two are negative because the correlation
+that started the file was an ARTIFACT***. The six failing lines in
+`lisparit.i` are its six longest, which looked like a size limit —
+but **only six lines in the file contain `TO_F_` at all**, and they
+are those six, so the comparison was against lines that never had the
+construct. *A name absent from a list is not a measurement until you
+have checked it could have been present.* A refutes a TOKEN limit
+(16405 tokens, all expand); B refutes a LENGTH limit (135221 chars,
+5.6x clisp's, all expand). **C is the real shape and came from
+counting**: clisp uses `CONCAT` 76 times and 70 expand, and in
+`flo_rest.d` the six `CONCAT(LFlen,s)` sites are each followed by a
+`CONCAT(TO_F_,r)` — six pairs, six failures — while every
+`CONCAT(TO_F_,r)` without one before it expands. So the rule under
+test is **a SECOND `CONCAT` in one expansion does not expand**, which
+every earlier probe missed by having exactly one. gcc expands all
+three and is the control),
 `regpair-probe` and `regpair-min` (**native, and their result is
 whether they COMPILE** — the bug they found is FIXED, so they are
 regression tests now, and **the only things here that ask a non-amd64
