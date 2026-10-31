@@ -4,6 +4,8 @@ Many (temporarily) breaking changes can occur between releases.
 The best option is probably to download the latest release.
 
 # APExp
+<center><img src="docs/APExp.png" alt="an APE explorer, logo/mascot of the project" width="300"/></center>
+
 Plan9 (9front) APE with experimental patches (a.k.a APExp)
 
 **Abstract**
@@ -223,12 +225,3 @@ Everything but this file lives under `docs/` -- see `docs/README.md`.
 `docs/compiler-improvements.md` is the state of the C compilers,
 `docs/releases/` is the release notes, and `docs/notes/` is the working
 record of the bugs found in this tree and what each one cost.
-
-
-***Post scriptum***
-
-The unofficial mascot of the project are the rabbit knights riding snails in medieval art.
-![a jousting rabbit riding a snail with a human head](docs/rabbit_riding_snail.jpg)
-
-It would be fun to have a Glenda-themed variant of this.
-
