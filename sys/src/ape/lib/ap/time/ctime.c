@@ -58,6 +58,28 @@ ctime(const time_t *t)
 	return asctime(localtime(t));
 }
 
+/*
+ * `ctime_r' was DECLARED by `<time.h>' and implemented nowhere, which
+ * is the state that costs a link error far from the claim: a package's
+ * `config.h' answers HAVE_CTIME_R from a header probe, gets a yes, and
+ * the failure arrives at the end of a build.  `sys/lib/tests/
+ * apfunc-sweep.py' reports it, and it was found that way while
+ * answering php's `config.h' by hand.
+ *
+ * Both of ctime's halves are reentrant already, so this is their
+ * composition and nothing more.  `asctime_r' wants 26 bytes, which is
+ * what POSIX says the caller must supply.
+ */
+char*
+ctime_r(const time_t *t, char *buf)
+{
+	struct tm tm;
+
+	if(localtime_r(t, &tm) == 0)
+		return 0;
+	return asctime_r(&tm, buf);
+}
+
 struct tm*
 gmtime_r(const time_t *timp, struct tm *result)
 {

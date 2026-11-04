@@ -3769,3 +3769,65 @@ a real `TEXT` file on the startup path. **And the invariant in
 file of the two and happens to be the one that does nothing; corrected.
 *A note naming the wrong file is harmless until the right file turns
 out to be empty.*
+
+## A partial `munmap` destroyed the whole segment, by two routes
+
+`p9_munmap` (`plan9/__p9_syscall.c`) looked its argument up in a table
+keyed on the mapping's START address and nothing else, so neither shape
+of a partial unmap was survivable:
+
+  * a **head** trim passes the mapping's start with a short length, which
+    *matched* the entry, so `_SEGDETACH` took the whole segment -- and
+    the caller then went on using `addr + len` inside it;
+  * a **tail** trim passes an *interior* address, which matched nothing,
+    and the fallback was `_SEGDETACH(addr)` -- and Plan 9's segdetach
+    takes any address IN a segment and detaches ALL of it.
+
+Both routes to the same silent disaster, and neither a failure the
+caller could see. **The idiom they break is how every POSIX program gets
+an ALIGNED allocation**: map more than you need and unmap the overhang.
+php's Zend allocator is built on it -- `Zend/zend_alloc.c`'s
+`zend_mm_chunk_alloc_int` trims the head *and* the tail of an over-sized
+mapping to land a 2MB-aligned 2MB chunk, and `zend_mm_chunk_truncate` is
+a third trim on a live chunk -- which is how this was found. See
+`docs/notes/php.md`.
+
+**A Plan 9 segment is indivisible, so a trim cannot return the trimmed
+pages.** What it can and must do is keep the range the caller still owns
+valid, and release the segment once the caller has given all of it back.
+So the entry now carries `base` -- what must eventually be detached --
+separately from `addr`/`len`, what the caller still holds, and a trim
+moves the second without touching the first. An interior hole would
+split an entry in two, which a segment cannot express, so it releases
+nothing and both sides stay live. **The cost is address space**: a
+trimmed chunk holds its whole over-sized segment until it is freed,
+which is why `mmaptrim-probe` section 0 matters -- if `_SEGATTACH`
+already returns 2MB-aligned addresses, zend never trims and nothing is
+held.
+
+**And the unknown-address fallback is gone on purpose.** `_SEGDETACH` on
+an address in no entry destroys whatever segment happens to contain it,
+possibly a live one belonging to something else, to free a mapping we
+are not sure we made. *Leaking is the direction a library should err
+in*, and it is reachable only when the table's own `realloc` has already
+failed.
+
+Two instruments, deliberately split, because the question has two
+halves: `sys/lib/tests/munmaptrim-xcheck.{c,sh}` is the bookkeeping, on
+the host, against the real function text cut out by marker -- 6
+sections, 0 failures, with the old rules replayed as controls (8
+failures and 2) -- and `sys/lib/tests/mmaptrim-probe.c` is the platform.
+
+### `ctime_r` was declared and implemented nowhere
+
+Found by `apfunc-sweep.py` while answering php's `config.h` by hand:
+`<time.h>:92` declares it, nothing defined it. That is the middle state
+the sweep exists to find -- a `config.h` answers `HAVE_CTIME_R` from a
+header probe, gets a yes, and the link fails at the end of a build, a
+long way from the claim. Both halves were already reentrant, so
+`time/ctime.c` now has their composition and nothing more.
+
+*Noted in passing and NOT live*: `time/asctime_r.c:30` is
+`return *__asctime_r(*tm, *buf);`, which could not compile anywhere, and
+the file is commented out of `time/mkfile` -- which is why nobody has
+noticed. Recorded so the next reader does not spend a round on it.
