@@ -6789,8 +6789,29 @@ typedef struct {
 %% export_def(Closure_instancep(obj));
 
 /* the position of the last const (or doc or lalist!) */
+/* APExp: `- unspecified', as `strm_len' at :6444 already has it.
+   `Cclosure' ENDS IN `clos_consts[unspecified]', and :1297 states the
+   rule outright -- "Instead of sizeof(..) you'll always have to use
+   offsetof(..,x)".  `unspecified' is 0 only for GNU and MICROSOFT
+   (:1298), so on every other compiler -- kencc, and the HP-UX and IRIX
+   ones the `#else' was written for -- `sizeof' counts ONE PHANTOM SLOT
+   and this comes out 3 where the fixed members are 2.
+   `last' is then one too small, so for a closure with no constants it
+   underflows to (uintL)-1, `end = last - lambda_list_p -
+   documentation_p - jitc_p' goes to (uintL)-2, and `io.d:9713's
+   `if (end != (uintL)-1)' guard -- which exists for exactly this
+   underflow -- MISSES BY ONE.  `pr_cclosure_lang' then walks past the
+   constants for ~2^32 iterations and `prin_object' faults on the first
+   thing that is not an object: clisp got to stage 2 of its bootstrap,
+   started writing `compiler.fas', and died in `pr_structure' reading
+   `0x000a00000000000a' -- typecode 10 IS `structure_type', so the
+   dispatch was right and the address part, also 10, was garbage.
+   MEASURED on the host: this expression is 3 before and 2 after, and
+   `Cclosure' is the ONLY struct in the file with this shape that was
+   missing the correction -- `Stream' has it, and `Package' has no
+   `[unspecified]' member at all. */
 #define Cclosure_last_const(obj)  (Cclosure_length(obj) - 1 -           \
-   (sizeof(*(Cclosure)0) - offsetofa(srecord_,recdata))/sizeof(gcv_object_t))
+   ((sizeof(*(Cclosure)0) - offsetofa(srecord_,recdata))/sizeof(gcv_object_t) - unspecified))
 #define ccv_flags_lambda_list_p(ccv_flags)    (((ccv_flags) & bit(1)) != 0)
 #define ccv_flags_documentation_p(ccv_flags)  (((ccv_flags) & bit(2)) != 0)
 #define ccv_flags_jitc_p(ccv_flags)           (((ccv_flags) & bit(5)) != 0)
