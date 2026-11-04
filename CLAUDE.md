@@ -683,13 +683,11 @@ failing entry aborts the whole tree's `mk`, so anything newly enabled is
 a thing the next full rebuild can stop on, and *a port that has only been
 built by hand has not been measured in that position*.
 
-**Ports not started:**
-- **go** — stopped four times, each one file further in, and every one of
-  the four was this tree's own mkfile rather than go: the `bool` keyword,
-  a missing `-c`, Makefile backslashes in a `-D`, and `-DPLAN9` doing two
-  unrelated jobs. The fourth is structural (`plan9.c` wants `<u.h>`; the
-  portable `unix.c` arm is written and satisfied and simply switched
-  off). **Out of the default build for 0.6.**
+**The clisp campaign — A WORKING PORT NOW, still out of the default
+build.** It is kept as its own section rather than folded into the list
+below because the nine bugs it flushed out are the reason the list
+below is shorter than it was, and four of them were in the COMPILER and
+silent:
 - **clisp** — ***THE NEXT STOP WAS A KENCC PREPROCESSOR BUG AFFECTING
   EVERY PACKAGE IN THE TREE, AND IT IS FIXED.*** `lisparit.c` answered
   `flo_rest.d:338 name not declared: TO_F_`: `cpp/expand()` painted a
@@ -856,6 +854,36 @@ built by hand has not been measured in that position*.
   make enabling it cheap.
 
 **Ports built and running**, each with what is NOT measured:
+- **go** — ***SIX OF SEVEN RUNGS, INCLUDING THE CORRECTNESS ONE.***
+  `sys/lib/tests/go-ladder` reports: `go version go1.4.3 plan9/amd64`;
+  GOROOT/GOOS/GOARCH/CGO_ENABLED all as `-DGOROOT_FINAL` baked them;
+  **`go build` and the binary RUNS**; `go run` runs; and
+  **`go test sort strings` is `ok` for both** — upstream's own
+  assertions against this compiler and runtime, which is the first
+  thing in this port that is a capability rather than a stage.
+  *Rungs 4 and 5 are separate deliberately and both passed, so this is
+  not `miniperl`'s gap.*
+  **The one failure is `go list std`**, and it is specific rather
+  than general: the GC reports `invalid heap pointer`, and the span
+  it names is `0x8d0c000-0x0-0x8d10000` with the object INSIDE it —
+  `start<<PageShift` and `(start+npages)<<PageShift` are both right
+  and **`s->limit` is 0**, which alone fails `mgc0.c:379`. `limit` is
+  written in only two places (`malloc.c:391`, `mcentral.c:204`), and
+  since `start<<PageShift` printed correctly either would have given
+  a non-zero value. The stack is `scanstack` → `gentraceback` →
+  `scanframe`, i.e. the bad word was found **scanning a goroutine's
+  frame**, under `os.(*File).readdir` (`os/dir_plan9.go:15`) —
+  go's own Plan 9 directory path, walking the whole of `$GOROOT/src`.
+  ***THAT `go test` PASSES REFUTES "the collector is broken"***: those
+  test binaries allocate and collect freely. So this is one path, not
+  the runtime.
+  **The discriminator not yet run is `GOGC=off go list std`** —
+  succeeding would put it in the GC's stack maps for that frame,
+  still crashing would mean the data really is corrupt, which is a
+  different and worse bug. **Out of the default build**; four earlier
+  stops were all this tree's own mkfile (the `bool` keyword, a missing
+  `-c`, Makefile backslashes in a `-D`, `-DPLAN9` doing two unrelated
+  jobs) and are long past.
 - **EDG** — `cpfe` builds, runs, and translates: `c++ -v -K /tmp/t.cpp`
   takes a toy through cpfe and through `cc -c` with no complaint, which
   is the first end-to-end measurement the driver has had. **It then
