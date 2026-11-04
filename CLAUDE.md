@@ -475,10 +475,20 @@ ships none — and its exit status is NOT the failure count); the 25
 present**, because a suite failing for a missing package and one failing
 because the port is broken give the same count.
 
-**rc harnesses** live in `rc/bin`: `fdwatch`, `bash-runtests` (which
-prints its own validity line FIRST and refuses the result if it is not
-0), and the five ladders `bash-scriptladder`, `bash-forkladder`,
-`bash-ifsladder`, `bash-fileladder`, `bash-lineladder`. **They are rc on
+**rc harnesses** live in **`sys/lib/tests`** beside everything else --
+*this line said `rc/bin` and that was wrong; only `fdwatch` and
+`vts-bash` are there* -- namely `bash-runtests` (which prints its own
+validity line FIRST and refuses the result if it is not 0), the five
+ladders `bash-scriptladder`, `bash-forkladder`, `bash-ifsladder`,
+`bash-fileladder`, `bash-lineladder`, and **`go-ladder`** (**does NOT
+gate, on purpose**: seven rungs from `go version` to
+`go test sort strings`, and the useful output is the HIGHEST RUNG
+REACHED, which a gate would throw away at rung 1. Rungs 4 and 5 are
+split because *a linker can emit a file that is not a working
+program* -- `miniperl`'s gap -- and rung 7 is the first that measures
+CORRECTNESS rather than plumbing. `$GOROOT/src/run.bash` is the real
+suite and is deliberately NOT a rung, because it can hang and a ladder
+whose last rung hangs cannot be read for position). **They are rc on
 purpose**: a harness written in the shell under test dies with it.
 
 `sys/src/ape/lib/libressl/test/` is separate — upstream's own ML-KEM and
