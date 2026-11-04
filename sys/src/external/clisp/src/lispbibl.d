@@ -4007,7 +4007,41 @@ typedef signed_int_with_n_bits(intVsize)  sintV;
 #if defined(MC68000)
   #define hardware_  0x00FFFFFFUL  /* 68000 drops 8 */
 #else
+  #if defined(WIDE_HARD) && (long_bitsize < 64)
+    /* APExp: LLP64 again, and this one is the GC crash.
+       `~0UL' means "nothing is dropped" and is 64 bits wide on every
+       platform CLISP is built on, because they are all LP64.  Under
+       kencc `unsigned long' is 32 bits, so `~0UL' is 0x00000000FFFFFFFF
+       and the top sixteen bits -- where `oint_type_shift' 48 puts the
+       type tag -- read as DROPPED BY THE ADDRESS BUS.
+       `type_pointable()' (:4082) then takes its unmasked arm:
+         (((oint)(tint)(type) << 48) & addressbus_mask) == 0
+           ? (void*)(aint)as_oint(obj)   <- tag left in the pointer
+           : (void*)(aint)pointable(obj)
+       and every `TheRecord'/`TheSubr'/`TheSvector' in `gc_mark'
+       dereferences an address with its tag still on.  On a machine
+       whose address bus really does ignore those bits that is the
+       intended optimisation; **x86-64 traps on a non-canonical
+       address**, so the first GC faults.
+       ***MEASURED***: `lisp.run' died at `spvw_gcmark.d:250' with
+       `sys: trap: general protection violation', and acid showed
+       DX = 0x000100000041a7c0 -- `subr_type' 0x01 in bits 48-63 over
+       a perfectly good heap address -- being dereferenced at `6(DX)'
+       with no AND in front of it.
+       ***AND THE SAME EXPRESSION IS EVALUATED TWICE, TWO WAYS.***  The
+       `#elif' at :4082 that selects this form tests `addressbus_mask'
+       in the PREPROCESSOR, where `#if' arithmetic is 64-bit (kencc's
+       `cpp/eval.c' computes in `vlong'), so it correctly decides the
+       mask is needed and emits the runtime check -- which the COMPILER
+       then evaluates in 32 bits and answers the other way.  *A
+       constant that disagrees with itself between cpp and cc.*
+       Spelled as upstream spells its other 64-bit all-ones mask,
+       `oint_addr_mask' at :2768, so kencc's floor rule gives it a
+       64-bit type. */
+    #define hardware_addressbus_mask  0xFFFFFFFFFFFFFFFFUL
+  #else
   #define hardware_addressbus_mask  ~0UL  /* Default: nothing is dropped */
+  #endif
 #endif
 /* Clever memory-mapping spares us from masking out of certain
  bits before one accesses the address */

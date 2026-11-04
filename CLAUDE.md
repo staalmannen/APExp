@@ -280,6 +280,13 @@ printed.
 header, so it renames the SOURCE with `sed`), and `strerror-xcheck.py`,
 which has to be a script because **APE's errno NUMBERS are its own**, so
 only the NAMES line up.
+**`hostkencc/clisp-mirror.sh` stages clisp's generated tree on the
+host** so the host kencc can compile and inspect it -- `--flags` prints
+the compile line, `--compile` builds all 31 TUs and GATES. *Its
+`intparam.h` is a MODEL*: the probe is built with gcc, so
+`long_bitsize` is patched 64 -> 32 afterwards, and leaving that out
+makes `oint` 32 bits and wastes a round concluding the object
+representation is broken.
 ***AND `hostkencc/` BUILDS ALL TEN C COMPILERS WITH gcc***, from the
 shipped `sys/src/cmd/cc` and `[1-9kqv]c` plus go1.4's `lib9`/`libbio`,
 already vendored at `sys/src/external/go1.4` — which **compiled with gcc
@@ -698,8 +705,33 @@ built by hand has not been measured in that position*.
   own fallback). *The prose beside the macro already said "vfork is not
   provided"* — the hand-answered-capability shape again, after
   `VALID_FILENAME_CHAR`.
-  **All 31 TUs now compile clean under `hostkencc` (`6c -J -p`)**, and
-  ***`lisp.run` LINKS***. `base:V:` is now the three-stage bootstrap
+  ***AND THE GC CRASH WAS `~0UL`, THE SAME LLP64 FAMILY A THIRD TIME.***
+  `lisp.run` ran, got to `init_subr_tab_2`, and died in `gc_mark` with
+  a general protection violation; acid showed `DX = BP =
+  0x000100000041a7c0` — `subr_type` 0x01 over a good heap address —
+  being dereferenced at `6(DX)` with **no mask**.
+  `lispbibl.d:4010`'s `hardware_addressbus_mask` is `~0UL`, which means
+  "nothing is dropped" and is 64 bits on every LP64 platform CLISP is
+  built on; under kencc it is `0x00000000FFFFFFFF`, so the tag bits read
+  as *dropped by the address bus* and `type_pointable()` takes its
+  UNMASKED arm. On a 68000 or an Alpha that is upstream's intended
+  optimisation; x86-64 traps on a non-canonical address.
+  ***THE SAME EXPRESSION IS EVALUATED TWICE, TWO WAYS***: the `#elif`
+  that selects the form tests the mask in the PREPROCESSOR, where `#if`
+  arithmetic is 64-bit, decides the mask is needed and emits a runtime
+  check — which the COMPILER then evaluates in 32 bits and answers the
+  other way. *A constant that disagrees with itself between cpp and cc.*
+  Fixed as `0xFFFFFFFFFFFFFFFFUL` (upstream's own spelling at `:2768`);
+  1087 sites move to the masked form and `gc_mark` now ANDs with
+  `0x0000FFFFFFFFFFFF` before dereferencing.
+  ***AND I HAD WAVED THAT `~0UL` THROUGH A ROUND EARLIER***:
+  `STACK_ADDRESS_RANGE`'s `~0UL` was checked and correctly cleared
+  because it occurs only in `#if` — and the verdict was generalised to
+  the other `~0UL` eleven lines away, which is used in a C expression.
+  **A verdict about one use of a constant is not a verdict about the
+  constant.**
+  **All 31 TUs compile clean under `hostkencc` (`6c -J -p`)**, and
+  ***`lisp.run` LINKS AND RUNS***. `base:V:` is now the three-stage bootstrap
   from `makemake.in:2870-2920` — `interpreted.mem`, then
   `compiler.fas`+`halfcompiled.mem` (*the same command as stage 1
   re-run*: `LOAD` prefers a `.fas`, so the image comes back with a

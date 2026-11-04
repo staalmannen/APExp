@@ -3117,3 +3117,76 @@ shows `curr` in `gc_mark` with a plausible heap address in the low 48
 bits and nonzero type bits above, that is it. **If `curr` is a small
 integer or zero, the hypothesis is wrong** and the subr table entry
 itself is the problem.
+#### The GC crash: `~0UL` again, and a constant that disagrees with itself
+
+`acid` on the broken process settled it in one round, and **the
+prediction written down beforehand held**: a general protection
+violation rather than a page fault meant a non-canonical address.
+
+```
+DX = BP = 0x000100000041a7c0      <- BP is REGARG, so this is gc_mark's argument
+```
+
+`0x0001` in bits 48-63 is `subr_type`, over the heap address `0x41a7c0`
+— a perfectly well-formed SUBR. The generated code was:
+
+```
+TEXT gc_mark<>+0(SB),0,$48
+     MOVQ    BP,DX
+     ...
+     MOVWQZX 6(DX),DI        <- dereference with the tag still on
+     ANDQ    $128,DI
+```
+
+so `marked()` read `0x000100000041a7c6`, which x86-64 refuses.
+
+**The cause is `hardware_addressbus_mask`, `lispbibl.d:4010`, and it is
+`~0UL`.** It means "nothing is dropped", and is 64 bits wide on every
+platform CLISP is built on because they are all LP64. Under kencc
+`unsigned long` is 32 bits, so it is `0x00000000FFFFFFFF` and the top
+sixteen bits read as *dropped by the address bus*. `type_pointable()`
+(`:4082`) then takes its unmasked arm:
+
+```c
+(((oint)(tint)(type) << 48) & addressbus_mask) == 0
+  ? (void*)(aint)as_oint(obj)     /* tag left in the pointer */
+  : (void*)(aint)pointable(obj)
+```
+
+On a machine whose address bus really does ignore those bits — a 68000,
+an Alpha — that is upstream's intended optimisation. x86-64 traps.
+
+***AND THE SAME EXPRESSION IS EVALUATED TWICE, TWO WAYS.*** The `#elif`
+at `:4082` that *selects* this form tests `addressbus_mask` in the
+**preprocessor**, where `#if` arithmetic is 64-bit (`cpp/eval.c`
+computes in `vlong`) — so it correctly concludes the mask is needed and
+emits a runtime check, which the **compiler** then evaluates in 32 bits
+and answers the other way. *A constant that disagrees with itself
+between cpp and cc.* Nothing in either half is wrong on its own.
+
+Fixed as `0xFFFFFFFFFFFFFFFFUL` under `WIDE_HARD && long_bitsize < 64`,
+which is how upstream already spells its other 64-bit all-ones mask
+(`oint_addr_mask`, `:2768`) and which kencc's floor rule types at 64
+bits. **Measured**: 1087 sites move from the unmasked ternary to the
+masked one, and `gc_mark` now emits
+
+```
+MOVQ    DX,BX
+MOVQ    $281474976710655,SI     /* 0x0000FFFFFFFFFFFF */
+ANDQ    SI,BX
+MOVWQZX 6(BX),DI
+```
+
+All 31 translation units still compile clean.
+
+***AND I HAD ALREADY LOOKED AT THIS `~0UL` AND WAVED IT THROUGH.*** The
+round before, `STACK_ADDRESS_RANGE`'s `~0UL` was checked and correctly
+found harmless, because it appears only inside `#if`. That conclusion
+was then generalised to the *other* `~0UL` eleven lines away, which is
+used in a C expression. **A verdict about one use of a constant is not
+a verdict about the constant**; `grep` found both and only one was
+opened.
+
+This is the third member of the LLP64 family in clisp, after `bit()`
+and `vfork`, and the second whose symptom was silence rather than a
+diagnostic.
