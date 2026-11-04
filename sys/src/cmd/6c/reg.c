@@ -722,6 +722,84 @@ doregbits(int r)
 	return b;
 }
 
+/*
+ * How many bytes an access of this etype covers, or -1 for "unknown",
+ * which `varalias' below treats as overlapping everything.  `ewidth' is
+ * -1 for TXXX/TARRAY/TSTRUCT/TUNION and 0 for TFUNC/TVOID.
+ */
+static int
+varwidth(int et)
+{
+	if(et <= TXXX || et >= NTYPE)
+		return -1;
+	if(ewidth[et] <= 0)
+		return -1;
+	return ewidth[et];
+}
+
+/*
+ * TWO ACCESSES TO THE SAME OBJECT AT DIFFERENT OFFSETS ALIAS EACH
+ * OTHER, AND NOTHING ELSE HERE NOTICES.
+ *
+ * `mkvar' keys a variable on (sym, name, OFFSET), so `x+0(FP)' and
+ * `x+6(FP)' are two unrelated variables.  A C program that writes an
+ * object and then reads part of it through a cast pointer -- the
+ * ordinary type pun -- produces exactly that pair, the store has no
+ * readers, and `regopt' excises it.  **It is a silent miscompile and it
+ * is not confined to parameters**:
+ *
+ *	int f(void){ u64 x = g(); return *((u16*)&x + 3); }
+ *	  CALL g; MOVWLZX x+-2(SP),AX	-- g()'s result never stored
+ *
+ *	u64 f(u64 x){ *((u16*)&x+3) = 0xbeef; return x; }
+ *	  MOVW $48879,x+6(FP); MOVQ BP,AX	-- the write is lost
+ *
+ * The second shape is the amd64 one: `REGARG' is `D_BP', so the
+ * parameter lives in a register and the frame copy exists only because
+ * `cc/pgen.c' spills it -- and that spill is what gets excised.
+ *
+ * `addrs' is the existing "do not keep this in a register and do not
+ * excise stores to it" set, gated on at `regopt's `excise' and at the
+ * `LOAD(r) & ~addrs' that starts register painting, so marking BOTH
+ * members of an overlapping pair is the whole fix.
+ *
+ * *The disjoint case is the common one and is untouched*: a struct's
+ * members, and an array's elements, sit at offsets whose ranges do not
+ * overlap, so they go on being separate variables exactly as before.
+ *
+ * `D_ADDR' already marked `addrs', which is why keeping the address in
+ * a pointer variable always worked -- that spells the access with a
+ * `LEAQ'.  The bug was never "the address was taken", it was "the
+ * address was taken and FOLDED INTO the memory reference".
+ *
+ * `sys/lib/tests/punoffset-test.c' is the case, and it is correct on
+ * gcc.
+ */
+static void
+varalias(int i, Bits bit)
+{
+	Var *v, *vi;
+	int j, w, wj, z;
+	Bits bitj;
+
+	vi = &var[i];
+	w = varwidth(vi->etype);
+	for(j=0; j<nvar; j++) {
+		if(j == i)
+			continue;
+		v = &var[j];
+		if(v->sym != vi->sym || v->name != vi->name)
+			continue;
+		wj = varwidth(v->etype);
+		if(w >= 0 && wj >= 0)
+		if(vi->offset + w <= v->offset || v->offset + wj <= vi->offset)
+			continue;		/* disjoint, nothing to do */
+		bitj = blsh(j);
+		for(z=0; z<BITS; z++)
+			addrs.b[z] |= bit.b[z] | bitj.b[z];
+	}
+}
+
 Bits
 mkvar(Reg *r, Adr *a)
 {
@@ -796,6 +874,7 @@ out:
 	if(v->etype != et || !(typechlpfd[et] || typev[et]))	/* funny punning */
 		for(z=0; z<BITS; z++)
 			addrs.b[z] |= bit.b[z];
+	varalias(i, bit);
 	return bit;
 
 none:

@@ -2415,6 +2415,26 @@ local uintC directory_namestring_parts (object pathname) {
  #endif
   { /* Directory: */
     var object directory = xpathname_directory(logp,pathname);
+    /* APExp instrument, $APEXP_PNDEBUG -- see whole_namestring.  The
+       record is well formed and slot [0] carries the cons bit, so this
+       asks the three questions that can still make the count 0:
+       `mconsp' false, or `mconsp' true with neither the :ABSOLUTE arm
+       nor the (:RELATIVE) arm taken and `Cdr' not a cons either.
+       Remove once the bug is named. */
+    if (getenv("APEXP_PNDEBUG") != NULL) {
+      fprintf(stderr,"APExp dnp: logp=%d host=%u dir=0x%llx mconsp=%d",
+              (int)logp,(unsigned)stringcount,
+              (unsigned long long)as_oint(directory),(int)(mconsp(directory)?1:0));
+      if (mconsp(directory))
+        fprintf(stderr," car=0x%llx cdr=0x%llx Kabs=0x%llx eqabs=%d cdrnull=%d cdrcons=%d",
+                (unsigned long long)as_oint(Car(directory)),
+                (unsigned long long)as_oint(Cdr(directory)),
+                (unsigned long long)as_oint(S(Kabsolute)),
+                (int)(eq(Car(directory),S(Kabsolute))?1:0),
+                (int)(nullp(Cdr(directory))?1:0),
+                (int)(consp(Cdr(directory))?1:0));
+      fprintf(stderr,"\n");
+    }
    #if defined(LOGICAL_PATHNAMES)
     if (logp) {
       if (consp(directory) && eq(Car(directory),S(Krelative))) {
@@ -2552,8 +2572,7 @@ local maygc object whole_namestring (object pathname) {
         fprintf(stderr," [%u]=0x%llx",(unsigned)i,
                 (unsigned long long)as_oint(TheRecord(pathname)->recdata[i]));
     }
-    fprintf(stderr," pathname_length=%u dirparts=%u\n",
-            (unsigned)pathname_length,(unsigned)stringcount);
+    fprintf(stderr," pathname_length=%u\n",(unsigned)pathname_length);
   }
   stringcount += directory_namestring_parts(pathname);
   stringcount += file_namestring_parts(pathname);

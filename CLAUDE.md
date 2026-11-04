@@ -220,7 +220,17 @@ zero the members its list omits — muon's crash), `longconst-test` (an
 (`-J`, conforming layout, **three runs** — gcc, then `pcc -9 -DPLAN9`
 which must FAIL, then plain `pcc` which must pass), `bitinit-test` (a
 static initialiser must write the bit-field GROUP's bytes, not the
-container's).
+container's), **`punoffset-test`** (***the worst compiler bug found
+here***: `[1-9]c/reg.c`'s `mkvar` keys an optimizer variable on
+(sym, name, **OFFSET**), so writing an object and reading part of it
+through a cast pointer makes two UNRELATED variables and `regopt`
+EXCISES the store — in either direction, with no diagnostic.
+**Sections 3/6/7/8 are controls that PASS against a broken compiler**,
+because an address kept in a pointer variable spells a `LEAQ`, which is
+a `D_ADDR`, which `mkvar` already marked. *The bug was never "the
+address was taken", it was "the address was taken and FOLDED INTO the
+memory reference"* — and it cannot be written with a union, which would
+test the path that already worked).
 **`truefalse-test.c` is the one NATIVE test here** — `6c`/`6l`, not
 `pcc` — and has to be: APE's `<stdbool.h>` `#define`s `true`/`false`, so
 a TU that INCLUDES that header never reaches kencc's own C23 keywords.
@@ -1619,6 +1629,20 @@ wrong — so fixing the compiler alone moved the failure EARLIER.
 (**2001 such compares in clisp's 31 TUs, 0 after**) and `6l` returns
 `Yi64`, which `MOVQ` can encode and `CMPQ` cannot, so the next one
 fails loudly in `asmins` instead of silently.
+***AND THE ONE UNDERNEATH BOTH OF THEM IS `reg.c`'s `mkvar`, WHICH
+KEYED A VARIABLE ON ITS OFFSET.*** `x+0(SP)` and `x+6(SP)` were two
+UNRELATED variables, so an ordinary type pun — write the object, read
+part of it through a cast pointer — left the store with no readers and
+`regopt` excised it, in either direction and with no diagnostic. **Not
+a `REGARG` bug**: a plain local loses its store too, and the amd64
+parameter case is only the sharpest form, since `REGARG = D_BP` means
+the frame copy exists solely because `cc/pgen.c` spills it. clisp's
+`mtypecode(obj)` is `(*((tint*)&(obj)+3))`, so `mconsp` answered "not
+a cons" for a slot that provably held one. `varalias()` marks
+overlapping accesses in `addrs`; `agree.c` is identical before and
+after, which is what says ordinary code does not move. **6c only** —
+all ten carry the keying but their `mkvar` signatures differ, so the
+other nine are in 0.6's inventory with the mechanism, 8c first.
 
 **The ABI move of this release is `-J`, conforming struct layout, on by
 default in `pcc`.** `pcc -9` is the way back and exists for the

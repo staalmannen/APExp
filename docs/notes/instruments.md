@@ -1077,3 +1077,39 @@ is entitled to write the constant; what matters is whether `6l` encodes
 seven bytes (`48 81 FD` + imm32, truncated) or the compiler has already
 split it into a register load. A run that reads only `6c -S` for this
 case has measured the wrong half.
+
+## `punoffset-test.c` — the store that was excised
+
+**From**: clisp printing its banner and then dying on an empty
+namestring, three rounds after the wide-constant family was closed.
+
+**The visible fault**: yes, and the biggest one in this tree —
+`[1-9]c/reg.c`'s `mkvar` keying a variable on its OFFSET, so an
+ordinary type pun lost its store with no diagnostic.
+
+**What it cost**: four rounds, and three of them were reading errors
+rather than wrong mechanisms. The generated code for the exact failing
+function was read and *cleared* — `MOVWQZX directory+-10(SP),SI` was
+taken as proof the local was "in memory and written", when only the
+READ had been checked. The instrument dump showed the data was fine, so
+the search kept moving upstream; the data was innocent and the test on
+it was not.
+
+**Its controls are the point.** Sections 3, 6, 7 and 8 pass against a
+broken compiler, because an address kept in a pointer variable compiles
+to a `LEAQ`, which is a `D_ADDR`, which `mkvar` already marked in
+`addrs`. A test written only in that form reports a clean run. *The
+bug was never "the address was taken", it was "the address was taken
+and FOLDED INTO the memory reference".*
+
+**And it cannot be written with a union**, which is the portable way to
+pun and also makes the compiler keep the object in memory for its own
+reasons — testing the path that already worked. It has to replicate the
+cast real code writes, which is why the gcc check wants
+`-fno-strict-aliasing`: the question is what kencc does with the shape,
+not whether the shape conforms.
+
+**Its name is a correction.** The first draft was `regargaddr-test.c`,
+after the parameter case found first; sections 1 and 2 show a plain
+local losing its store with no parameter involved. *Naming an
+instrument after the first example found hides the rest of the family.*
