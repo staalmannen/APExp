@@ -475,10 +475,20 @@ ships none — and its exit status is NOT the failure count); the 25
 present**, because a suite failing for a missing package and one failing
 because the port is broken give the same count.
 
-**rc harnesses** live in `rc/bin`: `fdwatch`, `bash-runtests` (which
-prints its own validity line FIRST and refuses the result if it is not
-0), and the five ladders `bash-scriptladder`, `bash-forkladder`,
-`bash-ifsladder`, `bash-fileladder`, `bash-lineladder`. **They are rc on
+**rc harnesses** live in **`sys/lib/tests`** beside everything else --
+*this line said `rc/bin` and that was wrong; only `fdwatch` and
+`vts-bash` are there* -- namely `bash-runtests` (which prints its own
+validity line FIRST and refuses the result if it is not 0), the five
+ladders `bash-scriptladder`, `bash-forkladder`, `bash-ifsladder`,
+`bash-fileladder`, `bash-lineladder`, and **`go-ladder`** (**does NOT
+gate, on purpose**: seven rungs from `go version` to
+`go test sort strings`, and the useful output is the HIGHEST RUNG
+REACHED, which a gate would throw away at rung 1. Rungs 4 and 5 are
+split because *a linker can emit a file that is not a working
+program* -- `miniperl`'s gap -- and rung 7 is the first that measures
+CORRECTNESS rather than plumbing. `$GOROOT/src/run.bash` is the real
+suite and is deliberately NOT a rung, because it can hang and a ladder
+whose last rung hangs cannot be read for position). **They are rc on
 purpose**: a harness written in the shell under test dies with it.
 
 `sys/src/ape/lib/libressl/test/` is separate — upstream's own ML-KEM and
@@ -828,9 +838,22 @@ built by hand has not been measured in that position*.
   for every platform it does not know, and rc says the same thing in
   one line *and* stays architecture-independent, because `$objtype` is
   a runtime variable where `-DLISPLIBDIR` would have been baked in.
-  **NOT in `_OPTIONAL_APPS` yet**: `install` re-runs the whole
-  bootstrap every time (`base` is a `V:` target), and a port that has
-  only been built by hand has not been measured in that position.
+  ***AND IT EVALUATES LISP***: `clisp -x '(print (+ 1 2))'` answers
+  `3`. **It answers it TWICE and prints the banner, and both are
+  upstream's**, checked at source rather than assumed: `-x` forms go
+  to `SYS::MAIN-LOOP` through a string input stream (`spvw.d:3601`),
+  which is a read-eval-PRINT loop, so `print` writes 3 and the REPL
+  echoes the returned 3; and `argv_verbose` defaults to 2
+  (`spvw.d:2418`) with `print_banner()` at `>=2` (`:3316`), suppressed
+  automatically only for `SYS::*QUIET*` or batch mode. For a script,
+  `clisp -q -x '(progn (print (+ 1 2)) (values))'` — no banner, and
+  zero values means no echo.
+  **NOT in `_OPTIONAL_APPS` yet, and the blocker is now purely the
+  BUILD COST**: `install` depends on `build` depends on `base`, a `V:`
+  target, so a tree-wide `mk install` would re-run the whole
+  three-stage bootstrap every time. Making `install` depend on
+  `$BUILD/lispinit.mem` as a FILE instead is the change that would
+  make enabling it cheap.
 
 **Ports built and running**, each with what is NOT measured:
 - **EDG** — `cpfe` builds, runs, and translates: `c++ -v -K /tmp/t.cpp`

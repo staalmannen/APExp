@@ -1,0 +1,109 @@
+#!/bin/rc
+# go-ladder -- how far does the go port actually go?
+#
+#	go-ladder
+#
+# ***A LADDER, NOT A TEST: IT DOES NOT GATE.*** Every rung prints what
+# it measured and the run continues, because the useful output is the
+# HIGHEST RUNG REACHED and a gate would throw that away at rung 1.
+# Read it from the top and stop at the first `no'.
+#
+# WHY THIS EXISTS. `go' builds and installs, which this tree has
+# learned twice over is not the same as a port working: bacon produced
+# a binary that could not do real work, and muon "builds and prints its
+# own usage" sat in the notes for a release as a non-answer.  clisp was
+# only settled by `clisp -x '(print (+ 1 2))''.  This is that command
+# for go, except that go has more layers than clisp and they fail
+# independently -- so one command cannot separate them and seven can.
+#
+# WHAT EACH RUNG ADDS, and the order is the point:
+#
+#   1 version     the binary runs at all.
+#   2 env         GOROOT/GOOS/GOARCH are what the mkfile baked in.
+#                 `mkfile.bootstrap' sets `-DGOROOT_FINAL' to the
+#                 SOURCE TREE, so a wrong answer here means the binary
+#                 cannot find anything else, and rungs 3+ are
+#                 meaningless rather than failing.
+#   3 list        `go list std' -- the std package set is KNOWN.  This
+#                 reads `$GOROOT/src' and nothing else, so it separates
+#                 "sources are there" from "they were compiled".
+#   4 build       compiles and links a hello.  First rung that needs
+#                 `pkg/tool/plan9_$GOARCH' (6g, 6l) AND the std
+#                 archives in `pkg/plan9_$GOARCH'.
+#   5 run it      the binary produced actually executes and prints.
+#                 **Rungs 4 and 5 are different measurements**: a
+#                 linker can emit a file that is not a working
+#                 program, which is exactly the gap `miniperl' had.
+#   6 go run      the same source through `go run', which is a
+#                 different path (temp dir, exec of the result).
+#   7 go test     `go test sort strings' -- two pure-Go std packages
+#                 with no network and no cgo.  **This is the first rung
+#                 that measures CORRECTNESS rather than plumbing**: it
+#                 runs upstream's own assertions against this
+#                 platform's compiler and runtime.
+#
+# AFTER RUNG 7 THE REAL SUITE IS `src/run.bash', which needs bash --
+# and this tree has bash.  That is go's equivalent of Tcl's 167 files,
+# and it is deliberately NOT run here: it is long, it can hang, and a
+# ladder whose last rung can hang cannot be read for position.  Run it
+# by hand once rung 7 is green.  *Every case expected to return comes
+# before every case expected to hang*, which is this tree's rule about
+# instrument order.
+#
+# NOT RUN HERE EITHER, and worth knowing before someone reads a `no' as
+# a port bug: anything needing cgo (`os/user', parts of `net' on other
+# platforms) or the network.  Plan 9's `net' is pure Go, and
+# CGO_ENABLED should be 0, which is what rung 2 prints.
+
+tmp=/tmp/go-ladder.$pid
+mkdir -p $tmp || exit mkdir
+
+fn rung {
+	echo
+	echo '=== rung '^$1^': '^$2
+}
+
+echo 'go-ladder: starting (nothing here gates; read the highest rung reached)'
+
+rung 1 'go version -- does the binary run'
+go version || echo 'go-ladder: rung 1 no -- the binary did not run'
+
+rung 2 'go env -- is GOROOT what the mkfile baked in'
+go env GOROOT GOOS GOARCH CGO_ENABLED || echo 'go-ladder: rung 2 no'
+
+rung 3 'go list std -- is the std package set known (reads src/ only)'
+if (go list std > $tmp/std.list >[2=1]) {
+	echo 'go-ladder: '^`{wc -l < $tmp/std.list}^' std packages listed'
+}
+if not
+	echo 'go-ladder: rung 3 no -- go list std failed'
+
+echo 'package main' > $tmp/hello.go
+echo '' >> $tmp/hello.go
+echo 'import "fmt"' >> $tmp/hello.go
+echo '' >> $tmp/hello.go
+echo 'func main() { fmt.Println("go-ladder: hello from a compiled go program") }' >> $tmp/hello.go
+
+rung 4 'go build -- compile and link (needs pkg/tool and the std archives)'
+if (go build -o $tmp/hello $tmp/hello.go)
+	echo 'go-ladder: built '^$tmp^'/hello'
+if not
+	echo 'go-ladder: rung 4 no -- go build failed'
+
+rung 5 'run it -- a linked file is not yet a working program'
+if (test -x $tmp/hello) {
+	$tmp/hello || echo 'go-ladder: rung 5 no -- the binary did not run'
+}
+if not
+	echo 'go-ladder: rung 5 skipped -- rung 4 produced nothing'
+
+rung 6 'go run -- a different path (temp dir, exec of the result)'
+go run $tmp/hello.go || echo 'go-ladder: rung 6 no'
+
+rung 7 'go test sort strings -- upstream assertions, the first CORRECTNESS rung'
+go test sort strings || echo 'go-ladder: rung 7 no -- std tests failed'
+
+echo
+echo 'go-ladder: done.  The real suite is $GOROOT/src/run.bash under bash,'
+echo 'go-ladder: deliberately not run here because it can hang.'
+rm -rf $tmp
