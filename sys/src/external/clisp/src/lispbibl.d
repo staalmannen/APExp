@@ -9317,7 +9317,17 @@ All other long words on the LISP-Stack are LISP-objects.
  Need to add some padding.
  Then jmpbufsize = sizeof(sp_jmp_buf)/sizeof(SPint). */
 #define sp_jmp_buf_incr  (alignof(jmp_buf)>alignof(SPint)?alignof(jmp_buf)-alignof(SPint):0)
-#define sp_jmp_buf_to_jmp_buf(x)  (*(jmp_buf*)(((long)&(x)+(long)sp_jmp_buf_incr)&-(long)(alignof(jmp_buf)>alignof(SPint)?alignof(jmp_buf):1)))
+/* APExp: `uintP', not `long'.  This rounds the ADDRESS of a local
+   `sp_jmp_buf' and hands the result to `setjmp', and kencc is LLP64 --
+   `long' is 32 bits beside a 64-bit pointer -- so the cast truncated a
+   stack address and the compiler sign-extended it back:
+   `0x00007ffffffde498' went in and `0xfffffffffffde498' came out, which
+   is what `setjmp.s:34's `MOVQ SP,0(BP)' faulted writing through.
+   Upstream is right everywhere it builds, because every other platform
+   with a 64-bit pointer is LP64.  `uintP' is `pointer_bitsize' wide by
+   construction, which is what this expression actually means, and on an
+   LP64 host it is the same type `long' already was. */
+#define sp_jmp_buf_to_jmp_buf(x)  (*(jmp_buf*)(((uintP)&(x)+(uintP)sp_jmp_buf_incr)&-(uintP)(alignof(jmp_buf)>alignof(SPint)?alignof(jmp_buf):1)))
 #define setjmpspl(x)  setjmpl(sp_jmp_buf_to_jmp_buf(x))
 #define longjmpspl(x,y)  longjmpl(sp_jmp_buf_to_jmp_buf(x),y)
 #define jmpbufsize  ceiling(sizeof(jmp_buf)+sp_jmp_buf_incr,sizeof(SPint))

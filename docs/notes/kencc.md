@@ -2964,9 +2964,21 @@ agreement was.*
 `CMP[QL] reg,$sym+<wide>(SB)`: **2001 before, 0 after.** `endp` now
 loads NIL into SI and compares registers. `agree.c` is identical again,
 all ten backends build, `--probe` reproduces eight-of-ten, and the
-mirror compiles 31 TUs with 0 errors. `6l` is **not** host-built here on
-purpose, so its change is gcc syntax-checked and otherwise unmeasured
-until the VM links something.
+mirror compiles 31 TUs with 0 errors.
+
+**`6l`'s half is measured now too**, on the VM, and the bytes are the
+measurement rather than the mnemonic:
+
+	200028 48b8f816400000000100 (105) MOVQ $subr_tab_data+281474976716536(SB),AX
+	200033 48bff816400000000100 (146) MOVQ $subr_tab_data+281474976716536(SB),DI
+	20003d 4839fd               (146) CMPQ BP,DI
+
+Ten bytes each — `Ziq_rp`, the whole 64-bit immediate, with bit 48 the
+`01` in the ninth byte — and a register-to-register compare. *That the
+disassembly says `MOVQ $...+281474976716536(SB)` proves nothing on its
+own*: it said exactly that before the fix as well, while five bytes were
+written. `6l -l -a` is the only form of this probe whose answer is not
+also consistent with a silent truncation.
 
 `tagconst-probe.c` grew a second function, `tagcmp`, for exactly this:
 *producing* a wide link-time constant and *comparing against* one are

@@ -139,6 +139,19 @@ tagconst(void)
  *
  *   CMPQ ... , 7 bytes  48 81 FD xx xx xx xx   -- truncated to imm32
  *   MOVQ $...,R11 then CMPQ BP,R11             -- correct
+ *
+ * ***MEASURED, AND THE RIGHT ANSWER IS 48 bf ... 01 00.*** Both
+ * functions now link as ten-byte loads,
+ *
+ *	200028 48b8f816400000000100  MOVQ $subr_tab_data+281474976716536(SB),AX
+ *	200033 48bff816400000000100  MOVQ $subr_tab_data+281474976716536(SB),DI
+ *	20003d 4839fd                CMPQ BP,DI
+ *
+ * **READ THE BYTE COUNT, NOT THE MNEMONIC.** `6l -l -a' printed the
+ * full constant in the text of the instruction while writing five
+ * bytes, all through the bug -- the disassembly is produced from the
+ * `Prog', not from the encoding. Ten bytes starting `48 b8'/`48 bf' is
+ * the pass; five starting `b8' is the fail.
  */
 int
 tagcmp(void *p)
