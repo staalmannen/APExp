@@ -1920,16 +1920,44 @@ local void subst_circ_unmark (gcv_object_t* ptr);
 local object subst_circ_alist;
 local jmp_buf subst_circ_jmpbuf;
 local object subst_circ_bad;
+/* APExp instrument, $APEXP_RLDEBUG.  The label-visit counter in
+   `case_small_read_label' below printed NOTHING -- not six times for
+   `defs1.lisp's macrolet, but zero, for every form -- while
+   `make_references' reported the table at 1 entry and this function
+   reported ok.  So the walk is not missing one label, it is not
+   descending.  This counts the recursion so the three possibilities
+   separate:
+     calls 0       -> the walk never ran at all.  `setjmp' returning
+                      nonzero here would do that and be SILENT, because
+                      the else arm returns `subst_circ_bad', a global
+                      that is zero-initialised and therefore `nullobj',
+                      which `make_references' reads as success.
+     calls 1..3    -> it returned early, and `case_cons's
+                      `if (marked(TheCons(obj))) return' is the line.
+     calls many    -> it walked, and the labels are not where the file
+                      says they are.
+   One line per form that has a `#n=', so the volume is low. */
+static unsigned long apexp_sc_calls;
+static int apexp_sc_aborted;
+
 global object subst_circ (gcv_object_t* ptr, object alist)
 {
   set_break_sem_1();             /* make Break impossible */
   subst_circ_alist = alist;
+  apexp_sc_calls = 0; apexp_sc_aborted = 0;
   if (!setjmp(subst_circ_jmpbuf)) {
     subst_circ_mark(ptr);       /* mark and substitute */
+    if (getenv("APEXP_RLDEBUG") != NULL)
+      fprintf(stderr,"APExp subst_circ: %lu calls, aborted=%d\n",
+              apexp_sc_calls,apexp_sc_aborted);
     subst_circ_unmark(ptr);     /* delete marks again */
     clr_break_sem_1();          /* allow Break again */
     return nullobj;
   } else {
+    apexp_sc_aborted = 1;
+    if (getenv("APEXP_RLDEBUG") != NULL)
+      fprintf(stderr,"APExp subst_circ: ABORTED after %lu calls\n",
+              apexp_sc_calls);
     /* abort from within subst_circ_mark() */
     subst_circ_unmark(ptr);     /* first unmark everything */
     clr_break_sem_1();          /* allow Break again */
@@ -1943,6 +1971,7 @@ global object subst_circ (gcv_object_t* ptr, object alist)
 }
 local void subst_circ_mark (gcv_object_t* ptr)
 {
+  apexp_sc_calls++;		/* APExp instrument -- see subst_circ */
   #if !(defined(NO_SP_CHECK) || defined(NOCOST_SP_CHECK))
   if (SP_overflow()) {          /* check SP-depth */
     subst_circ_bad = nullobj; longjmp(subst_circ_jmpbuf,true); /* abort */
