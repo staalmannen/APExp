@@ -71,3 +71,22 @@ __pycache__/
 
 # host builds of kencc (sys/lib/tests/hostkencc) -- binaries and objects
 sys/lib/tests/hostkencc/out/
+
+# go1.4's build output. `GOROOT_FINAL' is the SOURCE TREE
+# (`sys/src/external/go1.4'), so the tools, the std archives and the
+# finished `go' are all written inside it: `pkg/tool/plan9_$GOARCH' by
+# `go-dist bootstrap', `pkg/plan9_$GOARCH' by `go_bootstrap install
+# std', and `bin/go' by `install cmd/go'. None of it is
+# pre-installable -- every file is a compiled archive or a binary, and
+# both are architecture-specific.
+sys/src/external/go1.4/pkg/
+sys/src/external/go1.4/bin/
+
+# clisp's build directory, one per architecture. It holds the 31
+# generated `.c', `lisp.run', the three `.mem' images and ~90 `.fas'.
+# **The base image cannot be pre-installed**: it is what the
+# three-stage Lisp bootstrap produces. The only clisp files anything
+# reads at runtime that are NOT build output are the two data files,
+# and both are already tracked as source --
+# `utils/unicode/UnicodeDataFull.txt' and `doc/Symbol-Table.text'.
+sys/src/ape/cmd/clisp/build-*/
