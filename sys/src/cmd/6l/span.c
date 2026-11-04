@@ -698,13 +698,40 @@ vaddr(Adr *a)
 static void
 asmandsz(Adr *a, int r, int rex, int m64)
 {
-	long v;
+	vlong v;
 	int t;
 	Adr aa;
 
 	rex &= (0x40 | Rxr);
 	v = a->offset;
 	t = a->type;
+	/*
+	 * ***AN ADDRESS DISPLACEMENT IS imm32 AND THERE IS NO imm64 FORM.***
+	 * Every `put4(v)' below writes four bytes, `v' was a `long', and
+	 * nothing checked that the value fits -- so a wide displacement
+	 * was TRUNCATED with no diagnostic, which is the third time this
+	 * release that a constant too big for its encoding went out
+	 * silently (after `MOVQ $sym+off(SB)' and `CMPQ r,$sym+off(SB)').
+	 *
+	 * clisp's `make_small_read_label(n)' is
+	 * `((oint)system_type << 48) + ((n<<1)+1)', which `6c' folds into
+	 *
+	 *	LEAQ	844424930131969(NONE)(DI*2),DI
+	 *
+	 * -- correct arithmetic, (3<<48)+1, and not an instruction.  The
+	 * low half survived, so every read label came out as oint 3: the
+	 * TYPE TAG was gone, `#n#' printed as `#<ADDRESS #x3>', and
+	 * `subst_circ' left it alone because typecode 0 is `machine_type',
+	 * not a label.  Hence `GETHASH: argument #<ADDRESS #x3> is not a
+	 * hash table'.
+	 *
+	 * `6c' must not fold such a constant into a memory operand at all;
+	 * this is the backstop that says so out loud when it does.  A
+	 * legitimate displacement always fits: Plan 9 lays text and data
+	 * out well inside 2^31.
+	 */
+	if((vlong)(int)v != v)
+		diag("address displacement %lld does not fit in 32 bits", v);
 	if(a->index != D_NONE) {
 		if(t >= D_INDIR) {
 			t -= D_INDIR;
