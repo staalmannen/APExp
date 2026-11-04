@@ -145,3 +145,18 @@ shm_unlink(const char *name)
 	snprintf(path, sizeof path, "/tmp/shm.%s", n);
 	return unlink(path);
 }
+
+/*
+ * Version marker for `mmaptrim-probe.c'.  `pcc -o x x.c' relinks
+ * against the INSTALLED libap, so a probe built from a fresh pull can
+ * run days-old library code and REPORT ON IT as if it were this
+ * machine's answer -- which for this probe is worse than for a test,
+ * because its subject is the platform.  A probe that calls this will
+ * not LINK against a libap predating `p9_munmap's partial-unmap arm.
+ * Twelfth use of the idiom.
+ */
+int
+_mmapmark(void)
+{
+	return 1;
+}
