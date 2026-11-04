@@ -1061,3 +1061,19 @@ from one that was not.*
 
 **Now a regression test**: the right answer is
 `MOVQ $subr_tab_data+281474976716536(SB)` from both commands.
+
+### `tagcmp`, the probe's second function
+
+Added when `tagconst` had already been answered, because **producing a
+wide link-time constant and comparing against one are two questions**:
+x86-64 has `MOV r64, imm64` and no `CMP r64, imm64`, so a correct
+`MOVQ` says nothing about the `CMPQ` beside it. clisp needed both —
+`L(name)` is the first shape and `nullp(obj)` is the second — and the
+second was found only after the first was fixed, because until then
+both sides of every such comparison were truncated and agreed.
+
+*Its answer is in the LINKER line, not the compiler line.* The compiler
+is entitled to write the constant; what matters is whether `6l` encodes
+seven bytes (`48 81 FD` + imm32, truncated) or the compiler has already
+split it into a register load. A run that reads only `6c -S` for this
+case has measured the wrong half.

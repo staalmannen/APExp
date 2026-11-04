@@ -316,7 +316,7 @@ int
 oclass(Adr *a)
 {
 	vlong v;
-	long l;
+	int l;	/* `int', because both uses ask "does it fit in 32 bits" */
 
 	if(a->type >= D_INDIR || a->index != D_NONE) {
 		if(a->index != D_NONE && a->scale == 0) {
@@ -324,7 +324,43 @@ oclass(Adr *a)
 				switch(a->index) {
 				case D_EXTERN:
 				case D_STATIC:
-					return Yi32;	/* TO DO: Yi64 */
+					/*
+					 * `$sym+off(SB)'.  This used to be an
+					 * unconditional `Yi32' with its own
+					 * `TO DO: Yi64' beside it, and the
+					 * TO DO was load-bearing: an offset
+					 * that does not fit was encoded by
+					 * `put4' with NO DIAGNOSTIC, so
+					 * `MOVQ $sym+(1<<48)(SB),AX' lost
+					 * its tag and `CMPQ BP,$sym+(1<<50)(SB)'
+					 * compared the wrong half.  clisp's
+					 * `L()' and `nullp()' are both this
+					 * shape; see `tagconst-probe.c'.
+					 *
+					 * The OFFSET alone decides, not the
+					 * final address: symbol values are
+					 * not all assigned when `oclass'
+					 * runs, and an address is small and
+					 * positive, so an offset that does
+					 * not fit guarantees the sum does
+					 * not either.
+					 *
+					 * `Yi64' then reaches `ymovq's
+					 * `Yi64,Yrl,Ziq_rp', which writes all
+					 * eight bytes.  Everything else --
+					 * `CMPQ' above all -- has no `Yi64'
+					 * row and now FAILS LOUDLY in
+					 * `asmins' instead of silently.  That
+					 * is the point of the change as much
+					 * as the `MOVQ' is: `6c' should never
+					 * hand us one (see `hardconst'), and
+					 * if it does we must say so.
+					 */
+					v = a->offset;
+					l = v;
+					if((vlong)l != v)
+						return Yi64;
+					return Yi32;
 				case D_AUTO:
 				case D_PARAM:
 					return Yiauto;

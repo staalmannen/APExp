@@ -1973,10 +1973,40 @@ immconst(Node *n)
 
 /*
  * if a constant and vlong, doesn't fit as 32-bit signed immediate
+ *
+ * ***AN ADDRESS CONSTANT WITH A WIDE OFFSET IS HARD TOO, AND IT IS NOT
+ * A SPECIAL CASE OF THE OCONST TEST BELOW.***  `xcom' folds
+ * `ADD(CONST, ADDR(NAME))' into the NAME, so the node is an OADDR with
+ * `addable' 13 and the constant lives in `left->xoffset' where
+ * `immconst' -- which only looks at OCONST -- can never see it.
+ *
+ * The operand then reaches `gopcode' as an immediate, and x86-64 has a
+ * `MOV r64, imm64' but NO `CMP r64, imm64': `6l/optab.c's `ycmpl' has
+ * rows for `Yi8' and `Yi32' only, so `CMPQ BP,$sym+(1<<50)(SB)' was
+ * encoded with `put4' and **thirty-two bits were written with no
+ * diagnostic**.  `boolgen' already knew about the shape from the other
+ * side -- its `l->addable == 13' test carries the comment "bad, 13 is
+ * address of external that becomes constant" -- and only the LEFT
+ * operand was covered.
+ *
+ * clisp's `nullp(obj)' is `eq(obj,NIL)' and `NIL' is an address plus a
+ * tag at bit 50, so every list looked dotted and `nreverse' walked off
+ * the end of `O(all_packages)'.  *Both sides of that comparison were
+ * truncated before `Node.xoffset' was widened, and matched each other*,
+ * which is why fixing the compiler moved the failure earlier rather
+ * than later.  `sys/lib/tests/tagconst-probe.c's `tagcmp' is the case.
+ *
+ * `int', not `long', for the same reason as `immconst' just above.
  */
 int
 hardconst(Node *n)
 {
+	int v;
+
+	if(n->op == OADDR && n->left != Z && n->left->op == ONAME) {
+		v = n->left->xoffset;
+		return n->left->xoffset != (vlong)v;
+	}
 	return n->op == OCONST && !immconst(n);
 }
 

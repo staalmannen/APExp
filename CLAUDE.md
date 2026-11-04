@@ -1593,6 +1593,17 @@ type tag at bit 48, so every CLISP SUBR object arrived untyped.
 NARROWED on purpose and the host then printed the VM's answer to the
 digit. `tagconst-probe.c` is the five-line case and is a regression
 test now; `agree.c` is identical before and after.
+***AND IT EXPOSED ITS OWN SECOND HALF, WHICH IS THE PART TO REMEMBER***:
+x86-64 has `MOV r64, imm64` and **no `CMP r64, imm64`**, and `6l`'s
+`oclass` returned `Yi32` for `$sym+off(SB)` whatever the offset, so
+`CMPQ BP,$sym+(1<<50)(SB)` was encoded with `put4`. clisp's `nullp()`
+is that shape, so every list looked dotted. *The two bugs CANCELLED* —
+while `xoffset` was 32 bits both sides of the comparison were equally
+wrong — so fixing the compiler alone moved the failure EARLIER.
+`6c`'s `hardconst` now loads such a constant into a register
+(**2001 such compares in clisp's 31 TUs, 0 after**) and `6l` returns
+`Yi64`, which `MOVQ` can encode and `CMPQ` cannot, so the next one
+fails loudly in `asmins` instead of silently.
 
 **The ABI move of this release is `-J`, conforming struct layout, on by
 default in `pcc`.** `pcc -9` is the way back and exists for the
