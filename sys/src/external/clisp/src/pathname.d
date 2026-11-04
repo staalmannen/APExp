@@ -2415,26 +2415,6 @@ local uintC directory_namestring_parts (object pathname) {
  #endif
   { /* Directory: */
     var object directory = xpathname_directory(logp,pathname);
-    /* APExp instrument, $APEXP_PNDEBUG -- see whole_namestring.  The
-       record is well formed and slot [0] carries the cons bit, so this
-       asks the three questions that can still make the count 0:
-       `mconsp' false, or `mconsp' true with neither the :ABSOLUTE arm
-       nor the (:RELATIVE) arm taken and `Cdr' not a cons either.
-       Remove once the bug is named. */
-    if (getenv("APEXP_PNDEBUG") != NULL) {
-      fprintf(stderr,"APExp dnp: logp=%d host=%u dir=0x%llx mconsp=%d",
-              (int)logp,(unsigned)stringcount,
-              (unsigned long long)as_oint(directory),(int)(mconsp(directory)?1:0));
-      if (mconsp(directory))
-        fprintf(stderr," car=0x%llx cdr=0x%llx Kabs=0x%llx eqabs=%d cdrnull=%d cdrcons=%d",
-                (unsigned long long)as_oint(Car(directory)),
-                (unsigned long long)as_oint(Cdr(directory)),
-                (unsigned long long)as_oint(S(Kabsolute)),
-                (int)(eq(Car(directory),S(Kabsolute))?1:0),
-                (int)(nullp(Cdr(directory))?1:0),
-                (int)(consp(Cdr(directory))?1:0));
-      fprintf(stderr,"\n");
-    }
    #if defined(LOGICAL_PATHNAMES)
     if (logp) {
       if (consp(directory) && eq(Car(directory),S(Krelative))) {
@@ -2553,31 +2533,8 @@ local maygc uintC file_namestring_parts (object pathname) {
  can trigger GC */
 local maygc object whole_namestring (object pathname) {
   var uintC stringcount = 0;
-  /* APExp instrument, $APEXP_PNDEBUG.  `probe_pathname' faulted reading
-     namestring_asciz[bytelen-1] with bytelen 0 -- an EMPTY namestring --
-     and the only way to get one is stringcount 0, which means
-     `directory_namestring_parts' took its `!mconsp(directory)' early
-     return.  This prints the record's raw slots so the broken one is
-     named rather than guessed.  It is guarded by the environment and
-     prints to stderr because the process dies immediately after, so a
-     buffered stdout would lose it.  Remove once the bug is named. */
-  if (getenv("APEXP_PNDEBUG") != NULL) {
-    var uintC i;
-    fprintf(stderr,"APExp wns: obj=0x%llx pathnamep=%d",
-            (unsigned long long)as_oint(pathname),(int)!!pathnamep(pathname));
-    if (orecordp(pathname)) {
-      fprintf(stderr," rectype=0x%x reclen=%u",
-              (unsigned)Record_type(pathname),(unsigned)Xrecord_length(pathname));
-      for (i = 0; i < (uintC)Xrecord_length(pathname); i++)
-        fprintf(stderr," [%u]=0x%llx",(unsigned)i,
-                (unsigned long long)as_oint(TheRecord(pathname)->recdata[i]));
-    }
-    fprintf(stderr," pathname_length=%u\n",(unsigned)pathname_length);
-  }
   stringcount += directory_namestring_parts(pathname);
   stringcount += file_namestring_parts(pathname);
-  if (getenv("APEXP_PNDEBUG") != NULL)
-    fprintf(stderr,"APExp wns: total parts=%u\n",(unsigned)stringcount);
   return string_concat(stringcount);
 }
 

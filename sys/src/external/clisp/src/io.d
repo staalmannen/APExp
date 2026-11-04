@@ -2204,6 +2204,29 @@ local object check_read_reference_table (void) {
  < result: destructively modified Object without References */
 local object make_references (object obj) {
   var object alist = check_read_reference_table();
+  /* APExp instrument, $APEXP_RLDEBUG.  `defs1.lisp' wraps ~120 lines of
+     DEFUNs in ONE `macrolet' and shares `#1=(apply #'list-to-ht ...)'
+     across them by `#1#'; `SET-DIFFERENCE's `#1#' reached the compiled
+     function UNSUBSTITUTED, as `#<ADDRESS #x000000000003>' -- which is
+     `make_small_read_label(1)', `type_data_object(system_type,(1<<1)+1)',
+     to the digit.  GETHASH then rejected it.
+
+     TWO WAYS TO GET THERE AND BOTH ARE SILENT, which is why this
+     prints rather than asserts:
+       (a) `#1=' never registered, so this alist is NIL and the `nullp'
+           arm below returns with nothing done -- silent BY DESIGN.
+       (b) the alist is fine and `subst_circ' missed it.  That is meant
+           to set `bad' and raise `no entry for ~S', and no such error
+           appeared, so it would mean the walk never VISITED the label.
+     The volume is low because only a form containing `#n=' has a
+     non-NIL table.  Remove once the bug is named. */
+  if (getenv("APEXP_RLDEBUG") != NULL && !nullp(alist)) {
+    var uintL n = 0;
+    var object l = alist;
+    while (consp(l)) { n++; l = Cdr(l); }
+    fprintf(stderr,"APExp make_references: table has %lu entries\n",
+            (unsigned long)n);
+  }
   /* SYS::*READ-REFERENCE-TABLE* = NIL -> nothing to do: */
   if (nullp(alist)) {
     return obj;
@@ -2222,6 +2245,9 @@ local object make_references (object obj) {
     pushSTACK(obj);
     var object bad_reference =
       subst_circ(&STACK_0,alist); /* substitute References by Objects */
+    if (getenv("APEXP_RLDEBUG") != NULL)
+      fprintf(stderr,"APExp make_references: subst_circ %s\n",
+              eq(bad_reference,nullobj) ? "reported ok" : "reported BAD");
     if (!eq(bad_reference,nullobj)) {
       pushSTACK(unbound);       /* STREAM-ERROR slot STREAM */
       pushSTACK(Symbol_value(S(read_reference_table)));
