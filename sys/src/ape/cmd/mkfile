@@ -62,10 +62,10 @@ _OPTIONAL_APPS=\
 # so the next thing either reports is newly MEASURED rather than newly \
 # broken -- but it will still be a stop. \
 # Build them with `cd sys/src/ape/cmd/<dir> && mk install'. \
-#	go\
+	go\
 	lua\
 	sqlite\
-#	clisp\
+	clisp\
 	tclsh\
 	itclsh\
 # GUI \
