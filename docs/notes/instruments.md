@@ -1113,3 +1113,38 @@ not whether the shape conforms.
 after the parameter case found first; sections 1 and 2 show a plain
 local losing its store with no parameter involved. *Naming an
 instrument after the first example found hides the rest of the family.*
+
+## `leawide-test.c` — the wide constant that became a displacement
+
+**From**: clisp's `GETHASH: argument #<ADDRESS #x000000000003> is not
+a hash table`, four rounds after the `mkvar` fix.
+
+**The visible fault**: yes — `6c/cgen.c:346` folding a wide constant
+into an `LEAQ` displacement, which x86-64 cannot encode.
+
+**What it cost: four rounds of instrumenting the wrong thing.**
+`#<ADDRESS #x3>` matches `make_small_read_label(1)` arithmetically, so
+the object was identified from that coincidence and four instruments
+were built on it — a table-size print, a label-visit counter, a
+recursion counter, and a batch of host constant checks — all hunting a
+`subst_circ` failure that never existed. **A read label prints
+`#<READ-LABEL n>`** (`io.d:8551`); `#<ADDRESS ...>` is `pr_machine`,
+a different type. *An object's value matching a constructor's
+arithmetic is not that object: ask what prints it.*
+
+**But the instruments were not wasted**, and that matters or the
+lesson reads as "do not instrument". The recursion counter is what
+established that the walk ran 630 times and visited **zero** labels,
+and it was that pair — a working walk and no labels — that made the
+identification untenable and sent me to the printer.
+
+**The sequencing lesson is the reusable one.** `6l` was made to DIAG
+on an unencodable displacement *before* the generator was fixed, and
+the diagnostic then named both sites (`lookup_label`,
+`prod_ungerade`) in one build. The host count agrees from the other
+end: 2 before, 0 after. *Make it loud, then fix what it names, rather
+than guessing which sites exist.*
+
+**Its controls** are sections 4 and 5: a constant that fits, and an
+unshifted variable that never reaches the fold. Both pass against a
+broken compiler.

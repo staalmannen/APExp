@@ -3072,3 +3072,75 @@ ten-backend build as the check. **In 0.6's inventory with the
 mechanism.** 8c matters most, since 386 cross-compiles today.
 
 **This is upstream kencc's bug, not APExp's** — the keying is original.
+
+## `LEAQ`: a wide constant became an address displacement
+
+**The third member of the family, and the one that took longest to
+see.** x86-64 has `MOV r64, imm64` and has **no** 64-bit form of a
+`CMP` immediate or of an address displacement. Each time, kencc emitted
+the wide value anyway and `6l` wrote the low half with `put4`:
+
+	MOVQ $sym+off(SB)             -- `Node.xoffset' was `long'
+	CMPQ r,$sym+off(SB)           -- `hardconst'/`oclass'
+	LEAQ off(base)(index*scale)   -- this one
+
+`6c/cgen.c:346` turns `(x << k) + C` into `genmuladd`, an
+`LEAQ C(base)(index*2^k)`. Its test already refused a **small** `C`,
+because `ADDQ` is better for one; it never refused a **wide** one. So
+
+	((u64)3 << 48) + ((n<<1)+1)
+	  LEAQ 844424930131969(NONE)(BP*2),AX
+
+— correct arithmetic, `(3<<48)+1`, and not an instruction.
+
+### What it was doing
+
+clisp's `make_small_read_label(n)` is
+`((oint)system_type << 48) + ((n<<1)+1)`, that shape exactly. The
+displacement truncated to 1, so every `#n#` reader label came out as
+oint 3 **with its type tag gone**. It printed as
+`#<ADDRESS #x000000000003>` — `machine_type` is 0 — rather than
+`#<READ-LABEL 1>`; `subst_circ` walked past it as `case_machine`,
+substituting nothing and reporting success; and `defs1.lisp:378`'s
+`#1#` reached `SET-DIFFERENCE`'s compiled body as a literal, where
+`GETHASH` refused it.
+
+### Fixed in both places, the same pairing as before
+
+- `6c`: the `cgen.c:346` test also requires `immconst(r)` — the same
+  fit test `hardconst` uses for the `CMPQ` member.
+- `6l`: `asmandsz` holds the displacement in a `vlong` and **diags** if
+  it does not fit, instead of `put4`-ing it. A legitimate displacement
+  always fits, since Plan 9 lays text and data well inside 2^31, so
+  every firing is a real miscompile.
+
+**And making the linker loud FIRST is what named the sites.** The
+diagnostic fired exactly twice, in `lookup_label` and `prod_ungerade`,
+both clisp — and the host count of wide `LEAQ` displacements across
+clisp's 31 TUs is **2 before, 0 after**, which is the same number from
+the other end. *Nothing else in the tree built so far trips it.*
+`agree.c` is identical, all ten backends build, mirror 31 TUs clean.
+
+### THE PRINTER WAS THE DISCRIMINATOR AND IT WAS NOT READ FOR FOUR ROUNDS
+
+`#<ADDRESS #x3>` matches `make_small_read_label(1)` arithmetically —
+`(1<<1)+1` is 3 — so the object was identified from that coincidence
+alone, and **four instruments were built on it**, hunting a
+substitution failure that never existed: an `io.d` table-size print, a
+`subst_circ` label-visit counter, a recursion counter, and a run of
+host constant checks (`garcol_bit_t`, `vbit`, `wbit`, `oint_data_len`)
+that were all clean because nothing was wrong with them.
+
+One look at `pr_readlabel` (`io.d:8551`) says a read label prints
+`#<READ-LABEL n>`, and `#<ADDRESS ...>` is `pr_machine` — a different
+type, measuring 0 against `system_type`'s 3. *The first instinct was
+right and the mechanism was not*, which is the harder version of this
+tree's rule about a grep hit being a name rather than an
+implementation: an object's VALUE matching a constructor's arithmetic
+is not that object. **Ask what prints it.**
+
+*The instruments were not wasted*, which is worth saying because the
+rule otherwise reads as "do not instrument": the recursion counter is
+what proved the walk ran 630 times and visited no label, and that pair
+of facts — a working walk and zero labels — is what finally made the
+identification untenable.
