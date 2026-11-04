@@ -3052,3 +3052,141 @@ announces itself before it starts, because a fault, a kill and a clean
 finish all give the prompt back. The recipe passes `rceq-sweep` and
 `mkcont-sweep`, but there is no `rc` on the build host, so its quoting
 has been swept and not executed.
+
+#### Stage 1 runs, and `lisp.run` crashes in the GC during init
+
+**The recipe is right**: `mk -f mkfile.runtime base` parsed as rc, printed
+`clisp: stage 1/3 -- interpreted.mem`, and ran `lisp.run`. So the quoting
+and the `^` concatenation survive mk and rc, which had been swept and not
+executed.
+
+***AND `lisp.run` RUNS.*** The `miniperl` gap is closed in the direction
+that matters: it is no longer "links but has not been shown to run", it
+is "runs, gets a long way into initialisation, and faults". The acid
+stack is complete:
+
+```
+gc_mark()+0x5b            spvw_gcmark.d:250      <- down_sxrecord(), case_subr
+gc_markphase()+0x65       spvw_garcol.d:134
+gar_col_normal()          gar_col_simple()       spvw_garcol.d:3037
+make_space_gc(heap_ptr=0x50c2f8, need=0x48, ...) spvw_allocate.d:586
+allocate_vector(len=0x7)                         spvw_typealloc.d:107
+init_subr_tab_2()                                subrkw.d:7
+initmem() -> init_memory() -> main()             spvw.d:1895, 3281, 3721
+```
+
+`sys: trap: general protection violation pc=0x203da5`.
+
+**A GC there is EXPECTED, and that was worth checking before blaming
+the allocator.** `spvw.d:1886` is upstream's own comment immediately
+above the call: *"Now the tables are coarsely initialized, nothing can
+happen at GC."* So the collector running during `init_subr_tab_2` is
+sanctioned; **the collector faulting is the bug**, and the first reading
+— that an empty page pool meant memory setup was wrong — is withdrawn.
+
+**The build contains the `bit()` fix, by arithmetic rather than by
+assumption.** The pre-patch log warned at `lispbibl.d:15704`; the patch
+added 34 lines above it; this run warns at `15738`. And the fix was
+load-bearing *for this very code*: `garcol_bit_o` is **63**
+(`lispbibl.d:2709`), and `marked()`, `MARK()`, `unmark()` and
+`with_mark_bit()` are all `wbit(garcol_bit_o)` — so before the widening
+every one of them was `0` and the mark bit did not exist.
+
+**Cleared locally with the host toolchain, so they need not be
+re-examined**: `typecode(expr)` is `(tint)(as_oint(expr) >> 48)` on a
+64-bit `oint`; `aint` is `uint48` is `ULONGLONG`, 64 bits; `oint_addr_mask`
+and friends are hex constants wide enough under kencc's floor rule;
+`mark`/`unmark`/`marked`/`with_mark_bit` are all correct now that
+`wbit` is wide; and `STACK_ADDRESS_RANGE`'s `~0UL` is harmless because it
+appears only inside `#if`, where `cpp/eval.c` computes in `vlong`.
+
+**What the compiler still flags, and what it is worth**: 24514
+*"32-bit unsigned complement zero-extended to 64 bits"* warnings, almost
+all from `SstringDispatch` and friends complementing `uintL` *field*
+masks, which is harmless; and **30 "conversion of pointer to shorter
+integer"**, which is not. Those 30 are in `eval.d` and `control.d`'s
+frame macros (`enter_frame_at_STACK`, `finish_entry_frame`) plus one
+debug `printf`. *Real, recorded, and probably not this crash* — none of
+them runs before `init_subr_tab_2`.
+
+**Prediction, with its refutation condition, for the next round**: a
+*general protection* violation rather than a page fault points at a
+**non-canonical address** — a pointer carrying garbage in bits 48-63,
+which is what an untagged-but-not-stripped `oint` looks like. If `lstk()`
+shows `curr` in `gc_mark` with a plausible heap address in the low 48
+bits and nonzero type bits above, that is it. **If `curr` is a small
+integer or zero, the hypothesis is wrong** and the subr table entry
+itself is the problem.
+#### The GC crash: `~0UL` again, and a constant that disagrees with itself
+
+`acid` on the broken process settled it in one round, and **the
+prediction written down beforehand held**: a general protection
+violation rather than a page fault meant a non-canonical address.
+
+```
+DX = BP = 0x000100000041a7c0      <- BP is REGARG, so this is gc_mark's argument
+```
+
+`0x0001` in bits 48-63 is `subr_type`, over the heap address `0x41a7c0`
+— a perfectly well-formed SUBR. The generated code was:
+
+```
+TEXT gc_mark<>+0(SB),0,$48
+     MOVQ    BP,DX
+     ...
+     MOVWQZX 6(DX),DI        <- dereference with the tag still on
+     ANDQ    $128,DI
+```
+
+so `marked()` read `0x000100000041a7c6`, which x86-64 refuses.
+
+**The cause is `hardware_addressbus_mask`, `lispbibl.d:4010`, and it is
+`~0UL`.** It means "nothing is dropped", and is 64 bits wide on every
+platform CLISP is built on because they are all LP64. Under kencc
+`unsigned long` is 32 bits, so it is `0x00000000FFFFFFFF` and the top
+sixteen bits read as *dropped by the address bus*. `type_pointable()`
+(`:4082`) then takes its unmasked arm:
+
+```c
+(((oint)(tint)(type) << 48) & addressbus_mask) == 0
+  ? (void*)(aint)as_oint(obj)     /* tag left in the pointer */
+  : (void*)(aint)pointable(obj)
+```
+
+On a machine whose address bus really does ignore those bits — a 68000,
+an Alpha — that is upstream's intended optimisation. x86-64 traps.
+
+***AND THE SAME EXPRESSION IS EVALUATED TWICE, TWO WAYS.*** The `#elif`
+at `:4082` that *selects* this form tests `addressbus_mask` in the
+**preprocessor**, where `#if` arithmetic is 64-bit (`cpp/eval.c`
+computes in `vlong`) — so it correctly concludes the mask is needed and
+emits a runtime check, which the **compiler** then evaluates in 32 bits
+and answers the other way. *A constant that disagrees with itself
+between cpp and cc.* Nothing in either half is wrong on its own.
+
+Fixed as `0xFFFFFFFFFFFFFFFFUL` under `WIDE_HARD && long_bitsize < 64`,
+which is how upstream already spells its other 64-bit all-ones mask
+(`oint_addr_mask`, `:2768`) and which kencc's floor rule types at 64
+bits. **Measured**: 1087 sites move from the unmasked ternary to the
+masked one, and `gc_mark` now emits
+
+```
+MOVQ    DX,BX
+MOVQ    $281474976710655,SI     /* 0x0000FFFFFFFFFFFF */
+ANDQ    SI,BX
+MOVWQZX 6(BX),DI
+```
+
+All 31 translation units still compile clean.
+
+***AND I HAD ALREADY LOOKED AT THIS `~0UL` AND WAVED IT THROUGH.*** The
+round before, `STACK_ADDRESS_RANGE`'s `~0UL` was checked and correctly
+found harmless, because it appears only inside `#if`. That conclusion
+was then generalised to the *other* `~0UL` eleven lines away, which is
+used in a C expression. **A verdict about one use of a constant is not
+a verdict about the constant**; `grep` found both and only one was
+opened.
+
+This is the third member of the LLP64 family in clisp, after `bit()`
+and `vfork`, and the second whose symptom was silence rather than a
+diagnostic.
