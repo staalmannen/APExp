@@ -212,11 +212,18 @@ p9_mmap_impl(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 /*
  * mmap tracking table.
  *
- * Tracks (addr, is_seg) so munmap can call the correct release function.
- * Uses a dynamically grown array so it never silently overflows — a full
- * fixed table would cause munmap to not find entries and leak memory/segments.
+ * Tracks (base, addr, len, is_seg) so munmap can call the correct release
+ * function.  Uses a dynamically grown array so it never silently overflows —
+ * a full fixed table would cause munmap to not find entries and leak
+ * memory/segments.
+ *
+ * `base' is what segattach() or malloc() returned and is what must
+ * eventually be handed back to _SEGDETACH()/free().  `addr'/`len' are the
+ * range the CALLER still believes is mapped, which a PARTIAL munmap can
+ * narrow — see p9_munmap below for why the two have to be separate.
  */
 static struct MmapEntry {
+	void  *base;
 	void  *addr;
 	size_t len;
 	int    is_seg;
@@ -245,9 +252,12 @@ p9_mmap_tracked(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 			mmap_table     = t;
 			mmap_table_cap = newcap;
 		}
-		/* if realloc fails we proceed; munmap will fall back to segdetach */
+		/* if realloc fails we proceed; the mapping is then untracked
+		 * and munmap() of it is a no-op, i.e. it leaks.  That is the
+		 * safe direction: see p9_munmap's tail. */
 	}
 	if(mmap_table_n < mmap_table_cap){
+		mmap_table[mmap_table_n].base   = p;
 		mmap_table[mmap_table_n].addr   = p;
 		mmap_table[mmap_table_n].len    = len;
 		mmap_table[mmap_table_n].is_seg = (len >= SEG_THRESHOLD);
@@ -256,25 +266,86 @@ p9_mmap_tracked(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	return p;
 }
 
+/*
+ * p9_munmap: unmap all of a mapping, or NARROW it.
+ *
+ * A Plan 9 segment is indivisible — segdetach() takes any address inside
+ * one and releases the WHOLE segment — so a partial unmap cannot return
+ * the trimmed pages.  What it can and must do is keep the range the
+ * caller still owns VALID, and release the segment once the caller has
+ * given all of it back.  So a trim narrows the entry and frees nothing;
+ * the pages stay resident until the last of the mapping is unmapped.
+ *
+ * ***THIS IS NOT A NICETY: PARTIAL UNMAP IS HOW A POSIX PROGRAM GETS AN
+ * ALIGNED ALLOCATION.*** The idiom is to map MORE than is needed and
+ * unmap the overhang, and php's Zend allocator is built on it —
+ * `Zend/zend_alloc.c's `zend_mm_chunk_alloc_int' trims the head and the
+ * tail of an over-sized mapping to land a 2MB-aligned 2MB chunk, and
+ * `zend_mm_chunk_truncate' trims the tail of a LIVE one.  Against the
+ * previous code both of those were silent disasters rather than
+ * failures:
+ *
+ *   - a HEAD trim passes the mapping's START with a SHORT length, which
+ *     matched on `addr' alone, so the whole segment was detached — and
+ *     the caller then went on using `addr + len' inside it;
+ *   - a TAIL trim passes an INTERIOR address, which matched nothing, and
+ *     the fallback was `_SEGDETACH(addr)', which detaches the segment
+ *     that address is in. The same disaster by the other route.
+ *
+ * Hence the two fields: `base' is what must be detached, `addr'/`len' is
+ * what the caller still holds, and a trim moves the second without
+ * touching the first.
+ *
+ * AND THE UNKNOWN-ADDRESS FALLBACK IS GONE. `_SEGDETACH' on an address
+ * that is in no entry destroys whatever segment happens to contain it —
+ * including a live one belonging to something else — to free a mapping
+ * we are not sure we made.  Doing nothing leaks instead, which is the
+ * direction a library should err in.  (It is reachable only when the
+ * table's realloc failed, i.e. under memory exhaustion already.)
+ */
 int
 p9_munmap(void *addr, size_t len)
 {
+	char *a = (char*)addr;
+	char *s, *e;
 	int i;
-	(void)len;
+
 	for(i = 0; i < mmap_table_n; i++){
-		if(mmap_table[i].addr == addr){
-			if(mmap_table[i].is_seg)
-				_SEGDETACH(addr);
-			else
-				free(addr);
-			mmap_table[i] = mmap_table[--mmap_table_n];
+		s = (char*)mmap_table[i].addr;
+		e = s + mmap_table[i].len;
+		if(a < s || a >= e)
+			continue;
+
+		if(a == s){
+			if(len >= mmap_table[i].len){
+				/* the whole of what is left: release it */
+				if(mmap_table[i].is_seg)
+					_SEGDETACH(mmap_table[i].base);
+				else
+					free(mmap_table[i].base);
+				mmap_table[i] = mmap_table[--mmap_table_n];
+				return 0;
+			}
+			/* head trim: the tail stays live */
+			mmap_table[i].addr = s + len;
+			mmap_table[i].len -= len;
 			return 0;
 		}
+
+		if(a + len >= e){
+			/* tail trim: the head stays live */
+			mmap_table[i].len = a - s;
+			return 0;
+		}
+
+		/* A hole in the middle would split the entry in two, which a
+		 * Plan 9 segment cannot express.  Keep it all mapped; the
+		 * caller's own two ranges both stay valid, which is what it
+		 * needs, and nothing is released early. */
+		return 0;
 	}
-	/* addr not in table — could be a segattach we couldn't record.
-	 * Attempt segdetach; if it fails this is an unknown address and
-	 * we return 0 rather than crash or corrupt the malloc heap. */
-	_SEGDETACH(addr);
+
+	/* addr is in no mapping we recorded — do nothing, deliberately. */
 	return 0;
 }
 

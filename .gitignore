@@ -90,3 +90,7 @@ sys/src/external/go1.4/bin/
 # and both are already tracked as source --
 # `utils/unicode/UnicodeDataFull.txt' and `doc/Symbol-Table.text'.
 sys/src/ape/cmd/clisp/build-*/
+
+# munmaptrim-xcheck's generated extract and its host binary
+sys/lib/tests/munmaptrim-extract.h
+sys/lib/tests/munmaptrim-xcheck

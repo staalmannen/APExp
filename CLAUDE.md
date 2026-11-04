@@ -886,8 +886,15 @@ silent:
   word in a goroutine FRAME was scanned as a pointer and points into
   FREED memory; go1.4 scans stacks PRECISELY, so a non-pointer is
   scanned only if that frame's STACK MAP claims the slot is one.
-  `sys/lib/tests/go-readdir-probe.go` asks whether the Plan 9 readdir
-  path alone reproduces it, with `GOGC=off` as its control.
+  ***AND THE READDIR PATH IS INNOCENT***, measured:
+  `sys/lib/tests/go-readdir-probe.go` walks `$GOROOT/src` with
+  `runtime.GC()` every 200 entries and completes — 297 dirs, 2759
+  files — **both with the GC on and with `GOGC=off`**. So the frame
+  that is scanned wrongly is elsewhere in `go list std`
+  (`go/build`, the package graph, `matchPackages`), and
+  `os/dir_plan9.go` being at the bottom of the traceback was where
+  the GC happened to fire, not what caused it. *The obvious
+  candidate was refuted by the cheapest instrument available.*
   **Whose bug it is is NOT established**: go1.4's plan9/amd64 port was
   new and thinly exercised in that release, so upstream is a live
   candidate beside `6g`/`6l`, which this tree's `pcc` builds and which
