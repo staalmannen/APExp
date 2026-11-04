@@ -377,7 +377,23 @@ zname(Biobuf *b, Sym *s, int t)
 void
 zaddr(Biobuf *b, Adr *a, int s)
 {
-	long l;
+	/*
+	 * `int l' and NOT `long l': `l' exists to TRUNCATE a->offset to 32
+	 * bits, so that `(vlong)l != a->offset' can detect an offset that
+	 * needs all 64 and set T_64.  That is the width talking, not the
+	 * type name, and `int' says so -- the same shape as `6c/cgen.c's
+	 * `immconst'.  On Plan 9 the two spellings are the same number, so
+	 * this is inert for every shipped compiler.
+	 *
+	 * ***MEASURED, and it is what makes a HOST-built 6c write a broken
+	 * object.***  Built with gcc, where `long' is 64 bits, nothing is
+	 * truncated, T_64 is never set, only four bytes are written, and
+	 * `MOVQ $sym+281474976716536(SB)' comes back out of the object file
+	 * as `$sym+5880' -- a clisp type tag at bit 48 silently gone.
+	 * `l' holds nothing wider than 32 bits anywhere else in this
+	 * function (the byte-at-a-time writes, and `e.l' from ieeedtod).
+	 */
+	int l;
 	int i, t;
 	char *n;
 	Ieee e;

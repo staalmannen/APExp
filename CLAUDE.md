@@ -1138,6 +1138,21 @@ in the topic file.
   line you predicted.** `select` was blocked exactly where expected, and
   `timeout != 0`, `t = 200` in the same frame showed the reason was the
   opposite of the one argued.
+- ***BUT `acid`'s `lstk()` MISREADS ARGUMENTS IN AN APExp amd64 BINARY,
+  AND THE FIRST ONE IS ALWAYS GARBAGE.*** kencc's amd64 `REGARG` is
+  `D_BP` (`6c/6.out.h:811`), so the first argument is passed in a
+  REGISTER and the caller never writes `0(SP)` -- but `acid` reads every
+  parameter from the frame, so **parameter one is whatever stale bytes
+  are in that slot**. It cost a round here: `funcall(...,fun=0x41d5b0)`
+  was read as a function object that had lost its type tag, and the
+  caller's own code is `MOVQ $subr_tab_data+281474976722416(SB),BP` --
+  the tag is there, in a register, and `0x41d5b0` was leftover stack.
+  **The tell is beside it**: a 4-byte parameter comes back as eight,
+  `args_on_stack=0x7fff00000004` and `errtype=0x18e4c1f50000000e`, two
+  32-bit values read as one. *So in any acid stack here, trust the CALL
+  CHAIN and the `regs()` dump, and treat `lstk()`'s values as a hint.*
+  `regs()` is reliable, and **BP holds argument one at a function's
+  entry**, which is how the clisp GC crash was read correctly.
 - **A bisect that narrows to nothing is evidence** -- of a cumulative
   cause -- not a failed bisect.
 - **When upstream does something from an event, ask what the event costs

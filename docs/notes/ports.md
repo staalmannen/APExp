@@ -3190,3 +3190,64 @@ opened.
 This is the third member of the LLP64 family in clisp, after `bit()`
 and `vfork`, and the second whose symptom was silence rather than a
 diagnostic.
+
+#### The GC crash is fixed; the next stop is `funcall` in `init_reader`
+
+`lisp.run` now gets past the collector entirely and dies somewhere
+else, which is the result the `~0UL` fix existed to get. The new stack
+is a *reported error*, not a wild crash:
+
+```
+error_value_stream()  stream.d:15422   stream=0x0   <- fault read addr=0x8
+var_stream()          stream.d:1095
+begin_error()         error.d:42
+prepare_error()       error.d:355
+check_value()         error.d:406
+check_funname_replacement()            error.d:1490
+funcall()             eval.d:4923      <- the `else' that rejects a non-function
+allocate_syntax_table()                io.d:149  -> funcall(L(make_hash_table),4)
+orig_readtable() / init_reader() / init_symbol_values() / initmem()
+```
+
+So two things, in order. **`funcall` rejected its argument**, and the
+error machinery then faulted because `var_stream` has no stream this
+early — the second is a consequence and not worth chasing until the
+first is understood.
+
+***AND THE FIRST READING OF IT WAS WRONG, FROM A BAD INSTRUMENT.***
+`lstk()` printed `fun=0x41d5b0` — an address with no type tag — which
+looked like the `~0UL` family a fourth time. It is not. **kencc's amd64
+`REGARG` is `D_BP`**, so `fun` is passed in a register and the caller
+never writes `0(SP)`; `acid` reads parameters from the frame, so that
+slot is stale bytes. The caller's own code is
+
+```
+MOVQ $subr_tab_data+281474976722416(SB),BP    /* (1<<48) + 0x2DF0 */
+MOVL $4,DI
+MOVL DI,8(SP)
+```
+
+— the tag is present, in BP, and only `args_on_stack` is ever stored.
+The tell was beside it the whole time: `args_on_stack=0x7fff00000004`
+and `errtype=0x18e4c1f50000000e` are 4-byte parameters read as eight.
+
+**Cleared locally, so the next round need not re-read them**: the
+caller emits the tag correctly; `funcall`'s dispatch is correct
+(`SHRQ $48` / `MOVWQZX` / `CMPQ $1` against `subr_type`); `subrp` is
+the shift form; `6c/swt.c`'s `zaddr` sets `T_64` for an offset this
+large and `6l/obj.c`'s reader honours it; and `6l`'s `vaddr` computes
+in `vlong`.
+
+**What is NOT cleared is the instruction encoding.** `MOVQ $imm64,BP`
+has two x86-64 forms — `C7 /0 id` with a sign-extended *imm32*, and
+`48 B8+r io` with a true imm64 — and only the linked binary says which
+`6l` chose. That is the one measurement left and it is one command:
+
+```
+acid <pid>
+asm(allocate_syntax_table)
+```
+
+If the constant in the linked code is `0x1000000002DF0` the encoding is
+fine and the fault is elsewhere; if it is `0x2DF0`, `6l` truncated it
+and this is ours, not clisp's.
