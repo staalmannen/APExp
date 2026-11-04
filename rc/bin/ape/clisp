@@ -1,0 +1,47 @@
+#!/bin/rc
+# clisp -- launch CLISP against its installed base image.
+#
+#	clisp                 # the REPL
+#	clisp -x '(print 1)'  # anything lisp.run takes
+#
+# ***THIS REPLACES UPSTREAM'S `clisp.c' DRIVER, AND THE REASON IS ONE
+# `#error'.*** `src/_clisp.c' is a 433-line C program whose entire job
+# is to find its own executable, derive `lisplibdir' from it, and exec
+# `lisp.run' with `-B' and `-M'.  It does the first part through
+# `src/execname.c', and that file ends
+#
+#	execname.c:153 #error "not implemented: find_executable()"
+#
+# for any platform it does not recognise, which is every platform that
+# is not Linux, a BSD, Solaris, Cygwin or Windows.  Porting it would
+# mean teaching it `/proc/$pid/text' -- real work for a program whose
+# output is two command-line options.
+#
+# **rc can say the same thing in one line, and say it better**, because
+# `$objtype' is a RUNTIME variable here: this script is architecture
+# independent while a compiled driver would have had `lisplibdir' baked
+# in by `-DLISPLIBDIR' and so needed one binary per architecture.
+# `rc/bin/ape/hostcc' is the precedent for a one-line rc command
+# standing in for something larger.
+#
+# THE TRAILING SLASH ON `-B' IS DELIBERATE.  `-lp' without one cost a
+# round: `spvw.d:3458' pushes the raw string onto `*LOAD-PATHS*' and a
+# bare-name load MERGES against it, so a pathname whose NAME is the
+# last component has that name REPLACED rather than appended to.  `-B'
+# goes to `SET-LIB-DIRECTORY' instead (`spvw.d:3351'), so it is not the
+# same code path -- but `mkfile.runtime's `base:V:' passes `-B ./' with
+# the slash and that is the spelling measured to work, so this matches
+# it rather than guessing that the other path is more forgiving.
+#
+# `$*' and not `$@': rc has no `$@', and `$*' is already the argument
+# list rather than one word, so no quoting is needed around it.
+
+lisplib=/$objtype/lib/ape/clisp
+
+if (! test -f $lisplib/base/lispinit.mem) {
+	echo 'clisp: no '^$lisplib^'/base/lispinit.mem' >[1=2]
+	echo 'clisp: build it in sys/src/ape/cmd/clisp with mk install' >[1=2]
+	exit noimage
+}
+
+exec $lisplib/base/lisp.run -B $lisplib/ -M $lisplib/base/lispinit.mem $*
