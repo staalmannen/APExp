@@ -63,6 +63,10 @@ if (! test -x $build^'/lisp.run') {
 	exit nobuild
 }
 
+# $APEXP_RLDEBUG is `io.d's make_references instrument -- see its
+# comment. Pass any argument to this script to turn it on.
+if (! ~ $#* 0) APEXP_RLDEBUG=1
+
 echo 'debug-stage1: -lp '^$src
 echo 'debug-stage1: cwd '^$build
 
