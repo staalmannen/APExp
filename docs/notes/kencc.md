@@ -2984,3 +2984,91 @@ also consistent with a silent truncation.
 *producing* a wide link-time constant and *comparing against* one are
 two questions with two different answers on this machine, and only the
 LINKER line distinguishes them.
+
+## `mkvar` keyed on the OFFSET, so a type pun deleted the store
+
+***THE WORST BUG IN THIS FILE, AND IT WAS LIVE IN ALL TEN BACKENDS.***
+
+`[1-9]c/reg.c`'s `mkvar` keys an optimizer variable on
+**(sym, name, offset)**. So `x+0(SP)` and `x+6(SP)` are two UNRELATED
+variables. A C program that writes an object and then reads part of it
+through a cast pointer — the ordinary type pun — produces exactly that
+pair: the store has no readers, and `regopt`'s `excise()` removes it.
+
+	int f(void){ u64 x = g(); return *((u16*)&x + 3); }
+	  CALL g; MOVWLZX x+-2(SP),AX        -- g()'s result never stored
+
+	u64 f(u64 x){ *((u16*)&x+3) = 0xbeef; return x; }
+	  MOVW $48879,x+6(FP); MOVQ BP,AX    -- the write is lost
+
+No diagnostic, in either direction.
+
+### Why the parameter form is the amd64 one
+
+`REGARG` is `D_BP`, so argument one arrives in a register and the caller
+never writes the frame slot — the frame copy exists **only** because
+`cc/pgen.c` spills it at entry. `6c -N` emits that spill; with `regopt`
+on it was excised while the `x+6(FP)` read remained. So the function
+read whatever was left on the stack.
+
+### The fix
+
+`varalias()` in `6c/reg.c`: on every `mkvar`, any other variable with
+the same (sym, name) whose byte range **overlaps** this one marks both
+in `addrs`. `addrs` is the existing "do not register-allocate, do not
+excise stores" set, gated at `excise` and at the `LOAD(r) & ~addrs`
+that starts painting, so marking both members of an aliasing pair is the
+whole of it. Widths come from `ewidth[etype]`, with `-1`
+(TXXX/TARRAY/TSTRUCT/TUNION) and `0` (TFUNC/TVOID) treated as
+"overlaps everything".
+
+**The disjoint case is the common one and is untouched** — a struct's
+members and an array's elements sit at non-overlapping offsets, so they
+remain separate variables. `agree.c` is **identical before and after**,
+which is the evidence that ordinary code does not move.
+
+**`D_ADDR` already marked `addrs`**, which is why keeping the address in
+a pointer variable always worked: that spells the access with a `LEAQ`.
+*The bug was never "the address was taken", it was "the address was
+taken and FOLDED INTO the memory reference".*
+
+### What it was doing to clisp
+
+`mtypecode(obj)` is `(*((tint*)&(obj)+3))` — the type tag read straight
+out of an object's top two bytes — and `mconsp`, `matomp` and every
+`SstringCase` are built on it. `lisp.run` printed its banner and died
+reading `namestring_asciz[bytelen-1]` with `bytelen` 0, because
+`directory_namestring_parts` answered "not a cons" for a pathname slot
+that provably held one: `var object directory = ...` wrote
+`directory+-16(SP)` and `mconsp(directory)` read `directory+-10(SP)`.
+Rebuilding `pathname.c` with the fix adds `MOVQ DI,directory+-16(SP)`,
+the store that was being excised.
+
+### Three reading errors on the way, each worth keeping
+
+*(1)* **The generated code for that very function was read and
+cleared.** `MOVWQZX directory+-10(SP),SI` was taken as proof that the
+local "is in memory and written" — the READ was checked and nothing was
+checked to have *written* it. Same shape as trusting a disassembly's
+mnemonic over its bytes, two rounds after that lesson was written down.
+*(2)* The instrument dump showed slot `[0]` carrying the cons bit and
+`rectype` 5, so the data was repeatedly declared innocent and the search
+kept moving upstream through `merge_pathnames` and the parser. The data
+*was* innocent; the test on it was not.
+*(3)* The first draft of the test was called `regargaddr-test.c`,
+because the parameter case was found first. **Sections 1 and 2 show a
+plain local losing its store with no parameter involved** — naming it
+after the first example found would have hidden half of it, and it is
+`punoffset-test.c` for that reason.
+
+### The other nine backends are NOT fixed, and that is deliberate
+
+All ten carry the same keying and the same `funny punning` guard, but
+the signatures differ — `1c`'s `mkvar(Adr*, int)` has no `Reg*` and its
+`Var` has no `name`; `8c`'s is `mkvar(Reg*, Adr*, int isro)` — so a
+blind patch would be wrong, and `agree.c` only measures amd64. 6c's fix
+is measured end to end; the rest need one deliberate edit each with the
+ten-backend build as the check. **In 0.6's inventory with the
+mechanism.** 8c matters most, since 386 cross-compiles today.
+
+**This is upstream kencc's bug, not APExp's** — the keying is original.
