@@ -877,10 +877,21 @@ silent:
   ***THAT `go test` PASSES REFUTES "the collector is broken"***: those
   test binaries allocate and collect freely. So this is one path, not
   the runtime.
-  **The discriminator not yet run is `GOGC=off go list std`** —
-  succeeding would put it in the GC's stack maps for that frame,
-  still crashing would mean the data really is corrupt, which is a
-  different and worse bug. **Out of the default build**; four earlier
+  ***`GOGC=off go list std` PRINTS 156, THE RIGHT NUMBER***, so the
+  heap data is fine and it is purely the collector on that path.
+  ***AND THE OBVIOUS READING OF THAT MESSAGE IS WRONG***: `state=2`
+  is `MSpanFree` (`malloc.h:404`), and a free span having `limit` 0
+  is simply what a free span looks like — *the field that looked
+  broken was the one field behaving*. What it actually says is that a
+  word in a goroutine FRAME was scanned as a pointer and points into
+  FREED memory; go1.4 scans stacks PRECISELY, so a non-pointer is
+  scanned only if that frame's STACK MAP claims the slot is one.
+  `sys/lib/tests/go-readdir-probe.go` asks whether the Plan 9 readdir
+  path alone reproduces it, with `GOGC=off` as its control.
+  **Whose bug it is is NOT established**: go1.4's plan9/amd64 port was
+  new and thinly exercised in that release, so upstream is a live
+  candidate beside `6g`/`6l`, which this tree's `pcc` builds and which
+  this release found four silent miscompiles in. **Out of the default build**; four earlier
   stops were all this tree's own mkfile (the `bool` keyword, a missing
   `-c`, Makefile backslashes in a `-D`, `-DPLAN9` doing two unrelated
   jobs) and are long past.
