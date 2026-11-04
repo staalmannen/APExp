@@ -498,7 +498,14 @@ zname(Biobuf *b, Sym *s, int t)
 char*
 zaddr(char *bp, Adr *a, int s)
 {
-	long l;
+	/*
+	 * `int l' and NOT `long l' -- see the comment in `6c/swt.c's
+	 * zaddr.  `l' exists to TRUNCATE a->offset to 32 bits so that the
+	 * comparison against the vlong can detect an offset needing all
+	 * 64 and set T_64; that is a WIDTH and not a type name.  Inert on
+	 * Plan 9, where the two spellings are the same number.
+	 */
+	int l;
 	Ieee e;
 
 	if(a->type == D_CONST){
