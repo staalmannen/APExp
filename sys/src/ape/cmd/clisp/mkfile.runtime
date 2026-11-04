@@ -438,7 +438,42 @@ base:V: lisprun
 
 build:V: base
 
+# WHAT AN INSTALLED CLISP IS, and it is four files plus a launcher.
+#
+# Upstream's `install-bin' (`makemake.in:3572') lays out a
+# `lisplibdir' holding `base/lisp.run', `base/lispinit.mem', `data/',
+# `linkkit/', `build-aux/' and `full/'.  The last three are for
+# building EXTERNAL MODULES, which `--without-dynamic-modules' rules
+# out here, so what is left is the image, the runtime and the two data
+# files.
+#
+# ***THE DATA FILES ARE ALREADY IN GIT AND NOTHING NEEDS
+# PRE-INSTALLING.*** `DATA_FILES' is exactly
+# `"UnicodeDataFull.txt Symbol-Table.text"' (`makemake.in:2756'), read
+# at runtime by `describe.lisp:687' and `clhs.lisp:318' through
+# `clisp-data-file', and both are tracked SOURCE --
+# `utils/unicode/UnicodeDataFull.txt' and `doc/Symbol-Table.text'.
+# Installing them is a copy.  `lispinit.mem' cannot be seeded by
+# definition: it is what the three-stage bootstrap produces.
+#
+# `$objtype/lib/ape' rather than `sys/lib', because `lisp.run' is a
+# binary and `lispinit.mem' is a MEMORY IMAGE OF ONE -- both
+# architecture-specific, so they do not belong in the tree
+# `sys/lib/perl' lives in.  `mount-include' binds
+# `$objtype/lib/ape' over `/$objtype/lib/ape', which is what makes the
+# path in `rc/bin/ape/clisp' resolve at runtime.  The cost is the two
+# data files duplicated per architecture, 1.3MB, which is the right
+# way round for keeping one `lisplibdir'.
+LISPLIB=$LIBDIR/clisp
+
 install:V: build
+	mkdir -p $LISPLIB/base $LISPLIB/data
+	cp $BUILD/lisp.run $LISPLIB/base/lisp.run
+	cp $BUILD/lispinit.mem $LISPLIB/base/lispinit.mem
+	cp $CLISPSRC/utils/unicode/UnicodeDataFull.txt $LISPLIB/data/UnicodeDataFull.txt
+	cp $CLISPSRC/doc/Symbol-Table.text $LISPLIB/data/Symbol-Table.text
+	echo 'clisp: installed into '$LISPLIB
+	echo 'clisp: run it with the clisp command in rc/bin/ape'
 
 installall:V:
 	for (objtype in $CPUS) @{

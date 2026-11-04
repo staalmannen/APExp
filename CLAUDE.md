@@ -815,10 +815,22 @@ built by hand has not been measured in that position*.
   found no second LIVE site** — the other `(long)`-on-an-address casts
   are in `foreign.d` and `MULTITHREAD`, neither of which this port
   compiles.
-  **What is left is the runtime mkfile replacing `makemake`** (4108
-  lines); `$CPARTS` is already enumerated in `mkfile.rebuild`, and the
-  hard half is the Lisp bootstrap, which RUNS `lisp.run` to build the
-  base image. **Out of the default build; it is its own release.**
+  ***ALL THREE BOOTSTRAP STAGES COMPLETE AND IT INSTALLS.***
+  `lispinit.mem` is 3,048,296 bytes. `install` lays out
+  `$objtype/lib/ape/clisp/{base,data}` — `lisp.run`, `lispinit.mem`,
+  and the two data files, which are **already tracked source**
+  (`utils/unicode/UnicodeDataFull.txt`, `doc/Symbol-Table.text`), so
+  nothing needed pre-installing. `linkkit`/`build-aux`/`full` are for
+  EXTERNAL MODULES and `--without-dynamic-modules` rules them out.
+  **`rc/bin/ape/clisp` replaces upstream's `clisp.c` driver**, whose
+  only job is to find its own executable and supply `-B`/`-M`:
+  `execname.c:153` is `#error "not implemented: find_executable()"`
+  for every platform it does not know, and rc says the same thing in
+  one line *and* stays architecture-independent, because `$objtype` is
+  a runtime variable where `-DLISPLIBDIR` would have been baked in.
+  **NOT in `_OPTIONAL_APPS` yet**: `install` re-runs the whole
+  bootstrap every time (`base` is a `V:` target), and a port that has
+  only been built by hand has not been measured in that position.
 
 **Ports built and running**, each with what is NOT measured:
 - **EDG** — `cpfe` builds, runs, and translates: `c++ -v -K /tmp/t.cpp`
