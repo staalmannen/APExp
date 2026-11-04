@@ -3251,3 +3251,56 @@ asm(allocate_syntax_table)
 If the constant in the linked code is `0x1000000002DF0` the encoding is
 fine and the fault is elsewhere; if it is `0x2DF0`, `6l` truncated it
 and this is ours, not clisp's.
+
+### clisp: `(long)&x` on a stack address, the fourth LLP64 one
+
+**Stage 1 of the bootstrap runs now**, and stopped with
+
+	lisp.run 51691: suicide: sys: trap: fault write addr=0xfffffffffffde498 pc=0x3546f5
+
+***The registers named the bug before the stack did.***
+
+	SI 0x00007ffffffde498      a real stack address
+	BP 0xfffffffffffde498      its low 32 bits, sign-extended
+
+`0xfffde498` sign-extended is `0xffffffff_fffde498` to the digit, so a
+pointer had been round-tripped through something 32 bits wide — and
+because it was a STACK address the result is non-canonical and traps,
+rather than quietly writing somewhere. *A heap pointer treated the same
+way would have scribbled and survived.*
+
+`lstk()` put the fault in `setjmp` (`arch/amd64/setjmp.s:34`, whose
+first instruction is `MOVQ SP,0(BP)` — BP is the `jmp_buf`, since
+`REGARG` is `D_BP`), called from `eval` at `eval.d:2953`, which is
+`finish_entry_frame(EVAL,my_jmp_buf,...)`. That expands through
+`setjmpspl` to `lispbibl.d:9320`:
+
+	#define sp_jmp_buf_to_jmp_buf(x) \
+	  (*(jmp_buf*)(((long)&(x)+(long)sp_jmp_buf_incr)& -(long)(...)))
+
+**`(long)&(x)` on a 64-bit pointer.** Upstream is correct everywhere it
+builds, because every other platform with a 64-bit pointer is LP64;
+kencc is the first LLP64 one, which is the same sentence this file has
+now written four times for clisp — `bit()`, `hardware_addressbus_mask`,
+`~0UL`, and this. `uintP` now, which is `pointer_bitsize` wide by
+construction and is the same type `long` already was on an LP64 host.
+
+**The control is the compiler's own output**, A/B on the mirror:
+
+	LEAQ    returner+-144(SP),BP      LEAQ    my_jmp_buf+-80(SP),BP
+	MOVQL   BP,BP                     ANDQ    $-1,BP
+	ANDL    $-1,BP                    CALL    ,setjmp
+	MOVLQSX BP,BP
+	CALL    ,setjmp
+
+`MOVQL` then `MOVLQSX` — truncate, then sign-extend — is the fault,
+written out by `6c` in two instructions. Gone after.
+
+**And the sweep found no second live site**, which is worth saying
+because the first three each had one. `(long)` applied to an address
+occurs elsewhere only in `foreign.d` (the FFI: `& -(long)alignment` in
+about eight places) and in `lispbibl.d`'s `TSD_CACHE_HASH`/`TSD_HASH`.
+*Neither is compiled here* — `foreign` is not among the 31 `$CPARTS`
+and `MULTITHREAD` is off — so they are recorded rather than fixed. The
+one remaining is `eval.d:573`, a `printf` of `SP_anchor` through
+`(unsigned long)`, which prints a wrong number and cannot fault.

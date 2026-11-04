@@ -776,6 +776,21 @@ built by hand has not been measured in that position*.
   so `SINGLEMAP_MEMORY` is impossible, and a mapping cannot grow in
   place, so `TRIVIALMAP` is too — `lispbibl.d:4259` then selects the
   malloc-backed `SPVW_BLOCKS`/`SPVW_MIXED`, a supported upstream mode.
+  ***AND THE FOURTH LLP64 ONE WAS `(long)&x` ON A STACK ADDRESS.***
+  `lispbibl.d:9320`'s `sp_jmp_buf_to_jmp_buf` rounds the address of a
+  local `sp_jmp_buf` and hands it to `setjmp`; `(long)` truncated it
+  and the compiler sign-extended it back, so
+  `0x00007ffffffde498` reached `setjmp.s:34`'s `MOVQ SP,0(BP)` as
+  `0xfffffffffffde498` and faulted. **The registers named it before
+  the stack did** — `SI` held the true address and `BP` its low 32
+  bits sign-extended, to the digit — and *a STACK address is what made
+  it visible*: non-canonical, so it traps, where a heap pointer
+  mangled the same way would have scribbled and survived. `uintP`
+  now. **The control is `6c`'s own output**: `MOVQL BP,BP` then
+  `MOVLQSX BP,BP` around the `ANDL`, and neither after. **A sweep
+  found no second LIVE site** — the other `(long)`-on-an-address casts
+  are in `foreign.d` and `MULTITHREAD`, neither of which this port
+  compiles.
   **What is left is the runtime mkfile replacing `makemake`** (4108
   lines); `$CPARTS` is already enumerated in `mkfile.rebuild`, and the
   hard half is the Lisp bootstrap, which RUNS `lisp.run` to build the
