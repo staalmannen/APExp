@@ -1,0 +1,73 @@
+#!/bin/rc
+# debug-stage1 -- run clisp's stage-1 bootstrap and dump the LISP STACK
+# at the first error.
+#
+#	cd sys/src/ape/cmd/clisp && ./debug-stage1
+#
+# ***THIS EXISTS BECAUSE THE COMMAND IS EASIER TO GET WRONG THAN TO
+# RUN.*** Three attempts at it by hand produced three DIFFERENT wrong
+# answers, none of them about clisp:
+#
+#   - `-lp .../src' without the TRAILING SLASH.  `spvw.d:3458' pushes
+#     the raw string onto `*LOAD-PATHS*', and a load of a bare name
+#     MERGES against each entry -- so a pathname whose NAME is `src'
+#     has that name REPLACED, and `defseq' is looked for as
+#     `.../external/clisp/defseq'.  The answer was
+#     `LOAD: A file with name defseq does not exist', which reads like
+#     a missing file and is a missing slash.  `mkfile.runtime' spells
+#     it `SRC=$srcroot/src/' and is right.
+#   - `"$Sinit.lisp"' instead of `"${S}init.lisp"', which is the
+#     variable `$Sinit' (unset) followed by `.lisp'.  The answer was
+#     `OPEN: No file name given: #P".../build-amd64/.lisp"'.
+#   - `:bt' at the break prompt, which printed NOTHING -- the debugger's
+#     command table is built in `reploop.lisp:350', and `reploop' loads
+#     far later in `$LPARTS' than anything failing this early.  **The
+#     Lisp debugger cannot be the instrument for a bootstrap bug.**
+#
+# `EXT::SHOW-STACK' can, because `debug.d:1524' makes it a
+# SYSTEM-FUNCTION -- C, present from startup, needing nothing loaded.
+# So is the break loop that reads it: `debug.d:578',
+# `INITIAL-BREAK-DRIVER'.  `-on-error debug' is what reaches it in a
+# non-interactive run (`spvw.d:2672', and the action is a SEPARATE
+# argument).
+#
+# READ THE TOP OF THE OUTPUT.  The dump is deepest-frame-first, so the
+# first twenty or so frames are the ones that matter; everything below
+# is the `LOAD' machinery and the driver.
+#
+# **`#<ADDRESS #x000000000000>` AT THE BOTTOM IS NORMAL** and is worth
+# knowing before it misleads someone: that is `nullobj', which
+# `lispbibl.d:7081' defines as `make_machine(0)'.  ADDRESS objects on
+# the stack are ordinary padding -- so an ADDRESS arriving where a
+# hash table belongs is a value coming from the wrong PLACE, not a
+# pointer that was damaged.
+#
+# rc rather than sh, because 9front always has rc and this tree's
+# other harnesses are rc for the same reason.  Leading assignments
+# only, `^' for concatenation, and the whole `-x' form built as ONE
+# word -- `CLAUDE.md's rc rules, which cost a round each.
+
+if (~ $#objtype 0) objtype=amd64
+
+root=`{cd ../../../../.. && pwd}
+src=$root^'/sys/src/external/clisp/src/'
+build=./build-^$objtype
+
+if (! test -f $src^'init.lisp') {
+	echo 'debug-stage1: no '^$src^'init.lisp' >[1=2]
+	echo 'debug-stage1: run me from sys/src/ape/cmd/clisp' >[1=2]
+	exit wrongdir
+}
+if (! test -x $build^'/lisp.run') {
+	echo 'debug-stage1: no '^$build^'/lisp.run -- mk first' >[1=2]
+	exit nobuild
+}
+
+echo 'debug-stage1: -lp '^$src
+echo 'debug-stage1: cwd '^$build
+
+cd $build
+echo '(ext::show-stack)' | ./lisp.run -B ./ -E UTF-8 -Epathname 1:1 -Emisc 1:1 \
+	-norc -on-error debug -m 2MW \
+	-lp $src \
+	-x '(load "'^$src^'init.lisp")'

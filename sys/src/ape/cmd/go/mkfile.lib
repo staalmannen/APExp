@@ -17,13 +17,38 @@ GOTOOLDIR=$GOSRCABS/pkg/tool/plan9_$GOARCH
 # cmd/go's second bootstrap round leaves go_bootstrap and the Go compiler
 # tools in GOTOOLDIR. This pass runs only after ape/cmd, so it can use
 # those tools to build the standard libraries and the final go command.
+#
+# ***INSTALL THE `go' THAT `install cmd/go' BUILT, NOT `go_bootstrap'.***
+# This line was `cp $GOTOOLDIR/go_bootstrap $BIN/go', which threw away
+# the output of the step on the line above it.  `go_bootstrap' is
+# `cmd/go' built with `-tags cmd_go_bootstrap', and
+# `src/cmd/go/bootstrap.go' is what that tag selects: `httpGET' and
+# `httpsOrHTTP' become stubs returning `no http in bootstrap go
+# command', so `go get' cannot work.  *Everything else -- build,
+# install, test, run -- does*, which is why the wrong binary would have
+# looked fine for a long time.  `go install cmd/go' puts the real one in
+# `$GOROOT/bin/go' (no GOBIN is set here).
+#
+# UNMEASURED: go does not build yet, so this file has never run.  See
+# `docs/notes/ports.md'.
+#
+# WHAT GO NEEDS AT RUNTIME, and why none of it is installed outside the
+# source tree: `GOROOT_FINAL' is baked as
+# `$APEXPROOT/sys/src/external/go1.4' by `mkfile.bootstrap', so the
+# finished `go' reads `$GOROOT/pkg/tool/plan9_$GOARCH' (the tools
+# `mkfile.rebuild's `go-dist bootstrap' leaves), `$GOROOT/pkg/plan9_
+# $GOARCH' (the std archives `install std' above leaves) and
+# `$GOROOT/src' (the std SOURCES, which `go build' needs to compile
+# anything).  **All three live in the repo, and all of `pkg' is build
+# output** -- nothing there can be pre-installed into git, and
+# `.gitignore' covers it so a built tree still reads cleanly.
 all:V:
 	mk install
 
 install:V:
 	cd $GOSRC/src && $GOTOOLDIR/go_bootstrap install std
 	cd $GOSRC/src && $GOTOOLDIR/go_bootstrap install cmd/go
-	cp $GOTOOLDIR/go_bootstrap $BIN/go
+	cp $GOSRCABS/bin/go $BIN/go
 
 installall:V:
 	mk install

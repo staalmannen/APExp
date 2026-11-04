@@ -3304,3 +3304,59 @@ about eight places) and in `lispbibl.d`'s `TSD_CACHE_HASH`/`TSD_HASH`.
 and `MULTITHREAD` is off — so they are recorded rather than fixed. The
 one remaining is `eval.d:573`, a `printf` of `SP_anchor` through
 `(unsigned long)`, which prints a wrong number and cannot fault.
+
+
+### What clisp and go actually need INSTALLED, and what can be pre-seeded
+
+Asked directly, and answered from the mkfiles rather than from memory.
+
+**clisp installs nothing at all today.** `mkfile.runtime`'s rule is
+`install:V: build` and `build:V: base`, so `mk install` runs the
+three-stage bootstrap in `build-amd64` and stops there. Upstream's
+`install-bin` (`makemake.in:3572`) lays out a `lisplibdir` holding
+
+	base/lisp.run      base/lispinit.mem
+	data/UnicodeDataFull.txt   data/Symbol-Table.text
+	linkkit/  build-aux/  full/   (and dynmod/ with dynamic modules)
+
+and builds the `clisp` DRIVER from `clisp.c` with
+`-DLISPLIBDIR='"..."'` baked in. For this port `linkkit`, `build-aux`
+and `dynmod` are for building EXTERNAL MODULES, which
+`--without-dynamic-modules` rules out.
+
+***NOTHING NEEDS PRE-INSTALLING IN GIT, AND THE REASON IS WORTH
+KEEPING.*** There are exactly two runtime data files,
+`DATA_FILES="UnicodeDataFull.txt Symbol-Table.text"`
+(`makemake.in:2756`), read by `describe.lisp:687` and `clhs.lisp:318`
+through `clisp-data-file`. **Both are already tracked**, as
+`utils/unicode/UnicodeDataFull.txt` and `doc/Symbol-Table.text` —
+`install` only COPIES them into `data/`. Everything else is build
+output: `lisp.run` is compiled, and `lispinit.mem` is what the
+bootstrap produces, so it cannot be seeded by definition.
+
+**go installs the std library already, and the line after it threw the
+result away.** `mkfile.lib` runs `go_bootstrap install std` and then
+`go_bootstrap install cmd/go` — and then did
+`cp $GOTOOLDIR/go_bootstrap $BIN/go`, which copies the BOOTSTRAP
+binary and discards the `go` the previous line just built into
+`$GOROOT/bin/go`. `go_bootstrap` is `cmd/go` with
+`-tags cmd_go_bootstrap`, and `src/cmd/go/bootstrap.go` is what that
+selects: `httpGET` and `httpsOrHTTP` become stubs answering *no http
+in bootstrap go command*. **So `go get` is the only thing that would
+have failed** — build, install, test and run all work — which is why
+the wrong binary could have shipped unnoticed. Now
+`cp $GOSRCABS/bin/go $BIN/go`. *Unmeasured: go does not build yet.*
+
+**And go needs no `sys/lib` either**, because `GOROOT_FINAL` is baked
+as `$APEXPROOT/sys/src/external/go1.4`: the tools
+(`pkg/tool/plan9_$GOARCH`, from `go-dist bootstrap`), the std archives
+(`pkg/plan9_$GOARCH`, from `install std`) and the std SOURCES (`src/`,
+which `go build` needs to compile anything) all live in the repo. All
+of `pkg/` is compiled, architecture-specific output, so none of it is
+seedable; `.gitignore` covers `pkg/` and `bin/` so a built tree still
+reads cleanly, which matters because **git is the only channel to the
+VM**.
+
+*The distinction `.gitignore` already states applies to both*: a
+generated file something on the VM must READ gets committed; one the
+build reproduces does not.
