@@ -2533,8 +2533,32 @@ local maygc uintC file_namestring_parts (object pathname) {
  can trigger GC */
 local maygc object whole_namestring (object pathname) {
   var uintC stringcount = 0;
+  /* APExp instrument, $APEXP_PNDEBUG.  `probe_pathname' faulted reading
+     namestring_asciz[bytelen-1] with bytelen 0 -- an EMPTY namestring --
+     and the only way to get one is stringcount 0, which means
+     `directory_namestring_parts' took its `!mconsp(directory)' early
+     return.  This prints the record's raw slots so the broken one is
+     named rather than guessed.  It is guarded by the environment and
+     prints to stderr because the process dies immediately after, so a
+     buffered stdout would lose it.  Remove once the bug is named. */
+  if (getenv("APEXP_PNDEBUG") != NULL) {
+    var uintC i;
+    fprintf(stderr,"APExp wns: obj=0x%llx pathnamep=%d",
+            (unsigned long long)as_oint(pathname),(int)!!pathnamep(pathname));
+    if (orecordp(pathname)) {
+      fprintf(stderr," rectype=0x%x reclen=%u",
+              (unsigned)Record_type(pathname),(unsigned)Xrecord_length(pathname));
+      for (i = 0; i < (uintC)Xrecord_length(pathname); i++)
+        fprintf(stderr," [%u]=0x%llx",(unsigned)i,
+                (unsigned long long)as_oint(TheRecord(pathname)->recdata[i]));
+    }
+    fprintf(stderr," pathname_length=%u dirparts=%u\n",
+            (unsigned)pathname_length,(unsigned)stringcount);
+  }
   stringcount += directory_namestring_parts(pathname);
   stringcount += file_namestring_parts(pathname);
+  if (getenv("APEXP_PNDEBUG") != NULL)
+    fprintf(stderr,"APExp wns: total parts=%u\n",(unsigned)stringcount);
   return string_concat(stringcount);
 }
 
