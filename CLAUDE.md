@@ -230,7 +230,12 @@ because an address kept in a pointer variable spells a `LEAQ`, which is
 a `D_ADDR`, which `mkvar` already marked. *The bug was never "the
 address was taken", it was "the address was taken and FOLDED INTO the
 memory reference"* — and it cannot be written with a union, which would
-test the path that already worked).
+test the path that already worked), **`leawide-test`** (***the third
+member of the wide-constant family***: x86-64 has `MOV r64, imm64` and
+NO 64-bit `CMP` immediate and NO 64-bit address DISPLACEMENT.
+`6c/cgen.c:346` folds `(x<<k) + C` into `LEAQ C(base)(index*2^k)` and
+refused only a SMALL `C`, never a wide one. **Sections 4 and 5 are
+controls that pass against a broken compiler.**).
 **`truefalse-test.c` is the one NATIVE test here** — `6c`/`6l`, not
 `pcc` — and has to be: APE's `<stdbool.h>` `#define`s `true`/`false`, so
 a TU that INCLUDES that header never reaches kencc's own C23 keywords.
@@ -1643,6 +1648,24 @@ overlapping accesses in `addrs`; `agree.c` is identical before and
 after, which is what says ordinary code does not move. **6c only** —
 all ten carry the keying but their `mkvar` signatures differ, so the
 other nine are in 0.6's inventory with the mechanism, 8c first.
+***AND THE THIRD WIDE-CONSTANT ONE WAS `LEAQ`.*** `6c/cgen.c:346`
+folds `(x<<k) + C` into `genmuladd`, an
+`LEAQ C(base)(index*2^k)`, and refused only a SMALL `C` — so
+`((u64)3<<48) + ((n<<1)+1)` compiled to
+`LEAQ 844424930131969(NONE)(BP*2)`, correct arithmetic and **not an
+instruction**, which `6l` wrote with `put4`. clisp's
+`make_small_read_label` is that shape, so every `#n#` reader label
+lost its TYPE TAG and became oint 3. `immconst` guards the fold now,
+and `6l`'s `asmandsz` **diags** instead of truncating — *making the
+linker loud FIRST is what named the two sites*, and the host count
+agrees from the other end: 2 wide `LEAQ` displacements in clisp's 31
+TUs before, 0 after. ***AND THE OBJECT WAS MISIDENTIFIED FOR FOUR
+ROUNDS***: `#<ADDRESS #x3>` matches `make_small_read_label(1)`'s
+arithmetic, so four instruments were built hunting a substitution
+failure that never existed. A read label prints `#<READ-LABEL n>`;
+`#<ADDRESS ...>` is `pr_machine`, a different type. **An object's
+value matching a constructor's arithmetic is not that object — ask
+what PRINTS it.**
 
 **The ABI move of this release is `-J`, conforming struct layout, on by
 default in `pcc`.** `pcc -9` is the way back and exists for the

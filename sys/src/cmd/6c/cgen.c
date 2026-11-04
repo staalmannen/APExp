@@ -343,8 +343,24 @@ cgen(Node *n, Node *nn)
 				break;
 			}
 		}
+		/*
+		 * `genmuladd' below builds `LEAQ disp(base)(index*scale)', and
+		 * **an x86-64 address displacement is imm32 with no imm64
+		 * form**.  This test already refused a SMALL constant, because
+		 * `ADDQ' is better for one, and never refused a WIDE one -- so
+		 * `((u64)3<<48) + (n<<1)' compiled to
+		 * `LEAQ 844424930131968(NONE)(BP*2),AX', correct arithmetic
+		 * and not an instruction, which `6l' then wrote with `put4'.
+		 *
+		 * clisp's `make_small_read_label(n)' is exactly that shape, so
+		 * every `#n#' read label lost its type tag and came out as
+		 * oint 3; `sys/lib/tests/leawide-test.c' is the case.
+		 * `immconst' is the same fit test `hardconst' uses for the
+		 * `CMPQ r,$sym+off(SB)' member of this family.
+		 */
 		if(n->op == OADD && l->op == OASHL && l->right->op == OCONST
-		&& (r->op != OCONST || r->vconst < -128 || r->vconst > 127)) {
+		&& (r->op != OCONST
+		    || ((r->vconst < -128 || r->vconst > 127) && immconst(r)))) {
 			c = l->right->vconst;
 			if(c > 0 && c <= 3) {
 				if(l->left->complex >= r->complex) {
