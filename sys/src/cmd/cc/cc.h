@@ -96,7 +96,34 @@ struct	Node
 	void*	label;
 	long	pc;
 	int	reg;
-	long	xoffset;
+	/*
+	 * `xoffset' is an ADDRESS offset, so it must be as wide as a
+	 * target address and not as wide as a target `long'.  It was
+	 * `long', and on an LLP64 target -- which is every 64-bit kencc
+	 * backend, and which the HOST build is not -- that silently drops
+	 * the top half of any offset above 2^31.
+	 *
+	 * The visible fault was clisp.  `L(name)' builds a SUBR object as
+	 * `&subr_tab_data.D_name + (subr_type << 48)', so the type tag is
+	 * a link-time constant with bit 48 set, and `6c/sgen.c:122's
+	 * `xcom' folds exactly that shape -- `ADD(CONST, ADDR(NAME))' --
+	 * into the NAME by `l->xoffset += r->vconst'.  With a 32-bit
+	 * `xoffset' the tag was gone before the object file was written,
+	 * so every CLISP object built this way arrived untyped and
+	 * `funcall' rejected it.
+	 *
+	 * `sys/lib/tests/tagconst-probe.c' is the five-line case, and it
+	 * is worth saying how the hunt ran, because the measurement is
+	 * what named the right file: the probe reported the COMPILER
+	 * already emitting the truncated constant, which cleared both the
+	 * object-file writer and the linker; narrowing `naddr's local `v'
+	 * on a host build then FAILED to reproduce it, which cleared the
+	 * `OADD' case there; and `6c -S -t' printing the tree after each
+	 * pass showed the constant arriving inside the NAME at the `x'
+	 * pass.  *Two of the three candidates were refuted by experiment
+	 * rather than by reading.*
+	 */
+	vlong	xoffset;
 	double	fconst;		/* fp constant */
 	vlong	vconst;		/* non fp const */
 	char*	cstring;	/* character string */

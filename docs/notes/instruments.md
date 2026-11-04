@@ -1021,3 +1021,43 @@ same way.
 
 Use `6c -J -p` for anything that `pcc` would build, and plain `6c` only
 for what `6c` would build (`cmd2/vts`, `vtwin`).
+
+## `tagconst-probe.c` — a wide link-time constant, three outcomes
+
+**From**: clisp's `lisp.run` dying in `init_reader`, because
+`funcall(L(make_hash_table),4)` got something it did not recognise as a
+function. `L(name)` is `&subr_tab_data.D_name + (subr_type << 48)`, so
+the type tag is a link-time constant with bit 48 set.
+
+**What it is**: five lines, no headers and no libc — which is deliberate,
+so that `6l -l -a` can link it and the LINKER's encoding can be read as
+well as the compiler's. Two commands, and **three** named outcomes:
+both right; the linker truncated; the object file truncated. *A probe
+whose negative result would have had two explanations was written with
+three lines of output instead.*
+
+**What it cost, and what it bought**: it was written after a round spent
+reading `6l` — `zaddr`'s reader and writer, `vaddr`, `oclass`, `optab` —
+all of which a host-built toolchain gets right end to end, so the
+reading cleared each of them and named no cause. The probe's FIRST
+command on the VM printed the truncated constant out of `6c -S`, which
+cleared the object file and the linker together and moved the hunt into
+the compiler. **The file's own header said the next thing to find was a
+`long` inside `6l`; the field was `cc/cc.h`'s `Node.xoffset`.**
+
+**The visible fault**: yes. `cc/cc.h`'s `Node.xoffset` was `long`, 32
+bits under kencc, and `6c/sgen.c:122`'s `xcom` folds
+`ADD(CONST, ADDR(NAME))` into the NAME through it.
+
+**Its companion instrument is a CONTROL, not a probe**, and it is the
+part that is worth reusing: a gcc-built host compiler has a 64-bit
+`long` and therefore cannot reproduce the VM's truncation, so the field
+was narrowed to `int` on purpose and the host `6c` then printed the VM's
+answer to the digit. The same control refuted two other candidates —
+`naddr`'s local `v` and `zaddr`'s `l` — by narrowing them and finding
+the output unchanged. *Reproduce the fault by narrowing the suspect
+field; widening it and re-measuring cannot tell a fix that was needed
+from one that was not.*
+
+**Now a regression test**: the right answer is
+`MOVQ $subr_tab_data+281474976716536(SB)` from both commands.

@@ -528,7 +528,7 @@ cgenrel(Node *n, Node *nn, int inrel)
 				diag(n, "DOT and no offset");
 				break;
 			}
-			nod.xoffset += (long)r->vconst;
+			nod.xoffset += r->vconst;
 			nod.type = n->type;
 			cgen(&nod, nn);
 		}
@@ -976,7 +976,7 @@ sugen(Node *n, Node *nn, long w)
 				diag(n, "DOT and no offset");
 				break;
 			}
-			nod1.xoffset += (long)r->vconst;
+			nod1.xoffset += r->vconst;
 			nod1.type = n->type;
 			sugen(&nod1, nn, w);
 		}

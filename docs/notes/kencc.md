@@ -2794,3 +2794,108 @@ goes to fd 1. The first version of the `--probe` sweep captured
 the wrong reason*, and it was caught only because this tree had already
 written down that the answer is eight of ten. A harness for a Plan 9
 compiler must capture stdout.
+
+## `Node.xoffset` was 32 bits, so an address offset above 2^31 was lost
+
+**The symptom was in clisp and not in the compiler.** `lisp.run` reached
+`init_reader` and died: `funcall(L(make_hash_table),4)` was handed
+something `funcall` did not recognise as a function. `L(name)` builds a
+SUBR object as
+
+	&subr_tab_data.D_name + (subr_type << 48)
+
+so the type tag is a LINK-TIME CONSTANT with bit 48 set. `acid: asm()`
+on the running binary showed
+
+	allocate_syntax_table+0x44   MOVL $0x41d5b0,BP
+
+where `6c -S` for the same line on the BUILD HOST was
+
+	MOVQ $subr_tab_data+281474976722416(SB),BP
+
+— 281474976722416 being `(1<<48) + 0x2DF0`. **Every CLISP object built
+this way was arriving untyped.**
+
+### The measurement, which is the part worth copying
+
+`sys/lib/tests/tagconst-probe.c` is the five-line case: a `long a[8000]`
+in an `extern struct`, and `return (uchar*)&s.a[1470] + ((uint64)1<<48);`.
+It needs no headers and no libc, so `6l -l` can link it, and it was
+written with **three** named outcomes rather than two — compiler right
+and linker right, linker truncated, or object file truncated — because
+the compiler and the linker can each lose the constant on their own and
+the symptom is identical.
+
+**The answer was the third one, which no reading had predicted.** The
+VM's very first command,
+
+	6c -S tagconst-probe.c | grep MOV
+	    MOVQ	$subr_tab_data+5880(SB),AX
+
+cleared the object-file writer and the linker in one line. The note in
+the probe at the time said the next thing to find was "a `long` inside
+`6l` holding something 64 bits wide"; the field was in `6c`, and *the
+plausible reading named the wrong component while the cheap measurement
+named the right one.*
+
+From there, three candidates and two refutations, all on the host:
+
+- **`6c/txt.c`'s `naddr` local `long v`**, which the `OADD` case adds
+  into `a->offset`. Narrowed to `int` on a host build: output
+  **unchanged**. Refuted — this expression never reaches that case.
+- **`6c/swt.c`'s `zaddr` local `long l`**, the object-file writer's
+  truncation test for `T_64`. Already fixed in `6c`, `7c` and `9c` for
+  its own sake, and already known to be inert on Plan 9 where `long` is
+  32 bits anyway. Not this.
+- **`cc/cc.h`'s `Node.xoffset`, declared `long`.** Found by printing the
+  tree after each pass — `6c -S -t` — which shows
+
+	 == a complex ==
+	   ADD IND UCHAR
+	      CONST "281474976716536" IND UCHAR
+	      ADDR IND LONG / NAME "subr_tab_data" 0
+
+	 == x complex ==
+	   ADDR <13> IND UCHAR
+	      NAME "subr_tab_data" 281474976716536 <10> LONG
+
+  so the constant is folded INTO THE NAME at the `x` pass, by
+  `6c/sgen.c:122`'s `xcom`: `l->xoffset += r->vconst;`.
+
+**The control is what made it a result rather than a third hypothesis.**
+A gcc-built host compiler has a 64-bit `long` and therefore cannot
+reproduce the VM's truncation by itself — so `xoffset` was narrowed to
+`int` on purpose, and the host `6c` then printed `+5880`, the VM's answer
+to the digit. Restored, it prints the full constant. *Reproduce the fault
+by narrowing the field, not by widening it and hoping.*
+
+### The fix, and its two companions
+
+- `Node.xoffset` is `vlong`. It is an ADDRESS offset, so it must be as
+  wide as a target address and not as wide as a target `long`; `Adr.offset`
+  is already `vlong` in `6c`, `7c` and `9c`. Three `%ld` in `cc/sub.c`'s
+  `prtree1` become `%lld`, and the eight `xoffset += (long)r->vconst`
+  casts in the backends' `ODOT` cases lose the now-pointless `(long)`.
+- **`6c`'s and `8c`'s `sconst()` had `long v`** where the other eight
+  backends already say `vlong vv`. `v = n->vconst` then holds the LOW
+  HALF of a wide constant and passes the `±32766` range test, so
+  `(uvlong)1<<48` came through `sconst` as 0 and was called *small*.
+  Both now `vlong`.
+- `naddr`'s `v` is `vlong` in `6c`, `7c` and `9c` — refuted as clisp's
+  path, but it narrows `Adr.offset` on the way through the function in
+  all three and is wrong for the same reason.
+
+`5c`, `kc`, `qc` and `vc` keep `long Adr.offset`, so their `naddr` is
+internally consistent and is left alone; that `kc` and `vc` are 64-bit
+targets with a 32-bit `Adr.offset` is a bigger thing and neither builds
+anything today.
+
+### What was checked afterwards
+
+- `agree.c`, the codegen control, is **identical before and after** —
+  131 lines each, no instruction moved. The change is inert on
+  everything that corpus covers and reaches only the wide-offset case.
+- All ten backends build with gcc, and `hostkencc.sh --probe` reproduces
+  the recorded answer exactly: ten compile `regpair-min`, eight compile
+  `regpair-probe`, `kc` and `vc` fail at `:242`.
+- `clisp-mirror.sh --compile`: 31 translation units, 0 errors.
