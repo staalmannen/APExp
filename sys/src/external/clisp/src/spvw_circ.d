@@ -2066,6 +2066,22 @@ local void subst_circ_mark (gcv_object_t* ptr)
           } else
       #endif
           case_small_read_label: { /* Small-Read-Label */
+            /* APExp instrument, $APEXP_RLDEBUG.  This is the GC-mark
+               implementation, the one a non-MULTITHREAD build uses.
+               `defs1.lisp's `macrolet' at :294-429 is ONE top-level
+               form holding `#1=' once (:312) and `#1#' SIX times
+               (:327,345,360,378,393,425), and `SET-DIFFERENCE's (:378)
+               reached the compiled function unsubstituted while
+               `make_references' reported the table at 1 entry and
+               `subst_circ' reported ok.  So the walk ran and missed at
+               least one: COUNT THE VISITS.  Six means every `#1#' was
+               reached and the fault is in the replacement; fewer means
+               the walk stopped early, and `case_cons's
+               `if (marked(...)) return' is then the thing to read.
+               Volume is one line per label occurrence. */
+            if (getenv("APEXP_RLDEBUG") != NULL)
+              fprintf(stderr,"APExp subst_circ: label oint=0x%llx\n",
+                      (unsigned long long)as_oint(obj));
             /* Search read-label obj in the Alist: */
             var object alist = subst_circ_alist;
             while (consp(alist)) {
