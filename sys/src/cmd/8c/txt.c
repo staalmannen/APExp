@@ -1419,11 +1419,18 @@ gpseudo(int a, Sym *s, Node *n)
 int
 sconst(Node *n)
 {
-	long v;
+	/*
+	 * `vlong', as the other eight backends already spell it: `vconst'
+	 * is a vlong, so a 32-bit `v' holds the LOW HALF of a wide
+	 * constant and then passes the range test.  `(uvlong)1<<48' came
+	 * through here as 0 and was called small, which is the same LLP64
+	 * family as `Node.xoffset' in `cc/cc.h'.
+	 */
+	vlong v;
 
 	if(n->op == OCONST && !typefd[n->type->etype]) {
 		v = n->vconst;
-		if(v >= -32766L && v < 32766L)
+		if(v >= -32766LL && v < 32766LL)
 			return 1;
 	}
 	return 0;

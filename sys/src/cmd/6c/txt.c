@@ -453,7 +453,15 @@ regind(Node *n, Node *nn)
 void
 naddr(Node *n, Adr *a)
 {
-	long v;
+	/*
+	 * `vlong', because `Adr.offset' is a vlong here and so is
+	 * `Node.vconst': a 32-bit `v' narrows an address offset on the
+	 * way through this function.  Measured NOT to be clisp's
+	 * truncation -- narrowing it on a host build did not reproduce
+	 * that, which is how `cc/cc.h's `xoffset' was found instead --
+	 * but it is the same family and wrong for the same reason.
+	 */
+	vlong v;
 
 	a->type = D_NONE;
 	if(n == Z)
@@ -1518,11 +1526,18 @@ gpseudo(int a, Sym *s, Node *n)
 int
 sconst(Node *n)
 {
-	long v;
+	/*
+	 * `vlong', as the other eight backends already spell it: `vconst'
+	 * is a vlong, so a 32-bit `v' holds the LOW HALF of a wide
+	 * constant and then passes the range test.  `(uvlong)1<<48' came
+	 * through here as 0 and was called small, which is the same LLP64
+	 * family as `Node.xoffset' in `cc/cc.h'.
+	 */
+	vlong v;
 
 	if(n->op == OCONST && !typefd[n->type->etype]) {
 		v = n->vconst;
-		if(v >= -32766L && v < 32766L)
+		if(v >= -32766LL && v < 32766LL)
 			return 1;
 	}
 	return 0;

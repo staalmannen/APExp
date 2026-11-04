@@ -455,7 +455,15 @@ raddr(Node *n, Prog *p)
 void
 naddr(Node *n, Adr *a)
 {
-	long v;
+	/*
+	 * `vlong', because `Adr.offset' is a vlong here and so is
+	 * `Node.vconst': a 32-bit `v' narrows an address offset on the
+	 * way through this function.  Measured NOT to be clisp's
+	 * truncation -- narrowing it on a host build did not reproduce
+	 * that, which is how `cc/cc.h's `xoffset' was found instead --
+	 * but it is the same family and wrong for the same reason.
+	 */
+	vlong v;
 
 	a->type = D_NONE;
 	if(n == Z)

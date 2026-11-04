@@ -62,18 +62,18 @@ prtree1(Node *n, int d, int f)
 	{
 	case ONAME:
 		print(" \"%F\"", n);
-		print(" %ld", n->xoffset);
+		print(" %lld", n->xoffset);
 		i = 0;
 		break;
 
 	case OINDREG:
-		print(" %ld(R%d)", n->xoffset, n->reg);
+		print(" %lld(R%d)", n->xoffset, n->reg);
 		i = 0;
 		break;
 
 	case OREGISTER:
 		if(n->xoffset)
-			print(" %ld+R%d", n->xoffset, n->reg);
+			print(" %lld+R%d", n->xoffset, n->reg);
 		else
 			print(" R%d", n->reg);
 		i = 0;

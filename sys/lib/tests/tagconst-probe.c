@@ -6,7 +6,26 @@
  *	6c -o tagconst-probe.6 tagconst-probe.c
  *	6l -l -a -o /dev/null tagconst-probe.6 | grep MOV   # what the LINKER emits
  *
- * ***A PROBE, AND IT HAS THREE OUTCOMES RATHER THAN TWO.*** Report all
+ * ***ANSWERED, AND IT IS A REGRESSION TEST NOW.*** The right answer is
+ *
+ *	MOVQ	$subr_tab_data+281474976716536(SB),AX
+ *
+ * from both commands. Anything else is a regression; the three outcomes
+ * below say which stage lost it.
+ *
+ * ***THE ANSWER WAS THE THIRD ONE, WHICH IS WHY THIS FILE EXISTS.***
+ * The VM's `6c -S' already printed `+5880' -- so the object file and
+ * the linker were both cleared by the first command, and the hunt moved
+ * into the compiler. `cc/cc.h's `Node.xoffset' was `long', 32 bits
+ * under kencc, and `6c/sgen.c:122's `xcom' folds `ADD(CONST,
+ * ADDR(NAME))' into the NAME with `l->xoffset += r->vconst'. The
+ * CONTROL is the measurement that names the field: narrow `xoffset' to
+ * `int' in a HOST build and this probe prints `+5880', restore it and
+ * it prints the full constant. *The two other candidates -- `naddr's
+ * local `v' and the `zaddr' writer -- were refuted the same way, by
+ * narrowing them and finding the output unchanged.*
+ *
+ * ***A PROBE WITH THREE OUTCOMES RATHER THAN TWO.*** Report all
  * three lines; the pair is the measurement, because compiler and linker
  * can each lose the constant on their own and the symptom is identical.
  *
@@ -57,11 +76,19 @@
  *     `arch/*''/fenv.s'.)*
  *
  * So a host-built toolchain gets this RIGHT end to end. The VM does
- * not. The remaining difference is that `6l' itself is compiled by
- * kencc there, where `long' is 32 bits -- so the next thing to find is
- * a `long` inside `6l' holding something 64 bits wide. *This probe is
- * what separates "the object file lost it" from "the encoder lost it"
- * without reading any more source.*
+ * not. The remaining difference is that the toolchain itself is
+ * compiled by kencc there, where `long' is 32 bits -- so the next thing
+ * to find is a `long` inside it holding something 64 bits wide. *This
+ * probe is what separates "the object file lost it" from "the encoder
+ * lost it" without reading any more source* -- and it answered a
+ * question neither of those was: `6c' never put the constant in the
+ * object file at all.
+ *
+ * ***THE LINE ABOVE SAID `6l' AND THE FIELD WAS IN `6c'.*** The guess
+ * was reasonable -- the linker was the one component still built by
+ * kencc that had not been read -- and it was wrong, and the probe's
+ * FIRST command settled it in one line. *Which is the argument for
+ * running the cheap measurement before the plausible reading.*
  *
  * It needs no headers and no libc, which is why `6l -l' can link it.
  */

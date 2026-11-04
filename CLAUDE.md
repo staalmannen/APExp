@@ -433,6 +433,12 @@ whether they COMPILE** — the bug they found is FIXED, so they are
 regression tests now, and **the only things here that ask a non-amd64
 backend anything**: run both against all ten `[1-9kqv]c` after any
 change to `cc/`'s type tables),
+`tagconst-probe` (**native, `6c -S` AND `6l -l -a`, and its answer is
+now fixed**: `MOVQ $subr_tab_data+281474976716536(SB)` from both. It
+was built with THREE outcomes rather than two, because compiler,
+object file and linker each lose a wide link-time constant with the
+same symptom — and the third is the one that happened. *Its first
+command refuted the reading the file itself was written on*),
 `devreg-probe` (**no host form and `pcc` only** — which files APE calls
 regular and whether `select()` then reports them readable; the subject
 is what *rio* serves, so run it in a rio window with no wish running,
@@ -1575,7 +1581,18 @@ wide case label, the compound-literal zero fill, and both bit-field
 rules with the static initialiser underneath them; **cpp's missing
 hideset INTERSECTION, which stopped a macro expanding inside the body
 of any macro whose name was built by `##`** — and the hash-interning
-underneath it, which made cpp 27x faster on clisp's biggest file.
+underneath it, which made cpp 27x faster on clisp's biggest file;
+**`cc/cc.h`'s `Node.xoffset` being `long`, so `6c` silently dropped the
+top half of any address offset above 2^31** — `xcom` folds
+`ADD(CONST, ADDR(NAME))' into the NAME, and clisp's `L(name)` puts its
+type tag at bit 48, so every CLISP SUBR object arrived untyped.
+`vlong` now, with `sconst`'s own 32-bit `v` in `6c`/`8c` beside it
+(a wide constant came through as 0 and was called *small*).
+***The control is the thing to copy***: a gcc-built host `6c` has a
+64-bit `long` and cannot reproduce the fault, so the field was
+NARROWED on purpose and the host then printed the VM's answer to the
+digit. `tagconst-probe.c` is the five-line case and is a regression
+test now; `agree.c` is identical before and after.
 
 **The ABI move of this release is `-J`, conforming struct layout, on by
 default in `pcc`.** `pcc -9` is the way back and exists for the
