@@ -2899,3 +2899,76 @@ anything today.
   the recorded answer exactly: ten compile `regpair-min`, eight compile
   `regpair-probe`, `kc` and `vc` fail at `:242`.
 - `clisp-mirror.sh --compile`: 31 translation units, 0 errors.
+
+### And widening `xoffset` exposed the second half: `CMP r64, imm64`
+
+**The failure moved EARLIER, which is the tell.** With `Node.xoffset`
+widened, `lisp.run` stopped in `init_packages` — before `init_reader`,
+where it had stopped the round before. `lstk()` gave the chain
+
+	endp()+0x3b			list.d:464
+	nreverse(...)+0xc5		list.d:155
+	init_packages()+0x490
+	initmem()+0x73 / init_memory()+0x32d / main()+0x7e
+
+so `endp` had taken its error branch — the object ending the list was
+neither a cons nor NIL — and then faulted *inside the error branch*,
+`MOVQ 0x8(BP),BP` with BP 0, because `back_trace` is null when `endp` is
+called from C rather than from its LISPFUN. **That second crash is
+upstream's and is secondary**; the question is why `nullp()` said no.
+
+`hostkencc` answered it without another VM round. The host `6c` compiles
+the same `list.c` to the same instructions the VM's `asm()` showed, and
+`nullp(obj)` is
+
+	CMPQ	BP,$symbol_tab_data+1125899906842624(SB)
+
+— `NIL`, which is `type_constpointer_object(symbol_type,&symbol_tab.S_nil)`,
+an address plus a tag at bit 50. **x86-64 has `MOV r64, imm64` and has
+no `CMP r64, imm64`.** `6l/span.c`'s `oclass` returned `Yi32` for
+`$sym+off(SB)` whatever the offset — the line carried its own
+`TO DO: Yi64` — and `optab.c`'s `ycmpl` has rows for `Yi8` and `Yi32`
+only, so `Zm_ilo` called `put4` and **wrote thirty-two bits with no
+diagnostic**.
+
+***THE TWO BUGS CANCELLED, WHICH IS WHY ONLY FIXING ONE MADE THINGS
+WORSE.*** While `xoffset` was 32 bits the compiler truncated the
+constant on BOTH sides of that comparison, so `nullp()` compared two
+equally wrong values and got the right answer. Widening `xoffset` made
+the materialised NIL correct and left the compared NIL truncated, so
+every list looked dotted. *This tree's rule about a fix reaching code
+nothing reached before, in its sharpest form: the code was not new, the
+agreement was.*
+
+**Fixed in both places, and deliberately so:**
+
+- `6c/cgen.c`'s `hardconst()` now answers true for an `OADDR` whose
+  `ONAME` carries an offset that does not fit a signed 32-bit
+  immediate, so the constant is loaded into a register first. The
+  shape was already half-known: `boolgen`'s `l->addable == 13` test
+  carries the comment *"bad, 13 is address of external that becomes
+  constant"* — and only the LEFT operand was covered. `immconst()`
+  could never have caught it, because `xcom` has folded the addition
+  into the NAME and the node is not an `OCONST` at all.
+- `6l/span.c`'s `oclass` returns `Yi64` when the offset does not fit.
+  `MOVQ` then matches `ymovq`'s `Yi64,Yrl,Ziq_rp` and writes all eight
+  bytes; **everything else, `CMPQ` included, has no `Yi64` row and now
+  fails loudly in `asmins`.** That is as much the point as the `MOVQ`
+  is — `6c` should never hand the linker one, and if it does we must
+  say so rather than `put4` it. The decision is on the OFFSET alone and
+  not the final address, because symbol values are not all assigned
+  when `oclass` runs and an address is small and positive. Its `long l`
+  is `int` now, the `immconst` fix a third time.
+
+**Measured.** Across clisp's 31 translation units, compares of the shape
+`CMP[QL] reg,$sym+<wide>(SB)`: **2001 before, 0 after.** `endp` now
+loads NIL into SI and compares registers. `agree.c` is identical again,
+all ten backends build, `--probe` reproduces eight-of-ten, and the
+mirror compiles 31 TUs with 0 errors. `6l` is **not** host-built here on
+purpose, so its change is gcc syntax-checked and otherwise unmeasured
+until the VM links something.
+
+`tagconst-probe.c` grew a second function, `tagcmp`, for exactly this:
+*producing* a wide link-time constant and *comparing against* one are
+two questions with two different answers on this machine, and only the
+LINKER line distinguishes them.

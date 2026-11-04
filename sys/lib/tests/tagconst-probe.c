@@ -104,3 +104,45 @@ tagconst(void)
 {
 	return (unsigned char*)&subr_tab_data.a[1470] + ((uint64)1 << 48);
 }
+
+/*
+ * SECOND CASE, AND IT IS A SECOND QUESTION RATHER THAN A RESTATEMENT.
+ * `tagconst' asks whether the constant can be PRODUCED. This asks
+ * whether it can be COMPARED, which on x86-64 is a different question
+ * with a different answer: there is a `MOV r64, imm64' and there is
+ * no `CMP r64, imm64'.
+ *
+ * `6c -S' emits
+ *
+ *	CMPQ	BP,$subr_tab_data+281474976716536(SB)
+ *
+ * which is not an instruction. `6l/span.c's `oclass' returns `Yi32'
+ * for `$sym+off(SB)' whatever the offset -- the line carries its own
+ * `TO DO: Yi64' -- and `optab.c's `ycmpl' has rows for `Yi8' and
+ * `Yi32' only, so `Zm_ilo' calls `put4' and **thirty-two bits are
+ * written with no diagnostic**.
+ *
+ * WHERE IT CAME FROM. clisp's `nullp(obj)' is `eq(obj,NIL)' and `NIL'
+ * is `type_constpointer_object(symbol_type,&symbol_tab.S_nil)' -- the
+ * same address-plus-tag shape as `L()', with the tag at bit 50. So
+ * `endp' answered "not NIL" for NIL, every list looked dotted, and
+ * `nreverse' in `init_packages' walked off the end. *Before `xoffset'
+ * was widened both sides of that comparison were truncated and matched
+ * each other*, which is why fixing the compiler moved the failure
+ * EARLIER -- this tree's rule about a fix reaching code nothing reached
+ * before, arriving as a comparison that had been wrong in a way that
+ * cancelled.
+ *
+ * READ THE LINKER LINE, NOT THE COMPILER LINE, FOR THIS CASE. The
+ * compiler is entitled to write the constant; the question is what the
+ * encoder does with it, and the two answers are
+ *
+ *   CMPQ ... , 7 bytes  48 81 FD xx xx xx xx   -- truncated to imm32
+ *   MOVQ $...,R11 then CMPQ BP,R11             -- correct
+ */
+int
+tagcmp(void *p)
+{
+	return p == (void*)((unsigned char*)&subr_tab_data.a[1470]
+	                    + ((uint64)1 << 48));
+}
