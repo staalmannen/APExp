@@ -828,9 +828,22 @@ built by hand has not been measured in that position*.
   for every platform it does not know, and rc says the same thing in
   one line *and* stays architecture-independent, because `$objtype` is
   a runtime variable where `-DLISPLIBDIR` would have been baked in.
-  **NOT in `_OPTIONAL_APPS` yet**: `install` re-runs the whole
-  bootstrap every time (`base` is a `V:` target), and a port that has
-  only been built by hand has not been measured in that position.
+  ***AND IT EVALUATES LISP***: `clisp -x '(print (+ 1 2))'` answers
+  `3`. **It answers it TWICE and prints the banner, and both are
+  upstream's**, checked at source rather than assumed: `-x` forms go
+  to `SYS::MAIN-LOOP` through a string input stream (`spvw.d:3601`),
+  which is a read-eval-PRINT loop, so `print` writes 3 and the REPL
+  echoes the returned 3; and `argv_verbose` defaults to 2
+  (`spvw.d:2418`) with `print_banner()` at `>=2` (`:3316`), suppressed
+  automatically only for `SYS::*QUIET*` or batch mode. For a script,
+  `clisp -q -x '(progn (print (+ 1 2)) (values))'` — no banner, and
+  zero values means no echo.
+  **NOT in `_OPTIONAL_APPS` yet, and the blocker is now purely the
+  BUILD COST**: `install` depends on `build` depends on `base`, a `V:`
+  target, so a tree-wide `mk install` would re-run the whole
+  three-stage bootstrap every time. Making `install` depend on
+  `$BUILD/lispinit.mem` as a FILE instead is the change that would
+  make enabling it cheap.
 
 **Ports built and running**, each with what is NOT measured:
 - **EDG** — `cpfe` builds, runs, and translates: `c++ -v -K /tmp/t.cpp`
