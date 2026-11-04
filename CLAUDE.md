@@ -764,9 +764,18 @@ built by hand has not been measured in that position*.
   DERIVED from `makemake.in`'s own shell, not transcribed** — run with
   this port's settings and diffed against the mkfile, 86 and 86,
   identical including order, and each feature test matches a `#+`
-  guard at the end of `init.lisp`. ***NOT YET RUN***: stage 1 is the
-  cheapest thing that separates "links" from "runs", and there is no
-  `rc` on the build host, so the recipe is swept and not executed.
+  guard at the end of `init.lisp`.
+  ***STAGE 1 COMPLETES.*** `interpreted.mem` is built: every file in
+  the 86-name list loads, `config.lisp` last, the GC stats print and
+  it exits clean. So the derived list and the whole `-lp`/`-o ./`
+  arrangement are measured rather than swept, and the three
+  wide-constant compiler bugs plus `mkvar` were what stood between
+  `lisp.run' running and the bootstrap working. **Stage 2 now stops
+  compiling `compiler.lisp`**: `trap: fault read addr=0x1a`, a small
+  offset off a null-ish pointer, unattributed.
+  `sys/src/ape/cmd/clisp/debug-stage1` runs stage 1 with
+  `EXT::SHOW-STACK` armed; its header carries the three ways the
+  invocation was got wrong by hand.
   ***AND `-J` IS NOT OPTIONAL WHEN `6c` STANDS IN FOR `pcc`***: without
   it `stream.d:17311` answers `duplicate cases in switch 8`, because
   `sizeof(ffloatjanus)` is 4 under `-J` and 8 under the 9front rule.
