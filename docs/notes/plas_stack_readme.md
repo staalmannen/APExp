@@ -1,30 +1,49 @@
 # The PLAS stack: Plan 9, Listener, SQLite, PHP
 
-A web stack with no dynamic linker, no package manager and no database
-server — PHP and SQLite on 9front, served by Plan 9's own listener.
+A web stack on 9front with no dynamic linker, no package manager and no
+database server: PHP 8.5 and SQLite 3.53 as static binaries, served
+either by PHP's own built-in HTTP server or by Plan 9's listener.
 
-**STATUS: PART MEASURED, PART NOT, AND ONE PART IS KNOWN BROKEN.** The
-architecture below is attractive and most of it is reachable. It does
-not work today, and this file says which pieces are which, because a
-guide that reads as instructions when it is a plan wastes the reader's
-afternoon. Every claim marked **measured** was run; every one marked
-**unmeasured** is a prediction with the command that would settle it.
+This is a guide to trying it, and a description of what the platform
+does and does not give you. **Each claim carries its state**: *measured*
+means it was run and the output is quoted; *unmeasured* means it follows
+from the source but nobody has run it, and the command that would settle
+it is given. The distinction is the useful part of this document — a
+stack guide that reads as instructions when it is a plan costs you an
+afternoon.
 
 | piece | state |
 |---|---|
-| PHP 8.5.12 CLI binary | **measured**: builds, installs, runs, `php -v` exits 0 |
-| SQLite 3.53.4 as `libsqlite.a` | **measured**: builds, in the default build |
-| PHP *bound to* SQLite (PDO / sqlite3) | **absent**: no extension is compiled in |
-| DOM, SimpleXML, ZIP | **absent**: same reason |
-| POSIX file locking under SQLite | **BROKEN**: `fcntl` answers `EINVAL` |
-| rc-httpd / listener wiring | **unmeasured** |
-| per-request namespace isolation | **overstated** — see §4 |
+| PHP 8.5.12 CLI, 23 extensions | **measured** — builds, installs, runs |
+| SQLite 3.53.4 (`libsqlite.a` + `sqlite3` shell) | **measured** — builds, in the default build |
+| `SQLite3` class in PHP | **measured on the build host**, not yet on 9front |
+| file-backed SQLite **writes** | **unmeasured, and the one likely blocker** — see §3 |
+| `php -S` built-in HTTP server | **unmeasured** — compiled in, see §4 |
+| rc-httpd / `listen1` wiring | **unmeasured** — see §4 |
+| reading `/net` and `/proc` from PHP | **measured** — see §5 |
+| `disk_free_space()` | **known limitation** — see §6 |
+| PDO | **not built** — use the `SQLite3` class |
 
 ---
 
-## 1. What exists today
+## 1. Getting it
 
-`php -v` on 9front:
+APExp does not install into `/`. `mk install` writes into the repository
+(`$objtype/bin/ape`, `$objtype/lib/ape`), and `apexp-sh` union-mounts
+those over `/bin` at run time. So everything below is run **inside
+`apexp-sh`**, where the binaries are plain names on `$PATH`.
+
+```rc
+cd /path/to/APExp
+mk install
+./apexp-sh
+```
+
+Then:
+
+```
+php -v
+```
 
 ```
 PHP 8.5.12 (cli) (built: Nov  5 2026 16:46:25) (NTS)
@@ -32,185 +51,170 @@ Copyright (c) The PHP Group
 Zend Engine v4.5.12, Copyright (c) Zend Technologies
 ```
 
-That is a real interpreter: 515 translation units, the Zend engine,
-opcache, pcre2, the standard library, date, hash, json, lexbor,
-random, reflection, spl and uri. It is built `--disable-all`, which in
-PHP 8.5 still leaves eleven extensions because they are
-unconditional.
+Outside `apexp-sh` the binary is `<repo>/amd64/bin/ape/php`.
 
-**What `--disable-all` leaves out is everything this stack needs.**
-Running the Phoronix Test Suite under it says so in its own words:
+## 2. What is in the build
+
+Twenty-three extensions are registered (`php -m` also shows `Core`, and
+prints opcache as `Zend OPcache` under a separate heading):
 
 ```
-MISSING DOM        REQUIRED - The Document Object Model is required for XML operations.
-MISSING ZIP        REQUIRED - ZIP support is required for file (de)compression.
-MISSING SimpleXML  REQUIRED - SimpleXML is required for XML operations.
+date pcre hash json lexbor opcache random reflection standard spl uri
+libxml dom simplexml zlib
+posix pcntl bz2 readline openssl curl sqlite3 zip
 ```
 
-So *the binary is finished and the build is not*. There is no `PDO`,
-no `sqlite3` driver, and `new PDO('sqlite:...')` in a script would
-throw before touching a database.
+The first line is what PHP 8.5 builds unconditionally — `--disable-all`
+does not mean a small build. The second and third are APExp's, and they
+link against libraries this tree already builds: `lib/xml2`, `lib/z`,
+`lib/sqlite`, `lib/libressl`, `lib/curl`, `lib/zip`, `lib/bz2`,
+`lib/readline`. Each is pulled in by `#pragma lib` in its own header,
+the Plan 9 way, so `cmd/php/mkfile` names no libraries at all.
 
-### The good news: the libraries are already here
+**Everything must be compiled in.** Plan 9 has no `dlopen`, so
+`extension=` in `php.ini` and `dl()` do nothing:
+`zend_portability.h:200` sets `ZEND_EXTENSIONS_SUPPORT` to 0 when
+dynamic loading is absent. Adding an extension is three edits —
+objects into `OFILES`, the `phpext_*_ptr` into
+`internal_functions_cli.c`, the `HAVE_*` into `cfg/main/php_config.h` —
+and a rebuild.
 
-`sys/src/ape/lib` already carries ports of everything the missing
-extensions link against, which is the hard half:
+**Not built**: PDO and `pdo_sqlite` (use the `SQLite3` class instead),
+mbstring, GD (there is no libgd in the tree), and `ext/sockets` (which
+needs `struct cmsghdr` and a real `recvmsg` in libap).
 
-| extension | library it needs | in this tree? |
-|---|---|---|
-| `sqlite3`, `pdo_sqlite` | SQLite 3.53.4 | **yes** — `lib/sqlite`, and a `cmd/sqlite` shell |
-| `dom`, `simplexml`, `xml` | libxml2 | **yes** — `lib/xml2` |
-| `zip` | libzip + zlib | **yes** — `lib/zip`, `lib/z` |
-| `curl` | libcurl | **yes** — `lib/curl` |
-| `openssl` | LibreSSL | **yes** — `lib/libressl` |
-| `mbstring` | oniguruma | **yes** — `lib/onig` |
+To check the build on the machine:
 
-Adding one is three edits to `sys/src/ape/cmd/php/mkfile` and its
-`cfg/`: the extension's objects into `OFILES`, its `phpext_*_ptr` into
-`internal_functions_cli.c`, and `HAVE_*` into `cfg/main/php_config.h`.
-*It has not been done, so none of it is measured.*
+```rc
+php /path/to/APExp/sys/lib/tests/php-smoke.php
+```
+
+Its Section 8 exercises each extension *through its library* — bz2 and
+zlib round-trip bytes, sqlite3 creates and queries, openssl digests, zip
+writes and reads an archive — rather than only asking
+`extension_loaded()`. It exits with the failure count. **0 failures on
+host PHP 8.3.6; not yet run on 9front.**
 
 ---
 
-## 2. The database layer has a blocker underneath it
+## 3. The database layer: test this before building anything on it
 
-***THE DOCUMENT THIS REPLACES CLAIMED THE OPPOSITE OF THE TRUTH HERE,
-AND IT IS THE CLAIM MOST WORTH GETTING RIGHT***, because believing it
-is how someone ends up with a corrupted database rather than an error
-message.
+SQLite works in memory today. What is unproven is a **file-backed
+database being written to**, and there is a specific reason to doubt it.
 
-The claim was: *"SQLite is traditionally bound to local contexts due to
-POSIX network file-locking vulnerabilities. Plan 9's native 9P protocol
-guarantees coherent file locking and atomic transactions, allowing
-multiple terminal nodes to safely write to a single centralized
-.sqlite file."*
-
-**9P has no byte-range locking, and APExp has none either.**
-`sys/src/ape/lib/ap/fcntl/fcntl.c:180` is:
-
-```c
-case F_GETLK:
-case F_SETLK:
-case F_SETLKW:
-        err = EINVAL;
-        break;
-```
+### The mechanism
 
 SQLite's default unix VFS takes a SHARED lock to read and escalates
-through RESERVED to EXCLUSIVE to write, **all with `fcntl` byte-range
-locks**, on every transaction. With `EINVAL` coming back, those calls
-fail. Plan 9's own exclusive-use bit (`DMEXCL`) is whole-file and is
-not what SQLite asks for.
+through RESERVED to EXCLUSIVE to write, all with **`fcntl` byte-range
+locks**, on every transaction. APExp's `fcntl` answers `EINVAL` to all
+three lock operations (`lib/ap/fcntl/fcntl.c:180`), because **9P has no
+byte-range locking** — Plan 9's own exclusive-use bit (`DMEXCL`) is
+whole-file and is not what SQLite asks for.
 
-*Answering `EINVAL` is the right answer* — a lock stub that returned
-success would let two writers both believe they held the file, which
-is the corruption the original text promised to prevent. But it means
-the question is not "can several machines share a database over 9P",
-it is **"does a single process get a write transaction at all"**, and
-that has never been run.
+`EINVAL` is the right answer. A lock stub that returned success would
+let two writers each believe they held the file, which is the corruption
+the locks exist to prevent. But it means a file-backed write is expected
+to fail with `disk I/O error` (`SQLITE_IOERR_LOCK`).
 
-**The measurement is one command** and needs nothing built:
+### The test — two commands, nothing to build
 
 ```rc
 sqlite3 /tmp/t.db 'create table t(a); insert into t values(1); select * from t;'
 ```
 
-- prints `1` → the write path works, and the open question is only
-  concurrency.
-- an `SQLITE_IOERR`/`disk I/O error` → locking is the blocker, as
-  predicted here.
+- prints `1` → the write path works and only concurrency is open.
+- `disk I/O error` → locking is the blocker, as predicted.
 
-**If it is the blocker, the remedy is known and is a build flag, not
-new code.** SQLite ships alternative locking styles — dot-file locking
-in particular, which needs only `create`/`remove` and therefore works
-over 9P. They are compiled only under `SQLITE_ENABLE_LOCKING_STYLE`,
-and the amalgamation in this tree has it at **0**
-(`sys/src/external/sqlite/sqlite3.c:169`), while
-`lib/sqlite/mkfile` passes no `-DSQLITE_*` at all. Turning it on and
-opening with the `unix-dotfile` VFS is the first thing to try; a
-Plan 9 VFS under `SQLITE_OS_OTHER` is the thorough version.
+If it is the blocker, try the alternative locking style immediately:
 
----
+```rc
+sqlite3 -vfs unix-dotfile /tmp/t2.db 'create table t(a); insert into t values(1); select * from t;'
+```
 
-## 3. What "statically linked" does and does not buy
+### Why dotfile locking should work here
 
-The stack is statically linked, and **that is not a property of this
-port — Plan 9 has no dynamic linker at all.** Every Plan 9 binary is
-static. So:
+`unix-dotfile` uses **`mkdir()` as its atomic primitive** —
+`dotlockLock()` calls `osMkdir(zLockFile, 0777)` and `dotlockUnlock()`
+calls `osRmdir()`. `mkdir` on an existing directory fails, which makes
+it a genuine test-and-set, and it is an ordinary 9P operation. No
+`fcntl` is involved.
 
-- The "no `glibc`/`musl` disparity, no shared-library conflicts" point
-  is true, and it is true of every program on the system.
-- The same fact removes capability. **PHP cannot load an extension at
-  run time here**: `dl()` and `extension=` in `php.ini` do nothing,
-  because `zend_portability.h:200` sets `ZEND_EXTENSIONS_SUPPORT` to 0
-  when there is no `dlopen`. Every extension must be compiled in.
-- *That same line caused the first crash this port had*: opcache's
-  module shutdown destroyed globals whose constructor — reached only
-  through the zend-extension startup that is compiled out — had never
-  run. See `docs/notes/php.md`.
+**`unix-dotfile` and `unix-none` are registered unconditionally** —
+only `unix-flock`, `unix-posix` and the Apple VFSes sit behind
+`SQLITE_ENABLE_LOCKING_STYLE` (which is 0 in this amalgamation). So the
+VFS is already in the `libsqlite.a` you have; nothing needs rebuilding
+to try it.
 
-"Deployment is copying two files" is fair, with the caveat that the
-binary is around the size of everything it statically contains.
+### Making it the default, for PHP
 
----
+PHP cannot select a VFS from a script — `SQLite3::__construct` has no
+VFS parameter and `sqlite3_open_v2` is called with a NULL VFS name
+(`ext/sqlite3/sqlite3.c:143`), so PHP always gets the default. The knob
+is a compile-time define in `sys/src/ape/lib/sqlite/mkfile`:
 
-## 4. The namespace claim, narrowed
+```
+CFLAGS=-c -I$SQSOURCE -DSQLITE_DEFAULT_UNIX_VFS='"unix-dotfile"'
+```
 
-The original said Plan 9 "forks a localized namespace for incoming
-requests", so a compromised application is "isolated within a
-transient, severely restricted process space".
+**Precedent**: the amalgamation already does exactly this for WASI
+(`sqlite3.c:40394`), which is also a platform without POSIX locking.
 
-**A new namespace is not a restricted one.** `rfork n` gives the child
-a *copy* of the parent's namespace — the same files, now privately
-mutable. It becomes a sandbox only when the service script then does
-the restricting itself: unmounting what it does not need, binding a
-subtree over `/`, dropping the network directory. Plan 9 makes that
-unusually easy and unusually cheap, and it is a genuine advantage over
-a Unix CGI — but it is work the handler script has to do, and none of
-the scripts below do it.
-
-The honest version: *Plan 9 gives you the cheapest per-request sandbox
-of any system here, and you still have to build it.*
+**This change has not been made and must not be made blind** — it
+changes locking for every SQLite consumer in the tree, and dotfile
+locking has a real cost: a crash leaves the lock *directory* behind and
+the next opener blocks until it is removed by hand. Run the two shell
+commands above first; they tell you whether it is needed and whether it
+works.
 
 ---
 
-## 5. Serving it — unverified, and flagged as such
+## 4. Serving it
 
-I have not run a web server on this system, and the 9front specifics
-below are the part of this document I am least able to check from the
-source tree. Treat §5 as a sketch to verify, not a recipe.
+Two routes. Neither has been run on 9front.
 
-**What I can state:**
+### 4.1 PHP's built-in server — the one to try first
 
-- APExp **does not install into `/`**. `mk install` puts binaries in
-  `$APEXPROOT/$objtype/bin/ape`, and `apexp-sh` union-mounts them over
-  `/bin`. So `cp /sys/src/cmd/php/php ...` is wrong; inside `apexp-sh`
-  the binary is just `php`, and outside it the path is
-  `<repo>/amd64/bin/ape/php`.
-- **This build has no CGI SAPI.** It is configured `--disable-cgi`, so
-  there is no `php-cgi` binary. Under the **CLI** SAPI `header()` is a
-  no-op: PHP does not emit HTTP headers, so a CGI bridge must print
-  the status line and headers itself before running the script — which
-  is what the wrapper below does, and why the example scripts in §6
-  must not rely on `header()`.
-- `aux/listen1 tcp!*!8080 <prog>` hands the program a *raw connection*
-  on its standard input and output. It does not set the CGI
-  environment, so a program behind `listen1` has to read and parse the
-  HTTP request itself. Using rc-httpd instead is what gets you CGI
-  variables.
-- **Which 9front HTTP server and how it is configured, I did not
-  verify.** 9front ships `rc-httpd`, a set of rc scripts, and it is
-  configured by editing its own handler-selection script rather than
-  by an `httpd.conf`; the `cgi .php ...` line and `ip/httpd -h` in the
-  original look like the older Plan 9 `ip/httpd`, and may not apply.
-  **Check `/rc/bin/rc-httpd/` on the machine before copying anything
-  from here.**
+`sapi/cli/php_cli_server.c` and `php_http_parser.c` **are compiled into
+this binary**, so `php -S` is available:
 
-A CLI-SAPI bridge, written to the constraints above:
+```rc
+php -S '*:8080' -t /usr/glenda/www
+```
+
+This is worth trying before any Plan 9 web server because it removes
+every other variable. It is single-process by default — it forks only
+when `PHP_CLI_SERVER_WORKERS` is set, which you should leave unset — and
+needs only `socket`, `bind`, `listen`, `accept` and `select`, all of
+which libap has.
+
+**Under `php -S`, `header()` works.** The built-in server is its own
+SAPI (`cli-server`) with its own header handler
+(`php_cli_server.c:552`). This is the opposite of the plain CLI SAPI —
+see §4.3.
+
+### 4.2 rc-httpd, and a caution
+
+9front ships `rc-httpd`, a set of rc scripts configured by editing its
+own handler-selection script rather than an `httpd.conf`. **Read
+`/rc/bin/rc-httpd/` on the machine before copying anything**; recipes
+that mention `ip/httpd -h` and a `cgi .php` line are for the older
+Plan 9 `ip/httpd` and may not apply.
+
+`aux/listen1 tcp!*!8080 <prog>` is the lower-level option. It hands the
+program a **raw connection** on standard input and output and sets no
+CGI environment, so a program behind `listen1` must parse the HTTP
+request itself. rc-httpd is what gets you CGI variables.
+
+### 4.3 If you use CGI, the CLI SAPI emits no headers
+
+**There is no CGI SAPI in this build** (`--disable-cgi`, so no
+`php-cgi`). Under the plain CLI SAPI — `php -f script.php` — `header()`
+is a no-op, so a CGI bridge must print the status line and headers
+itself:
 
 ```rc
 #!/bin/rc
-# php-cgi -- run a .php file under the CLI SAPI and supply the headers
+# php-cgi -- run a .php file under the CLI SAPI, supplying the headers
 # ourselves, because the CLI SAPI emits none.
 
 if(! test -f $PATH_TRANSLATED){
@@ -225,26 +229,25 @@ echo
 exec php -f $PATH_TRANSLATED
 ```
 
-*`rc` note*: `echo` with no argument prints the blank line that ends
-the headers. Do not write `key=value` arguments anywhere in an rc
-script — `=` is a syntax character and is legal only as a leading
-assignment.
+*rc notes*: `echo` with no argument prints the blank line that ends the
+headers; and `=` is a syntax character in rc, legal only as a leading
+assignment, so never write `key=value` as an argument to a command.
 
 ---
 
-## 6. The example scripts, corrected
+## 5. The part that is genuinely Plan 9: reading the namespace
 
-### 6.1 Reading Plan 9's synthetic files — the part that already works
-
-This is the genuinely interesting half, it needs **no extension at
-all**, and every function in it is in the build we have.
+This needs **no extension at all** and every function in it is in the
+build. It is also the most interesting thing the stack can do, because
+on Plan 9 the kernel, the network stack and every process are files.
 
 ```php
 <?php
 $out = ['stack' => 'PLAS', 'metrics' => []];
 
 if (is_readable('/dev/sysstat')) {
-    $out['metrics']['sysstat'] = preg_split('/\s+/', trim(file_get_contents('/dev/sysstat')));
+    $out['metrics']['sysstat'] =
+        preg_split('/\s+/', trim(file_get_contents('/dev/sysstat')));
 }
 
 $conns = [];
@@ -259,39 +262,65 @@ $out['tcp'] = ['count' => count($conns), 'connections' => $conns];
 echo json_encode($out, JSON_PRETTY_PRINT), "\n";
 ```
 
-Changed from the original: `glob('/net/tcp/[0-9]*')` rather than `*`,
-because `/net/tcp` also holds `clone` and `stats`, which are not
-connection directories; `is_readable` rather than `file_exists`,
-because a synthetic file can exist and refuse to be read; and no
-`header()`, which does nothing under the CLI SAPI.
+Three things in that script are load-bearing:
 
-**Note for anyone extending this**: reading files under `/net` and
-`/proc` is the whole appeal of the idea, and it is also where a long
-run will meet Plan 9's `warning: process exceeds 100 file descriptors`
-— seen already in the Phoronix run. Close what you open.
+* **`glob('/net/tcp/[0-9]*')`, not `*`.** `/net/tcp` also contains
+  `clone` and `stats`, which are not connection directories.
+* **`is_readable`, not `file_exists`.** A synthetic file can exist and
+  refuse to be read.
+* **No `header()`** — it does nothing under `php -f` (§4.3).
 
-### 6.2 The SQLite script — does not run yet
+`/net/tcp/stats` is **measured**: `php-smoke.php` reads it as 404 bytes
+on 9front.
 
-The original's `new PDO('sqlite:...')` needs `pdo_sqlite`, which is
-not compiled in (§1), and would then need write locking, which is
-`EINVAL` (§2). It is kept here as the target rather than as an
-instruction, and it is worth attempting only after both of those are
-dealt with, in that order.
+**Close what you open.** A long-running script walking `/net` or `/proc`
+will meet the kernel's `warning: process exceeds 100 file descriptors`;
+it is an advisory rather than a limit, but a climbing count is a leak.
+
+### Per-request namespaces: real, but you have to build it
+
+Plan 9 gives the cheapest per-request sandbox of any system here, and it
+is not automatic. **`rfork n` gives the child a *copy* of the parent's
+namespace — the same files, now privately mutable.** It becomes a
+sandbox only when the handler then does the restricting itself:
+unmounting what it does not need, binding a subtree over `/`, dropping
+the network directory. None of the scripts in this document do that.
 
 ---
 
-## 7. The shortest path from here
+## 6. Platform limits worth knowing before you start
 
-1. `sqlite3 /tmp/t.db 'create table t(a);'` — does the database layer
-   work at all? One command, nothing to build. **Do this first**: if it
-   fails, everything downstream is blocked on one build flag.
-2. Add `ext/sqlite3` and `ext/pdo_sqlite` to `cmd/php/mkfile` against
-   the `libsqlite.a` already in the tree.
-3. Add `ext/dom`, `ext/simplexml` and `ext/zip` against `libxml2` and
-   `libzip` — which is also what makes Phoronix runnable, and would
-   make it a real test of the port rather than of its extension list.
-4. Only then the server wiring, and verify §5 against the machine
-   rather than against this file.
+* **No dynamic loading.** Every Plan 9 binary is static; this is not a
+  property of the port. "Deployment is copying a file" is fair, with the
+  caveat that the file contains everything it uses.
+* **No byte-range file locking** — §3.
+* **`disk_free_space()` and `disk_total_space()` return `false`** with
+  `Function not implemented`. **9P2000 has no `Tstatfs`**: the protocol's
+  entire message set has no filesystem-level space query, so libap's
+  `statvfs` fails rather than reporting zeros, which would read as an
+  empty disk. A 9front file server will tell you on its own console
+  (`echo df >>/srv/cwfs.cmd`), but that is per-server and not reachable
+  from a libc call. Applications that check free space before writing —
+  the Phoronix Test Suite is one — will report a full disk.
+* **Whole-second file timestamps**, no symlinks, no hard links, no
+  `/dev/fd`, no `mkfifo`.
+* **No job control**, so anything expecting process groups will not get
+  them.
 
-*The order matters: steps 2 and 3 are mkfile work with known inputs,
-and step 1 can invalidate step 2 before it is started.*
+---
+
+## 7. A suggested order
+
+1. `php -v`, then `php sys/lib/tests/php-smoke.php`. Confirms the
+   interpreter and all 23 extensions on the machine, in one command.
+2. The two `sqlite3` commands in §3. **Do this before designing
+   anything around a database** — it is the one piece with a known
+   mechanism pointing at failure, and it needs no build.
+3. `php -S '*:8080'` with a one-line `<?php phpinfo();` and a browser or
+   `hget`. Confirms the serving path with the fewest moving parts.
+4. The namespace script in §5, which is the part that is worth doing on
+   this platform rather than on Linux.
+5. Only then rc-httpd, and verify §4.2 against the machine.
+
+Steps 1, 2 and 3 are each one command and each can invalidate the work
+after it.
