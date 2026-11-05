@@ -4,6 +4,8 @@ Many (temporarily) breaking changes can occur between releases.
 The best option is probably to download the latest release.
 
 # APExp
+<center><img src="docs/APExp.png" alt="an APE explorer, logo/mascot of the project" width="300"/></center>
+
 Plan9 (9front) APE with experimental patches (a.k.a APExp)
 
 **Abstract**
@@ -136,9 +138,12 @@ Install paths have been modified so that libraries and binaries are installed in
 
 ***Languages***
 
-
+- Clisp (version 2.49)
+- Go (version 1.4)
 - Lua (version 5.5.0)
+- ocaml (version 4.06)
 - perl (version 5.42.2)
+- php (version 8.5.12)
 - sqlite (version 3.53.4)
 - Tcl (tclsh) & Tk (wish) (version 9.0.3)
 	Tcl/Tk extensions itcl (4.2.3)
@@ -154,7 +159,7 @@ C transpilers are fun little proof-of-concept programs, which also open up for m
 - pascal-to-C transpiler p2c (version 2.01)
 - fortran-to-C transpiler f2c (version 20250303)
 - portable ObjC-to-C transpiler (version 3.4.13)
-- C++-to-C transpiler EDG (version 7.0)
+- C++-to-C transpiler EDG (version 7.0), with paragon portable STL
 - Scheme-to-C transpiler Chicken (version 5.4.0) 
 
 
@@ -200,7 +205,7 @@ Yes, the default build is "bloated" because I enable everything that I believe w
 
 [9] https://github.com/lufia/plan9/pulls
 
-[10] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adzip:///home/jens/Downloads/src.zip/src/libvtermaf.squirrel@mx.sdf.org/
+[10] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adaf.squirrel@mx.sdf.org
 
 [11] https://github.com/archiecobbs/libnbcompat
 
@@ -223,12 +228,3 @@ Everything but this file lives under `docs/` -- see `docs/README.md`.
 `docs/compiler-improvements.md` is the state of the C compilers,
 `docs/releases/` is the release notes, and `docs/notes/` is the working
 record of the bugs found in this tree and what each one cost.
-
-
-***Post scriptum***
-
-The unofficial mascot of the project are the rabbit knights riding snails in medieval art.
-![a jousting rabbit riding a snail with a human head](docs/rabbit_riding_snail.jpg)
-
-It would be fun to have a Glenda-themed variant of this.
-
