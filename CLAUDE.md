@@ -1149,12 +1149,15 @@ two are the opposite of what it says — `HAVE_TM_ZONE` and
 `HAVE_ST_BLOCKS` are both YES, `struct tm` and `struct stat` having
 those members. *A sweep over function names, asked about a struct
 field, answers `absent` confidently.*
-**What can still stop it, in order**: (1) fibers — **CLOSED on the
-host, unmeasured on the VM**: `zend_fibers.c` is unconditional and
-wants either boost.context's GAS assembly or `<ucontext.h>`, and APExp
-now has the second (`lib/ap/arch/amd64/mcontext.s` + `ucontext.c`,
-`docs/notes/libap.md`). amd64 only; the other ten follow the same
-shape when wanted.
+**What can still stop it, in order**: (1) fibers — **CLOSED and
+MEASURED**: `zend_fibers.c` is unconditional and wants either
+boost.context's GAS assembly or `<ucontext.h>`, and APExp now has the
+second (`lib/ap/arch/amd64/ucontext.s` + `makecontext.c`), with
+`ucontext-test` at **0 failures on the VM**. amd64 only; the other ten
+follow the same shape when wanted. *php has not been pointed at it
+yet* — that is `ZEND_FIBER_UCONTEXT` in the `config.h`.
+`docs/notes/libap.md` has the two bugs it cost, both of them
+`long`-width and both invisible to the host check.
 (2) **`ext/opcache` is mandatory in 8.5** — there is no
 `--disable-opcache`, only `--disable-opcache-jit`, which is what drops
 the 13-file `jit/ir` code generator; opcache only has to COMPILE, since
@@ -1488,6 +1491,21 @@ in the topic file.
   relink -- rounds later, with nothing nearby to blame. *The rule that
   a library fix can sit unused for rounds has a second edge: so can a
   library BREAKAGE.*
+- **RENAMING a source file in a library directory leaves its OBJECT in
+  the archive, and `clean` does not remove it.** `mksyslib`'s `clean`
+  is `rm -f *.[$OS] ...`, which touches the directory and never
+  `$LIB`; only `nuke` removes the archive, and `ar vu` replaces
+  members by NAME, so an object whose source no longer exists is
+  simply never revisited. *Renaming `mcontext.s` to `ucontext.s` left
+  `mcontext.6` defining `_ctxreturn` beside the new `ucontext.6`
+  defining it too*, and the next build said `duplicate text symbol:
+  _ctxreturn`. **The loud case is the lucky one**: when the stale
+  object does NOT collide, its code stays linked into every program
+  in the tree for ever with no diagnostic from anyone. One
+  `ar d <lib> <stale>.$O` fixes it; `mk distclean` fixes it at the
+  cost of a full rebuild. *There is no instrument for "a member of
+  `libap.a` whose source is gone" and it would be cheap* -- `ar t`
+  against the directory -- but the archive exists only on the VM.
 - **Check every object built against a library for the flags that library
   was built with**, not just the ones the linker complained about.
   `nm -g --defined-only x.o | wc -l` is a one-second check.

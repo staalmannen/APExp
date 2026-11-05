@@ -15,6 +15,7 @@
 #include <ucontext.h>
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -87,7 +88,7 @@ void
 makecontext(ucontext_t *ucp, void (*func)(void), int argc, ...)
 {
 	unsigned long long *base;
-	unsigned long long top;
+	uintptr_t top;
 	va_list ap;
 	int i;
 
@@ -100,18 +101,32 @@ makecontext(ucontext_t *ucp, void (*func)(void), int argc, ...)
 	if(ucp->uc_stack.ss_sp == 0 || ucp->uc_stack.ss_size < UC_SLOTS*8 + 64)
 		ucdie("stack missing or too small");
 
-	top = (unsigned long long)(unsigned long)ucp->uc_stack.ss_sp
-	    + (unsigned long long)ucp->uc_stack.ss_size;
-	top &= ~(unsigned long long)15;		/* 6c does not require 16;
+	/*
+	 * ***EVERY POINTER HERE GOES THROUGH `uintptr_t', AND THE FIRST
+	 * DRAFT USED `unsigned long', WHICH IS FOUR BYTES.***  `pcc'
+	 * caught it with five `conversion of pointer to shorter integer'
+	 * warnings and it would otherwise have truncated the stack
+	 * address, `_ctxreturn' and `func' alike.
+	 *
+	 * *The host cross-check could not have caught it and never will*:
+	 * `unsigned long' is eight bytes under glibc, so the conversion
+	 * is lossless there.  **That is the second `long'-width bug in
+	 * this one file that gcc was structurally blind to** -- the other
+	 * was `ucontext-test's section 5 -- so anything in these files
+	 * that moves a pointer through an integer gets read for it
+	 * specifically rather than left to the host.
+	 */
+	top = (uintptr_t)ucp->uc_stack.ss_sp + (uintptr_t)ucp->uc_stack.ss_size;
+	top &= ~(uintptr_t)15;			/* 6c does not require 16;
 						 * its frames are not a
 						 * multiple of it.  Free. */
-	base = (unsigned long long *)(unsigned long)(top - UC_SLOTS*8);
+	base = (unsigned long long *)(top - UC_SLOTS*8);
 
-	base[0] = (unsigned long long)(unsigned long)_ctxreturn;
+	base[0] = (uintptr_t)_ctxreturn;
 	base[1] = 0;				/* 6c's reserved 0(FP) slot */
 	for(i = 2; i <= UC_ARGMAX; i++)
 		base[i] = 0;
-	base[UC_ARGMAX+1] = (unsigned long long)(unsigned long)ucp;
+	base[UC_ARGMAX+1] = (uintptr_t)ucp;
 
 	/*
 	 * POSIX says the arguments are `int'.  They are read here as the
@@ -142,10 +157,8 @@ makecontext(ucontext_t *ucp, void (*func)(void), int argc, ...)
 	 * no-stack-write form of a RET -- so the SP recorded here is one
 	 * slot BELOW the frame, and `func' begins with SP = base.
 	 */
-	ucp->uc_mcontext.mc_regs[_MC_SP] =
-		(unsigned long long)(unsigned long)base - 8;
-	ucp->uc_mcontext.mc_regs[_MC_PC] =
-		(unsigned long long)(unsigned long)func;
+	ucp->uc_mcontext.mc_regs[_MC_SP] = (uintptr_t)base - 8;
+	ucp->uc_mcontext.mc_regs[_MC_PC] = (uintptr_t)func;
 
 	/*
 	 * mc_regs[3..7] -- BX, R12..R15 -- are left exactly as they are.

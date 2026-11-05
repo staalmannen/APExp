@@ -4098,6 +4098,38 @@ bug the reference implementation is blind to, because the difference IS
 the reference's width. The tree's first invariant, arriving inside a
 file written to check something else.
 
+***MEASURED ON THE VM: `ucontext-test` 0 failures, all six sections.***
+Section 0 prints its PASS line twice, which is the resumed path
+re-entering at `getcontext`'s return and the thing the C wrapper could
+not do. So the switch, the new stack, `uc_link`, all eight argument
+slots, five round trips and a context's own locals are all behaving on
+the machine as they do against glibc.
+
+### Two things the first VM build of it said
+
+**`conversion of pointer to shorter integer`, five times.** The casts
+read `(unsigned long long)(unsigned long)ptr`, and **`unsigned long`
+is four bytes here** -- the stack address, `_ctxreturn` and `func`
+would all have been truncated. `uintptr_t` now.
+
+*The host cross-check could not have caught it and never will*:
+`unsigned long` is eight bytes under glibc, so the conversion is
+lossless there. **That is the second `long`-width bug in this one port
+that gcc was structurally blind to**, after `ucontext-test`'s section
+5. The rule that follows is narrow and worth keeping narrow: a host
+cross-check is blind to `long` by construction, so anything that moves
+a POINTER through an INTEGER is read for that specifically rather than
+left to the host.
+
+**`duplicate text symbol: _ctxreturn`.** Not the code: renaming
+`mcontext.s` to `ucontext.s` left `mcontext.6` in `libap.a`, because
+`mksyslib`'s `clean` removes `*.[$OS]` from the directory and never
+touches the archive, and `ar vu` replaces members by name. One
+`ar d` on the stale member clears it. *The collision was the lucky
+outcome* -- a stale object that does not collide stays linked into
+every program with no diagnostic at all. The rule is in CLAUDE.md's
+build-system list.
+
 **What neither instrument covers**: nothing exercises a context switch
 with signals actually blocked. And the header could not be
 syntax-checked against the APE headers on the host -- they reach each
