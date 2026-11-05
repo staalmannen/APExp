@@ -507,6 +507,37 @@ two things on its first run beyond the case it was built for:
   uses them; *recorded, not acted on*, which is why clisp is not in
   the sweep's gating list.
 
+### And the same mistake had a second half: the EPILOGUE
+
+The next build got past `ZEND_API` and stopped at
+`zend_operators.h:308`:
+`incompatible types: "IND VOID" and "INT" for op "RETURN"`, on
+`return mempcpy(dest, src, n);`.
+
+`mempcpy` is declared, unguarded, at `sys/include/ape/string.h:62` --
+and **`<string.h>` was not reachable in that translation unit at
+all**. `Zend/zend_operators.h` does not include it; the only thing
+that does is `main/php.h:208`, which a Zend file never reaches.
+***`memcpy`, `memcmp` and `strncasecmp` were undeclared in the same
+unit and said nothing***, because an implicit `int` converts to
+`size_t` in silence: *the pointer return was the only one loud
+enough to notice.*
+
+`main/php_config.h.in:2225-2236` ends with four `#include`s --
+`<stdlib.h>`, `<sys/types.h>`, `<sys/select.h>`, `<string.h>` -- and
+that is how every unit in php sees them. **The same category as the
+prologue, missed for the same reason**, and `cfghdr-sweep` could not
+see it either, because its first version compared macro NAMES and an
+`#include` has none. It compares both now, and its control carries
+both shapes.
+
+*The host reproduced the whole thing* -- `gcc -fsyntax-only` on
+`block_pass.c` with the real flags listed the same implicit
+declarations -- which is how it was diagnosed without a second round
+trip. One residual host-only artifact: `memrchr` still warns there,
+because glibc guards it behind `_GNU_SOURCE` while APE declares it
+unguarded at `string.h:54`. *Not a finding; the host's limit.*
+
 The other 18 are `_GNU_SOURCE` and its family, `__STDC_WANT_*`, and
 two Linux headers. **Left out deliberately**: APE's feature macros are
 `_POSIX_SOURCE`, `_BSD_EXTENSION` and `_PLAN9_SOURCE`, which the
