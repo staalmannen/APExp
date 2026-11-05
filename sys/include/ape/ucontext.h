@@ -2,6 +2,7 @@
 #define __UCONTEXT_H
 
 #include <signal.h>
+#include <stddef.h>
 #include <ucontext_arch.h>
 
 #ifdef __cplusplus
@@ -32,7 +33,7 @@ extern "C" {
  */
 typedef struct {
 	void  *ss_sp;
-	long   ss_size;
+	size_t ss_size;		/* POSIX's type, and `long' is 4 bytes here */
 	int    ss_flags;
 } stack_t;
 
