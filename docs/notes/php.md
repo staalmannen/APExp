@@ -217,6 +217,73 @@ memory — so the limit was Plan 9 segment slots, one spent by
 10MB of heap**, long before any trimming question arose.
 `SEG_THRESHOLD` is 64MB now; `docs/notes/libap.md` has it.
 
+## `__x86_64__` has to be defined, and it is the honest answer
+
+**kencc defines no architecture macro at all**, and php needs one. The
+consequence is not a micro-optimisation:
+
+* `Zend/zend_long.h:26` selects `zend_long` from
+  `__x86_64__ || __LP64__ || _LP64 || _WIN64` -- *not* from
+  `SIZEOF_LONG` -- so without it php's integer type is **32 bits**.
+* `ext/date/lib/timelib.h:112` has the identical test for
+  `timelib_sll`.
+* ***And five arms in `Zend/zend_float.h` read
+  `!defined(__x86_64__)`***, selecting x87 control-word code
+  (`_controlfp`, `_FPU_SETCW`, `fpsetprec`, inline x86 asm) that is
+  wrong for an SSE machine. **Not defining it is itself a positive,
+  wrong choice**, which is the argument that settles this: there is no
+  neutral option.
+
+`__LP64__` would be the available alternative and it is a **lie** --
+kencc is LLP64, `long` is four bytes -- so anything keying on it to
+mean "long is 64 bits" would be silently wrong. `__x86_64__` is simply
+true of the machine.
+
+**The risk is what else it switches on, and that was measured rather
+than assumed.** Of the 30 files mentioning it, every site that emits
+GCC inline assembly is separately gated:
+
+| site | also needs | verdict |
+|---|---|---|
+| `zend_string.h:444`, `.c:394/452`, `zend_multiply.h:45/177`, `zend_execute.c:56`, `zend_cpuinfo.c:31`, `zend_vm_execute.h:364`, `TSRM.c:779` | `__GNUC__` | off |
+| `zend_operators.h:566/645/731/835` | `ZEND_USE_ASM_ARITHMETIC`, which is `HAVE_ASM_GOTO` (`:547`) -- answered **0** | off |
+| `zend_portability.h:561` | `HAVE_TMMINTRIN_H` / `NMMINTRIN` / `WMMINTRIN` -- all absent | off |
+| `php_hash_sha.h:58` | `HAVE_IMMINTRIN_H` -- absent | off |
+| `zend_vm_opcodes.h:52` | `ZEND_VM_KIND == HYBRID` -- it is CALL | off |
+| `zend_cpuinfo.c:76` | nothing, but `get_xcr0_eax` and `__zend_cpuid` both have a `return 0` / zeroing fallback for a non-GCC compiler | **on, and harmless** |
+| `zend_string.h:537` | nothing; a plain C multiplication hash loop | **on, and wanted** |
+| `crypt_blowfish.c:56`, `md5.c:160`, murmur, xxhash | nothing; "unaligned access is cheap" | **on, and true** |
+
+So it goes on the compile line (`-D__x86_64__`) rather than in the
+`config.h`, because `timelib.h` is reached by files that have not
+included `php_config.h` yet and a macro that is defined for only some
+translation units is worse than one that is defined for none.
+
+## The headers: 39 of 91 are present
+
+Mechanical, and checkable: every `HAVE_*_H` name in the generated
+config resolved against `sys/include/ape` and `amd64/include/ape`.
+**39 present**, including everything structural --
+`dirent`, `fcntl`, `poll`, `pwd`, `grp`, `langinfo`, `netinet/in`,
+`resolv`, `syslog`, `sys/{file,ioctl,mman,param,resource,select,socket,
+statvfs,stat,sysmacros,time,uio,utsname,wait}`, `utime`, `wchar`.
+
+The 52 absent are ODBC (14 of them), tidy, the Linux `linux/*` family,
+the SSE intrinsic headers, Windows, and `crypt.h` -- php bundles its
+own crypt, which is why `crypt_blowfish`, `crypt_freesec`,
+`crypt_sha256` and `crypt_sha512` are already in the object list.
+Three absences line up with decisions already taken: no
+`sys/ipc.h` (opcache's SysV shm), no `*mmintrin.h` (every SSE path),
+no `sys/mount.h`/`statfs`/`vfs` (`statvfs` is what we have).
+
+***BUT `HAVE_DLFCN_H` RESOLVES TO YES AND THE ANSWER IS NO.*** APE
+ships a `dlfcn.h`, and `apfunc-sweep.py` reports `dlopen` and
+`dlerror` as **declared-only** -- the middle state, a header promise
+with nothing behind it. *A file-existence check answers this one
+confidently and wrongly*, which is the clearest single argument in
+this port for hand-answering rather than deriving: the mechanical
+method is right 90 times and this is one of the others.
+
 ## Extensions: the ones with a ported library
 
 The user's own framing, and the right one: enable what this tree already
