@@ -1202,8 +1202,31 @@ silent:
 - **itcl** — done. 10 failures, all upstream or Tcl 9's, two settled at
   source, none ours.
 
-**php — ***ALL 514 TRANSLATION UNITS COMPILE***, measured on the HOST,
-and the notes are in `docs/notes/php.md`.** 8.5.12, vendored at
+**php — ***IT LINKS AND IT RUNS***: `PHP 8.5.12 (cli) (NTS)`, Zend
+Engine v4.5.12, printed by the binary on the VM. Notes in
+`docs/notes/php.md`.** **`php -v` then FAULTED at exit and the cause
+is a platform consequence**: `ZEND_EXTENSIONS_SUPPORT` is 0 without
+dlopen (`zend_portability.h:200`), so `zend_extension_startup`'s body
+is compiled out and **no zend_extension's startup ever runs here** --
+while opcache's MSHUTDOWN is an ordinary MODULE shutdown, gated by
+nothing, and destroys globals its ctor never built:
+`zend_string_free(NULL)`, `GC_FLAGS` reading offset 4, which is what
+`fault read addr=0x4` said. Guarded, as the next line of the same
+function and `zend_accel_blacklist_shutdown` already are; upstream's,
+and the second upstream php bug this campaign.
+***THE DIAGNOSIS COST ONE COMMAND AND NO REBUILD***: `php -h` returns
+before `module_started`/`sapi_started` are set (`php_cli.c:1318`
+against `:1337`/`:1359`), so it runs `exit()` and neither shutdown --
+it exits clean, which cleared libap's teardown and left two functions
+standing where nine calls had been candidates. Then `acid 6.out` and
+`src(pc)` named `zend_string.h:401` outright. *A CLI with an early
+exit path is a bisect someone else already wrote.*
+**Also `mk install` could not copy the binary**: `mkone`'s rule is
+`cp $prereq $BIN/$TARG` and nothing set `BIN`, which in rc is a null
+list in a concatenation rather than an empty string -- every other
+APE command mkfile assigns it, and nothing could notice until a link
+succeeded.
+**ALL 515 TRANSLATION UNITS COMPILE**, measured on the HOST. 8.5.12, vendored at
 `sys/src/external/php`; `--compile` answers `compiled 515, errors 0,
 missing 0` and **`--undefined` says the program wants 283 symbols
 from outside php, every one of which libap has** (273 the sweep

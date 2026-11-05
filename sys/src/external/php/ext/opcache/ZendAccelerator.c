@@ -2971,7 +2971,34 @@ static void accel_globals_ctor(zend_accel_globals *accel_globals)
 
 static void accel_globals_dtor(zend_accel_globals *accel_globals)
 {
-	zend_string_free(accel_globals->key);
+	/*
+	 * APExp: `key' is allocated by `accel_globals_ctor', which is
+	 * called ONLY from `accel_startup' -- the zend_extension's
+	 * startup -- and `zend_extension_startup' in
+	 * `Zend/zend_extensions.c:194' has its whole body inside
+	 * `#if ZEND_EXTENSIONS_SUPPORT'.  That macro is 1 for dlopen and
+	 * for Windows and **0 otherwise** (`zend_portability.h:200'), and
+	 * Plan 9 has no dlopen -- so `accel_startup' never runs.
+	 *
+	 * opcache's MSHUTDOWN is an ordinary MODULE shutdown and is not
+	 * gated by anything, so it still calls `accel_shutdown', which
+	 * takes its `!ZCG(enabled) || !accel_startup_ok' arm and calls
+	 * this function.  **A platform that constructs nothing destroys
+	 * anyway**, and `zend_string_free' requires a non-NULL argument:
+	 *
+	 *	zend_string.h:401  if (!ZSTR_IS_INTERNED(s))
+	 *	6.out: suicide: sys: trap: fault read addr=0x4
+	 *
+	 * -- `GC_FLAGS' reading `gc.u.type_info', which is at offset 4.
+	 * Every `php -v' died this way, after printing the version.
+	 *
+	 * The guard is the one the next statement already has, and the
+	 * one `zend_accel_blacklist_shutdown' opens with four lines
+	 * earlier in the same call.  Upstream.
+	 */
+	if (accel_globals->key) {
+		zend_string_free(accel_globals->key);
+	}
 	if (accel_globals->preloaded_internal_run_time_cache) {
 		pefree(accel_globals->preloaded_internal_run_time_cache, 1);
 	}
