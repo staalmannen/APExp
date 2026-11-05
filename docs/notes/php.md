@@ -384,6 +384,32 @@ entry aborts the whole tree's `mk`, and a port that has never been
 built has not been measured in that position. `cd sys/src/ape/cmd/php
 && mk` is how to try it.
 
+### What the first `mk install` said, and both answers were cheap
+
+**`mkfile:612: syntax error`** -- the `OFILES` list ended one line
+early, leaving a tab-indented entry orphaned. `mkcont-sweep` reported
+0 over it, and is widened now; see `CLAUDE.md`.
+
+**`basename: invalid option -- d`** -- the rule used Plan 9's idiom
+for a dirname, and inside `apexp-sh` the union puts APExp's own
+`/bin` first, so `basename` is **GNU coreutils'**. *A command name
+here is whatever the union resolves it to.* The rule uses a static
+directory list now and runs no external command at all.
+
+***AND `no recipe to make 'ext/json/json_parser.6'` HAD A BETTER
+ANSWER THAN EXPECTED.*** `ext/json`'s parser is bison-generated and
+**the generated file ships in the tarball** as `json_parser.tab.c`,
+so the object upstream calls `json_parser.lo` is built from a source
+whose name does not match it. One explicit rule covers it.
+
+The useful half is what the check found rather than what it fixed:
+**all 513 objects were resolved against the vendored tree and this was
+the only name that does not** -- so **no bison and no re2c are needed
+anywhere in this port**. `json_scanner.c` and
+`php_json_scanner_defs.h` are shipped too, alongside the four Zend
+parsers and scanners and the 4.2MB `zend_vm_execute.h`. *A question
+that could have cost two more build tools cost one grep.*
+
 ## What the config.h decided, and why by hand
 
 The long reasoning is in the file itself; what matters as a summary:

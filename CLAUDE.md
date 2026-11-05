@@ -1471,6 +1471,16 @@ in the topic file.
   it is repeated here. *Check which `6l` answers before reading
   anything into it*, and see the bind rule immediately below for how a
   window quietly acquires the host's.
+- **A command name inside `apexp-sh` is whatever the UNION resolves it
+  to, and Plan 9's own flags are the ones most likely to be missing.**
+  `cmd/php/mkfile` used `` `{basename -d $target} `` -- the Plan 9
+  idiom for a dirname -- and got `basename: invalid option -- d`,
+  because the union puts APExp's `/bin` first and that `basename` is
+  **GNU coreutils'**. *mk then reported the failure of the compile,
+  not of the `mkdir`*, so the message named the victim again. Same
+  family as "check which `6l` answers". A recipe that needs a Plan 9
+  flag should not assume it is reachable; the php mkfile dropped the
+  external command entirely and uses a static directory list.
 - **`rm -rf` on a directory something has BOUND does not unbind it.**
   The bind still names the removed directory, a recreated one has a new
   qid, and the union component silently falls through to whatever is

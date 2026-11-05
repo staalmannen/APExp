@@ -654,6 +654,24 @@ LD=pcc
 DEFS=-D__x86_64__ -DHAVE_TIMELIB_CONFIG_H=1 -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1\
 	-DSHADOW_STACK_SYSCALL=0 -D_POSIX_SOURCE -D_BSD_EXTENSION -D_PLAN9_SOURCE
 
+OBJDIRS=\
+	TSRM Zend Zend/Optimizer ext/date ext/date/lib ext/hash\
+	ext/hash/murmur ext/hash/sha3/generic64lc ext/json ext/lexbor\
+	ext/lexbor/lexbor/core ext/lexbor/lexbor/css\
+	ext/lexbor/lexbor/css/at_rule ext/lexbor/lexbor/css/property\
+	ext/lexbor/lexbor/css/selectors ext/lexbor/lexbor/css/syntax\
+	ext/lexbor/lexbor/css/syntax/tokenizer ext/lexbor/lexbor/dom\
+	ext/lexbor/lexbor/dom/interfaces ext/lexbor/lexbor/encoding\
+	ext/lexbor/lexbor/html ext/lexbor/lexbor/html/interfaces\
+	ext/lexbor/lexbor/html/tokenizer ext/lexbor/lexbor/html/tree\
+	ext/lexbor/lexbor/html/tree/insertion_mode ext/lexbor/lexbor/ns\
+	ext/lexbor/lexbor/ports/posix/lexbor/core\
+	ext/lexbor/lexbor/punycode ext/lexbor/lexbor/tag\
+	ext/lexbor/lexbor/unicode ext/lexbor/lexbor/url ext/opcache\
+	ext/pcre ext/pcre/pcre2lib ext/random ext/reflection ext/spl\
+	ext/standard ext/standard/libavifinfo ext/uri\
+	ext/uri/uriparser/src main main/streams sapi/cli
+
 INCS=-I. -I$PHPSRC -I$PHPSRC/main -I$PHPSRC/Zend -I$PHPSRC/TSRM\
 	-I$PHPSRC/ext/date/lib -I$PHPSRC/ext/lexbor\
 	-I$PHPSRC/ext/uri/uriparser/include
@@ -661,13 +679,47 @@ INCS=-I. -I$PHPSRC -I$PHPSRC/main -I$PHPSRC/Zend -I$PHPSRC/TSRM\
 CFLAGS=-c $DEFS $INCS
 
 # The objects live beside their sources in the build directory, so the
-# directory has to exist before `pcc -o' can write into it.
+# directories have to exist before `pcc -o' can write into them.
+#
+# ***THE FIRST VERSION SAID ``mkdir -p `{basename -d $target}'' AND
+# THAT IS A PLAN 9 IDIOM THIS SHELL DOES NOT HAVE.***  Inside
+# `apexp-sh' the union mount puts APExp's own `/bin' first, so
+# `basename' is **GNU coreutils'**, which has no `-d':
+#
+#	basename: invalid option -- d
+#	mkdir: missing operand
+#
+# -- and mk then reported the failure of the compile, not of the
+# `mkdir'.  *The same shape as "check which `6l' answers"*: a command
+# name inside `apexp-sh' is whatever the union resolves it to, and
+# Plan 9's own flags are the ones most likely to be missing.
+#
+# So no external command at all: the directory list is known
+# statically, `mkdir -p' is idempotent, and one exec per compile is
+# nothing beside 513 runs of pcc.
 %.$O: $PHPSRC/%.c
-	mkdir -p `{basename -d $target}
+	mkdir -p $OBJDIRS
 	$CC $CFLAGS $prereq -o $target
 
 %.$O: %.c
 	$CC $CFLAGS $stem.c
+
+# ***ONE OBJECT IS NOT NAMED AFTER ITS SOURCE.***  `ext/json's parser
+# is bison-generated, and the generated file SHIPS IN THE TARBALL as
+# `json_parser.tab.c' -- so the object upstream calls
+# `ext/json/json_parser.lo' is built from `json_parser.tab.c', not
+# from a `json_parser.c' that does not exist.  mk said so plainly:
+# `no recipe to make 'ext/json/json_parser.6''.
+#
+# **No bison and no re2c are needed anywhere in this port**, which was
+# worth checking rather than assuming: `json_scanner.c' and
+# `php_json_scanner_defs.h' are in the tarball too, as are the four
+# Zend parsers and scanners and the 4.2MB `zend_vm_execute.h'.  A
+# sweep of all 513 objects against the vendored tree found this as the
+# ONLY name that does not resolve.
+ext/json/json_parser.$O: $PHPSRC/ext/json/json_parser.tab.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS -I$PHPSRC/ext/json $prereq -o $target
 
 # mkone's `clean' is `rm -f *.[$OS] ...', which cannot see an object in
 # a subdirectory -- and 512 of the 513 here are in one.  Overriding it
