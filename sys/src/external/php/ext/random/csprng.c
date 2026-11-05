@@ -191,7 +191,15 @@ ZEND_ATTRIBUTE_NONNULL PHPAPI zend_result php_random_bytes_ex(void *bytes, size_
 		read_bytes = 0;
 		while (read_bytes < size) {
 			errno = 0;
-			ssize_t n = read(fd, bytes + read_bytes, size - read_bytes);
+			/*
+			 * APExp: `bytes' is `void *' and arithmetic on one
+			 * is a GNU extension, which kencc does not have:
+			 * `pointer addition not fully declared: VOID'.  The
+			 * three other `bytes + read_bytes' in this file are
+			 * inside getrandom(2) arms this platform does not
+			 * compile, so only this one is changed.
+			 */
+			ssize_t n = read(fd, (char *) bytes + read_bytes, size - read_bytes);
 
 			if (n <= 0) {
 				if (errno != 0) {

@@ -4137,3 +4137,101 @@ other through absolute `/sys/include/ape/...` paths that resolve only
 inside `apexp-sh` -- so the gcc check symlinks the two ucontext headers
 into a scratch directory instead and supplies `sigset_t` from glibc's
 own `<bits/types/sigset_t.h>`.
+
+## Four header gaps php's compile sweep found, and one duplicated truth
+
+`php-mirror.sh --compile` (`docs/notes/php.md`) compiled php's 514
+translation units on the build host; three of the eight errors were
+APE headers' and the fourth came out of fixing one of them.
+
+### `<sys/time.h>` had none of the BSD `timeval` macros
+
+`main/network.c:406` is `timercmp(&time_now, &limit_time, <)` and
+answered `syntax error, last name: limit_time` — an undefined macro,
+so the `<` argument reaches the parser as an operator with nothing on
+its left. *The message names the victim*, as it does whenever a missing
+macro is called with something that is not an expression.
+
+glibc, musl and every BSD carry `timerisset`, `timerclear`,
+`timercmp`, `timeradd` and `timersub` in `<sys/time.h>`. All five are
+there now and **every one is guarded**, which is existing practice
+rather than caution: `bash/include/posixtime.h`,
+`readline/posixtime.h` and `libressl/include/compat/sys/time.h` each
+define their own under `#ifndef`, so an unguarded definition here
+would be a `Macro redefinition` for whichever is reached first — which
+is exactly how APE's own `<sys/param.h>` MIN/MAX answered php one round
+earlier.
+
+### `<syslog.h>` was missing five facilities, four of them POSIX
+
+`ext/standard/basic_functions_arginfo.h:3677` registers the facility
+names as PHP constants and answered `name not declared: LOG_MAIL`,
+`name not declared: LOG_LPR`. The absent numbers were **exactly 2, 6,
+7, 8 and 11** — `LOG_MAIL`, `LOG_LPR`, `LOG_NEWS`, `LOG_UUCP` and
+`LOG_FTP`, the facilities with no modern use — and POSIX requires the
+first four by name. The numbering is the wire protocol's (RFC 5424
+Table 1), so it is not a choice; the one other definition in the tree,
+`perl/os2/os2ish.h`, agrees to the digit.
+
+*They are enum constants in this header, not `#define`s*, which means a
+package that `#define`s its own would not merely redefine it but fail
+to compile — the same exposure the list already had for `LOG_KERN`,
+and the reason the grep before adding a name is for the BARE WORD.
+
+### `<arpa/nameser.h>` had the `ns_` half and no compat half
+
+php's `ext/standard/dns.c:341` is
+
+	typedef union {
+		HEADER qb1;
+		uint8_t qb2[65536];
+	} querybuf;
+
+and answered `syntax error, last name: HEADER`. BIND 8 renamed the
+BIND 4 names to the `ns_` forms and kept the old ones in
+`<arpa/nameser_compat.h>`, which glibc, musl and the BSDs all include
+unconditionally from `<arpa/nameser.h>`. APExp had the new half only.
+
+***THE CAPABILITY BEHIND IT IS REAL, AND THAT IS WHY THE ANSWER WAS TO
+ADD THE TYPE RATHER THAN SWITCH THE FEATURE OFF.*** php reaches that
+block only with `HAVE_RES_SEARCH`, `HAVE_DN_EXPAND` and
+`HAVE_DN_SKIPNAME` all yes, and the first question was whether those
+three answers were honest — `apfunc-sweep`'s declared-only middle
+state is what makes a `config.h` link-fail far from the claim, and
+`res_query.c` ends in `weak_alias(res_query, res_search)`, which on
+kencc is a **no-op**. They hold anyway:
+`network/res_aliases.c` exists precisely because kencc has no weak
+symbols and defines strong `res_search` and `dn_expand` forwarders,
+and `dn_skipname.c` defines its name directly. *The file that looked
+like the trap is the file that prevents it.*
+
+`HEADER` is a bit-field struct whose layout is the wire format's, so
+it is endian-conditional — four of APExp's eleven architectures are
+big-endian — and it was checked rather than written and hoped for:
+`sizeof` 12, `qr` setting byte 2 to 0x80, `rcode` setting byte 3 to
+0x03 and `ancount` landing in bytes 6 and 7, **identical to the host's
+own `<arpa/nameser.h>` under gcc and to APExp's under the host
+`6c -J`**. `GETSHORT`/`GETLONG`/`PUTSHORT`/`PUTLONG` are aliases of
+the `NS_GET`/`NS_PUT` macros, and the seven `NS_*FIXEDSZ`/`NS_*ADDRSZ`
+constants the compat names alias were added to `<arpa/nameser.h>`
+itself, so no number is defined in the compat header alone.
+
+### And `<resolv.h>` had been defining the same constants itself
+
+Adding the compat header turned up sixteen `Macro redefinition`s:
+`<resolv.h>` carried its own `MAXDNAME`, `MAXCDNAME`, `MAXLABEL`, four
+`NS_*` and the whole `T_*`/`C_*` list beside `<arpa/nameser.h>`'s —
+**two definitions of each constant in two headers with nothing making
+them agree**, which is the `PATH_MAX` shape from CLAUDE.md's own rules.
+*Nothing could notice while no translation unit included both*, and
+php's `dns.c` includes both. `<resolv.h>` includes
+`<arpa/nameser.h>` now, as glibc's does, and keeps only what is the
+resolver's own: the opcodes, the response codes, `RES_*`, and the
+record types and classes `<arpa/nameser.h>` does not know. One
+definition per name, and both include orders compile.
+
+***AND `dn_skipname` WAS DEFINED BY libap AND DECLARED BY NO HEADER***
+— the `asctime_r` shape again, with the same consequence: every caller
+got an implicit `int`. It is declared in `<resolv.h>` now. *The
+inverse question — what does libap define that no header declares —
+still has no instrument.*

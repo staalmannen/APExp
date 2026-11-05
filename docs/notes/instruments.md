@@ -1148,3 +1148,64 @@ than guessing which sites exist.*
 **Its controls** are sections 4 and 5: a constant that fits, and an
 unshifted variable that never reaches the fold. Both pass against a
 broken compiler.
+
+## `php-mirror.sh` — php's whole build, compiled on the host
+
+`sys/lib/tests/hostkencc/php-mirror.sh`. `--flags` prints the compile
+line, `--compile` builds all 514 translation units and **gates**.
+Depends on `hostkencc.sh` having run.
+
+**What it came from**: eight consecutive rounds, each costing a VM
+rebuild to learn about one compile error, because the error in the next
+file is invisible until the first is fixed. Its first run returned all
+eight at once, in six files, and all six were fixed and re-measured
+without the VM. `docs/notes/php.md` has the list.
+
+***UNLIKE `clisp-mirror.sh` THERE IS NOTHING TO STAGE.*** clisp needs
+its `.d` files converted, three `configure` probes run and an
+`intparam.h` patched, and that staging is most of its mirror. php's
+sources compile where they lie — the generated parsers, scanners and
+`zend_vm_execute.h` all ship in the tarball — so this file is the FLAG
+SET and the source list and almost nothing else, which is precisely
+what the round trips were being spent on.
+
+**Both of those are DERIVED from `cmd/php/mkfile` with sed**, not
+transcribed: `DEFS`, `INCS`, `PCRE2FLAGS`, `KECCAKFLAGS` and the
+514-entry `OFILES`, with a gate of its own if a variable comes back
+unexpanded. *A mirror whose flags have drifted from the build reports
+failures the build does not have and misses the ones it does*, which
+this tree has paid for twice — clisp's `intparam.h` and the missing
+`-J`.
+
+**Its own two faults, both in the first run and both recorded in its
+header.** It matched the Keccak flags on the DIRECTORY, which reads
+like the mkfile's rule but is not it — there are four explicit Keccak
+rules and one of them is `ext/hash/hash_sha3.c`, in `ext/hash` itself
+— and it duly reported `Could not find include file "KeccakHash.h"`,
+a finding that was the instrument's. And it passed the mkfile's
+`CFLAGS` straight through, whose leading **`-c` means "compile only"
+to `pcc` and "print `const if`" to `6c`** (`cc/lex.c:40`), which
+`pcc` does not forward: dozens of lines per file that read exactly
+like diagnostics. *A flag one letter from another flag is checked
+rather than recalled, and these two meanings are in two different
+programs.*
+
+**What it does not measure is the LINK** — the host has no libap and
+`hostkencc` deliberately does not build the linkers — so the
+undefined-symbol class stays the VM's.
+
+## `boolptr-test` — a pointer converted to `bool`
+
+`sys/lib/tests/boolptr-test.c`, 0 failures on gcc. The four sites that
+CONVERT rather than cast — return, initialiser, assignment, argument —
+plus the cast, at three pointer values.
+
+From `Zend/zend_lazy_objects.c:117`, a `void *` returned from a `bool`
+function, which kencc refused; `docs/notes/kencc.md` has the mechanism.
+
+***SECTIONS 1 AND 2 ARE WHY IT IS A TEST AND NOT A COMPILE.*** The
+plausible wrong fix lets the pointer through as a NUMBER, which keeps
+the low byte — so section 2 uses `0x0000555500000000`, non-null and
+zero in every byte a `char`, `short` or `int` conversion would keep.
+*That is the shape of the perl `cBOOL` bug `boolnorm` was written for,
+arriving by a different route.*

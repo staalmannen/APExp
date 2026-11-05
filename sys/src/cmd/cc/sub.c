@@ -363,6 +363,36 @@ stcompat(Node *n, Type *t1, Type *t2, long ttab[])
 	i = 0;
 	if(t1 != T)
 		i = t1->etype;
+	/*
+	 * ***A POINTER MAY BE ASSIGNED TO A bool, AND THE TABLE CANNOT
+	 * SAY SO.***  C99 6.5.16.1 lists `the left operand has _Bool
+	 * type and the right operand is a pointer' as a simple
+	 * assignment constraint of its own, because 6.3.1.2 converts
+	 * every SCALAR to bool by comparison with 0.  kencc has no
+	 * TBOOL etype -- bool is unsigned char (`lex.c', `typebool' in
+	 * `cc.h') -- so `tasign[TUCHAR]' is `BNUMBER', which excludes
+	 * BIND, and the question never reaches the `isbool' mark.
+	 *
+	 * `com.c' already has the CONVERSION for all four sites that
+	 * assign -- OAS, OASI, ORETURN and the argument case in
+	 * `tcoma' -- each calling `boolnorm' when the target is bool.
+	 * **Every one of them runs `stcompat' with `tasign' FIRST**, so
+	 * the code that would have done the right thing was behind a
+	 * check that refused the operand.  *The cast form works and
+	 * always did*: `tcast[TUCHAR]' carries BIND, which is how
+	 * `(bool)p' reaches the same `boolnorm'.
+	 *
+	 * php's `Zend/zend_lazy_objects.c:117' is
+	 * `return zend_hash_index_find_ptr(...)' in a `bool' function
+	 * and answered `incompatible types: "UCHAR" and "IND VOID" for
+	 * op "RETURN"'.  `sys/lib/tests/boolptr-test.c' has the four
+	 * sites; the host harness reproduces the message exactly.
+	 *
+	 * Only this direction: `p = b' is an integer assigned to a
+	 * pointer and stays an error.
+	 */
+	if(ttab == tasign && t1 != T && t1->isbool && b == BIND)
+		return 0;
 	if(b & ttab[i]) {
 		if(ttab == tasign)
 			if(b == BSTRUCT || b == BUNION)

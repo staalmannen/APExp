@@ -3144,3 +3144,148 @@ rule otherwise reads as "do not instrument": the recursion counter is
 what proved the walk ran 630 times and visited no label, and that pair
 of facts — a working walk and zero labels — is what finally made the
 identification untenable.
+
+## Three bugs php's 514 files found, all three in the front end
+
+`sys/lib/tests/hostkencc/php-mirror.sh --compile` compiles php's whole
+build with the host-built `6c`. Its first run returned eight errors in
+six files; three were this compiler's, and each is a case where the
+machinery to do the right thing was already present and reached by
+nothing.
+
+**All three are LOUD**, which is why they are recorded as a set rather
+than argued over one at a time: none of them can miscompile a program
+silently. `agree.c`, the codegen control, is **identical before and
+after all three**, and `hostkencc.sh --probe` still answers ten
+`regpair-min` and eight `regpair-probe` with `kc` and `vc` failing at
+`:242` — the recorded numbers to the digit — so nothing moved that was
+not meant to.
+
+### 1. A pointer could not be assigned to a `bool`
+
+`Zend/zend_lazy_objects.c:117` is
+
+	static bool zend_lazy_object_has_stale_info(const zend_object *obj)
+	{
+		return zend_hash_index_find_ptr(&EG(...), obj->handle);
+	}
+
+and answered `incompatible types: "UCHAR" and "IND VOID" for op
+"RETURN"`. C99 6.5.16.1 lists "the left operand has `_Bool` type and
+the right operand is a pointer" as a simple-assignment constraint of
+its own, because 6.3.1.2 converts every SCALAR to bool by comparison
+with 0.
+
+***THE CONVERSION WAS ALREADY WRITTEN AND SAT BEHIND THE CHECK THAT
+REFUSED THE OPERAND.*** `com.c` calls `boolnorm` — `!!x`, a comparison
+and not a truncation, the function the perl `cBOOL` bug paid for — at
+OAS, OASI, ORETURN and in `tcoma`'s argument case. **Every one of the
+four runs `stcompat(..., tasign)` first**, and `tasign[TUCHAR]` is
+`BNUMBER`, which excludes BIND; kencc has no TBOOL etype, so the
+question never reached the `isbool` mark that the next four lines test.
+One clause in `sub.c`'s `stcompat` lets a pointer through when the
+target is bool, and all four sites then do what they already meant to.
+
+*The CAST form worked all along* — `tcast[TUCHAR]` carries BIND — which
+is why `(bool)p` is everywhere in this tree and nothing had noticed.
+`p = b`, an integer assigned to a pointer, is still an error.
+
+`sys/lib/tests/boolptr-test.c` has the four sites at three pointer
+values, and **its sections 1 and 2 are the ones that matter**: the
+plausible wrong fix lets the pointer through as a NUMBER, which keeps
+the low byte, so a pointer whose low four bytes are zero converts to
+`false`. `6c -S` shows `CMPQ AX,$0` at all four, and the test is 0
+failures on gcc.
+
+### 2. `bool visible;` declared nothing
+
+`ext/reflection/php_reflection.c:3896` is a function whose whole body
+is `bool visible;` and a `zend_parse_parameters` of `&visible`, and it
+answered `name not declared: visible`. `bool vis;` compiles, which is
+what makes the message read as being about the name.
+
+`lex.c` swallows the GNU visibility attributes `hidden` and `visible`
+— unprefixed, because the Linux kernel spells them that way — only
+when the previous token is NOT a position where an identifier must be a
+name. That predicate, `indeclname`, lists `LCHAR`, `LINT`, `LSTRUCT`,
+`LUNION`, `LENUM`, `LTYPE` and the rest, and **did not list `LBOOL`**.
+So after `bool` the declarator was eaten as an attribute.
+
+The omission is of one member of a set the list already covered:
+`LBOOL` is in the grammar's `complex:` rule beside `LSTRUCT`,
+`LUNION`, `LENUM` and `LTYPE`, all four of which were listed.
+`LCOMPLEX`, `LIMAGINARY` and the internal `LCOMPLEXF`/`LCOMPLEXD` that
+`float _Complex` combines to are the rest of that set and were added
+from the same reading rather than from a failure.
+
+**The struct form is loud too**: `struct { bool visible; int x; }`
+answers `unnamed structure element must be struct/union`, so no member
+was ever silently dropped.
+
+***AND A SECOND LIMIT OF THE SAME PREDICATE IS RECORDED AND NOT
+FIXED.*** A `;` does not reset `lasttok`, so in
+
+	visible int g;
+	hidden  int h;
+
+the second line is not swallowed — `lasttok` is still `LNAME` from `g`
+— and answers `not a function`. Measured against the compiler from
+before this change and identical, so it predates it. Nothing in the
+tree uses the unprefixed spelling at file scope; widening the predicate
+would mean swallowing a name in a position where one is legal, which is
+the worse failure. In 0.6's inventory.
+
+### 3. The attribute scanner counted parentheses inside string literals
+
+`main/debug_gdb_scripts.c` is a generated file whose entire content is
+one `__asm__()` holding 1680 `.ascii` directives — gdb's own python,
+inlined into a `.debug_gdb_scripts` section — and it answered
+
+	<eof> unexpected EOF in __attribute__
+
+`lex.c` makes `__attribute__`, `__attribute`, `__declspec`,
+`__extension__`, `__asm__` and `__asm` invisible to the grammar by
+consuming from the opening `(` to the matching `)`, tracking depth. It
+did that **without honouring quotes or escapes**, and the gdb text has
+one more `(` than `)` in it, so the depth never came back to 0 and the
+scanner ate the file. The same hazard is an `__attribute__((section(
+"a)b")))` or a `'('` anywhere in an attribute argument. A string or
+character literal is now skipped whole, backslash escapes included.
+
+**The message named something the file did not contain**, for the
+fourth time in these notes after the `lock.h` shadow, `cmd/mkfile:96`
+and the `basename -d` round: all six constructs reported
+`__attribute__`. It prints `s->name` now, so the same failure would
+have said `__asm__`.
+
+## The host harness lied about a child's exit status
+
+Not a compiler bug, but it was indistinguishable from one for a round
+and belongs beside them. One php file made the host `6c` **exit 1,
+delete its own output file and print nothing at all** — no diagnostic
+on either stream, from a compiler that had just written 46 buffers of
+object code.
+
+`strace -f` settled it in one run: the `cpp` child `exit_group(0)`,
+the parent's `wait4` returned `WIFEXITED && WEXITSTATUS == 0`, and the
+parent then exited 1. The only path that raises `nerrors` without
+printing is `lex.c:349`,
+
+	if(nerrors == 0 && mywait(&status) > 0 && status != 0)
+		nerrors++;
+
+and `compat-unix.c`'s `mywait` sets `status` from `w->msg[0]`. The
+fault is in `go1.4/src/lib9/await.c`: `w = malloc(sizeof *w + 200)`
+followed by `memset(w, 0, sizeof *w)`, which stops at the struct and
+leaves the message buffer — part of the same allocation —
+**uninitialised**. A child that exits 0 writes nothing to it, so
+`msg[0]` was whatever `malloc` last left there, and the answer varied
+by input. `memset(w, 0, sizeof *w + 200)` now. The file is
+`+build !plan9`, so nothing on the VM reads it and the VM's `mywait`
+is `cc/compat.c`'s.
+
+*An instrument that reports a failure the subject does not have is the
+one fault that cannot be found by reading the subject* — and this one
+also explains why `exits()` losing a buffered `diagbuf` was the first
+suspicion and the wrong one: go1.4's `libbio` registers an `atexit`
+flush, so a diagnostic would have appeared.
