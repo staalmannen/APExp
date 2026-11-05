@@ -183,7 +183,7 @@
 /* #undef HAVE_DLFCN_H */
 /* #undef HAVE_LIBDL */
 
-/* absent: ODBC (14 names), tidy, linux/*, the SSE intrinsic headers,
+/* absent: ODBC (14 names), tidy, the linux/ family, the SSE headers,
  * Windows, crypt.h, sys/ipc.h, sys/mount.h, sys/statfs.h, sys/vfs.h,
  * pty.h, ieeefp.h, cpuid.h, io.h, dns.h, libproc.h, valgrind. */
 /* #undef HAVE_CRYPT_H */
