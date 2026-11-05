@@ -91,6 +91,22 @@
  *   sections 2 and 3: **both survived**. The partial-unmap arm works
  *     on the machine as well as on the host.
  *
+ * ***AND THEN THE LIBRARY CHANGED UNDER THE PROBE, SO SECTION 0 IS NOT
+ * MEASURING WHAT IT MEASURED ABOVE.*** `SEG_THRESHOLD' is 64MB now, so
+ * a 2MB mapping is `malloc'-backed and section 0 reports where the
+ * ALLOCATOR puts things, not where `segattach' does. The second run
+ * says so plainly: `0x436000', `0x837000', `0xc37000', `0x1037000',
+ * ... spaced 4MB apart at offset `0x37000', and **nothing fails any
+ * more**. Both readings are true of their own run and neither
+ * describes the other -- *the 2MB grid off by one page was a fact
+ * about `segattach' and is no longer reachable from here*; section 0c
+ * is what still asks the kernel anything.
+ *
+ * The answer section 0 gives is unchanged where it counts: still
+ * misaligned, so zend still trims. Section 1's head trim went from 0
+ * to `0x1c8000', so the real path now exercises BOTH trims rather than
+ * just the tail.
+ *
  * THE HOST IS THE CONTROL, AND IT HAS BEEN RUN. Built with gcc on
  * Linux: sections 2 and 3 both SURVIVE, so the probe's own mechanics
  * are sound and a fault on the VM is the platform's answer rather than
@@ -183,21 +199,30 @@ main(int argc, char **argv)
 	/* ---- section 0b: HOW MANY mappings can be live at once? ----
 	 *
 	 * Section 0's first run answered `0 of 8 aligned' AND `mmap
-	 * failed' three times, and the SECOND of those is the bigger
+	 * failed' three times, and the SECOND of those was the bigger
 	 * finding: five 2MB mappings is not a memory limit, it is a
 	 * limit on how many a process may HOLD.  Plan 9 gives a process
-	 * a fixed number of segment slots and `p9_mmap_impl' spends one
-	 * on every mapping at or above SEG_THRESHOLD.
+	 * a fixed number of segment slots and `p9_mmap_impl' spent one
+	 * on every mapping at or above SEG_THRESHOLD, which was 1MB.
 	 *
 	 * ***THE PREDICTION, WRITTEN BEFORE THE RUN***: if the limit is
 	 * SLOTS, the count is the same small number at every size, and
 	 * the total bytes held differ by orders of magnitude for no
 	 * reason.  If it is address space or memory, the count falls as
 	 * the size rises, roughly as 1/size.  The two cannot be confused.
+	 * It answered 64 / 5 / 5 -- slots, five of them.
 	 *
-	 * The small size is deliberately just UNDER SEG_THRESHOLD, so it
-	 * is malloc-backed and takes no slot: it is the control, and it
-	 * should run to the array's end.
+	 * ***AND IT NO LONGER ASKS THAT QUESTION, WHICH IS WHY 0c EXISTS.***
+	 * SEG_THRESHOLD is 64MB now, so ALL THREE of these sizes take the
+	 * malloc arm and all three answer 64.  That is the right answer
+	 * and it is worth keeping -- it is the regression check that mmap
+	 * spends no slot at any size a program is likely to ask for -- but
+	 * *a run of 64/64/64 says nothing about how many slots exist*, and
+	 * read on its own it looks exactly like the Linux control.  The
+	 * smallest size is no longer a control at all, since it is on the
+	 * same arm as the other two.  **A section whose three cases have
+	 * collapsed onto one path is a check that can only pass**, and the
+	 * platform question it used to answer moved to 0c.
 	 */
 	{
 		static void *m[64];
@@ -222,11 +247,48 @@ main(int argc, char **argv)
 			for(i = 0; i < n; i++)
 				munmap(m[i], sizes[s]);
 		}
-		printf("  same count at every size -> the limit is SEGMENT SLOTS\n");
-		printf("  count falls as size rises -> it is address space\n");
-		printf("  (on the host all three hit 64; that shows only that\n");
-		printf("   the section RUNS -- Linux has no slot limit to find)\n");
+		printf("  all three at the array's end -> mmap spends no slot\n");
+		printf("  any of them small -> mmap is back on the segment arm\n");
 	}
+
+	/* ---- section 0c: how many SEGMENTS can a process hold? ----
+	 *
+	 * The platform question, asked of the platform rather than through
+	 * mmap, which is what keeps it alive now that SEG_THRESHOLD is
+	 * above every size 0b uses.  It is also the cheaper way to ask:
+	 * 64KB a time, so the whole sweep touches at most 4MB, where
+	 * reaching the ceiling through mmap would now need mappings of
+	 * 64MB and five of those is 320MB of real pages -- `p9_mmap_impl'
+	 * memsets what it returns.
+	 *
+	 * `_SEGATTACH' is libap's own, and this is the one place a test
+	 * reaches past the POSIX surface on purpose: the number it reports
+	 * is a property of the kernel, and going through mmap to get it
+	 * would measure the library's policy instead.
+	 */
+#ifndef __linux__
+	{
+		/* copied from `lib/ap/include/sys9.h:94,96' */
+		extern void *_SEGATTACH(int, char*, void*, unsigned long);
+		extern int   _SEGDETACH(void*);
+		static void *seg[64];
+		int n;
+
+		printf("\n-- section 0c: how many SEGMENTS can be held at once\n");
+		for(n = 0; n < 64; n++){
+			seg[n] = _SEGATTACH(0, "memory", 0, 64*1024);
+			if(seg[n] == (void*)-1)
+				break;
+		}
+		printf("  %d segattach(64KB) succeeded before refusal%s\n",
+		       n, n == 64 ? " (hit the array's end)" : "");
+		printf("  that is the ceiling SEG_THRESHOLD has to stay clear of\n");
+		for(i = 0; i < n; i++)
+			_SEGDETACH(seg[i]);
+	}
+#else
+	printf("\n-- section 0c: skipped, no segments on the host\n");
+#endif
 
 	/* ---- section 1: the over-sized mapping zend actually asks for ---- */
 	printf("\n-- section 1: one %d-byte mapping\n", OVER);
