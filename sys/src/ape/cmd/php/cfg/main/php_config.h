@@ -376,6 +376,179 @@
 #define HAVE_DOM 1
 #define HAVE_SIMPLEXML 1
 #define HAVE_ZLIB 1
+
+/*
+ * ***THE EIGHT OPTIONAL EXTENSIONS, AND WHY EVERY ONE OF THESE LINES
+ * HAD TO BE WRITTEN BEFORE ANYTHING COULD BE MEASURED.***
+ *
+ * Phoronix's `system-info' lists nine OPTIONAL extensions once the
+ * four required ones are in.  Eight of them have a library in this
+ * tree already -- `lib/bz2', `lib/readline'+`lib/history',
+ * `lib/libressl', `lib/curl', `lib/sqlite', `lib/zip' -- and two need
+ * no library at all.  **GD is the one that is impossible**: there is
+ * no libgd here, only libpng, and libpng is not a drawing library.
+ *
+ * ***FIVE OF THE EIGHT "COMPILED CLEAN" BEFORE A SINGLE LINE BELOW
+ * EXISTED, AND THAT WAS AN EMPTY TRANSLATION UNIT EACH TIME.***  Every
+ * one of these extensions wraps its whole body in `#ifdef HAVE_<X>',
+ * so the mirror compiled `ext/posix/posix.c', `ext/bz2/bz2.c',
+ * `ext/sockets/sockets.c', `ext/openssl/openssl.c' and
+ * `ext/readline/readline.c' to *nothing at all* and reported 0 errors
+ * for each.  *A check that cannot fail is not a check*, and this one
+ * could only pass.  **The discriminator that works is the module
+ * entry**: `6c -S' on the extension's main file either mentions
+ * `<ext>_module_entry' or it does not, and that told the five empty
+ * ones from the four real ones in a single command.
+ * ***AND THE FIRST DISCRIMINATOR TRIED WAS NO BETTER***: counting
+ * `TEXT' symbols gave 363-505 for everything, empty units included,
+ * because kencc emits the `static inline's out of php's headers that
+ * gcc at -O2 discards -- so the floor is ~360 and the signal is lost
+ * in it.
+ *
+ * Every function answer below is `apfunc-sweep.py' with the library's
+ * own tree as a `--root', not recall; every macro and struct answer is
+ * a compile against the real APE headers.  The two that are neither --
+ * `HAVE_ERASE_EMPTY_LINE' and `HAVE_STRUCT_SIGINFO_T' -- say so.
+ */
+
+/* ---- ext/posix.  `getsid' and `eaccess' are the only two absent. -- */
+#define HAVE_POSIX 1
+#define HAVE_CTERMID 1
+#define HAVE_FPATHCONF 1
+#define HAVE_PATHCONF 1
+#define HAVE_GETGROUPS 1
+#define HAVE_GETLOGIN 1
+#define HAVE_GETPGID 1
+#define HAVE_GETRLIMIT 1
+#define HAVE_INITGROUPS 1
+#define HAVE_MKFIFO 1
+#define HAVE_MKNOD 1
+#define HAVE_SETEGID 1
+#define HAVE_SETEUID 1
+#define HAVE_SETRLIMIT 1
+#define HAVE_SETSID 1
+/* `makedev' comes from musl's <sys/sysmacros.h>; compiled, not grepped. */
+#define HAVE_MAKEDEV 1
+/* #undef HAVE_EACCESS */
+/* #undef HAVE_GETSID */
+/* #undef HAVE_TTYNAME_R */
+
+/*
+ * ---- ext/pcntl.  `fork', `sigaction', `sigprocmask', `sigwaitinfo',
+ * `sigtimedwait', `wait3' and `wait4' are all in libap; `waitid',
+ * `getpriority', `setpriority', `sched_getcpu', `unshare', `forkx' and
+ * `getcpuid' are not.
+ *
+ * **`WIFCONTINUED' exists and `WCONTINUED' does not**, which looks
+ * like a typo and is not: they are separate `#ifdef's in `pcntl.c' and
+ * a compile against `<sys/wait.h>' answers them separately.
+ * `HAVE_STRUCT_SIGINFO_T' is a TYPE question, so it is a compile of
+ * `siginfo_t si;' rather than anything the sweep can see.
+ */
+#define HAVE_SIGWAITINFO 1
+#define HAVE_STRUCT_SIGINFO_T 1
+#define HAVE_WAIT3 1
+#define HAVE_WAIT4 1
+#define HAVE_WIFCONTINUED 1
+/* #undef HAVE_WCONTINUED */
+/* #undef HAVE_DECL_WCONTINUED */
+/* #undef HAVE_WAITID */
+/* #undef HAVE_WAIT6 */
+/* #undef HAVE_GETPRIORITY */
+/* #undef HAVE_SETPRIORITY */
+/* #undef HAVE_SCHED_GETCPU */
+/* #undef HAVE_SCHED_SETAFFINITY */
+/* #undef HAVE_UNSHARE */
+/* #undef HAVE_FORKX */
+/* #undef HAVE_GETCPUID */
+/* #undef HAVE_RFORK */
+/* #undef HAVE_PTHREAD_SET_QOS_CLASS_SELF_NP */
+/* #undef HAVE_LINUX_RAW_SYSCALL_WAITID */
+/* #undef HAVE_LINUX_RAW_SYSCALL_PIDFD_OPEN */
+
+/* ---- ext/bz2, against `lib/bz2'. ---------------------------------- */
+#define HAVE_BZ2 1
+
+/*
+ * ---- ext/readline, against `lib/readline' (GNU readline 8.3) and
+ * `lib/history'.  **Not libedit**, which this tree also has: the two
+ * are mutually exclusive in `readline.c' and GNU readline is the one
+ * built.  `rl_erase_empty_line' is a VARIABLE, so the sweep cannot see
+ * it -- `readline.c:250' defines it and `readline.h:648' declares it.
+ */
+#define HAVE_LIBREADLINE 1
+#define HAVE_HISTORY_LIST 1
+#define HAVE_RL_CALLBACK_READ_CHAR 1
+#define HAVE_RL_ON_NEW_LINE 1
+#define HAVE_RL_COMPLETION_MATCHES 1
+#define HAVE_ERASE_EMPTY_LINE 1
+/* #undef HAVE_LIBEDIT */
+
+/*
+ * ---- ext/openssl, against `lib/libressl' (LibreSSL 4.3.2).
+ *
+ * **LibreSSL announces `OPENSSL_VERSION_NUMBER 0x20000000L'**
+ * (`opensslv.h:13'), so php takes its *v1* backend; all six files
+ * compile.  The TLS feature macros -- `HAVE_TLS13', `HAVE_SEC_LEVEL',
+ * `HAVE_EVP_PKEY_EC' and the rest -- are NOT answered here and must
+ * not be: `xp_ssl.c:70-146' and `php_openssl_backend.h:136' compute
+ * them from the version macros themselves.
+ *
+ * `RAND_egd' and `OSSL_set_max_threads' are both absent from LibreSSL,
+ * which is the sweep's answer and is also what the two `#undef's below
+ * mean: no EGD, and no argon2 (that one wants OpenSSL 3.2).
+ */
+#define HAVE_OPENSSL_EXT 1
+/* #undef HAVE_RAND_EGD */
+/* #undef HAVE_OPENSSL_ARGON2 */
+/* #undef USE_OPENSSL_SYSTEM_CIPHERS */
+/* #undef LOAD_OPENSSL_LEGACY_PROVIDER */
+
+/* ---- ext/curl, against `lib/curl'. -------------------------------- */
+#define HAVE_CURL 1
+
+/*
+ * ---- ext/sqlite3, against `lib/sqlite' (3.53.4).
+ *
+ * **`SQLITE_OMIT_LOAD_EXTENSION' is the Plan 9 answer and not a
+ * preference**: `sqlite3_load_extension' is dlopen, which does not
+ * exist here, so the alternative is a link error rather than a
+ * missing feature.
+ */
+#define HAVE_SQLITE3 1
+#define HAVE_SQLITE3_ERRSTR 1
+#define HAVE_SQLITE3_EXPANDED_SQL 1
+#define SQLITE_OMIT_LOAD_EXTENSION 1
+
+/*
+ * ---- ext/zip, against `lib/zip' (libzip 1.11.4).  Each of the five
+ * feature names is a `PHP_CHECK_LIBRARY' on one libzip function, and
+ * 1.11.4 is newer than all five, which the sweep confirms by naming
+ * the file each is defined in.
+ */
+#define HAVE_ZIP 1
+#define HAVE_LIBZIP_VERSION 1
+#define HAVE_ENCRYPTION 1
+#define HAVE_SET_MTIME 1
+#define HAVE_PROGRESS_CALLBACK 1
+#define HAVE_CANCEL_CALLBACK 1
+#define HAVE_METHOD_SUPPORTED 1
+
+/*
+ * ---- ext/sockets is NOT built, and the reason is in libap rather
+ * than in php.  `<sys/socket.h>' has no `struct cmsghdr', no
+ * `CMSG_DATA'/`CMSG_LEN'/`CMSG_SPACE', no `MSG_TRUNC'/`MSG_CTRUNC',
+ * and `struct msghdr' has no `msg_flags'; `sendmsg' is a stub
+ * returning ENOSYS and **`recvmsg' is declared by the header and
+ * defined nowhere**, which `apfunc-sweep' reports as `declared' -- the
+ * middle state that link-fails far from the claim.
+ *
+ * Phoronix wants sockets only "when running the Phoromatic Server",
+ * so it is the least valuable of the nine and the only one needing a
+ * public struct to change.  `docs/notes/php.md' has what it would
+ * take.
+ */
+/* #undef HAVE_SOCKETS */
 /* #undef HAVE_GETIFADDRS */
 /* #undef HAVE_GETLOADAVG */
 /* #undef HAVE_GETTID */

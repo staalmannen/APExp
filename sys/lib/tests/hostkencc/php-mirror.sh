@@ -226,13 +226,36 @@ for s in $list; do
 		# `-S' rather than `-o': the assembly carries the symbol
 		# table this mode needs, and nothing else does without a
 		# reader for Plan 9 object files.
+		#
+		# ***BUT kencc's `diag()' WRITES TO STDOUT***, which under
+		# `-S' is where the assembly goes -- so a failing unit's
+		# diagnostics land at the END OF THE .s FILE and `t.log'
+		# comes back holding nothing but cpp's `#warning' line.
+		# The first version of this arm saved exactly that, and a
+		# real error (`sk_X509_new_reserve' undeclared, from
+		# LibreSSL) read as *exit 1 with no message*.  **The same
+		# trap `hostkencc.sh --probe' already carries**, where ten
+		# backends "passed" because `diag' is not on stderr.
+		#
+		# So on failure, recompile to an OBJECT -- where stdout is
+		# the diagnostics and nothing else -- and report that.
 		if $CC6 $extra $CFL -S "$src" \
 		    > "$OUT/asm/$(echo "$s" | tr / _).s" 2> "$OUT/t.log"; then
 			ok=$((ok+1))
 		else
 			bad=$((bad+1))
 			echo "==== $s" >> "$OUT/errors"
-			cat "$OUT/t.log" >> "$OUT/errors"
+			# `|| true' on BOTH: this file runs under `set -e',
+			# the recompile is EXPECTED to fail, and a bare
+			# failing command kills the script -- which it did,
+			# silently, so the run printed nothing at all and
+			# exited 1.  *The positive control caught it; the
+			# first version of this arm was never exercised
+			# because nothing had failed since it was written.*
+			$CC6 $extra $CFL -o "$OUT/t.6" "$src" \
+				> "$OUT/t.log" 2>&1 || true
+			grep -v '#warning directive' "$OUT/t.log" \
+				>> "$OUT/errors" || true
 		fi
 		continue
 	fi
@@ -278,21 +301,38 @@ EOF
 	n=$(wc -l < "$OUT/undefined")
 	echo "php-mirror: $n symbol(s) the link must find outside php"
 	echo "php-mirror: the list is in $OUT/undefined; asking libap --"
-	# ***THREE LIBRARIES NOW, NOT ONE.***  php pulls libxml2 and libz
-	# through `#pragma lib' in their headers, so a sweep that knows
-	# only libap answers `absent' for every `xmlParseFile' and
-	# `deflateInit_' -- 241 of the 539 the first run with the dom,
-	# simplexml and zlib extensions reported.  `--root' adds their
-	# vendored sources; add one here for every library a new
-	# extension links.
+	# ***NINE LIBRARIES NOW, NOT ONE.***  php pulls each of them
+	# through `#pragma lib' in its own header, so a sweep that knows
+	# only libap answers `absent' for every `xmlParseFile',
+	# `deflateInit_', `SSL_new' and `curl_easy_init' -- 241 of the
+	# 539 the first run with the dom, simplexml and zlib extensions
+	# reported.  `--root' adds their vendored sources; **add one here
+	# for every library a new extension links**, or the sweep's
+	# `absent' column fills with names that are present and the real
+	# findings are lost in it.
 	python3 "$ROOT/sys/lib/tests/apfunc-sweep.py" \
 		--root sys/src/external/libxml2 \
 		--root sys/src/external/zlib \
+		--root sys/src/external/libressl \
+		--root sys/src/external/curl \
+		--root sys/src/external/sqlite \
+		--root sys/src/external/libzip \
+		--root sys/src/external/readline \
+		--root sys/src/external/bzip2 \
 		--file "$OUT/undefined" |
 		grep -v '	*defined   ' || true
 	echo "php-mirror: ^ anything here is READ, not a failure -- the"
 	echo "php-mirror:   sweep sees C function definitions only, so"
 	echo "php-mirror:   assembly reads as 'declared' and DATA as 'absent'."
+	echo "php-mirror:   The known-innocent 'absent' names, all checked"
+	echo "php-mirror:   by hand: stdin/stdout/stderr, environ, h_errno,"
+	echo "php-mirror:   _ctype, _errnoloc, xmlParserVersion,"
+	echo "php-mirror:   xmlStringText (DATA); the 16 rl_* (readline"
+	echo "php-mirror:   VARIABLES); and the 15 BZ2_* -- bzlib.c spells"
+	echo "php-mirror:   every definition 'int BZ_API(BZ2_bzopen)', so"
+	echo "php-mirror:   the NAME IS INSIDE A MACRO and no regex over"
+	echo "php-mirror:   definition sites can see it.  **A name here"
+	echo "php-mirror:   that is not on that list is the finding.**"
 	exit 0
 fi
 echo "php-mirror: compiled $ok, errors $bad, missing $missing"

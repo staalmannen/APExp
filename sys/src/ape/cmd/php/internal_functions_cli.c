@@ -62,6 +62,14 @@
 #include "ext/spl/php_spl.h"
 #include "ext/standard/php_standard.h"
 #include "ext/uri/php_uri.h"
+#include "ext/posix/php_posix.h"
+#include "ext/pcntl/php_pcntl.h"
+#include "ext/bz2/php_bz2.h"
+#include "ext/readline/php_readline.h"
+#include "ext/openssl/php_openssl.h"
+#include "ext/curl/php_curl.h"
+#include "ext/sqlite3/php_sqlite3.h"
+#include "ext/zip/php_zip.h"
 
 
 static zend_module_entry * const php_builtin_extensions[] = {
@@ -86,6 +94,24 @@ static zend_module_entry * const php_builtin_extensions[] = {
 	phpext_standard_ptr,
 	phpext_spl_ptr,
 	phpext_uri_ptr,
+	/*
+	 * The eight optional extensions Phoronix asks for.  Only one of
+	 * the eight declares a dependency -- `PHP_ADD_EXTENSION_DEP(zip,
+	 * pcre)' -- and pcre is the second entry in this array, so the
+	 * order below is free and is the order the mkfile lists them in.
+	 *
+	 * GD is the ninth and is absent because there is no libgd in
+	 * this tree; ext/sockets is the tenth and is deferred to a libap
+	 * change.  Both are explained in `php_config.h'.
+	 */
+	phpext_posix_ptr,
+	phpext_pcntl_ptr,
+	phpext_bz2_ptr,
+	phpext_readline_ptr,
+	phpext_openssl_ptr,
+	phpext_curl_ptr,
+	phpext_sqlite3_ptr,
+	phpext_zip_ptr,
 
 };
 

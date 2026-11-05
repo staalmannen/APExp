@@ -1492,7 +1492,19 @@ void pcntl_signal_dispatch(void)
 
 static void pcntl_signal_dispatch_tick_function(int dummy_int, void *dummy_pointer)
 {
-	return pcntl_signal_dispatch();
+	/*
+	 * APExp: was `return pcntl_signal_dispatch();'.  Returning a void
+	 * EXPRESSION from a void function is a constraint violation --
+	 * C11 6.8.6.4p1, "A return statement with an expression shall not
+	 * appear in a function whose return type is void" -- which gcc
+	 * and clang accept as an extension and kencc rejects:
+	 *
+	 *	pcntl.c:1495 incompatible types: "VOID" and "VOID" for op "RETURN"
+	 *
+	 * *Both operands void is the tell that this is the rule and not a
+	 * type mismatch.*  The two statements below are the same program.
+	 */
+	pcntl_signal_dispatch();
 }
 
 /* {{{ Enable/disable asynchronous signal handling and return the old setting. */

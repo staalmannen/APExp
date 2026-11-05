@@ -1152,8 +1152,33 @@ broken compiler.
 ## `php-mirror.sh` — php's whole build, compiled on the host
 
 `sys/lib/tests/hostkencc/php-mirror.sh`. `--flags` prints the compile
-line, `--compile` builds all 514 translation units and **gates**.
+line, `--compile` builds all 579 translation units and **gates**.
 Depends on `hostkencc.sh` having run.
+
+***ITS `--undefined` MODE SAVED EMPTY DIAGNOSTICS FOR A YEAR OF ITS
+SHORT LIFE, AND THE REASON IS THE ONE `hostkencc.sh --probe` ALREADY
+CARRIES: kencc's `diag()` WRITES TO STDOUT.*** Under `-S` stdout is
+where the assembly goes, so a failing unit's errors land at the END OF
+THE .s FILE and the `2>` capture holds nothing but cpp's `#warning`
+line. A real finding -- LibreSSL's missing `sk_X509_new_reserve` --
+read as **exit 1 with no message**, which is indistinguishable from a
+compiler crash and was nearly filed as one. The arm now recompiles a
+failing unit to an OBJECT, where stdout is the diagnostics and nothing
+else. *The same trap, in the same directory, found twice by two
+different people-shaped mistakes.*
+
+**`--undefined` needs a `--root` for every library an extension
+links**, and this is not optional bookkeeping: with only libap known,
+241 of 539 names came back `absent` and the real findings were
+invisible among them. Nine roots now. **Its `absent` column has three
+standing caveats and the script prints all of them**: DATA symbols
+(`stdin`, `environ`, `h_errno`, `xmlParserVersion`, ...), readline's 16
+`rl_*` **variables**, and the 10 `BZ2_*`, which are *functions that
+are present* -- `bzlib.c` spells every definition
+`int BZ_API(BZ2_bzopen)`, so **the name is inside a macro** and no
+regex over definition sites can see it. *A sweep that reads source
+text cannot see through the preprocessor, and the failure mode is a
+confident `absent` naming a function that is right there.*
 
 **What it came from**: eight consecutive rounds, each costing a VM
 rebuild to learn about one compile error, because the error in the next

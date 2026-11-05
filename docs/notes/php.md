@@ -1220,3 +1220,160 @@ cannot be found by reading the subject.*
   by `apfunc-sweep.py` while answering php's `config.h`. It is the
   composition of `localtime_r` and `asctime_r`, both of which were
   already there, and is now in `time/ctime.c`.
+
+## The eight optional extensions, and the check that could only pass
+
+Phoronix's `system-info` lists nine OPTIONAL extensions once the four
+required ones are in: OpenSSL, GD, Bzip2, SQLite3, PCNTL, POSIX, CURL,
+Sockets, Readline. **Eight are built. GD is impossible and Sockets is
+deferred**, and the two reasons are different in kind.
+
+Eight of the nine already had a library in this tree — `lib/bz2`,
+`lib/readline`+`lib/history`, `lib/libressl`, `lib/curl`, `lib/sqlite`,
+`lib/zip` — and POSIX and PCNTL need none. **GD needs libgd, which is
+not here**; `lib/png` is, and a PNG codec is not a drawing library, so
+this is an absent dependency rather than a port.
+
+### The first measurement was worthless, twice over
+
+Running the mirror over the candidate files reported **posix 1/1,
+sqlite3 1/1, zip 2/2, curl 4/4 — clean**. Four of those were real and
+*five other extensions reported clean while compiling to nothing at
+all*: every one of these extensions wraps its whole body in
+`#ifdef HAVE_<X>`, and none of the `HAVE_` names was in the
+`config.h`. `ext/posix/posix.c` with `HAVE_POSIX` unanswered is an
+empty translation unit, and an empty translation unit compiles.
+
+***A check that cannot fail is not a check***, and this file already
+carried that rule for `config.h` answers. What makes it worth writing
+down again is that the obvious repair **also failed**: counting `TEXT`
+symbols in `6c -S` output gave 363, 368, 397, 452, 470, 486, 505 — for
+empty and non-empty units alike — because kencc emits the `static
+inline` functions out of php's headers that gcc at `-O2` discards. *The
+floor is about 360 and the signal is underneath it.*
+
+**The discriminator that works is one `grep`**: does the assembly
+mention `<ext>_module_entry`. 0 for the five empty ones, 10-14 for the
+real ones, in a single command. *The question was never "did it
+compile" but "did it compile the extension".*
+
+### Three findings, and all three were somebody else's
+
+**LibreSSL has no `*_new_reserve` family at all.**
+`openssl_backend_common.c:714` is
+`sk_X509_new_reserve(NULL, sk_X509_INFO_num(sk))`, and neither that nor
+the `OPENSSL_sk_new_reserve` underneath it exists in LibreSSL 4.3.2.
+The call is a **capacity hint and nothing else** — the stack it makes
+is filled by `sk_X509_push` in the loop immediately below, and push
+grows on demand — so `#define sk_X509_new_reserve(cmp, n)
+sk_X509_new_null()` is the same program with one more realloc in it.
+It is in `php_openssl_backend.h` under `#if
+defined(LIBRESSL_VERSION_NUMBER)`, which is **upstream's own
+convention**: php already carries five such guards, one of them in
+that same file. *All six openssl files compile after it.*
+
+**`ext/readline` reaches `php_cli_get_shell_callbacks` through
+`dlsym`,** and upstream's own commented-out alternative three lines
+above is the direct call. Upstream's comment says why the dynamic
+lookup is there — even the CGI SAPI links against "CLI"-only
+extensions, so the symbol may be absent at run time — and *neither half
+of that applies to a build with no dynamic linking*: the extension is
+static, `sapi/cli/php_cli.c:111` is in the same binary, and
+`sapi/cli/cli.h` is already included.
+
+***The alternative was not "leave it alone".*** APE ships a
+`<dlfcn.h>` whose `dlsym` is `return NULL`, so including it compiles,
+links, and then installs no callbacks at all — `php -a` without
+readline and nothing printed to say so. **A stub that answers "nothing
+found" is the trap, not the fix**, which is this tree's oldest rule
+arriving through a header nobody added for php. Keyed on
+`!defined(HAVE_DLFCN_H)` rather than on Plan 9, so any platform with
+dynamic linking keeps upstream's arm untouched.
+
+**`return <void expression>;` in a `void` function.**
+`ext/pcntl/pcntl.c:1495` is `return pcntl_signal_dispatch();`, and
+kencc answers `incompatible types: "VOID" and "VOID" for op "RETURN"`.
+***Both operands being `VOID` is the tell that this is a rule and not
+a type mismatch***: C11 6.8.6.4p1 is a constraint and kencc is right,
+while gcc and clang accept it silently without `-pedantic`. Fixed as
+two statements in php; **the compiler deviation is recorded in 0.6's
+inventory and not taken**, with the reason — `ORETURN` with a non-`Z`
+left means "compute the value into the return location", so accepting
+a void operand is a statement-tree rewrite, not a relaxed check.
+
+### What the answers were derived from
+
+Every function question went to `apfunc-sweep.py` with the library's
+own tree as a `--root`; every macro and struct question was a compile
+against the real APE headers. The results that mattered:
+
+* libap has **26 of the 29** functions `ext/posix` asks about. Only
+  `eaccess`, `getsid` and `ttyname_r` are absent.
+* `ext/pcntl` gets `fork`, `sigaction`, `sigprocmask`, `sigwaitinfo`,
+  `sigtimedwait`, `wait3` and `wait4`; not `waitid`, `getpriority`,
+  `setpriority`, `sched_getcpu`, `unshare`, `forkx` or `getcpuid`.
+* **`WIFCONTINUED` exists and `WCONTINUED` does not.** That looks like
+  a typo and is not — they are separate `#ifdef`s in `pcntl.c` and a
+  compile answers them separately.
+* LibreSSL has neither `RAND_egd` nor `OSSL_set_max_threads`, so no EGD
+  and no argon2. **The TLS feature macros are not answered in the
+  `config.h` and must not be**: `xp_ssl.c:70-146` computes
+  `HAVE_TLS13`, `HAVE_SEC_LEVEL` and the rest from the version macros
+  itself.
+* libzip 1.11.4 has all six functions php version-checks for;
+  sqlite 3.53.4 has both. **`SQLITE_OMIT_LOAD_EXTENSION` is the Plan 9
+  answer and not a preference** — `sqlite3_load_extension` is dlopen,
+  so the alternative is a link error rather than a missing feature.
+* `rl_erase_empty_line` is a **variable**, so the sweep cannot see it;
+  `readline.c:250` defines it and `readline.h:648` declares it.
+
+**All six libraries come in by `#pragma lib` from their own headers**,
+checked rather than asserted: `<bzlib.h>`, `<readline/readline.h>`,
+`<readline/history.h>`, `<curl/curl.h>`, `<sqlite3.h>`, `<zip.h>` and
+the `<openssl/*.h>` set each carry one. `zip.h` carries **six**, which
+is libzip's compression backends and its crypto. So there is still no
+`LIB=` line in `cmd/php/mkfile`. *`history.h` naming `libreadline.a`
+is right rather than a slip*: `lib/readline/mkfile` puts `$HISTOBJ`
+into `libreadline.a` as well.
+
+### The state
+
+**579 translation units compile, 0 errors**, and the link wants **1166**
+symbols from outside php, of which `--undefined` resolves **1120**
+against libap and the eight library trees. The remaining 46 — 40
+`absent`, 6 `declared-only` — are all data, assembly or macro-hidden,
+and each was opened by hand: the nine known DATA symbols
+(`stdin`/`stdout`/`stderr`, `environ`, `h_errno`, `_ctype`,
+`_errnoloc`, `xmlParserVersion`, `xmlStringText`), `getcontext`/
+`swapcontext`/`signal`/`xmlMalloc`/`zError`/`zlibVersion` as before,
+the 16 readline **variables**, and **the 15 `BZ2_*`, which are
+functions and are present** — `bzlib.c` spells every definition
+`int BZ_API(BZ2_bzopen)`, so the name is inside a macro and no regex
+over definition sites can match it. That caveat is
+now printed by the mirror itself, with the list, so the next reader
+compares against it instead of re-deriving it.
+
+### ext/sockets, and why it is the one deferred
+
+It is not a `config.h` answer. `<sys/socket.h>` has **no `struct
+cmsghdr`**, no `CMSG_DATA`/`CMSG_LEN`/`CMSG_SPACE`, no
+`MSG_TRUNC`/`MSG_CTRUNC`, and `struct msghdr` has no `msg_flags`;
+`multicast.c` additionally `#error`s unless `HAVE_IF_NAMETOINDEX` is
+set, which is a free answer since libap has the function. Underneath
+that, **`sendmsg` is a stub returning ENOSYS and `recvmsg` is declared
+by the header and defined nowhere** — `apfunc-sweep` reports it
+`declared`, the middle state that link-fails far from the claim.
+
+What it would take: the `CMSG_*` macros and `struct cmsghdr` are
+boilerplate pointer arithmetic; `msg_flags` is a **public struct
+change**, so it needs `mk distclean` and an entry beside `-J` and the
+64-bit `ino_t`; and `sendmsg`/`recvmsg` can be real for the
+scatter/gather case — iterate the iovec over the socket fd — with
+ancillary data the only part that genuinely cannot work, since Plan 9
+has no `SCM_RIGHTS`. **That last part is the one to get right**: an
+`fd`-passing call must fail loudly rather than silently drop the
+control message.
+
+Phoronix wants sockets only "when running the Phoromatic Server", so
+it is the least valuable of the nine and the only one needing a public
+struct to move. *Deferred on cost, not on possibility.*
