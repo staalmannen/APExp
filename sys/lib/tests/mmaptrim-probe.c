@@ -71,6 +71,26 @@
  *                      that bites are a Zend storage handler or
  *                      `USE_ZEND_ALLOC=0'.
  *
+ * ***RUN, AND THE ANSWER IS THE SECOND ONE -- BUT THE RUN FOUND
+ * SOMETHING ELSE THAT MATTERS MORE.*** On 9front/amd64:
+ *
+ *   section 0: **0 of 8 aligned**, and every one misaligned by exactly
+ *     `0x1ff000' -- `0xfedff000', `0xfebff000', `0xfe9ff000', ...,
+ *     spaced 2MB apart and each starting ONE PAGE BELOW a 2MB
+ *     boundary. So the placement is on a 2MB grid, off by 4096.
+ *   section 0: ***AND THREE OF THE EIGHT `mmap' CALLS FAILED.*** Five
+ *     2MB mappings is 10MB, which is nothing, so this is not memory --
+ *     it is a limit on how many mappings a process may HOLD. That is
+ *     what section 0b exists to separate, and it is a harder ceiling
+ *     for php than any amount of trimming.
+ *   section 1: the over-sized mapping came back `0xfec00000', offset
+ *     **0** -- aligned. *One sample, and it contradicts section 0's
+ *     five*, so the placement rule depends on the size; do not
+ *     generalise it. In zend's real path that means no head trim and
+ *     one tail trim.
+ *   sections 2 and 3: **both survived**. The partial-unmap arm works
+ *     on the machine as well as on the host.
+ *
  * THE HOST IS THE CONTROL, AND IT HAS BEEN RUN. Built with gcc on
  * Linux: sections 2 and 3 both SURVIVE, so the probe's own mechanics
  * are sound and a fault on the VM is the platform's answer rather than
@@ -159,6 +179,54 @@ main(int argc, char **argv)
 	for(i = 0; i < 8; i++)
 		if(p[i] != 0)
 			munmap(p[i], CHUNK);
+
+	/* ---- section 0b: HOW MANY mappings can be live at once? ----
+	 *
+	 * Section 0's first run answered `0 of 8 aligned' AND `mmap
+	 * failed' three times, and the SECOND of those is the bigger
+	 * finding: five 2MB mappings is not a memory limit, it is a
+	 * limit on how many a process may HOLD.  Plan 9 gives a process
+	 * a fixed number of segment slots and `p9_mmap_impl' spends one
+	 * on every mapping at or above SEG_THRESHOLD.
+	 *
+	 * ***THE PREDICTION, WRITTEN BEFORE THE RUN***: if the limit is
+	 * SLOTS, the count is the same small number at every size, and
+	 * the total bytes held differ by orders of magnitude for no
+	 * reason.  If it is address space or memory, the count falls as
+	 * the size rises, roughly as 1/size.  The two cannot be confused.
+	 *
+	 * The small size is deliberately just UNDER SEG_THRESHOLD, so it
+	 * is malloc-backed and takes no slot: it is the control, and it
+	 * should run to the array's end.
+	 */
+	{
+		static void *m[64];
+		static const size_t sizes[3] = {
+			1024*1024 - 4096,	/* under SEG_THRESHOLD: control */
+			CHUNK,			/* what zend asks for */
+			16*1024*1024,		/* eight times bigger */
+		};
+		int s, n;
+
+		printf("\n-- section 0b: how many mappings can be LIVE at once\n");
+		for(s = 0; s < 3; s++){
+			for(n = 0; n < 64; n++){
+				m[n] = map(sizes[s]);
+				if(m[n] == 0)
+					break;
+			}
+			printf("  %9llu bytes each: %2d live%s  (%llu MB held)\n",
+			       (unsigned long long)sizes[s], n,
+			       n == 64 ? " (hit the array's end)" : "",
+			       (unsigned long long)sizes[s] * n / (1024*1024));
+			for(i = 0; i < n; i++)
+				munmap(m[i], sizes[s]);
+		}
+		printf("  same count at every size -> the limit is SEGMENT SLOTS\n");
+		printf("  count falls as size rises -> it is address space\n");
+		printf("  (on the host all three hit 64; that shows only that\n");
+		printf("   the section RUNS -- Linux has no slot limit to find)\n");
+	}
 
 	/* ---- section 1: the over-sized mapping zend actually asks for ---- */
 	printf("\n-- section 1: one %d-byte mapping\n", OVER);
