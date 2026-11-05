@@ -205,7 +205,7 @@ Yes, the default build is "bloated" because I enable everything that I believe w
 
 [9] https://github.com/lufia/plan9/pulls
 
-[10] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adzip:///home/jens/Downloads/src.zip/src/libvtermaf.squirrel@mx.sdf.org/
+[10] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52ad
 
 [11] https://github.com/archiecobbs/libnbcompat
 
