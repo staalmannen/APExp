@@ -2,6 +2,30 @@
 APEXPROOT=../../../../..
 TARG=php
 
+# ***`mkone's INSTALL RULE IS `cp $prereq $BIN/$TARG' AND NOTHING HERE
+# SET `BIN'.***  rc answered
+#
+#	/rc/lib/rcmain:24 *eval*:1: null list in concatenation
+#	mk: cp 6.out $BIN/php : exit status=rc 57534: error
+#
+# -- `$BIN/php' is a CONCATENATION in rc, and concatenating an empty
+# list with a string is an error rather than an empty result.  *The
+# message names the shell and the line inside `rcmain', not the
+# mkfile*, which is the "mk names the wrong line" shape a third time.
+#
+# `sys/src/ape/config' supplies `APEBIN' and not `BIN', so **every
+# other APE command mkfile assigns this itself** -- `cmd/bzip2',
+# `cmd/m4' and the rest all carry the same line.  This file includes
+# `</$objtype/mkfile' directly rather than `<$APE/config', and set
+# `CC' and `LD' by hand, so the one variable that only `mkone' reads
+# was the one nobody noticed was missing.  *It had to get as far as a
+# successful LINK before anything could.*
+#
+# It must come before the `<mkone' include below, because `install:V:
+# $BIN/$TARG' is a PREREQUISITE and so is expanded when the file is
+# parsed, not when the recipe runs.
+BIN=$APEXPROOT/$objtype/bin/ape
+
 PHPSRC=../../../external/php
 
 # ***THE OBJECT LIST IS DERIVED FROM UPSTREAM'S OWN CONFIGURE, NOT
