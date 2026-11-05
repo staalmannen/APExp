@@ -271,6 +271,14 @@ reach its start routine and `pthread_cond_timedwait` must actually
 wait; the two are different bugs and the sections are split so), `poll-test` (the count is
 of pollfd ENTRIES, a negative fd is ignored, a closed one is POLLNVAL —
 the two rules whose absence makes a `while(poll())` caller SPIN),
+`ucontext-test` (**the one test here with a REAL REFERENCE
+IMPLEMENTATION** — glibc has ucontext, so all six sections were checked
+against a working one before the VM saw them, 0 failures; *a failure on
+Plan 9 that also fails on gcc is the test's bug*. Section 1 asks whether
+the function ran **on the stack it was given**, which a switch that
+quietly used the caller's would otherwise pass; section 3 passes the
+maximum arguments because the ucontext cell sits just above them and the
+failure mode of an off-by-one is `exit(0)`, so it prints a marker first),
 `rdev-test` (two different files must
 be distinguishable — it transcribes diffutils' `same_file()` verbatim,
 because the question is what THAT function answers), `stdio-test`.
@@ -282,8 +290,8 @@ so a test built from a fresh pull can run days-old library code and say
 nothing. `_sock_listenmark`, `_execmark`, `_ttymark`, `_getcwdmark`,
 `_printfmark`, `_dupmark`, `_dotdirmark`, `_tempmark`, `_fdinfomark`,
 `_umaskmark`, `_bufmark`, `_rdevmark`, `_selregmark`, `_pthreadmark`,
-`_syncmark`, `_mmapmark` each make the test **fail to LINK** against a libap
-predating its fix. The idiom has paid twelve times; bump one when a file changes in a way a test must see — and
+`_syncmark`, `_mmapmark`, `_ucmark` each make the test **fail to LINK** against a libap
+predating its fix. The idiom has paid thirteen times; bump one when a file changes in a way a test must see — and
 it matters most where the bug's whole symptom is that nothing is
 printed.
 
@@ -313,6 +321,18 @@ field was. The harness wraps `malloc` now, as it already wrapped
 `free`. *The assertion had been phrased against the thing under test
 instead of against something independent of it*, which is the shape
 to look for when a break does not fire.
+**`makectx-xcheck.{c,sh}`** checks `makecontext`'s FRAME on the host,
+and **it compiles the real `ucontext.c` rather than a copy** — no
+extraction and no markers to rot, which is possible only because
+everything structural in that file is C and the assembly knows just
+"eight slots". It exists because the one number spanning the two
+languages (where the ucontext pointer sits in the new frame) fails
+SILENTLY on the VM. No external oracle, so its control is a deliberate
+break: the cell off by one gives **3** failures, `SP` not one slot below
+**1**. ***Its first run reported its own STUB***: the real
+`_setmcontext` never returns, the fake recorded and returned, and
+section 3 duly failed — *the assertion was right and the fake was
+wrong*, which is the shape to recognise rather than argue with.
 **`hostkencc/clisp-mirror.sh` stages clisp's generated tree on the
 host** so the host kencc can compile and inspect it -- `--flags` prints
 the compile line, `--compile` builds all 31 TUs and GATES. *Its
@@ -485,8 +505,16 @@ and 3 say both trims survive. **But three of the eight `mmap` calls
 FAILED**, and 10MB is not a memory limit, so **section 0b** asks how
 many mappings a process may HOLD, at three sizes, *with the prediction
 written down first*: slots give the same count at every size, address
-space gives one falling as 1/size. It is **5 at 2MB and 5 at 16MB**,
-and 64 at a size below `SEG_THRESHOLD` — the control. **Two of its
+space gives one falling as 1/size. It was **5 at 2MB and 5 at 16MB**,
+and 64 at a size below `SEG_THRESHOLD` — the control. ***AND THE FIX
+DISARMED IT***: with `SEG_THRESHOLD` at 64MB all three of 0b's sizes
+take the malloc arm, so it answers 64/64/64 — right, worth keeping as
+the regression check that `mmap` spends no slot, and *unable to say
+how many slots exist*. **Section 0c** asks the platform instead,
+`_SEGATTACH` in a loop at 64KB: **5**, the same number over a 256-fold
+range of sizes for a total of 320KB, which excludes memory outright.
+*A section whose cases have collapsed onto one path is a check that
+can only pass.* **Two of its
 sections can kill the process, so it takes an ARGUMENT**: no argument
 runs the tail trim, `3` runs the head trim, never sharing a run,
 because a section that can kill the process hides every section after
@@ -1121,11 +1149,12 @@ two are the opposite of what it says — `HAVE_TM_ZONE` and
 `HAVE_ST_BLOCKS` are both YES, `struct tm` and `struct stat` having
 those members. *A sweep over function names, asked about a struct
 field, answers `absent` confidently.*
-**What can still stop it, in order**: (1) **fibers have no context
-switch** — `zend_fibers.c` is unconditional and wants either
-boost.context's GAS assembly or `<ucontext.h>`, and APExp has neither;
-a libap `ucontext` for amd64 is the reusable half, and it is a decision
-to make BEFORE the mkfile, since it changes what the mkfile builds.
+**What can still stop it, in order**: (1) fibers — **CLOSED on the
+host, unmeasured on the VM**: `zend_fibers.c` is unconditional and
+wants either boost.context's GAS assembly or `<ucontext.h>`, and APExp
+now has the second (`lib/ap/arch/amd64/mcontext.s` + `ucontext.c`,
+`docs/notes/libap.md`). amd64 only; the other ten follow the same
+shape when wanted.
 (2) **`ext/opcache` is mandatory in 8.5** — there is no
 `--disable-opcache`, only `--disable-opcache-jit`, which is what drops
 the 13-file `jit/ir` code generator; opcache only has to COMPILE, since
@@ -1690,12 +1719,25 @@ the index, so that nothing here is a surprise.
   reason it scrubs `FD_ISTTY` and `FD_ISREG`. `FD_BUFFEREDX` is poison:
   `read()` and `select()` both answer EIO for it without touching the
   fd.
-- **A process gets FIVE spare segment slots, measured**, so `mmap`
-  cannot be backed by `segattach` in general: `mmaptrim-probe` section
-  0b maps until refused at three sizes and answers 5 at 2MB and 5 at
-  16MB -- *the same count for eight times the memory*. `SEG_THRESHOLD`
-  is 64MB for that reason and anything below it is `malloc`-backed,
-  page-aligned by hand since `malloc` is not.
+- **kencc amd64 has NO callee-saved registers, measured.** A host
+  `6c -S` on a function that computes three values, calls through a
+  function pointer and then uses them spills all three to the stack and
+  touches BX and R12-R15 not at all. *So nothing may be kept in a
+  register across a call into arbitrary code* — which is why libap's
+  `ucontext` puts its bookkeeping pointer on the new stack. `main9.s:7`
+  calls R12-R15 "callee-saved REGEXT registers" and both can be true: a
+  register the allocator never hands out is trivially preserved.
+- **A process gets FIVE spare segment slots, measured twice and the
+  second time at 64KB**, so `mmap` cannot be backed by `segattach` in
+  general. `mmaptrim-probe` section 0b got 5 at 2MB and 5 at 16MB
+  through `mmap`; **section 0c calls `_SEGATTACH` directly and gets 5
+  at 64KB**. *Five, over a 256-fold range of sizes and a total of
+  320KB* -- so memory and address space are excluded outright, and the
+  number is the kernel's rather than the library's. `SEG_THRESHOLD` is
+  64MB for that reason and anything below it is `malloc`-backed,
+  page-aligned by hand since `malloc` is not. **0c is the one that
+  still asks**: every size 0b uses is now under the threshold, so it
+  answers 64/64/64 and can only confirm that `mmap` spends no slot.
 - `/dev/snarf` is the clipboard and has no concept of ownership.
 - Plan 9 has no loopback unless `ip/ipconfig loopback /dev/null 127.1`
   has been run -- and that belongs in the machine's startup, not in
