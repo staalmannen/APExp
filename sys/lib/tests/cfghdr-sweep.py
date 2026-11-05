@@ -89,12 +89,13 @@ PAIRS = [
 
 DEFINE = re.compile(r'^\s*#\s*define\s+([A-Za-z_][A-Za-z0-9_]*)')
 IFNDEF = re.compile(r'^\s*#\s*ifndef\s+([A-Za-z_][A-Za-z0-9_]*)')
+INCLUDE = re.compile(r'^\s*#\s*include\s+([<"][^>"]+[>"])')
 UNDEF_C = re.compile(r'^\s*/\*\s*#\s*undef\s+([A-Za-z_][A-Za-z0-9_]*)\s*\*/')
 UNDEF_H = re.compile(r'^\s*#\s*undef\s+([A-Za-z_][A-Za-z0-9_]*)')
 
 
 def scan(path):
-    """(defines, undefs) as name sets.
+    """(defines, undefs, includes) as sets.
 
     ***THE INCLUDE GUARD IS EXCLUDED, AND THE CONTROL IS WHAT SAID
     SO.***  A guard is a `#define' like any other, so the first
@@ -105,7 +106,7 @@ def scan(path):
     have shown it.  *A fixture is allowed to differ from the real
     case in exactly the way that exposes the bug.*
     """
-    d, u = set(), set()
+    d, u, inc = set(), set(), set()
     guarded = set()
     with open(path, encoding='utf-8', errors='replace') as f:
         for line in f:
@@ -124,14 +125,40 @@ def scan(path):
             m = UNDEF_H.match(line)
             if m:
                 u.add(m.group(1))
-    return d, u
+                continue
+            m = INCLUDE.match(line)
+            if m:
+                inc.add(m.group(1))
+    return d, u, inc
 
 
 def check(tmpl, ans):
     """Returns the number of GATING findings."""
-    tdef, tundef = scan(tmpl)
-    adef, aundef = scan(ans)
+    tdef, tundef, tinc = scan(tmpl)
+    adef, aundef, ainc = scan(ans)
     gating = 0
+
+    # 0. ***THE TEMPLATE'S OWN `#include's, WHICH ARE WHY THIS CHECK
+    # EXISTS A SECOND TIME.***  php's template ends with four, and
+    # they are how every translation unit comes to see <string.h>:
+    # `zend_operators.h' does not include it and neither does
+    # anything a Zend file reaches.  Leaving them out gave
+    # `incompatible types: "IND VOID" and "INT" for op "RETURN"' on
+    # `return mempcpy(...)' -- and memcpy, memcmp and strncasecmp
+    # were undeclared in the same unit and said nothing, since `int'
+    # converts to `size_t' in silence.
+    #
+    # *The first version of this sweep compared macro NAMES only*,
+    # which is the prologue's shape and not the epilogue's.  The
+    # category is "verbatim template text", and an `#include' is as
+    # verbatim as a `#define'.
+    lostinc = sorted(tinc - ainc)
+    if lostinc:
+        print('  MISSING template #includes -- verbatim text, and the')
+        print('  reason every unit sees the headers it does:')
+        for n in lostinc:
+            print('      %s' % n)
+        gating += len(lostinc)
 
     # 1. the copied-through text.  This is the gate.
     #
@@ -185,6 +212,8 @@ CONTROL_TMPL = """\
 
 /* another */
 #undef HAVE_SILENT
+
+#include <stdlib.h>
 #endif
 """
 
@@ -208,9 +237,9 @@ def control():
         a = os.path.join(d, 'a.h');    open(a, 'w').write(CONTROL_ANS)
         print('control:')
         n = check(t, a)
-    ok = (n == 1)
-    print('control: %d gating finding(s), want 1 (COPIED_THROUGH) -- %s'
-          % (n, 'ok' if ok else 'FAILED'))
+    ok = (n == 2)
+    print('control: %d gating finding(s), want 2 (COPIED_THROUGH and'
+          ' the #include) -- %s' % (n, 'ok' if ok else 'FAILED'))
     return 0 if ok else 1
 
 
@@ -230,10 +259,12 @@ def main():
         print('%s' % os.path.relpath(ans, ROOT))
         gating += check(tmpl, ans)
         print()
-    print('---- %d template #define(s) not carried through' % gating)
+    print('---- %d piece(s) of verbatim template text not carried '
+          'through' % gating)
     if gating:
         print('Copy them VERBATIM from the template: they are not')
-        print('capability answers and autoheader never generates them.')
+        print('capability answers, and autoheader generates only')
+        print('`#undef NAME\' lines, so nothing else in a .h.in is.')
     return gating
 
 

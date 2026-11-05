@@ -438,4 +438,35 @@
 /* #undef HAVE_DTRACE */
 /* #undef HAVE_HUGE_CODE_PAGES */
 
+/*
+ * ***THE EPILOGUE IS UPSTREAM'S TOO, AND LEAVING IT OUT WAS THE SAME
+ * MISTAKE TWICE.***  `main/php_config.h.in:2225-2236' ends with four
+ * `#include's, and they are how EVERY translation unit in php comes
+ * to see `<string.h>': `Zend/zend_operators.h' does not include it,
+ * and neither does anything else `Zend/Optimizer/block_pass.c'
+ * reaches -- only `main/php.h:208', which a Zend file never gets to.
+ *
+ * Without them `zend_operators.h:308' answered
+ * `incompatible types: "IND VOID" and "INT" for op "RETURN"' on
+ * `return mempcpy(dest, src, n);' -- an undeclared function returning
+ * implicit `int' where a `void *' belongs.  **`memcpy', `memcmp' and
+ * `strncasecmp' were undeclared in the same translation unit** and
+ * said nothing, because `int' converts to `size_t' without
+ * complaint: *the pointer was the only one loud enough to notice.*
+ *
+ * Verbatim, guards included.
+ */
+
+#include <stdlib.h>
+
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif
+
+#include <string.h>
+
 #endif /* PHP_CONFIG_H */
