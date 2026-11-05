@@ -90,6 +90,17 @@ extern int timespec_get(struct timespec *, int);
 extern struct tm *gmtime_r(const time_t *, struct tm *);
 extern struct tm *localtime_r(const time_t *, struct tm *);
 extern char *ctime_r(const time_t *, char *);
+/*
+ * `asctime_r' has been DEFINED in `time/ctime.c' and declared by no
+ * header, which is the invariant this tree has about implicit `int':
+ * a caller without a prototype gets the pointer TRUNCATED, with no
+ * diagnostic.  It was found by calling it from `ctime_r' one screen
+ * away in its own file -- `ctime.c:80 incompatible types: "IND CHAR"
+ * and "INT" for op "RETURN"', and the `redeclaration of: asctime_r'
+ * warning beside it was kencc complaining about its OWN implicit
+ * declaration, 120 lines later, against the real definition.
+ */
+extern char *asctime_r(const struct tm *, char *);
 
 extern char *strptime(const char *, const char *, struct tm *);
 extern time_t timegm(struct tm *);

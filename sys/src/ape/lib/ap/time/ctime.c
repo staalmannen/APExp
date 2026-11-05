@@ -69,6 +69,18 @@ ctime(const time_t *t)
  * Both of ctime's halves are reentrant already, so this is their
  * composition and nothing more.  `asctime_r' wants 26 bytes, which is
  * what POSIX says the caller must supply.
+ *
+ * ***AND IT FOUND A SECOND BUG BY BEING WRITTEN.***  The first build
+ * answered `ctime.c:80 incompatible types: "IND CHAR" and "INT" for
+ * op "RETURN"' on the line below, because **`asctime_r' was declared
+ * by no header at all** -- defined 120 lines further down this very
+ * file and invisible to every caller, including this one.  An
+ * undeclared function returns implicit `int', so the pointer was
+ * truncated.  `<time.h>' declares it now.
+ *
+ * *The warning beside the error is the tell*: `redeclaration of:
+ * asctime_r' at the DEFINITION, which is kencc objecting to its own
+ * implicit declaration rather than to anything in the header.
  */
 char*
 ctime_r(const time_t *t, char *buf)
