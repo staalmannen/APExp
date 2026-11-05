@@ -94,3 +94,7 @@ sys/src/ape/cmd/clisp/build-*/
 # munmaptrim-xcheck's generated extract and its host binary
 sys/lib/tests/munmaptrim-extract.h
 sys/lib/tests/munmaptrim-xcheck
+
+# makectx-xcheck's host binary and its scratch include directory
+sys/lib/tests/makectx-xcheck
+sys/lib/tests/.makectx-xcheck.d/

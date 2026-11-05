@@ -3945,3 +3945,122 @@ already wrapped `free`, and the same break gives 3 failures. *A check
 that cannot fail is not a check*, and the way it got written is worth
 naming: the assertion was phrased against the thing under test instead
 of against something independent of it.
+
+## ucontext for amd64
+
+php's `Zend/zend_fibers.c` is unconditional -- `Fiber` is a language
+class -- and wants either boost.context's GAS assembly or
+`<ucontext.h>`. APExp had neither. This is the second, chosen because
+it is libap's own code and reusable beyond php; the other ten
+architectures can follow the same shape.
+
+**Three files.** `arch/amd64/mcontext.s` holds `_getmcontext`,
+`_setmcontext`, `_swapmcontext` and the `_ctxreturn` stub;
+`arch/amd64/ucontext.c` holds the four POSIX entry points and
+`_ctxfinish`; `sys/include/ape/ucontext.h` and
+`amd64/include/ape/ucontext_arch.h` are the interface.
+
+**It is `setjmp.s` with the return-value convention changed**, and
+deliberately so: the two problems are the same one. Both of that file's
+findings carry over unchanged --
+
+* **eight registers, not two.** 6c has `REGEXT = D_R15`, so R15 and R14
+  are reserved program-wide (`6c/reg.c:55-57`) and R13/R12 can follow
+  them as caches for global variables. A switch restoring only SP and
+  PC leaves the resumed code reading another context's globals.
+* **the restore must not WRITE to the stack.** `ADDQ $8,SP` then `JMP`
+  instead of storing the PC at `0(SP)` and `RET`ing. A context resumed
+  at the top of a fresh fiber stack is exactly the case that faults.
+
+**And AX is zeroed before the jump.** Without it a `getcontext` resumed
+by `setcontext` returns whatever was in AX and its caller believes the
+number -- the same reason `longjmp` sets it, found by writing the
+section that checks it rather than by reasoning.
+
+### No register survives a call here, and that is measured
+
+The first design kept the ucontext pointer in a callee-saved register
+across the context's own function. **There are no callee-saved
+registers.** `hostkencc/out/bin/6c -S` on a function that computes three
+values, calls through a function pointer and then uses them spills all
+three to the stack and touches BX and R12-R15 not at all. So the
+pointer goes on the new stack instead.
+
+*`main9.s:7` calls R12-R15 "callee-saved REGEXT registers", and both
+statements can be true* -- a register the allocator never hands out is
+trivially preserved -- but nothing in this implementation now depends on
+either reading, which is the point.
+
+### The one number that spans two languages
+
+`makecontext` writes the ucontext pointer at `base[UC_ARGMAX+1]`;
+`_ctxfinish` reads it at `sp[UC_ARGMAX]`, where `sp` is what
+`_ctxreturn` hands over after the RET has popped one slot. **Off by one
+and the pointer read back is an argument**, so `uc_link` is garbage and
+the usual consequence is `exit(0)` -- indistinguishable from a clean
+finish at a shell prompt.
+
+`_ctxreturn` therefore passes its stack pointer to C and does nothing
+else: *the frame layout belongs to `makecontext`, which is C, so the
+stub carries no magic number.* No offset into `ucontext_t` appears in
+assembly at all.
+
+**`UC_ARGMAX` is a cap and not a convention.** On an ABI that passes the
+first six arguments in registers the stack image does not change shape
+with `argc`, so the bookkeeping cell can sit at a fixed offset whatever
+the count -- how glibc does it. Here only argument zero is in a register
+(6c's `RARG` = BP) and the rest are contiguous from `8(FP)`, so the cell
+must follow a FIXED number of argument slots. Eight, chosen rather than
+derived; php passes none.
+
+**`mc_regs[3..7]` are left exactly as they are, and that is why POSIX
+makes `getcontext` a precondition of `makecontext`**: those registers
+may hold 6c's caches for global variables, so the right value for a new
+context is the caller's, which the required `getcontext` already put
+there. Zeroing them would hand the new context a null view of every
+register-cached global.
+
+**`stack_t` is defined in `<ucontext.h>` and not in `<signal.h>`.**
+POSIX puts it beside `sigaltstack`, and APExp has no `sigaltstack`: a
+probe compiling `stack_t ss;` against `<signal.h>` would answer yes and
+the next thing such a package does is call the function. *This tree's
+commonest bug shape with the sign flipped* -- not a stub answering
+success but a TYPE answering for a capability that is not there. The
+`external/` grep found 39 files; every C use is a consumer behind
+`HAVE_SIGALTSTACK`, and the two `config.h` hits are gnulib's
+replacement slot, which a plain typedef does not disturb.
+
+### Two instruments, and what each can and cannot say
+
+`sys/lib/tests/ucontext-test.c` is the switch, and **it has a real
+reference implementation**, which is rare here: glibc has ucontext, so
+all six sections were checked against a working one before the VM saw
+them. 0 failures on gcc. A failure on Plan 9 that also fails on glibc is
+the test's bug.
+
+`sys/lib/tests/makectx-xcheck.{c,sh}` is the frame arithmetic, on the
+host. **It compiles the real `ucontext.c` rather than a copy** -- no
+extraction, no markers to rot -- with stubs for the three assembly
+primitives, which is possible only because everything structural in that
+file is C. It exists because the off-by-one above fails *silently* on
+the VM and costs a rebuild to find. No external oracle, so its control
+is a deliberate break, run and reverted: the ucp cell off by one gives
+**3** failures, `SP` not one slot below gives **1**.
+
+***AND ITS FIRST RUN REPORTED ITS OWN STUB.*** Section 3 failed on "did
+not exit", because the real `_setmcontext` jumps away and never returns
+while the stub recorded and returned, falling through to `_ctxfinish`'s
+`exit(0)`. The stub `longjmp`s now, which is what "does not return"
+means in a host program. *The instrument reporting itself is the shape
+to recognise rather than argue with* -- the assertion was right and the
+fake was wrong.
+
+**What neither covers**: `uc_sigmask` is saved and restored through
+`sigprocmask`, which on APE is a read and a write of one global
+(`signal/sigprocmask.c`), and nothing here exercises a context switch
+with signals actually blocked. And the header could not be
+syntax-checked against the APE headers on the host -- they reach each
+other through absolute `/sys/include/ape/...` paths that resolve only
+inside `apexp-sh` -- so the gcc check symlinks the two ucontext headers
+into a scratch directory instead and supplies `sigset_t` from glibc's
+own `<bits/types/sigset_t.h>`.
