@@ -619,7 +619,8 @@ OFILES=\
 # is how `HELP_BUILTIN' was turned on and did not reach bash; the same
 # line is in `lib/perl/mkfile' and `cmd/bash/mkfile' for the same
 # reason.
-HFILES=php_config.h zend_config.h timelib_config.h build-defs.h
+HFILES=cfg/main/php_config.h cfg/php_config.h cfg/zend_config.h\
+	cfg/timelib_config.h cfg/build-defs.h
 
 <$APEXPROOT/sys/src/cmd/mkone
 
@@ -672,7 +673,19 @@ OBJDIRS=\
 	ext/standard ext/standard/libavifinfo ext/uri\
 	ext/uri/uriparser/src main main/streams sapi/cli
 
-INCS=-I. -I$PHPSRC -I$PHPSRC/main -I$PHPSRC/Zend -I$PHPSRC/TSRM\
+# ***`cfg' COMES FIRST AND `.' IS NOT ON THE LIST AT ALL.***
+# The four hand-kept headers are reached by three different spellings
+# -- `<main/php_config.h>' from `TSRM/TSRM.h:20', `<php_config.h>'
+# from Zend and opcache, `<build-defs.h>' from `main/php.h' -- and
+# `-Icfg' answers all of them, with `cfg/php_config.h' redirecting to
+# `cfg/main/php_config.h' so there is only ever one set of answers.
+#
+# *`-I.' is deliberately absent.* The build writes its objects into
+# `main/', `Zend/', `TSRM/' and `ext/' right here, so `.' on the
+# include path would put directories named after php's own source
+# trees in front of php's own source trees.  Nothing needs it:
+# `internal_functions_cli.c' reaches everything through `$PHPSRC'.
+INCS=-Icfg -I$PHPSRC -I$PHPSRC/main -I$PHPSRC/Zend -I$PHPSRC/TSRM\
 	-I$PHPSRC/ext/date/lib -I$PHPSRC/ext/lexbor\
 	-I$PHPSRC/ext/uri/uriparser/include
 
@@ -720,6 +733,182 @@ CFLAGS=-c $DEFS $INCS
 ext/json/json_parser.$O: $PHPSRC/ext/json/json_parser.tab.c
 	mkdir -p $OBJDIRS
 	$CC $CFLAGS -I$PHPSRC/ext/json $prereq -o $target
+
+
+# ------------------------------------------------------------------
+# ***TWO DIRECTORIES NEED FLAGS THE REST MUST NOT HAVE, AND THE RULES
+# ARE EXPLICIT RATHER THAN PATTERNED ON PURPOSE.***
+#
+# A `ext/pcre/pcre2lib/%.$O:' meta-rule beside the general `%.$O:' one
+# would be shorter, and mk probably prefers the more specific stem --
+# but *probably* is recollection, and this tree's rule is that a flag
+# one letter from another flag is checked rather than recalled.  There
+# is no mk here to check it with, and a wrong guess costs a VM round
+# trip, so these are 32 explicit rules.  Explicit beats meta-rule in
+# every mk, which needs no checking at all.
+#
+# ***AND THE FLAGS CANNOT SIMPLY GO IN THE GLOBAL CFLAGS, WHICH WAS
+# MEASURED RATHER THAN FEARED.***  pcre2 wants `-DHAVE_CONFIG_H' and
+# `-I$PHPSRC/ext/pcre/pcre2lib', which holds a `config.h' -- and
+# `ext/json/json.c:18', `json_encoder.c:18' and
+# `main/php_odbc_utils.c:18' each read
+#
+#	#ifdef HAVE_CONFIG_H
+#	#include <config.h>
+#	#endif
+#
+# so the two flags together would hand three php files **pcre2's**
+# config.h.  Not a failure: a different header, silently.  Upstream
+# avoids it by giving every extension its own compile line, which is
+# what these rules are.
+#
+# The Keccak `-D..._excluded' flags are why `KeccakP-200-SnP.h' was
+# reported missing: it is excluded, and the exclusion is a flag rather
+# than a file.
+#
+# All 32 were found in ONE pass -- `gcc -E' over all 513 sources on
+# the host with these include paths, reporting only
+# `No such file or directory'.  *One sweep instead of 31 VM round
+# trips*, which is the same economics as every other host instrument
+# here.  Anything the preprocessor can answer should be answered
+# before the VM sees it.
+# ------------------------------------------------------------------
+
+PCRE2FLAGS=-DHAVE_CONFIG_H -DHAVE_MEMMOVE -I$PHPSRC/ext/pcre\
+	-I$PHPSRC/ext/pcre/pcre2lib
+
+KECCAKFLAGS=-DKeccakP200_excluded -DKeccakP400_excluded\
+	-DKeccakP800_excluded -I$PHPSRC/ext/hash\
+	-I$PHPSRC/ext/hash/sha3/generic64lc
+
+
+ext/pcre/pcre2lib/pcre2_auto_possess.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_auto_possess.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_chartables.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_chartables.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_chkdint.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_chkdint.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_compile.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_compile.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_config.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_config.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_context.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_context.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_convert.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_convert.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_dfa_match.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_dfa_match.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_error.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_error.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_extuni.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_extuni.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_find_bracket.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_find_bracket.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_jit_compile.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_jit_compile.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_maketables.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_maketables.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_match.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_match.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_match_data.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_match_data.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_newline.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_newline.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_ord2utf.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_ord2utf.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_pattern_info.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_pattern_info.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_script_run.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_script_run.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_serialize.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_serialize.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_string_utils.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_string_utils.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_study.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_study.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_substitute.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_substitute.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_substring.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_substring.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_tables.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_tables.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_ucd.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_ucd.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_valid_utf.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_valid_utf.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/pcre/pcre2lib/pcre2_xclass.$O: $PHPSRC/ext/pcre/pcre2lib/pcre2_xclass.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $PCRE2FLAGS $prereq -o $target
+
+ext/hash/hash_sha3.$O: $PHPSRC/ext/hash/hash_sha3.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $KECCAKFLAGS $prereq -o $target
+
+ext/hash/sha3/generic64lc/KeccakHash.$O: $PHPSRC/ext/hash/sha3/generic64lc/KeccakHash.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $KECCAKFLAGS $prereq -o $target
+
+ext/hash/sha3/generic64lc/KeccakP-1600-opt64.$O: $PHPSRC/ext/hash/sha3/generic64lc/KeccakP-1600-opt64.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $KECCAKFLAGS $prereq -o $target
+
+ext/hash/sha3/generic64lc/KeccakSponge.$O: $PHPSRC/ext/hash/sha3/generic64lc/KeccakSponge.c
+	mkdir -p $OBJDIRS
+	$CC $CFLAGS $KECCAKFLAGS $prereq -o $target
 
 # mkone's `clean' is `rm -f *.[$OS] ...', which cannot see an object in
 # a subdirectory -- and 512 of the 513 here are in one.  Overriding it
