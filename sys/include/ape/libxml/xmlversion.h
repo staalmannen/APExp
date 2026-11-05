@@ -13,6 +13,29 @@
 #ifndef __XML_VERSION_H__
 #define __XML_VERSION_H__
 
+/*
+ * APExp: link libxml2 the Plan 9 way, as <zlib.h> and the rest of the
+ * APE headers do.  `cc/macbody:728' reads this and records the archive
+ * in the object, so a program that includes any <libxml/*.h> links
+ * against it without naming it in a mkfile; `apexp-sh' binds this
+ * tree's `$objtype/lib/ape' over `/$M/lib/ape', so the path is ours.
+ *
+ * **THIS HEADER IS OTHERWISE BYTE-IDENTICAL TO THE VENDORED COPY** at
+ * `sys/src/external/libxml2/include/libxml/xmlversion.h', so a re-sync
+ * of `sys/include/ape/libxml' silently drops these three lines and
+ * every libxml2 consumer then fails to link with no hint as to why.
+ * `<zlib.h>' is the same arrangement -- it differs from
+ * `external/zlib/zlib.h' by this pragma and a blank line, and nothing
+ * else -- so re-applying it is the known cost of updating either.
+ *
+ * ***IT GOES IN THIS FILE BECAUSE THIS IS THE ONE EVERY OTHER HEADER
+ * REACHES***: 42 of the 46 installed `<libxml/*.h>' include it, and
+ * the three that do not -- `SAX.h', `nanoftp.h', `xmlunicode.h' -- are
+ * empty deprecation stubs that declare nothing, so they cannot create
+ * a reference to resolve.  *Checked rather than assumed.*
+ */
+#pragma lib "/$M/lib/ape/libxml2.a"
+
 /**
  * the version string like "1.2.3"
  */

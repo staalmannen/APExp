@@ -424,6 +424,94 @@ OFILES=\
 	ext/lexbor/lexbor/url/url.$O\
 # ext/lexbor\
 	ext/lexbor/php_lexbor.$O\
+# ***THE FOUR EXTENSIONS PHORONIX NEEDS, AND THE LIST IS DERIVED FROM\
+# pts-core's OWN CHECK RATHER THAN FROM ITS ERROR MESSAGE.***\
+# `pts-core.php:208's `pts_needed_extensions()' requires four things:\
+# JSON (already built), DOM, SimpleXML, and -- the one the message\
+# hides -- `extension_loaded('zip') || extension_loaded('zlib')'.\
+# **ext/zlib satisfies the "MISSING ZIP" line**, so libzip is not\
+# needed and `ext/zip' is not built; `lib/z' already is.\
+#\
+# `ext/libxml' is the glue BOTH dom and simplexml declare a dependency\
+# on (`PHP_ADD_EXTENSION_DEP'), so it comes first in this list and\
+# first in `internal_functions_cli.c' -- the module order is the\
+# registration order. dom also depends on `lexbor', which this build\
+# already carries for its own sake.\
+#\
+# Every name below is from the extension's own `config.m4'\
+# `PHP_NEW_EXTENSION' line, read with awk, and each was checked to\
+# exist on disk -- the same derivation as the original 513.\
+#\
+# ***AND THE FIRST DERIVATION DROPPED TWO OF THEM, SILENTLY.***  The\
+# awk pattern was `^ *[a-z0-9_]+\.c$', which cannot match a path with\
+# a SLASH, so `parentnode/css_selectors.c' and `parentnode/tree.c'\
+# vanished.  **And the check that the list was complete compared it\
+# against `ls *.c' in `ext/dom', which cannot see a subdirectory\
+# either** -- 34 against 34, agreeing because both sides shared the\
+# same wrong assumption.  *A derivation and its check have to fail\
+# independently or the check is decoration.*\
+#\
+# `php-mirror.sh --undefined' is what caught it, naming\
+# `dom_parent_node_append' among the unresolved symbols; the VM's\
+# `6l' would have said the same thing one rebuild later.\
+#\
+# ***THEN THE WIDENED PATTERN DROPPED A THIRD, FOR THE HYPHEN.***\
+# Allowing `/' in the path found the two above and still missed\
+# `lexbor/selectors-adapted/selectors.c', whose directory has a `-'\
+# in it, and `--undefined' came back naming `lxb_selectors_init'.\
+# *Two rounds of widening a character class, each time believing the\
+# list was now complete.*  *** READ THE BLOCK, DO NOT PATTERN-MATCH\
+# IT***: dom's `PHP_NEW_EXTENSION' is 37 plain lines, and the\
+# `PHP_ADD_BUILD_DIR' right under it names both subdirectories --\
+# which is where the OBJDIRS entries below come from as well.\
+# ext/libxml\
+	ext/libxml/libxml.$O\
+	ext/libxml/mime_sniff.$O\
+	ext/libxml/image_svg.$O\
+# ext/dom\
+	ext/dom/attr.$O\
+	ext/dom/cdatasection.$O\
+	ext/dom/characterdata.$O\
+	ext/dom/comment.$O\
+	ext/dom/document.$O\
+	ext/dom/documentfragment.$O\
+	ext/dom/documenttype.$O\
+	ext/dom/dom_iterators.$O\
+	ext/dom/domexception.$O\
+	ext/dom/domimplementation.$O\
+	ext/dom/element.$O\
+	ext/dom/entity.$O\
+	ext/dom/entityreference.$O\
+	ext/dom/html5_parser.$O\
+	ext/dom/html5_serializer.$O\
+	ext/dom/html_collection.$O\
+	ext/dom/html_document.$O\
+	ext/dom/infra.$O\
+	ext/dom/inner_outer_html_mixin.$O\
+	ext/dom/namednodemap.$O\
+	ext/dom/namespace_compat.$O\
+	ext/dom/node.$O\
+	ext/dom/nodelist.$O\
+	ext/dom/notation.$O\
+	ext/dom/obj_map.$O\
+	ext/dom/php_dom.$O\
+	ext/dom/private_data.$O\
+	ext/dom/processinginstruction.$O\
+	ext/dom/text.$O\
+	ext/dom/token_list.$O\
+	ext/dom/xml_document.$O\
+	ext/dom/xml_serializer.$O\
+	ext/dom/xpath.$O\
+	ext/dom/xpath_callbacks.$O\
+	ext/dom/parentnode/css_selectors.$O\
+	ext/dom/parentnode/tree.$O\
+	ext/dom/lexbor/selectors-adapted/selectors.$O\
+# ext/simplexml\
+	ext/simplexml/simplexml.$O\
+# ext/zlib\
+	ext/zlib/zlib.$O\
+	ext/zlib/zlib_fopen_wrapper.$O\
+	ext/zlib/zlib_filter.$O\
 # ext/opcache\
 	ext/opcache/ZendAccelerator.$O\
 	ext/opcache/shared_alloc_mmap.$O\
@@ -665,6 +753,20 @@ OFILES=\
 HFILES=cfg/main/php_config.h cfg/php_config.h cfg/zend_config.h\
 	cfg/timelib_config.h cfg/build-defs.h
 
+# ***NO `LIB=' LINE, AND THAT IS DELIBERATE.***  Both libraries this
+# binary needs beyond libap -- libxml2 and libz -- are pulled by
+# `#pragma lib' in their own headers, which is how every other library
+# in this tree is linked: `<zlib.h>:34' has always carried one, and
+# `<libxml/xmlversion.h>' carries one now.  `cc/macbody:728' records
+# the archive in the object, so naming it here as well would be
+# saying the same thing twice in the place where it can rot.
+#
+# *The first version of this mkfile did name libxml2 in `LIB='*, on
+# the grounds that putting a pragma in a public APE header reaches
+# every program in the tree.  It does, and that is the point: a
+# program that includes `<libxml/*.h>' is a program that needs the
+# archive.
+
 <$APEXPROOT/sys/src/cmd/mkone
 
 CC=pcc
@@ -712,6 +814,8 @@ OBJDIRS=\
 	ext/lexbor/lexbor/ports/posix/lexbor/core\
 	ext/lexbor/lexbor/punycode ext/lexbor/lexbor/tag\
 	ext/lexbor/lexbor/unicode ext/lexbor/lexbor/url ext/opcache\
+	ext/libxml ext/dom ext/dom/parentnode\
+	ext/dom/lexbor/selectors-adapted ext/simplexml ext/zlib\
 	ext/pcre ext/pcre/pcre2lib ext/random ext/reflection ext/spl\
 	ext/standard ext/standard/libavifinfo ext/uri\
 	ext/uri/uriparser/src main main/streams sapi/cli

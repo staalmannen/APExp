@@ -278,7 +278,17 @@ EOF
 	n=$(wc -l < "$OUT/undefined")
 	echo "php-mirror: $n symbol(s) the link must find outside php"
 	echo "php-mirror: the list is in $OUT/undefined; asking libap --"
-	python3 "$ROOT/sys/lib/tests/apfunc-sweep.py" --file "$OUT/undefined" |
+	# ***THREE LIBRARIES NOW, NOT ONE.***  php pulls libxml2 and libz
+	# through `#pragma lib' in their headers, so a sweep that knows
+	# only libap answers `absent' for every `xmlParseFile' and
+	# `deflateInit_' -- 241 of the 539 the first run with the dom,
+	# simplexml and zlib extensions reported.  `--root' adds their
+	# vendored sources; add one here for every library a new
+	# extension links.
+	python3 "$ROOT/sys/lib/tests/apfunc-sweep.py" \
+		--root sys/src/external/libxml2 \
+		--root sys/src/external/zlib \
+		--file "$OUT/undefined" |
 		grep -v '	*defined   ' || true
 	echo "php-mirror: ^ anything here is READ, not a failure -- the"
 	echo "php-mirror:   sweep sees C function definitions only, so"
