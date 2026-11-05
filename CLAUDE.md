@@ -282,8 +282,8 @@ so a test built from a fresh pull can run days-old library code and say
 nothing. `_sock_listenmark`, `_execmark`, `_ttymark`, `_getcwdmark`,
 `_printfmark`, `_dupmark`, `_dotdirmark`, `_tempmark`, `_fdinfomark`,
 `_umaskmark`, `_bufmark`, `_rdevmark`, `_selregmark`, `_pthreadmark`,
-`_syncmark` each make the test **fail to LINK** against a libap
-predating its fix. The idiom has paid eleven times; bump one when a file changes in a way a test must see — and
+`_syncmark`, `_mmapmark` each make the test **fail to LINK** against a libap
+predating its fix. The idiom has paid twelve times; bump one when a file changes in a way a test must see — and
 it matters most where the bug's whole symptom is that nothing is
 printed.
 
@@ -295,6 +295,16 @@ printed.
 header, so it renames the SOURCE with `sed`), and `strerror-xcheck.py`,
 which has to be a script because **APE's errno NUMBERS are its own**, so
 only the NAMES line up.
+**`munmaptrim-xcheck.{c,sh}`** is the one that checks a function's
+BOOKKEEPING rather than its arithmetic: the script cuts `p9_munmap` and
+its table out of `__p9_syscall.c` **by marker** (never transcribed, and
+it gates if a marker stops matching) and links them against a fake
+`_SEGDETACH` that records what was released. *The bug it guards is not
+a crash in the function but the function freeing a segment the caller
+is still using*, which is invisible from inside and expensive from the
+VM. No external oracle, so its control is a deliberate break and has
+been run twice: the old start-address-only rule gives **8** failures,
+the old `_SEGDETACH` fallback gives **2**.
 **`hostkencc/clisp-mirror.sh` stages clisp's generated tree on the
 host** so the host kencc can compile and inspect it -- `--flags` prints
 the compile line, `--compile` builds all 31 TUs and GATES. *Its
@@ -458,7 +468,19 @@ command refuted the reading the file itself was written on*),
 regular and whether `select()` then reports them readable; the subject
 is what *rio* serves, so run it in a rio window with no wish running,
 and note that it never READS any of them, since reading `/dev/mouse` is
-the call that hangs), and
+the call that hangs),
+**`mmaptrim-probe`** (does a large `mmap` come back 2MB-ALIGNED here —
+which is what decides whether php's Zend allocator ever has to trim an
+over-sized mapping at all. **Two of its four sections can kill the
+process, so it takes an ARGUMENT**: no argument runs the tail trim, `3`
+runs the head trim, and they never share a run, because a section that
+can kill the process hides every section after it. The host is the
+control and has been run: both trims survive there, and **8 of 8
+aligned on Linux is why php works there**, while *section 1's
+over-sized mapping is misaligned on Linux too* — so section 1 is
+information about the trim SIZE and only section 0 can clear or condemn
+anything. Calls `_mmapmark`, since a probe built against stale library
+code reports a lie shaped like the platform's answer), and
 `mkrecipe-probe/`, which is a whole mk DIRECTORY because the question is
 what `mk` hands `rc` (`mk -k all`; `-k` is not optional).
 
@@ -1061,6 +1083,49 @@ silent:
 - **itcl** — done. 10 failures, all upstream or Tcl 9's, two settled at
   source, none ours.
 
+**php — SURVEYED, NOTHING BUILT YET, and the survey is in
+`docs/notes/php.md`.** 8.5.12, vendored at `sys/src/external/php`.
+**508 objects with `--disable-all`**, derived from a real configure run
+on the host rather than guessed, and `ext/lexbor` is 186 of them —
+*`--disable-all` does not mean a small build in 8.5*. **Three things
+are free and were checked rather than assumed**: the generated
+parsers, scanners and the 4.2MB `zend_vm_execute.h` are all in the
+tarball, so no bison, no re2c and *no bootstrap PHP* — the gap
+`miniperl` has; that file is dispatch-kind AGNOSTIC, so
+`ZEND_VM_KIND_CALL` falls out of `zend_vm_opcodes.h:40` by itself with
+no computed gotos and no global register variables; and
+`zend_portability.h` `#define`s `__has_attribute`/`__has_builtin`/
+`__has_feature` to 0 when absent, so every GCC-ism takes its portable
+arm and the atomics fall to a plain `volatile` implementation plus a
+`#warning` — **which kencc's cpp has**, at WARNING and not FATAL
+(`cpp/nlist.c:38`, `cpp.c:278`). *A first grep of the wrong two files
+said it did not.*
+**`main/php_config.h` is 2239 lines, 169 of them a `HAVE_*` define**,
+and that is an INVENTORY of questions rather than a set of answers —
+clisp's `mprotect` rule: a working configure would get this machine
+wrong. `apfunc-sweep.py` answers 106 of them mechanically: **69
+defined, 4 declared-only, 33 absent**. ***And the absent list must not
+be read at face value***: most of its entries are not functions, and
+two are the opposite of what it says — `HAVE_TM_ZONE` and
+`HAVE_ST_BLOCKS` are both YES, `struct tm` and `struct stat` having
+those members. *A sweep over function names, asked about a struct
+field, answers `absent` confidently.*
+**What can still stop it, in order**: (1) **fibers have no context
+switch** — `zend_fibers.c` is unconditional and wants either
+boost.context's GAS assembly or `<ucontext.h>`, and APExp has neither;
+a libap `ucontext` for amd64 is the reusable half, and it is a decision
+to make BEFORE the mkfile, since it changes what the mkfile builds.
+(2) **`ext/opcache` is mandatory in 8.5** — there is no
+`--disable-opcache`, only `--disable-opcache-jit`, which is what drops
+the 13-file `jit/ir` code generator; opcache only has to COMPILE, since
+`opcache.enable_cli` is off by default, and all three of its shared
+memory macros must be answered NO — *`shm_open` answering success with
+a file in `/tmp` over a per-process `mmap` is `HAVE_WORKING_MPROTECT`
+in its exact shape.* (3) the Zend allocator's partial `munmap`, which
+is **fixed** in libap with one measurement still open
+(`mmaptrim-probe` section 0).
+**No extension in the first build**, whatever its library's state.
+
 **Queued**: **tkdesk** gets its mkfile in `sys/src/ape/app` and is **not
 built by default**, being a proof-of-concept rather than part of APExp.
 (`tkblt` was dropped: 3.2 is C++ with namespaces, and tkdesk never needed
@@ -1107,6 +1172,7 @@ covers what you are about to touch; do not re-derive from scratch.
 | `docs/notes/bash.md` | the bash campaign: the allocation storm and the twelve instrument faults it cost, the fourteen `config.h` features, printf, strftime, strtoull, strerror, dup, readdir, and the per-file state of its suite |
 | `docs/notes/edg.md` | EDG's C++ front end: the target description, the link model, the `auto` grammar bug, the entry point, the folded `offsetof`, and the two bit-field rules it flushed out of kencc |
 | `docs/notes/ports.md` | one section per package — cfront, bacon, muon, go, chicken, perl, GNU tar — what each took to build and what the breakage turned out to be about |
+| `docs/notes/php.md` | the php 8.5.12 survey: the 508-object file list derived from upstream's own configure, why CALL dispatch falls out by itself, the `config.h` inventory and what `apfunc-sweep` answers of it, and the three things that can still stop it |
 | `docs/notes/instruments.md` | every test, probe, sweep, model and cross-check: what it came from, what it cost, and which of them turned out to be the visible fault |
 
 Two more under `docs/`, which are surveys rather than history:
@@ -1694,7 +1760,18 @@ identical; **16-bit `ino_t`/`dev_t`**, against a tree of 64799 files;
 **`pthread_create` never running the thread it created** — the child
 waited on a rendezvous the parent never answered, which was both
 archiver hangs; **`fsync` answering FAILURE, so `xz` deleted every file
-it wrote**; `poll()`'s three POSIX violations and `select()` on a
+it wrote**; **a partial `munmap` destroying the whole segment, by two
+different routes** — a head trim matched the table on its start address
+and detached the segment the caller was about to use, and a tail trim's
+interior address fell through to `_SEGDETACH(addr)`, which detaches the
+segment that address is in; *the idiom both of those break is how every
+POSIX program gets an ALIGNED allocation*, php's Zend allocator
+included, and the unknown-address `_SEGDETACH` fallback is gone
+deliberately, because destroying a stranger's segment to free a mapping
+we are not sure we made is worse than leaking; **`ctime_r` declared in
+`<time.h>` and implemented nowhere**, found by `apfunc-sweep.py` while
+answering php's `config.h` and already the composition of two functions
+that were there; `poll()`'s three POSIX violations and `select()` on a
 regular file; itcl's
 four `sfbug`s; kencc's `false` keyword, the `L`-suffix width cap, the
 wide case label, the compound-literal zero fill, and both bit-field
