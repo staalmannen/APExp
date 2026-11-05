@@ -82,9 +82,43 @@ static zend_always_inline void zend_object_release(zend_object *obj)
 
 static zend_always_inline size_t zend_object_properties_size(zend_class_entry *ce)
 {
-	return sizeof(zval) *
-		(ce->default_properties_count -
-			((ce->ce_flags & ZEND_ACC_USE_GUARDS) ? 0 : 1));
+	/*
+	 * ***THIS SUBTRACTION IS MEANT TO GO NEGATIVE, AND THE WHOLE
+	 * EXPRESSION HAS TO BE EVALUATED AT size_t WIDTH FOR THAT TO
+	 * WORK.***  `zend_object' ends in `zval properties_table[1]', so
+	 * a class with NO properties wants one zval LESS than the
+	 * struct -- the count is `int', the result is -1, and
+	 * `sizeof(zval) * -1' is 2**64-16, which the caller's
+	 * `sizeof(zend_object) + ...' wraps back to 40.  Upstream is
+	 * right and relies on C: `sizeof' yields `size_t'.
+	 *
+	 * **kencc gives `sizeof' the type TULONG, which on amd64 is 32
+	 * BITS** (`cc/com.c:894', deliberately, so an unprototyped call
+	 * is not handed eight bytes). `size_t' here is 64. So the
+	 * multiply happened in 32 bits and the result was ZERO-extended:
+	 * `6c -S' is `SUBL' / `SALL $4' / **`MOVLQZX`**, giving
+	 * 4294967280 where gcc gives 2**64-16.
+	 *
+	 * Every `exit()' in every script then asked the allocator for
+	 * 4294967336 bytes, which it page-rounds to 4294971392 -- the
+	 * number that killed `php -v'-sized scripts and the Phoronix
+	 * Test Suite alike, at `zend_throw_unwind_exit' ->
+	 * `zend_objects_new(&zend_ce_unwind_exit)', a class with zero
+	 * properties and no guards.
+	 *
+	 * Doing the subtraction and the multiply in `ptrdiff_t' -- which
+	 * is signed and size_t's width on every target -- makes kencc
+	 * emit `MOVLQSX' / `SUBQ' / `SALQ' and agree with gcc. It is a
+	 * no-op anywhere `sizeof' already has the width C requires.
+	 *
+	 * *The compiler is the deviation here, not php*; see
+	 * `docs/notes/kencc.md'. This is the local fix, and the same
+	 * idiom in any other package is still exposed.
+	 */
+	ptrdiff_t n = (ptrdiff_t)ce->default_properties_count
+		- ((ce->ce_flags & ZEND_ACC_USE_GUARDS) ? 0 : 1);
+
+	return (size_t)(n * (ptrdiff_t)sizeof(zval));
 }
 
 /* Allocates object type and zeros it, but not the standard zend_object and properties.

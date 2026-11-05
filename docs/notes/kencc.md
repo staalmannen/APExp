@@ -3352,3 +3352,74 @@ Both fixes are in the block the string-literal fix of the previous
 round also touched, and the controls are the same three: `agree.c`
 identical, `--probe` ten `regpair-min` and eight `regpair-probe` with
 `kc` and `vc` at `:242`, clisp's 31 TUs clean.
+
+## `sizeof` is 32 bits, and that breaks ARITHMETIC as well as arguments
+
+This file and `CLAUDE.md` have carried "`sizeof` is 32-bit" for a long
+time, always with the same consequence attached: *a call with no
+prototype in scope corrupts the argument*. **There is a second
+consequence and it is worse, because it needs no missing prototype and
+produces no diagnostic at all.**
+
+`cc/com.c:894` types the result of `sizeof` as `TULONG`, with the
+reason written beside it: on Plan 9 `long` is 32 bits even on amd64,
+so returning that width "matches the ABI width of every long/int
+parameter without corrupting the call stack". **But C requires
+`sizeof` to yield `size_t`, and APE's `size_t` here is 64 bits.** Any
+expression that multiplies `sizeof` by something that can go negative
+is therefore evaluated in 32 bits and then **zero-extended** to 64.
+
+***THE MEASUREMENT, FROM THE COMPILER ITSELF.*** php's
+`Zend/zend_objects_API.h:83` is ordinary, correct C:
+
+	return sizeof(zval) *
+		(ce->default_properties_count -
+			((ce->ce_flags & ZEND_ACC_USE_GUARDS) ? 0 : 1));
+
+`zend_object` ends in `zval properties_table[1]`, so a class with no
+properties wants one zval LESS than the struct; `default_properties_count`
+is an `int`, the subtraction is -1, and `sizeof(zval) * -1` is
+2**64-16, which the caller's `sizeof(zend_object) + ...` wraps back to
+40. `6c -J -S` on that expression:
+
+	MOVL	4(CX),DI
+	SUBL	AX,DI
+	MOVL	DI,AX
+	SALL	$4,AX
+	MOVLQZX	AX,AX
+
+-- a 32-bit subtract, a 32-bit multiply, and **`MOVLQZX`**, which
+zero-extends. 4294967280 where gcc gives 2**64-16. Both numbers were
+confirmed by running the same source under gcc (40) and reading
+kencc's output (4294967336, page-rounded to 4294971392).
+
+**That number killed every `exit()` in every php script**, because
+`zend_throw_unwind_exit` constructs an object of a class with zero
+properties and no guards. It is in `docs/notes/php.md` with how it was
+found, and the local fix is to compute in `ptrdiff_t`, which makes
+kencc emit `MOVLQSX` / `SUBQ` / `SALQ` and agree.
+
+### Why the compiler is not being changed, and what it would take
+
+**The conformant fix is one line**: give `OSIZE` the target's `size_t`
+type -- `TUVLONG` where `ewidth[TIND]` is 8, `TULONG` where it is 4.
+*It is not obviously safe*, and the comment already in `com.c` says
+why: `print("%d", sizeof(x))` is ordinary in Plan 9 and in old C, and
+with a 64-bit `sizeof` it hands a variadic `%d` eight bytes and
+corrupts every argument after it. **That trade is a tree-wide decision
+with a new silent failure mode on the other side of it**, so it is
+recorded rather than taken.
+
+If anyone does take it, the control set is unusually good and should
+all be run: `agree.c` (codegen identical but for the two known
+orderings), `hostkencc.sh --probe` (ten `regpair-min`, eight
+`regpair-probe`, `kc` and `vc` at `:242`), `clisp-mirror.sh --compile`
+(31 TUs), `php-mirror.sh --compile` (515 TUs) and `--undefined` (283
+symbols), plus a sweep for `%d`/`%u` against a `sizeof` argument,
+which is the regression the change would introduce.
+
+**The idiom recurs**, and the local fix does not cover it:
+`zend_call_graph.c:72` is `sizeof(zend_send_arg_info) * ((int)opline->extended_value - 1)`
+and `Optimizer/dfa_pass.c:556` and `zend_ssa.c:1610` have the same
+shape with counts that are non-negative in practice. *Unmeasured, and
+listed so the next one is recognised rather than re-derived.*

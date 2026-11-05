@@ -746,6 +746,118 @@ general form is worth keeping**: a header-only helper that calls into
 a file the port does not compile is a link error here and silence on
 gcc.
 
+### CLOSED: `exit()` was kencc's 32-bit `sizeof`
+
+Three one-liners on the VM settled it with no rebuild:
+
+	php -r 'echo "no-exit\n";'          -> clean
+	php -r 'echo "exit0\n"; exit(0);'   -> 4294971392
+	php -d memory_limit=1 -r 'exit(0);' -> same, same limit
+
+**A script that just ends is clean**, so request shutdown and module
+shutdown are both fine and it is `ZEND_EXIT` alone.
+
+`exit` calls `zend_throw_unwind_exit`, which is
+`zend_objects_new(&zend_ce_unwind_exit)`, and that is
+
+	emalloc(sizeof(zend_object) + zend_object_properties_size(ce))
+
+with `zend_object_properties_size` (`zend_objects_API.h:83`):
+
+	sizeof(zval) * (ce->default_properties_count -
+		((ce->ce_flags & ZEND_ACC_USE_GUARDS) ? 0 : 1))
+
+`UnwindExit` is `INIT_CLASS_ENTRY(..., "UnwindExit", NULL)` -- zero
+properties -- and `ZEND_ACC_USE_GUARDS` is set only under
+`CG(compiler_options) & ZEND_COMPILE_GUARDS`, **which nothing in php
+ever sets**. So the subtraction is `0 - 1`, deliberately: `zend_object`
+ends in `zval properties_table[1]`, so a class with no properties wants
+one zval less than the struct, and `sizeof(zval) * -1` is 2**64-16,
+which the caller's `+ sizeof(zend_object)` wraps back to **40**.
+
+***UPSTREAM IS RIGHT AND THE COMPILER IS THE DEVIATION.*** C makes
+`sizeof` a `size_t`, 64 bits here; kencc types it TULONG, 32 bits
+(`cc/com.c:894`, on purpose). `6c -J -S` on the expression:
+
+	SUBL / SALL $4 / MOVLQZX
+
+-- 32-bit subtract, 32-bit multiply, **zero-extend** -- so 4294967280
+instead of 2**64-16, plus 56 is 4294967336, page-rounded to
+**4294971392**. The same source under gcc asks for 40. *Both numbers
+were run, not reasoned.*
+
+Fixed in the vendored header by computing in `ptrdiff_t`, which is
+signed and size_t's width on every target; kencc then emits
+`MOVLQSX` / `SUBQ` / `SALQ` and agrees with gcc. 515 TUs still
+compile. **The compiler change is recorded and not taken** --
+`docs/notes/kencc.md` has the trade and the controls -- so *the same
+idiom elsewhere is still exposed*, and three more instances in php's
+optimizer are named there.
+
+**Two reading errors on the way, both worth keeping.** I blamed
+`display_text_table`'s padding loop from the line number alone; the
+smoke test's reduction of that loop passes, and the real line was
+`exit` in both programs. And my first reduction of the size expression
+declared `default_properties_count` as `uint32_t` when it is `int`, so
+gcc "confirmed" a 68GB request and briefly made upstream look broken on
+Linux too. *A reduction that changes a type is not a reduction.*
+
+### The smoke test ran, and it moved the bug
+
+`php-smoke.php` on the VM: **44 of 45 cases pass**, including
+`PHP_INT_SIZE` 8, `PHP_INT_MAX`, `strlen`, `max`, `str_repeat` at
+100k, every arithmetic case, preg, json, and `/net/tcp/stats` read as
+404 bytes. `PHP_OS = Plan9, PHP_VERSION = 8.5.12`. **The interpreter
+evaluates correctly.**
+
+***SO THE PHORONIX DIAGNOSIS WAS WRONG, AND THE TEST IS WHAT SAID
+SO.*** Section 5 reproduces `display_text_table`'s padding loop over
+the exact table php had printed, and it **passes** -- `$m` is 15, not
+2**32. The crash is not in the loop.
+
+**It is in `exit`.** The smoke test's own last line is
+
+	Hard memory limit of 268435456 bytes exhausted
+	(tried to allocate 4294971392 bytes) in php-smoke.php on line 194
+
+and **line 194 is `exit($fails);`** -- printed *after* the test's own
+total, so everything before it ran. Phoronix's line 854 is `exit;` in
+the same `if($do_exit)` block. *Two unrelated programs, same line
+kind, same byte count to the digit.*
+
+**The size decomposes and the decomposition is the lead**:
+4294971392 is 1048577 pages of 4096, i.e. a request of just over
+2**32 rounded up by one page -- a length of **exactly 2**32** plus a
+small header. And `2**32 == (uint32_t)-1 + 1`. So the shape is a
+**32-bit -1 ZERO-extended into a 64-bit size and incremented**, not a
+sign-extended one (that would be `(size_t)-1`, and `len+1` would be
+0). *An identical size in two programs of different sizes is not
+data-dependent.*
+
+**What runs there**: `exit` compiles to ZEND_EXIT, which calls
+`zend_bailout`, which is `LONGJMP(*EG(bailout), FAILURE)` --
+and `zend_portability.h:427` makes that **`siglongjmp` into a
+`sigjmp_buf`, unconditionally on non-Windows**; there is no
+`HAVE_SIGSETJMP` test to answer. APExp's `sigsetjmp` is assembly
+(`arch/amd64/setjmp.s`) and its `siglongjmp` is C
+(`arch/amd64/notetramp.c:83`), and the two agree about the layout on
+inspection -- 30 ints is 120 bytes against the 80 the pair uses, and
+the C side passes `&jmpbuf[0]`, not the base. **So nothing is yet
+ruled in or out**; what is established is that the fault is on the
+bailout-and-shutdown path and not in the engine.
+
+**Three one-liners separate the remaining possibilities**, with no
+rebuild:
+
+	php -r 'echo "no-exit\n";'            # ends without exit()
+	php -r 'echo "exit0\n"; exit(0);'     # bailout
+	php -d memory_limit=-1 -r 'exit(0);'  # same, limit removed
+
+A clean first and a dying second puts it on `zend_bailout`; both
+dying puts it on request shutdown generally; and the third turns a
+clean `_exit(137)` into a real allocation failure or a fault, which
+`acid` can name the way it named `zend_string.h:401`.
+
 ### The first real program: Phoronix, and a 2**32
 
 `php -v` works, `php -h` works, and **the port has still never been

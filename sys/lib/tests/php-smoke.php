@@ -40,6 +40,12 @@
  * other, which is exactly the shape that produces a high half full
  * of junk.
  *
+ * ***ON THIS PORT THE EXIT STATUS IS NOT USABLE YET, SO READ THE
+ * COUNT LINE.***  `exit()' itself asks the allocator for 2**32 bytes
+ * (see `docs/notes/php.md'), so the process dies with 137 after
+ * printing its total.  The last line of output is the result until
+ * that is fixed; the status will mean what it says again afterwards.
+ *
  * Exit status is the failure count.
  */
 
@@ -73,7 +79,27 @@ echo "\nSection 1: the integer width, which is the suspect\n";
  */
 eq("PHP_INT_SIZE", PHP_INT_SIZE, 8);
 eq("PHP_INT_MAX", PHP_INT_MAX, 9223372036854775807);
-eq("PHP_INT_MIN", PHP_INT_MIN, -9223372036854775807 - 1);
+/*
+ * ***THE FIRST VERSION OF THIS CASE PUT ITS FINDING IN THE `want'
+ * COLUMN, WHICH IS BACKWARDS.***  It was
+ *
+ *	eq("PHP_INT_MIN", PHP_INT_MIN, -9223372036854775807 - 1);
+ *
+ * and on Plan 9 it printed
+ *
+ *	got -9223372036854775807-1  want -9.223372036854776E+18
+ *
+ * -- the `got' side is correct and the EXPECTED side is the bug: the
+ * subtraction overflowed into a float.  *An assertion whose expected
+ * value is computed by the thing under test reports the fault as a
+ * wrong expectation*, which is the same shape as the xcheck that read
+ * both sides out of the field it was testing.  Asked directly now.
+ */
+eq("PHP_INT_MIN + PHP_INT_MAX is -1", PHP_INT_MIN + PHP_INT_MAX, -1);
+eq("PHP_INT_MIN is an int", is_int(PHP_INT_MIN), true);
+eq("LONG_MIN by subtraction stays an int",
+   is_int(-9223372036854775807 - 1), true);
+eq("...and equals PHP_INT_MIN", (-9223372036854775807 - 1) === PHP_INT_MIN, true);
 eq("a literal above 2**32", 4294967296 + 4096, 4294971392);
 eq("1 << 32", 1 << 32, 4294967296);
 eq("a 2**32 round trip through a variable", (function () { $x = 4294967296; return $x; })(), 4294967296);
