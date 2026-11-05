@@ -746,6 +746,78 @@ general form is worth keeping**: a header-only helper that calls into
 a file the port does not compile is a link error here and silence on
 gcc.
 
+### It links, it runs, and the first fault was opcache's
+
+`6.out --version` prints
+
+	PHP 8.5.12 (cli) (built: Nov  5 2026 16:19:35) (NTS)
+	Copyright (c) The PHP Group
+	Zend Engine v4.5.12, Copyright (c) Zend Technologies
+
+and then dies: `suicide: sys: trap: fault read addr=0x4 pc=0x7ef0f7`.
+
+**Two things were wrong and they are unrelated.** `mk install` could
+not copy the binary at all -- `null list in concatenation`, because
+nothing set `BIN` and `mkone`'s rule is `cp $prereq $BIN/$TARG`; the
+mkfile now assigns it like every other APE command's. The fault is
+below.
+
+***THE DIAGNOSIS COST ONE COMMAND AND NO REBUILD, BECAUSE THE CLI HAS
+AN EXIT PATH THAT SKIPS THE SHUTDOWNS.*** `php_cli.c:1318`'s `-h`
+arm does `php_cli_usage(); goto out;` while `module_started` and
+`sapi_started` are still 0 -- they are set at `:1337` and `:1359`,
+after `exit_loop` -- so `-h` runs `exit()` and neither
+`php_module_shutdown()` nor `sapi_shutdown()`. **`./6.out -h` exits
+clean**, which cleared libap's `exit`, the stdio teardown and
+`php_ini_builder_deinit` in one line and left two functions standing.
+*Two outcomes, one command, no acid and no rebuild* -- and the
+alternative was nine candidate calls to read.
+
+Then `acid 6.out` and `src(0x7ef0f7)`:
+
+	Zend/zend_string.h:401
+	>401       if (!ZSTR_IS_INTERNED(s)) {
+
+`zend_string_free(NULL)`. **The address agrees with the source**:
+`zend_refcounted_h` is `{uint32_t refcount; union {uint32_t
+type_info;} u;}`, so `GC_FLAGS` reads **offset 4**, and `addr=0x4` is
+a null `zend_string *`. *`zend_string_free` is `zend_always_inline`
+and kencc does not inline*, so it is a real static function in every
+TU that uses it -- which is why there was a pc to resolve at all.
+
+**The caller is `accel_globals_dtor`** (`ZendAccelerator.c:2974`),
+found by listing every `zend_string_free` call site in php -- 91 of
+them -- and keeping the ones whose enclosing function name looks like
+teardown. Exactly one did.
+
+***AND THE MECHANISM IS A PLATFORM CONSEQUENCE, NOT AN ACCIDENT.***
+`accel_globals->key` is allocated by `accel_globals_ctor`, whose only
+caller is `accel_startup` -- the **zend_extension's** startup. And
+`zend_extensions.c:194`'s `zend_extension_startup` has its entire
+body inside `#if ZEND_EXTENSIONS_SUPPORT`, which
+`zend_portability.h:191-200` sets to 1 for dlopen and for Windows and
+**0 otherwise**. Plan 9 has no dlopen, so no zend_extension's startup
+ever runs here. opcache's **MSHUTDOWN is an ordinary MODULE
+shutdown**, gated by nothing, and calls `accel_shutdown`, which takes
+its `!ZCG(enabled) || !accel_startup_ok` arm and destroys the globals
+anyway. *A platform that constructs nothing destroys regardless.*
+
+Guarded, which is what the **next statement in the same function**
+already does for `preloaded_internal_run_time_cache` and what
+`zend_accel_blacklist_shutdown` opens with four lines earlier in the
+same call. **Upstream's, and the second upstream php bug this
+campaign** after the `zend_atomic.h` typo; both are worth reporting.
+
+*The rest of that path was checked for the same shape rather than
+left*: `zend_jit_shutdown` is `#ifdef HAVE_JIT` and we answer no, the
+blacklist has its own guard, and `UNREGISTER_INI_ENTRIES` over
+entries that were never registered walks an empty set.
+
+**Prediction, written down before the run**: `php -v` now exits 0.
+**What would refute it**: a fault at a different address or line --
+which would be the next member of the same family, since every
+zend_extension on this platform is constructed by nobody.
+
 ### The eight, and what each turned out to be
 
 Three were kencc's, three were APE headers', one was php's and one was
