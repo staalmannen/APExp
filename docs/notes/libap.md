@@ -4098,6 +4098,13 @@ bug the reference implementation is blind to, because the difference IS
 the reference's width. The tree's first invariant, arriving inside a
 file written to check something else.
 
+***MEASURED ON THE VM: `ucontext-test` 0 failures, all six sections.***
+Section 0 prints its PASS line twice, which is the resumed path
+re-entering at `getcontext`'s return and the thing the C wrapper could
+not do. So the switch, the new stack, `uc_link`, all eight argument
+slots, five round trips and a context's own locals are all behaving on
+the machine as they do against glibc.
+
 ### Two things the first VM build of it said
 
 **`conversion of pointer to shorter integer`, five times.** The casts

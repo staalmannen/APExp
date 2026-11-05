@@ -239,9 +239,9 @@ version, then add one library at a time.
 
 ## Open, as a list
 
-* fibers: `ucontext` is written (`docs/notes/libap.md`) and passes on
-  the host against glibc; **not yet run on the VM**, and php has not
-  been pointed at it (`ZEND_FIBER_UCONTEXT` in the `config.h`)
+* fibers: **done** — `ucontext` is in libap and `ucontext-test` is 0
+  failures on the VM (`docs/notes/libap.md`). What remains is pointing
+  php at it: `ZEND_FIBER_UCONTEXT` in the `config.h`
 * `main/php_config.h` not written yet; the inventory is derived, the
   answers are not
 * `memfd_create` is declared with no implementation, which is a libap

@@ -1149,12 +1149,15 @@ two are the opposite of what it says — `HAVE_TM_ZONE` and
 `HAVE_ST_BLOCKS` are both YES, `struct tm` and `struct stat` having
 those members. *A sweep over function names, asked about a struct
 field, answers `absent` confidently.*
-**What can still stop it, in order**: (1) fibers — **CLOSED on the
-host, unmeasured on the VM**: `zend_fibers.c` is unconditional and
-wants either boost.context's GAS assembly or `<ucontext.h>`, and APExp
-now has the second (`lib/ap/arch/amd64/mcontext.s` + `ucontext.c`,
-`docs/notes/libap.md`). amd64 only; the other ten follow the same
-shape when wanted.
+**What can still stop it, in order**: (1) fibers — **CLOSED and
+MEASURED**: `zend_fibers.c` is unconditional and wants either
+boost.context's GAS assembly or `<ucontext.h>`, and APExp now has the
+second (`lib/ap/arch/amd64/ucontext.s` + `makecontext.c`), with
+`ucontext-test` at **0 failures on the VM**. amd64 only; the other ten
+follow the same shape when wanted. *php has not been pointed at it
+yet* — that is `ZEND_FIBER_UCONTEXT` in the `config.h`.
+`docs/notes/libap.md` has the two bugs it cost, both of them
+`long`-width and both invisible to the host check.
 (2) **`ext/opcache` is mandatory in 8.5** — there is no
 `--disable-opcache`, only `--disable-opcache-jit`, which is what drops
 the 13-file `jit/ir` code generator; opcache only has to COMPILE, since
