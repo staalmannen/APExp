@@ -746,6 +746,59 @@ general form is worth keeping**: a header-only helper that calls into
 a file the port does not compile is a link error here and silence on
 gcc.
 
+### The first real program: Phoronix, and a 2**32
+
+`php -v` works, `php -h` works, and **the port has still never been
+measured evaluating anything** -- a version string is printed before
+the engine runs an opcode. The first real program put on it, the
+Phoronix Test Suite, said two things.
+
+**The expected one**: `MISSING DOM`, `MISSING ZIP`, `MISSING
+SimpleXML`. That is `--disable-all` working as intended and is not a
+fault; what it costs is written up in `plas_stack_readme.md`, together
+with the fact that **libxml2, libzip, zlib, SQLite, curl, LibreSSL and
+oniguruma are all already ported in `sys/src/ape/lib`** -- so every
+one of those extensions is mkfile work against a library that exists.
+
+***THE OTHER ONE IS A REAL BUG AND THE NUMBER NAMES ITS SHAPE.***
+
+	Hard memory limit of 2147483648 bytes exhausted
+	(tried to allocate 4294971392 bytes) in pts_client.php on line 854
+
+**4294971392 is 2**32 + 4096.** No program asks for that; it is a
+64-bit quantity whose low half is sane and whose high half holds a 1,
+page-rounded on the way through the allocator. The 2GB limit is
+Phoronix's own `memory_limit`, so only the second number is ours.
+
+Line 854 is `pts_user_io::display_text_table($exts)` -- *printing the
+very table of missing extensions that appears above it* -- and that
+function's inner loop is six lines:
+
+	$m = max($min, 1 + $extra + $widths[$c]) - strlen($cell);
+	if ($m > 0) $line .= str_repeat(' ', $m);
+
+So `$m` came out near 2**32 and `str_repeat` was the victim rather
+than the culprit. **The fault is in `strlen` or in integer
+arithmetic**, which is the first place to look anyway: `zend_long` is
+chosen from `__x86_64__` and is 64 bits, while kencc's `long` is 32
+and `php_config.h` answers `SIZEOF_LONG 4`. *Both of those are
+correct and they disagree with each other.*
+
+`sys/lib/tests/php-smoke.php` is the instrument that should have
+existed before Phoronix was ever started: PHP_INT_SIZE and
+PHP_INT_MAX first, then `strlen`, then the exact padding expression,
+then `str_repeat`, then the whole failing loop reduced to the table
+php had just printed. **It has a real reference implementation** --
+the build host's own php -- and nothing in it is newer than PHP 8.0,
+so a case that fails on the host is the test's bug. *Its first host
+run found one: my own expected padding was 14 and the answer is 15.*
+0 failures on 8.3.6 now.
+
+**Also seen and not diagnosed**: `warning: process exceeds 100 file
+descriptors`, twice, from the kernel. Phoronix walks directories, so
+it may be ordinary; it may also be an `opendir` that never closes.
+Recorded, unmeasured.
+
 ### It links, it runs, and the first fault was opcache's
 
 `6.out --version` prints
