@@ -1,37 +1,37 @@
 /*
- * POSIX user contexts: the C half.
+ * POSIX user contexts: `makecontext' and the function a context
+ * returns through.  `ucontext.s' has `getcontext', `setcontext' and
+ * `swapcontext'.
  *
- * `ucontext.s' holds three register-only primitives that know nothing
- * but "eight slots"; everything structural is here, so **no offset into
- * `ucontext_t' is ever written down in two languages**.  See that file's
- * header for why the register set is eight and why the restore must not
- * write to the stack.
+ * WHERE IT CAME FROM.  php's `Zend/zend_fibers.c' is unconditional --
+ * `Fiber' is a language class -- and wants either boost.context's GAS
+ * assembly or <ucontext.h>; APExp had neither.  `docs/notes/php.md'.
  *
- * WHERE IT CAME FROM.  php's `Zend/zend_fibers.c' is unconditional and
- * wants either boost.context's GAS assembly or this; APExp had neither.
- * `docs/notes/php.md' has the survey.
- *
- * ***THE WRAPPERS BELOW ARE ARCHITECTURE-INDEPENDENT AND LIVE IN AN
- * ARCHITECTURE DIRECTORY ANYWAY***, because `makecontext' is NOT -- the
- * argument layout is 6c's amd64 convention -- and because a shared
- * `ucontext/' directory would be built for all eleven targets and link
- * against `_getmcontext' on ten of them that do not have it.  *A second
- * architecture is the right moment to split this*, not before: there
- * would be nothing to check the split against today.
+ * ***THIS FILE IS ARCHITECTURE-SPECIFIC AND THE REASON IS THE ARGUMENT
+ * LAYOUT***, which is 6c's amd64 convention and nothing else's.  A
+ * second architecture adds its own pair beside this one.
  */
 #include "lib.h"
 #include <ucontext.h>
-#include <signal.h>
 #include <stdarg.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
 #include <string.h>
 
-extern int  _getmcontext(mcontext_t *);
-extern void _setmcontext(const mcontext_t *);
-extern void _swapmcontext(mcontext_t *, const mcontext_t *);
 extern void _ctxreturn(void);
+
+/*
+ * ***THE ONE OFFSET `ucontext.s' KNOWS, ASSERTED RATHER THAN TRUSTED.***
+ * The three switches are assembly because a C wrapper cannot save its
+ * caller's frame (see `ucontext.s'), and the price is that they address
+ * `uc_sigmask' by number.  A negative array size turns a layout change
+ * into a COMPILE error instead of a context switch that quietly
+ * restores the wrong signal mask.
+ */
+typedef char _uc_layout_assert[
+	(offsetof(ucontext_t, uc_mcontext) == 0
+	 && offsetof(ucontext_t, uc_sigmask) == 64) ? 1 : -1];
 
 /*
  * THE NEW CONTEXT'S STACK FRAME, as `makecontext' builds it and
@@ -47,8 +47,8 @@ extern void _ctxreturn(void);
  * `func' is entered with SP = base, exactly as a CALL would leave it.
  * When it returns, the RET pops base[0] and `_ctxreturn' sees
  * SP = &base[1], so the ucontext is at sp[UC_ARGMAX] -- **one constant,
- * in one language**, which is the whole reason `_ctxreturn' hands its
- * stack pointer to C instead of dereferencing it itself.
+ * in one language**, which is why `_ctxreturn' hands its stack pointer
+ * to C instead of dereferencing it itself.
  *
  * ***UC_ARGMAX IS A CAP AND NOT A CONVENTION, AND THE REASON IS 6c's
  * FIRST-ARGUMENT REGISTER.*** On an ABI that passes the first six
@@ -81,51 +81,6 @@ ucdie(const char *msg)
 	write(2, msg, strlen(msg));
 	write(2, "\n", 1);
 	abort();
-}
-
-int
-getcontext(ucontext_t *ucp)
-{
-	if(ucp == 0){
-		errno = EINVAL;
-		return -1;
-	}
-	sigprocmask(SIG_SETMASK, (sigset_t*)0, &ucp->uc_sigmask);
-	/*
-	 * Returns 0 now, and 0 again when a later _setmcontext resumes
-	 * the saved PC -- which is this function's own return address, so
-	 * control re-enters here and falls out of the bottom.  The
-	 * sigprocmask above is deliberately NOT re-run on that path: the
-	 * side that resumes a context is the side that installs its mask.
-	 */
-	return _getmcontext(&ucp->uc_mcontext);
-}
-
-int
-setcontext(const ucontext_t *ucp)
-{
-	if(ucp == 0){
-		errno = EINVAL;
-		return -1;
-	}
-	/* sigprocmask's `set' is not const (signal/sigprocmask.c:8) */
-	sigprocmask(SIG_SETMASK, (sigset_t*)&ucp->uc_sigmask, (sigset_t*)0);
-	_setmcontext(&ucp->uc_mcontext);
-	errno = EINVAL;		/* not reached */
-	return -1;
-}
-
-int
-swapcontext(ucontext_t *oucp, const ucontext_t *ucp)
-{
-	if(oucp == 0 || ucp == 0){
-		errno = EINVAL;
-		return -1;
-	}
-	sigprocmask(SIG_SETMASK, (sigset_t*)0, &oucp->uc_sigmask);
-	sigprocmask(SIG_SETMASK, (sigset_t*)&ucp->uc_sigmask, (sigset_t*)0);
-	_swapmcontext(&oucp->uc_mcontext, &ucp->uc_mcontext);
-	return 0;
 }
 
 void
@@ -183,7 +138,7 @@ makecontext(ucontext_t *ucp, void (*func)(void), int argc, ...)
 		ucp->uc_mcontext.mc_regs[_MC_ARG] = 0;
 
 	/*
-	 * `_setmcontext' loads SP and then adds 8 before jumping -- the
+	 * `setcontext' loads SP and then adds 8 before jumping -- the
 	 * no-stack-write form of a RET -- so the SP recorded here is one
 	 * slot BELOW the frame, and `func' begins with SP = base.
 	 */
@@ -200,6 +155,7 @@ makecontext(ucontext_t *ucp, void (*func)(void), int argc, ...)
 	 * for a new context is the CALLER's, which the required
 	 * `getcontext' has already put there.  Zeroing them would hand the
 	 * new context a null view of every register-cached global.
+	 * `uc_sigmask' is left alone for the same reason.
 	 */
 }
 

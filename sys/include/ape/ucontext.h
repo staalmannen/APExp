@@ -37,17 +37,22 @@ typedef struct {
 } stack_t;
 
 /*
- * `uc_mcontext' IS FIRST and must stay first: `_getmcontext' and
- * friends are handed `&ucp->uc_mcontext' by the C wrappers, so nothing
- * in the assembly depends on this layout -- but keeping the machine
- * state at offset 0 means a debugger looking at a `ucontext_t' finds
- * the registers where it expects them.
+ * ***THE FIRST TWO MEMBERS ARE A CONTRACT WITH `ucontext.s', WHICH
+ * ADDRESSES THEM BY NUMBER.***  `uc_mcontext' at 0 and `uc_sigmask' at
+ * 64 are what `getcontext', `setcontext' and `swapcontext' assume, and
+ * `arch/amd64/makecontext.c' turns a change here into a COMPILE error
+ * rather than a switch that quietly restores the wrong signal mask.
+ * The two after them are C's alone and may be reordered freely.
+ *
+ * *Those three are assembly, rather than C around a smaller primitive,
+ * because a C wrapper cannot save its CALLER's frame* -- `ucontext.s'
+ * has the failure that established it.
  */
 typedef struct __ucontext {
-	mcontext_t          uc_mcontext;
+	mcontext_t          uc_mcontext;	/* 0 */
+	sigset_t            uc_sigmask;		/* 64 */
 	struct __ucontext  *uc_link;
 	stack_t             uc_stack;
-	sigset_t            uc_sigmask;
 } ucontext_t;
 
 extern int  getcontext(ucontext_t *);
