@@ -4055,9 +4055,50 @@ means in a host program. *The instrument reporting itself is the shape
 to recognise rather than argue with* -- the assertion was right and the
 fake was wrong.
 
-**What neither covers**: `uc_sigmask` is saved and restored through
-`sigprocmask`, which on APE is a read and a write of one global
-(`signal/sigprocmask.c`), and nothing here exercises a context switch
+### The C wrapper could not save its caller's frame
+
+***THE FIRST VERSION HAD `getcontext`, `setcontext` AND `swapcontext`
+AS C AROUND THREE REGISTER-ONLY PRIMITIVES, AND THE VM REFUTED IT.***
+`ucontext-test` section 0 printed its PASS line **once** instead of
+twice and reported `setcontext came back round: got 1 want 2`.
+
+What a C `getcontext` saves is a point inside `getcontext` itself.
+That is fine until the context is RESUMED after `getcontext` has
+returned -- by then the wrapper's frame is dead stack, its own
+return-address slot has been reused by whatever the caller did next,
+and the resumed epilogue RETs to that. Here it landed after the
+`setcontext` CALL, because *setcontext's* return address was sitting in
+the slot: control appeared to flow straight on, with the counter still
+at 1.
+
+**The same reasoning says why `swapcontext` got away with it**, and
+that half is worth keeping so the lesson is not over-general: a context
+saved by `swapcontext` is resumed while its stack is parked, so nothing
+has run on it and the frame is intact. Sections 1 to 4 all passed.
+*`getcontext` is the one that returns and is then resumed, and it is
+the only one that could have shown this.*
+
+All three are assembly now, which is what `setjmp.s` was all along.
+**The cost is one shared offset** -- `uc_sigmask` at 64 -- and
+`makecontext.c` turns a change to it into a COMPILE error
+(`size of array '_uc_layout_assert' is negative`) rather than a switch
+that quietly restores the wrong mask. The mask is handled the way
+`sigsetjmp` handles it, through `_psigblocked(SB)`, with `MOVL`
+because `sigset_t` is `long` and kencc's `long` is four bytes.
+
+### And section 5 was the test's bug, of the one kind gcc cannot catch
+
+It read `volatile long a = 0x1111111111111111L;`. **kencc's `long` is
+four bytes**, so `a` held `0x11111111` and the comparison against the
+full 64-bit constant was false -- section 5 reported `got 0 want 1` for
+a context switch that was working perfectly. `long long` now.
+
+*The glibc run could not have caught it*: this is the one class of test
+bug the reference implementation is blind to, because the difference IS
+the reference's width. The tree's first invariant, arriving inside a
+file written to check something else.
+
+**What neither instrument covers**: nothing exercises a context switch
 with signals actually blocked. And the header could not be
 syntax-checked against the APE headers on the host -- they reach each
 other through absolute `/sys/include/ape/...` paths that resolve only

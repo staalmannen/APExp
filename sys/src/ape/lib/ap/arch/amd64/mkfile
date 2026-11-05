@@ -11,8 +11,8 @@ OFILES=\
 	main9p.$O\
 	notetramp.$O\
 	setjmp.$O\
-	mcontext.$O\
 	ucontext.$O\
+	makecontext.$O\
 	strchr.$O\
 	strlen.$O\
 	tas.$O\

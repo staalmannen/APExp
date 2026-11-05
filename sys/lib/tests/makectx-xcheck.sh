@@ -1,15 +1,15 @@
 #!/bin/sh
-# makectx-xcheck.sh -- compile libap's real `ucontext.c' on the build
-# host, beside stubs for the three assembly primitives, and check that
+# makectx-xcheck.sh -- compile libap's real `makecontext.c' on the build
+# host, beside stubs for `_ctxreturn' and `setcontext', and check that
 # the frame `makecontext' builds is the one `_ctxfinish' reads back.
 #
 #	sh makectx-xcheck.sh
 #
 # ***NOTHING IS EXTRACTED OR TRANSCRIBED HERE.*** The harness
-# `#include's the library file itself, which is possible because
-# everything structural in it is C -- the assembly knows only "eight
-# slots".  So there are no markers to rot, and the thing under test is
-# the thing that ships.
+# `#include's the library file itself, which is possible because the
+# frame layout lives entirely in C -- the assembly knows only the eight
+# register slots and one asserted offset.  So there are no markers to
+# rot, and the thing under test is the thing that ships.
 #
 # The three headers it needs are the tree's own: `<ucontext.h>' from
 # `sys/include/ape' and `<ucontext_arch.h>' from `amd64/include/ape'.
@@ -30,7 +30,7 @@ set -e
 
 # This file is three levels below the repository root.
 ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
-SRC=$ROOT/sys/src/ape/lib/ap/arch/amd64/ucontext.c
+SRC=$ROOT/sys/src/ape/lib/ap/arch/amd64/makecontext.c
 HDR=$ROOT/sys/include/ape/ucontext.h
 ARCH=$ROOT/amd64/include/ape/ucontext_arch.h
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -43,7 +43,7 @@ done
 rm -rf "$TMP"; mkdir -p "$TMP"
 ln -s "$HDR"  "$TMP/ucontext.h"
 ln -s "$ARCH" "$TMP/ucontext_arch.h"
-ln -s "$SRC"  "$TMP/ucontext.c"
+ln -s "$SRC"  "$TMP/makecontext.c"
 : > "$TMP/lib.h"
 cat > "$TMP/signal.h" <<'EOF'
 #ifndef _MAKECTX_STUB_SIGNAL_H

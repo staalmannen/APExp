@@ -130,14 +130,27 @@ s4_fn(void)
 static ucontext_t s5_main, s5_ctx;
 static int s5_seen;
 
+/*
+ * ***`long long', NOT `long', AND THAT IS WHAT THE FIRST VM RUN
+ * FOUND.***  This said `volatile long a = 0x1111111111111111L;', which
+ * passes on glibc and cannot on this machine: **kencc's `long` is four
+ * bytes**, so `a' held `0x11111111' and the comparison against the full
+ * 64-bit constant was false.  Section 5 reported `got 0 want 1' for a
+ * context switch that was working perfectly.
+ *
+ * *The gcc check could not have caught it* -- this is the one class of
+ * test bug that the reference implementation is blind to, because the
+ * difference IS the reference's width.  The tree's own first invariant,
+ * arriving in the file written to check something else.
+ */
 static void
 s5_fn(void)
 {
-	volatile long a = 0x1111111111111111L;
-	volatile long b = 0x2222222222222222L;
+	volatile long long a = 0x1111111111111111LL;
+	volatile long long b = 0x2222222222222222LL;
 
 	swapcontext(&s5_ctx, &s5_main);
-	if(a == 0x1111111111111111L && b == 0x2222222222222222L)
+	if(a == 0x1111111111111111LL && b == 0x2222222222222222LL)
 		s5_seen = 1;
 	swapcontext(&s5_ctx, &s5_main);
 }

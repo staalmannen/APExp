@@ -4,11 +4,11 @@
  *	sh makectx-xcheck.sh
  *
  * ***A CROSS-CHECK, AND IT COMPILES THE REAL FILE RATHER THAN A COPY
- * OF IT.*** `lib/ap/arch/amd64/ucontext.c' is compiled straight into
+ * OF IT.*** `lib/ap/arch/amd64/makecontext.c' is compiled straight into
  * this program -- no extraction, no transcription, no markers to rot --
- * with stubs standing in for the three assembly primitives and for
- * `sigprocmask'.  That is possible because everything structural in
- * that file is C; the assembly knows only "eight slots".
+ * with stubs standing in for `_ctxreturn' and `setcontext'.  That is
+ * possible because the frame layout lives entirely in C; the assembly
+ * knows only the eight register slots and one asserted offset.
  *
  * WHY IT IS WORTH A FILE.  The one number that has to agree across the
  * two languages is where the ucontext pointer sits in the new frame:
@@ -32,6 +32,13 @@
  *   `base[UC_ARGMAX+1]' -> `base[UC_ARGMAX]'   **3 failures**
  *   `(...)base - 8' -> `(...)base'             **1 failure**
  *
+ * and a third that is not a failure count at all: swapping
+ * `uc_sigmask' and `uc_link' in `<ucontext.h>' is a **compile error**,
+ * `size of array `_uc_layout_assert' is negative'.  That is the one
+ * offset the assembly addresses by number, so it is asserted rather
+ * than trusted -- a wrong answer there would be a context switch
+ * quietly restoring the wrong signal mask.
+ *
  * Exit status is the failure count.
  */
 
@@ -43,13 +50,13 @@
 
 #include <ucontext.h>		/* the tree's, through the script's -I */
 
-/* ---- stubs for what lives in mcontext.s ---------------------- */
+/* ---- stubs for what lives in ucontext.s ---------------------- */
 
 void _ctxreturn(void) { }
 
 /*
  * ***THE STUB MUST NOT RETURN, AND THE FIRST VERSION DID.***  The real
- * `_setmcontext' jumps away and never comes back, so `_ctxfinish's
+ * `setcontext' jumps away and never comes back, so `_ctxfinish's
  * `exit(0)' is unreachable once a `uc_link' has been followed.  A stub
  * that simply recorded and returned fell through to that `exit', and
  * section 3's "did not exit" check failed -- *the instrument reporting
@@ -57,24 +64,15 @@ void _ctxreturn(void) { }
  * with*.  It longjmps instead, which is what "does not return" means in
  * a host program.
  */
-static const mcontext_t *last_set;
+static const ucontext_t *last_set;
 static jmp_buf away;
 
-void
-_setmcontext(const mcontext_t *mc)
-{
-	last_set = mc;
-	longjmp(away, 1);
-}
-
-void _swapmcontext(mcontext_t *o, const mcontext_t *n) { (void)o; last_set = n; }
-int  _getmcontext(mcontext_t *mc) { (void)mc; return 0; }
-
 int
-sigprocmask(int how, sigset_t *set, sigset_t *oset)
+setcontext(const ucontext_t *ucp)
 {
-	(void)how; (void)set; (void)oset;
-	return 0;
+	last_set = ucp;
+	longjmp(away, 1);
+	return -1;
 }
 
 /* `_ctxfinish' ends in exit(0) when uc_link is null; catch that. */
@@ -83,7 +81,7 @@ static int exited;
 static void xexit(int n) { (void)n; exited = 1; }
 
 /* ---- the real file ------------------------------------------- */
-#include "ucontext.c"
+#include "makecontext.c"
 
 #undef exit
 
@@ -164,22 +162,22 @@ main(void)
 	 * pointer, uc_link is garbage and the usual result is a silent
 	 * exit.
 	 */
-	last_set = (const mcontext_t *)0;
+	last_set = (const ucontext_t *)0;
 	exited = 0;
 	if(setjmp(away) == 0)
 		_ctxfinish((void *)(base + 1));
-	eq("it followed uc_link", last_set == &link.uc_mcontext, 1);
+	eq("it followed uc_link", last_set == &link, 1);
 	eq("and did not fall through to exit", exited, 0);
 
 	printf("\nSection 4: a null uc_link exits instead\n");
 	uc.uc_link = (ucontext_t *)0;
 	base[UC_ARGMAX+1] = (unsigned long long)(uintptr_t)&uc;
-	last_set = (const mcontext_t *)0;
+	last_set = (const ucontext_t *)0;
 	exited = 0;
 	if(setjmp(away) == 0)
 		_ctxfinish((void *)(base + 1));
 	eq("it exited", exited, 1);
-	eq("and followed no link", last_set == (const mcontext_t *)0, 1);
+	eq("and followed no link", last_set == (const ucontext_t *)0, 1);
 
 	printf("\nSection 5: every argument slot, at the cap\n");
 	memset(&uc, 0, sizeof uc);
