@@ -284,6 +284,41 @@ confidently and wrongly*, which is the clearest single argument in
 this port for hand-answering rather than deriving: the mechanical
 method is right 90 times and this is one of the others.
 
+### And the no-atomics arm had never been compiled by anyone
+
+`zend_atomic.c:44` answered
+`argument prototype mismatch "IND STRUCT zend_atomic_bool_s" for
+"IND STRUCT zend_atomic_int_s"`. It is **upstream's typo**, not
+ours: `zend_atomic.h:323` declares
+`zend_atomic_bool_compare_exchange_ex(zend_atomic_int *obj, ...)`,
+while the other four arms -- C11, GNUC, SYNC and WIN32, at `:106`,
+`:161`, `:207`, `:263` -- all say `zend_atomic_bool *`, as does every
+sibling `_bool_` function in that same arm.
+
+***IT SURVIVES BECAUSE NOBODY COMPILES THAT ARM.*** It is reached
+only by a platform with no C11 atomics, no GCC atomics, no `__sync`
+builtins and not Windows -- which until kencc was no platform at all.
+And **gcc only warns** (`-Wincompatible-pointer-types`) where kencc
+errors, so even someone who did compile it might not have noticed.
+Fixed in the vendored source, one word, with the reasoning beside it.
+Worth reporting upstream.
+
+**The arm has exactly one bug, which is measured rather than hoped.**
+Compiling it in isolation found nothing, because the mismatch is
+between a caller and a callee and the arm is self-consistent within
+itself. Forcing `HAVE_NO_ATOMICS` in a copy of the header and
+compiling the real `zend_atomic.c` against it reproduces the kencc
+diagnostic exactly and reports **nothing else** -- and after the fix,
+nothing at all.
+
+*Forcing it took two attempts.* The first `-I` did nothing, because
+`zend_atomic.c` includes `"zend_atomic.h"` **quoted**, which resolves
+next to the source file before any `-I`; the compile silently took
+the GNUC arm and reported a clean result. **A forced configuration
+that was not actually forced reads exactly like a passing one** --
+the tell was that the `#warning` was absent, and checking for it is
+what turned a false clean into a real one.
+
 ### The atomics: not worth implementing for this build, and here is why
 
 `#warning No atomics support detected` appears on every file and is

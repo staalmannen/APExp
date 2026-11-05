@@ -320,7 +320,21 @@ static zend_always_inline void zend_atomic_int_store_ex(zend_atomic_int *obj, in
 	obj->value = desired;
 }
 
-static zend_always_inline bool zend_atomic_bool_compare_exchange_ex(zend_atomic_int *obj, bool *expected, bool desired) {
+/*
+ * APExp: `zend_atomic_int *' here was UPSTREAM'S TYPO and this is the
+ * one-word fix.  The other four arms of this file -- C11, GNUC, SYNC
+ * and WIN32, at :106, :161, :207 and :263 -- all declare
+ * `zend_atomic_bool *', as does every sibling `_bool_' function in
+ * this same arm, and `zend_atomic.c:44' passes a `zend_atomic_bool *'.
+ *
+ * ***IT SURVIVES BECAUSE NOBODY COMPILES THIS ARM.***  It is reached
+ * only when a platform has no C11 atomics, no GCC atomics, no
+ * `__sync' builtins and is not Windows, which until kencc was no
+ * platform at all.  gcc only WARNS here (`-Wincompatible-pointer-
+ * types'); kencc makes it an error, which is why APExp is the first
+ * to see it.  Worth reporting upstream.
+ */
+static zend_always_inline bool zend_atomic_bool_compare_exchange_ex(zend_atomic_bool *obj, bool *expected, bool desired) {
 	bool prev = obj->value;
 	if (prev == *expected) {
 		obj->value = desired;
