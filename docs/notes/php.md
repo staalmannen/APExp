@@ -746,6 +746,85 @@ general form is worth keeping**: a header-only helper that calls into
 a file the port does not compile is a link error here and silence on
 gcc.
 
+### The four extensions Phoronix needs, and three derivation faults
+
+`php-smoke.php` is **0 failures** on the VM and Phoronix now reaches
+its own requirement check instead of crashing. What it asks for is in
+`pts-core.php:208`, and the error message is misleading in a way that
+matters:
+
+	array(1, extension_loaded('zip') || extension_loaded('zlib'), 'ZIP', ...)
+
+**"MISSING ZIP" is satisfied by ext/zlib**, so libzip is not involved
+at all. With JSON already built, the required set is **libxml + dom +
+simplexml + zlib** -- 37 + 1 + 3 + 3 = 44 objects against two
+libraries this tree already carries, `lib/xml2` (2.15.2) and `lib/z`.
+dom also depends on `lexbor`, which this build already has for its own
+sake. **559 translation units compile, 0 errors.**
+
+#### Linking is by `#pragma lib`, not by a mkfile variable
+
+`<zlib.h>:34` has always carried `#pragma lib "/$M/lib/ape/libz.a"`;
+`<libxml/xmlversion.h>` carries one now. `cc/macbody:728` reads it and
+records the archive in the object, and `apexp-sh`'s bind makes that
+path this tree's copy -- so no `LIB=` line, and *every* libxml2
+consumer links correctly rather than just this one.
+
+**It goes in `xmlversion.h` because that is the header every other one
+reaches**: 42 of the 46 installed `<libxml/*.h>` include it, and the
+three that do not -- `SAX.h`, `nanoftp.h`, `xmlunicode.h` -- are empty
+deprecation stubs that declare nothing and so cannot create a
+reference. *Checked, not assumed.* **Measured**: a TU including it
+records `<libxml2.a` in the object, exactly as a TU including
+`<zlib.h>` records `<libz.a`, and one including neither records
+nothing.
+
+*The hazard is that the header is otherwise byte-identical to the
+vendored copy*, so a re-sync drops the pragma and every consumer then
+fails to link with no hint why. `<zlib.h>` has the same arrangement
+and the same exposure; both say so in the file.
+
+#### THREE DERIVATION FAULTS IN ONE LIST, EACH FOUND BY THE NEXT CHECK
+
+The object list was *derived* from each extension's own `config.m4`,
+which is this tree's rule -- and the derivation was wrong three times:
+
+1. `^ *[a-z0-9_]+\.c$` **cannot match a path with a slash**, so
+   `parentnode/css_selectors.c` and `parentnode/tree.c` vanished.
+   ***And the completeness check compared the result against
+   `ls *.c`, which cannot see a subdirectory either*** -- 34 against
+   34, agreeing because both sides shared the same wrong assumption.
+   *A derivation and its check have to fail independently, or the
+   check is decoration.* `--undefined` caught it by naming
+   `dom_parent_node_append`.
+
+2. Widening the class to allow `/` found those two and **still missed
+   `lexbor/selectors-adapted/selectors.c`, for the hyphen**.
+   `--undefined` caught that one too, naming `lxb_selectors_init`.
+
+3. Widening it again to `[^ \t"]+\.c` matched fragments mid-token and
+   produced `dom/ion.c`, `dom/ype.c`, `zlib/er.c` -- garbage that an
+   existence check does filter out, but by then the method was
+   plainly wrong.
+
+**The answer was to read the block.** dom's `PHP_NEW_EXTENSION` is 37
+plain lines, and the `PHP_ADD_BUILD_DIR` directly under it names both
+subdirectories -- which is also where the `OBJDIRS` entries come from.
+*Two rounds were spent widening a regular expression against a file
+short enough to read.*
+
+#### The instrument had to grow with the build
+
+`--undefined` asked `apfunc-sweep.py`, which knows **libap and
+nothing else** -- correct while every port linked only libap, and
+wrong the moment php pulled libxml2 and libz: it answered `absent`
+for 241 of 539 names. *The same shape as that sweep's own recorded
+wrong-`ROOT` failure, from the other direction -- not a corpus that
+does not exist, but one that is merely incomplete.* It takes
+`--root DIR` now, repeatable, default unchanged, and `php-mirror`
+passes the two library trees. **Add a root there for every library a
+new extension links.**
+
 ### CLOSED: every multiplication over 2**32 was a float
 
 `exit()` fixed, the smoke test runs to completion and **the exit

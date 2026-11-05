@@ -56,6 +56,21 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(
 AP = os.path.join(ROOT, 'sys/src/ape/lib/ap')
 HDR = os.path.join(ROOT, 'sys/include/ape')
 
+# ***THE CORPUS IS A LIST BECAUSE A PROGRAM LINKS MORE THAN ONE
+# LIBRARY.***  It was `libap and nothing else', which is the right
+# default and was the whole question while every port linked only
+# libap.  php now pulls libxml2 and libz through `#pragma lib', so
+# `php-mirror.sh --undefined' asked about 539 names and this file
+# confidently answered `absent' for the 241 that live in those two --
+# *the same shape as the wrong-ROOT failure above, arrived at from
+# the other direction*: not a corpus that does not exist, but one
+# that is merely incomplete.
+#
+# `--root DIR' (repeatable, relative to the tree root) adds a library
+# source tree.  The default is unchanged, so every existing caller
+# gets exactly the answers it got before.
+ROOTS = [AP]
+
 if not os.path.isdir(AP) or not os.path.isdir(HDR):
     sys.stderr.write('apfunc-sweep: %s or %s is not a directory -- ROOT is '
                      'wrong, and every answer would be "absent"\n' % (AP, HDR))
@@ -94,11 +109,12 @@ def definition_patterns(name):
 
 def defined_in(name):
     for pat in definition_patterns(name):
-        out = subprocess.run(['grep', '-rlE', pat, AP, '--include=*.c'],
-                             capture_output=True, text=True)
-        files = out.stdout.strip().splitlines()
-        if files:
-            return os.path.relpath(files[0], ROOT)
+        for root in ROOTS:
+            out = subprocess.run(['grep', '-rlE', pat, root, '--include=*.c'],
+                                 capture_output=True, text=True)
+            files = out.stdout.strip().splitlines()
+            if files:
+                return os.path.relpath(files[0], ROOT)
     return None
 
 
@@ -149,6 +165,15 @@ def control():
 
 def main():
     args = sys.argv[1:]
+    while '--root' in args:
+        i = args.index('--root')
+        extra = os.path.join(ROOT, args[i + 1])
+        if not os.path.isdir(extra):
+            sys.stderr.write('apfunc-sweep: --root %s is not a directory\n'
+                             % extra)
+            return 2
+        ROOTS.append(extra)
+        del args[i:i + 2]
     if '--control' in args:
         return control()
     if args[:1] == ['--file']:
@@ -156,7 +181,7 @@ def main():
     elif args:
         names = args
     else:
-        print(__doc__ or 'usage: apfunc-sweep.py NAME... | --file f | --control')
+        print(__doc__ or 'usage: apfunc-sweep.py [--root DIR]... NAME... | --file f | --control')
         return 1
     run(names)
     return 0

@@ -360,6 +360,22 @@
  * this is the arity, and it is 1.
  */
 #define HAVE_FUNC_GETHOSTBYNAME_R_6 1
+
+/*
+ * ***THE FOUR EXTENSIONS ADDED FOR PHORONIX.***  Each name is the one
+ * its own `config.m4' AC_DEFINEs -- `libxml/config0.m4:12',
+ * `dom/config.m4:9', `simplexml/config.m4:9', `zlib/config0.m4:8' --
+ * read out of the files rather than recalled, since an extension that
+ * compiles with its HAVE_ unanswered is an extension whose every
+ * `#ifdef'-guarded function quietly vanishes.
+ *
+ * `HAVE_ZLIB' is what satisfies Phoronix's "MISSING ZIP": its check is
+ * `extension_loaded('zip') || extension_loaded('zlib')'.
+ */
+#define HAVE_LIBXML 1
+#define HAVE_DOM 1
+#define HAVE_SIMPLEXML 1
+#define HAVE_ZLIB 1
 /* #undef HAVE_GETIFADDRS */
 /* #undef HAVE_GETLOADAVG */
 /* #undef HAVE_GETTID */

@@ -31,6 +31,13 @@
  *
  * Adding an extension means adding its header, its `phpext_*_ptr' and
  * its objects to the mkfile, together.
+ *
+ * ***THE FOUR ADDED FOR PHORONIX ARE libxml, dom, simplexml AND
+ * zlib***, which is what `pts_needed_extensions()' asks for once JSON
+ * is counted as present and once `extension_loaded('zip') ||
+ * extension_loaded('zlib')' is read as the disjunction it is -- the
+ * error message says "MISSING ZIP" and ext/zlib answers it, so
+ * libzip is not involved.
  */
 #include "php.h"
 #include "php_main.h"
@@ -45,6 +52,10 @@
 #include "ext/hash/php_hash.h"
 #include "ext/json/php_json.h"
 #include "ext/lexbor/php_lexbor.h"
+#include "ext/libxml/php_libxml.h"
+#include "ext/dom/php_dom.h"
+#include "ext/simplexml/php_simplexml.h"
+#include "ext/zlib/php_zlib.h"
 #include "ext/opcache/zend_accelerator_module.h"
 #include "ext/random/php_random.h"
 #include "ext/reflection/php_reflection.h"
@@ -59,6 +70,16 @@ static zend_module_entry * const php_builtin_extensions[] = {
 	phpext_hash_ptr,
 	phpext_json_ptr,
 	phpext_lexbor_ptr,
+	/*
+	 * libxml comes before dom and simplexml because both declare a
+	 * dependency on it (`PHP_ADD_EXTENSION_DEP' in their config.m4)
+	 * and this array IS the registration order.  dom also depends on
+	 * lexbor, which is above it for its own reasons.
+	 */
+	phpext_libxml_ptr,
+	phpext_dom_ptr,
+	phpext_simplexml_ptr,
+	phpext_zlib_ptr,
 	phpext_opcache_ptr,
 	phpext_random_ptr,
 	phpext_reflection_ptr,
