@@ -1202,9 +1202,19 @@ silent:
 - **itcl** — done. 10 failures, all upstream or Tcl 9's, two settled at
   source, none ours.
 
-**php — ***IT LINKS AND IT RUNS***: `PHP 8.5.12 (cli) (NTS)`, Zend
-Engine v4.5.12, printed by the binary on the VM. Notes in
-`docs/notes/php.md`.** **`php -v` then FAULTED at exit and the cause
+**php — ***IT LINKS, IT RUNS AND IT EVALUATES***: `PHP 8.5.12 (cli)
+(NTS)`, and `php-smoke.php` is **44 of 45** on the VM -- PHP_INT_SIZE
+8, strlen, max, str_repeat at 100k, preg, json, and `/net/tcp/stats`
+read as 404 bytes. Notes in `docs/notes/php.md`.**
+***THE ONE THAT MATTERED WAS `exit()`, AND IT WAS kencc's 32-BIT
+`sizeof`***: `zend_object_properties_size` is `sizeof(zval) * (count -
+1)` with count 0, which C makes 2**64-16 and kencc makes 4294967280 by
+multiplying in 32 bits and zero-extending -- so every `exit()` asked
+for 4GB and died. *A script with no `exit()` was always clean*, which
+is the one-command bisect that found it (`php_cli.c:1318` returns
+before `module_started` is set), and `acid`'s `src(pc)` named the line
+the round before. Fixed locally in php; **the compiler deviation is
+recorded and not taken**, see the invariant above. **`php -v` then FAULTED at exit and the cause
 is a platform consequence**: `ZEND_EXTENSIONS_SUPPORT` is 0 without
 dlopen (`zend_portability.h:200`), so `zend_extension_startup`'s body
 is compiled out and **no zend_extension's startup ever runs here** --
@@ -1834,6 +1844,18 @@ the index, so that nothing here is a surprise.
   sign-extended with no diagnostic. `strtoumax` calling `strtoull`
   without `<stdlib.h>` is what made bash print `FFFFFFFF9B3A59A5`;
   `sys/lib/tests/apdecl-sweep.py` sweeps libap for the shape.
+  ***AND THE ARGUMENT IS ONLY HALF OF IT: `sizeof` BREAKS ARITHMETIC
+  TOO, WITH NO MISSING PROTOTYPE AND NO DIAGNOSTIC.*** C requires
+  `sizeof` to yield `size_t`, which is 64 bits here; `cc/com.c:894`
+  gives it TULONG, which is 32. So `sizeof(T) * (n - 1)` with `n == 0`
+  -- php's `zend_object_properties_size`, ordinary correct C that
+  relies on the wraparound -- multiplies in 32 bits and then
+  **ZERO-extends**: `SUBL` / `SALL $4` / `MOVLQZX`, 4294967280 where
+  gcc gives 2**64-16. **Every `exit()` in every php script then asked
+  the allocator for 4GB.** The conformant fix is one line and is NOT
+  taken, because a 64-bit `sizeof` hands a variadic `%d` eight bytes;
+  `docs/notes/kencc.md` has the measurement, the trade and the control
+  set to run if anyone takes it.
 - A variadic sentinel must be a pointer, never `0`.
 - `free()` needs exactly the pointer `malloc()` returned.
 - `longjmp` must never write to the stack; `main9.s` must use only

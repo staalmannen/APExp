@@ -746,6 +746,62 @@ general form is worth keeping**: a header-only helper that calls into
 a file the port does not compile is a link error here and silence on
 gcc.
 
+### CLOSED: `exit()` was kencc's 32-bit `sizeof`
+
+Three one-liners on the VM settled it with no rebuild:
+
+	php -r 'echo "no-exit\n";'          -> clean
+	php -r 'echo "exit0\n"; exit(0);'   -> 4294971392
+	php -d memory_limit=1 -r 'exit(0);' -> same, same limit
+
+**A script that just ends is clean**, so request shutdown and module
+shutdown are both fine and it is `ZEND_EXIT` alone.
+
+`exit` calls `zend_throw_unwind_exit`, which is
+`zend_objects_new(&zend_ce_unwind_exit)`, and that is
+
+	emalloc(sizeof(zend_object) + zend_object_properties_size(ce))
+
+with `zend_object_properties_size` (`zend_objects_API.h:83`):
+
+	sizeof(zval) * (ce->default_properties_count -
+		((ce->ce_flags & ZEND_ACC_USE_GUARDS) ? 0 : 1))
+
+`UnwindExit` is `INIT_CLASS_ENTRY(..., "UnwindExit", NULL)` -- zero
+properties -- and `ZEND_ACC_USE_GUARDS` is set only under
+`CG(compiler_options) & ZEND_COMPILE_GUARDS`, **which nothing in php
+ever sets**. So the subtraction is `0 - 1`, deliberately: `zend_object`
+ends in `zval properties_table[1]`, so a class with no properties wants
+one zval less than the struct, and `sizeof(zval) * -1` is 2**64-16,
+which the caller's `+ sizeof(zend_object)` wraps back to **40**.
+
+***UPSTREAM IS RIGHT AND THE COMPILER IS THE DEVIATION.*** C makes
+`sizeof` a `size_t`, 64 bits here; kencc types it TULONG, 32 bits
+(`cc/com.c:894`, on purpose). `6c -J -S` on the expression:
+
+	SUBL / SALL $4 / MOVLQZX
+
+-- 32-bit subtract, 32-bit multiply, **zero-extend** -- so 4294967280
+instead of 2**64-16, plus 56 is 4294967336, page-rounded to
+**4294971392**. The same source under gcc asks for 40. *Both numbers
+were run, not reasoned.*
+
+Fixed in the vendored header by computing in `ptrdiff_t`, which is
+signed and size_t's width on every target; kencc then emits
+`MOVLQSX` / `SUBQ` / `SALQ` and agrees with gcc. 515 TUs still
+compile. **The compiler change is recorded and not taken** --
+`docs/notes/kencc.md` has the trade and the controls -- so *the same
+idiom elsewhere is still exposed*, and three more instances in php's
+optimizer are named there.
+
+**Two reading errors on the way, both worth keeping.** I blamed
+`display_text_table`'s padding loop from the line number alone; the
+smoke test's reduction of that loop passes, and the real line was
+`exit` in both programs. And my first reduction of the size expression
+declared `default_properties_count` as `uint32_t` when it is `int`, so
+gcc "confirmed" a 68GB request and briefly made upstream look broken on
+Linux too. *A reduction that changes a type is not a reduction.*
+
 ### The smoke test ran, and it moved the bug
 
 `php-smoke.php` on the VM: **44 of 45 cases pass**, including
