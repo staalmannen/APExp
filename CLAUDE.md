@@ -1206,6 +1206,32 @@ silent:
 (NTS)`, and `php-smoke.php` is **44 of 45** on the VM -- PHP_INT_SIZE
 8, strlen, max, str_repeat at 100k, preg, json, and `/net/tcp/stats`
 read as 404 bytes. Notes in `docs/notes/php.md`.**
+***AND TWELVE EXTENSIONS ARE BUILT NOW***: the four Phoronix REQUIRES
+(libxml, dom, simplexml, zlib -- `system-info` runs) plus eight of the
+nine it calls OPTIONAL -- posix, pcntl, bz2, readline, openssl
+(LibreSSL), curl, sqlite3, zip. **579 TUs compile and `--undefined`
+resolves 1120 symbols** against libap and eight library trees, all of
+which come in by `#pragma lib` from their own headers, so `cmd/php`
+still has no `LIB=` line. *GD is impossible* (no libgd here; libpng is
+not a drawing library) and **`ext/sockets` is deferred to a libap
+change**: no `struct cmsghdr`, no `CMSG_*`, no `msg_flags`, `sendmsg`
+a stub and **`recvmsg` declared-by-the-header-and-defined-nowhere**.
+***THE MEASUREMENT THAT NEARLY SHIPPED WAS AN EMPTY TRANSLATION
+UNIT***: five of these wrap their whole body in `#ifdef HAVE_<X>`, so
+with the name unanswered they compile to nothing and report 0 errors
+-- and *counting `TEXT` symbols does not separate them either*,
+because kencc emits php's header `static inline`s that gcc at -O2
+discards, putting the floor at ~360. **The discriminator is whether
+the assembly mentions `<ext>_module_entry`**: 0 against 10-14, one
+grep. Three findings, all upstream's: LibreSSL has no
+`sk_X509_new_reserve` (a capacity hint, so `sk_X509_new_null()`);
+readline reaches its CLI callbacks through `dlsym`, where APE's
+`<dlfcn.h>` would have answered NULL and installed nothing *silently*,
+and upstream's own commented-out direct call is the fix; and
+`return <void expr>;` in a `void` function, which gcc accepts and C11
+6.8.6.4p1 forbids -- fixed in php, **deviation recorded in 0.6 and not
+taken**, since `ORETURN` with a left operand means "compute into the
+return location" and accepting void is a statement-tree rewrite.
 ***AND THE SECOND ONE WAS EVERY MULTIPLICATION.***
 `zend_multiply.h:135`'s fallback arm -- the one this port takes --
 declared the product `long`, which is 64 bits on LP64 and **32

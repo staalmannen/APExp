@@ -290,6 +290,26 @@ X509_REQ *php_openssl_csr_from_param(
 #define PHP_OPENSSL_ASN1_INTEGER_set ASN1_INTEGER_set
 #endif
 
+#if defined(LIBRESSL_VERSION_NUMBER)
+/*
+ * APExp: LibreSSL has no `*_new_reserve' family at all -- not
+ * `sk_X509_new_reserve', not the `OPENSSL_sk_new_reserve' underneath
+ * it -- so `openssl_backend_common.c:714' does not compile against it.
+ *
+ * The call is a CAPACITY HINT and nothing else: the stack it makes is
+ * filled by `sk_X509_push' in the loop immediately below, and push
+ * grows the stack on demand.  So `sk_X509_new_null()' is the same
+ * program with one more realloc in it, and the second argument --
+ * `sk_X509_INFO_num(sk)' -- is discarded rather than worked around.
+ *
+ * ***NOT a stub that answers failure, and not a change of meaning***:
+ * both forms return a new empty stack or NULL.  The comparison cost
+ * is the only thing that differs, and `NULL' is already being passed
+ * as the comparison function at this one site.
+ */
+#define sk_X509_new_reserve(cmp, n)	sk_X509_new_null()
+#endif
+
 EVP_PKEY *php_openssl_extract_public_key(EVP_PKEY *priv_key);
 
 struct php_openssl_pem_password {

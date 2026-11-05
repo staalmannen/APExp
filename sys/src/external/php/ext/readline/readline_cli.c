@@ -763,6 +763,33 @@ this extension sharedto offer compatibility.
 #endif*/
 #endif
 
+#if !defined(COMPILE_DL_READLINE) && !defined(HAVE_DLFCN_H)
+/*
+ * APExp: upstream's own alternative, three lines above this one,
+ * restored for the one case it was written for.
+ *
+ * The `dlsym' arm is deliberate and upstream's comment says why: even
+ * the CGI SAPI links against "CLI"-only extensions, so the symbol may
+ * genuinely be absent at run time and the lookup has to be dynamic.
+ * **Neither half of that applies to a build with no dynamic linking at
+ * all**: this extension is static, `php_cli_get_shell_callbacks' is
+ * `sapi/cli/php_cli.c:111' in the same binary, and `sapi/cli/cli.h' is
+ * already included above, so the direct call is resolved by the linker.
+ *
+ * ***AND THE ALTERNATIVE HERE IS NOT "LEAVE IT ALONE".***  APE does
+ * ship a `<dlfcn.h>', whose `dlsym' is `return NULL' -- so including
+ * it compiles, links, and then installs no callbacks at all, leaving
+ * `php -a' without readline and with nothing printed to say so.  *A
+ * stub that answers "nothing found" is the trap, not the fix.*
+ *
+ * Keyed on `HAVE_DLFCN_H' rather than on Plan 9: the condition is that
+ * there is no dynamic linking, and any platform that has it keeps
+ * upstream's arm untouched.
+ */
+#undef GET_SHELL_CB
+#define GET_SHELL_CB(cb) (cb) = php_cli_get_shell_callbacks()
+#endif
+
 PHP_MINIT_FUNCTION(cli_readline)
 {
 	cli_shell_callbacks_t *cb;

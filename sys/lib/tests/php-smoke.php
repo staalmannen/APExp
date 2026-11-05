@@ -51,10 +51,25 @@
 
 $fails = 0;
 
+/*
+ * Long values are ELIDED IN THE MIDDLE, not truncated at the end.
+ * Section 8 round-trips a few thousand bytes through libbz2 and
+ * libz, and printing those in full buries every other line in the
+ * section -- but *a value cut at the front only is the one that
+ * hides a difference in the tail*, which is exactly where a
+ * compression round trip goes wrong.  Both ends are kept.
+ */
+function brief($v) {
+	$s = var_export($v, true);
+	if (strlen($s) <= 72) return $s;
+	return substr($s, 0, 36) . " ...[" . strlen($s) . " chars]... "
+		. substr($s, -24);
+}
+
 function eq($what, $got, $want) {
 	global $fails;
-	$g = var_export($got, true);
-	$w = var_export($want, true);
+	$g = brief($got);
+	$w = brief($want);
 	if ($got === $want) {
 		printf("  PASS %-44s %s\n", $what, $g);
 	} else {
@@ -254,6 +269,152 @@ if ($net === false) {
 eq("getcwd returns a string", is_string(getcwd()), true);
 eq("PHP_OS is a string", is_string(PHP_OS), true);
 echo "  INFO PHP_OS = " . PHP_OS . ", PHP_VERSION = " . PHP_VERSION . "\n";
+
+/* ---------------------------------------------------------------- */
+echo "\nSection 8: the twelve extensions, and each one DOING something\n";
+/*
+ * ***LOADED IS NOT WORKING, AND THAT IS THE WHOLE POINT OF THIS
+ * SECTION.***  `extension_loaded()' asks whether a module entry was
+ * registered, which is a fact about `internal_functions_cli.c' and
+ * not about the library underneath it.  Every one of these
+ * extensions was first seen "compiling clean" while its body was
+ * `#ifdef'd out to nothing -- so a check that only counts modules
+ * would have passed on that build too.
+ *
+ * So each line below calls through to the LIBRARY: bz2 round-trips
+ * bytes through libbz2, zip and sqlite3 and curl and openssl each
+ * ask their own library its version or do one real operation.
+ */
+$want = ['core', 'date', 'pcre', 'hash', 'json', 'random', 'Reflection',
+	 'SPL', 'standard', 'libxml', 'dom', 'SimpleXML', 'zlib',
+	 'posix', 'pcntl', 'bz2', 'readline', 'openssl', 'curl',
+	 'sqlite3', 'zip'];
+$missing = [];
+foreach ($want as $e) {
+	if (!extension_loaded($e)) $missing[] = $e;
+}
+echo "  INFO loaded: " . implode(', ', get_loaded_extensions()) . "\n";
+/*
+ * ***ASSERTED ON Plan9 ONLY, and this is Section 7's rule rather than
+ * a softening.***  The list above is a statement about THIS PORT's
+ * `internal_functions_cli.c', so a build host that happens not to
+ * ship `ext/readline' would fail it while being perfectly correct --
+ * and *a test that fails on the reference cannot tell you whether the
+ * test or the tree is wrong*, which is the whole reason this file is
+ * run against host php first.
+ *
+ * `PHP_OS' is `"Plan9"' here, from `php_config.h:594'.  **Section 7
+ * prints PHP_OS**, so a build whose PHP_OS changed shows up as this
+ * check silently not running rather than as a mystery pass -- which
+ * is the failure mode to watch for, not the one being accepted.
+ */
+if (PHP_OS === 'Plan9') {
+	eq("every expected extension is registered", $missing, []);
+} elseif ($missing) {
+	echo "  INFO not on Plan9; absent here: " . implode(', ', $missing) . "\n";
+}
+
+/* bz2 -- a real round trip through libbz2, not a version string. */
+if (extension_loaded('bz2')) {
+	$plain = str_repeat("APExp bzip2 round trip. ", 200);
+	$packed = bzcompress($plain, 9);
+	eq("bzcompress returns a string", is_string($packed), true);
+	eq("bzcompress actually compresses", strlen($packed) < strlen($plain), true);
+	eq("bzdecompress round trip", bzdecompress($packed), $plain);
+}
+
+/* zlib -- the same question, since ext/zlib is what answers "MISSING ZIP". */
+if (extension_loaded('zlib')) {
+	$plain = str_repeat("APExp zlib round trip. ", 200);
+	eq("gzdeflate/gzinflate round trip", gzinflate(gzdeflate($plain, 9)), $plain);
+}
+
+/* dom + libxml -- parse and read a value back out. */
+if (extension_loaded('dom')) {
+	$d = new DOMDocument();
+	$d->loadXML('<r><a id="x">hello</a></r>');
+	eq("DOM parses and reads text", $d->getElementsByTagName('a')->item(0)->textContent, "hello");
+	eq("DOM reads an attribute", $d->getElementsByTagName('a')->item(0)->getAttribute('id'), "x");
+}
+if (extension_loaded('SimpleXML')) {
+	$x = simplexml_load_string('<r><a>7</a></r>');
+	eq("SimpleXML reads an element", (string)$x->a, "7");
+}
+
+/* sqlite3 -- create, insert, select, in memory, so no file is left. */
+if (extension_loaded('sqlite3')) {
+	echo "  INFO SQLite3 library version: " . SQLite3::version()['versionString'] . "\n";
+	$db = new SQLite3(':memory:');
+	$db->exec('CREATE TABLE t (a INTEGER, b TEXT)');
+	$db->exec("INSERT INTO t VALUES (42, 'forty-two')");
+	$row = $db->querySingle('SELECT b FROM t WHERE a = 42');
+	eq("sqlite3 round trip", $row, "forty-two");
+	$db->close();
+}
+
+/* openssl -- a digest and a random, both computed by libressl. */
+if (extension_loaded('openssl')) {
+	echo "  INFO OpenSSL: " . OPENSSL_VERSION_TEXT . "\n";
+	eq("openssl_digest sha256 of the empty string",
+	   openssl_digest("", "sha256"),
+	   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+	eq("openssl_random_pseudo_bytes length",
+	   strlen(openssl_random_pseudo_bytes(16)), 16);
+	eq("a cipher list is non-empty", count(openssl_get_cipher_methods()) > 0, true);
+}
+
+/* curl -- built, and able to report its own library's version. */
+if (extension_loaded('curl')) {
+	$v = curl_version();
+	echo "  INFO libcurl " . $v['version'] . ", ssl " . ($v['ssl_version'] ?? 'none') . "\n";
+	eq("curl_init returns a handle", curl_init() !== false, true);
+}
+
+/* zip -- write an archive to a temp file, read it back, delete it. */
+if (extension_loaded('zip')) {
+	echo "  INFO libzip " . (function_exists('zip_libzip_version') ? zip_libzip_version() : ZipArchive::LIBZIP_VERSION) . "\n";
+	$tmp = tempnam(sys_get_temp_dir(), 'apexpzip');
+	$z = new ZipArchive();
+	eq("ZipArchive::open for writing", $z->open($tmp, ZipArchive::OVERWRITE) === true, true);
+	$z->addFromString('hello.txt', 'zip round trip');
+	$z->close();
+	$z2 = new ZipArchive();
+	eq("ZipArchive::open for reading", $z2->open($tmp) === true, true);
+	eq("zip round trip", $z2->getFromName('hello.txt'), "zip round trip");
+	$z2->close();
+	@unlink($tmp);
+}
+
+/* posix -- ids that must agree with the ones standard php reports. */
+if (extension_loaded('posix')) {
+	eq("posix_getpid agrees with getmypid", posix_getpid(), getmypid());
+	eq("posix_getuid returns an int", is_int(posix_getuid()), true);
+	$u = posix_getpwuid(posix_getuid());
+	eq("posix_getpwuid returns a name", is_array($u) && isset($u['name']), true);
+	if (is_array($u)) echo "  INFO posix user: " . $u['name'] . "\n";
+	eq("posix_uname returns a sysname", is_array(posix_uname()), true);
+}
+
+/* pcntl -- the parts that need no fork, so the test cannot hang. */
+if (extension_loaded('pcntl')) {
+	/*
+	 * ***NO fork() HERE, DELIBERATELY.***  A forked child that does
+	 * not exit turns this file into the one test in the tree that
+	 * can hang, and the convention is that such a case gets its own
+	 * file and its own SIGALRM.  What is asked here is only that
+	 * the extension registered and its signal table is readable.
+	 */
+	eq("pcntl_signal_dispatch runs", (function () { pcntl_signal_dispatch(); return true; })(), true);
+	eq("pcntl_strerror is a string", is_string(pcntl_strerror(1)), true);
+}
+
+/* readline -- registered, and its library version readable. */
+if (extension_loaded('readline')) {
+	$i = readline_info();
+	eq("readline_info returns an array", is_array($i), true);
+	if (is_array($i) && isset($i['library_version']))
+		echo "  INFO readline " . $i['library_version'] . "\n";
+}
 
 printf("\nphp-smoke: %d failures\n", $fails);
 exit($fails);

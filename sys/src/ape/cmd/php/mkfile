@@ -512,6 +512,50 @@ OFILES=\
 	ext/zlib/zlib.$O\
 	ext/zlib/zlib_fopen_wrapper.$O\
 	ext/zlib/zlib_filter.$O\
+# ***THE EIGHT OPTIONAL EXTENSIONS PHORONIX ASKS FOR.***  Nine are\
+# listed; **GD is the one left out and it is not a choice** -- there\
+# is no libgd in this tree, only libpng, and libpng is not a drawing\
+# library.  `ext/sockets' is the ninth and is deferred: it needs\
+# `struct cmsghdr', the `CMSG_*' macros, `msg_flags' and a real\
+# `recvmsg' in libap, which is a public-struct change.  The\
+# `php_config.h' entry has the detail.\
+#\
+# Each file list is the extension's own `config.m4'\
+# `PHP_NEW_EXTENSION' line, read rather than recalled, after that\
+# mistake cost three rounds on `ext/dom' above.\
+#\
+# **The libraries all come in by `#pragma lib' from their own\
+# headers** -- `<bzlib.h>', `<readline/readline.h>', `<openssl/*.h>',\
+# `<curl/curl.h>', `<sqlite3.h>', `<zip.h>' -- which is why there is\
+# still no `LIB=' line in this mkfile.\
+# ext/posix\
+	ext/posix/posix.$O\
+# ext/pcntl\
+	ext/pcntl/pcntl.$O\
+	ext/pcntl/php_signal.$O\
+# ext/bz2\
+	ext/bz2/bz2.$O\
+	ext/bz2/bz2_filter.$O\
+# ext/readline\
+	ext/readline/readline.$O\
+	ext/readline/readline_cli.$O\
+# ext/openssl\
+	ext/openssl/openssl.$O\
+	ext/openssl/openssl_pwhash.$O\
+	ext/openssl/openssl_backend_common.$O\
+	ext/openssl/openssl_backend_v1.$O\
+	ext/openssl/openssl_backend_v3.$O\
+	ext/openssl/xp_ssl.$O\
+# ext/curl\
+	ext/curl/interface.$O\
+	ext/curl/multi.$O\
+	ext/curl/share.$O\
+	ext/curl/curl_file.$O\
+# ext/sqlite3\
+	ext/sqlite3/sqlite3.$O\
+# ext/zip\
+	ext/zip/php_zip.$O\
+	ext/zip/zip_stream.$O\
 # ext/opcache\
 	ext/opcache/ZendAccelerator.$O\
 	ext/opcache/shared_alloc_mmap.$O\
@@ -816,6 +860,8 @@ OBJDIRS=\
 	ext/lexbor/lexbor/unicode ext/lexbor/lexbor/url ext/opcache\
 	ext/libxml ext/dom ext/dom/parentnode\
 	ext/dom/lexbor/selectors-adapted ext/simplexml ext/zlib\
+	ext/posix ext/pcntl ext/bz2 ext/readline ext/openssl\
+	ext/curl ext/sqlite3 ext/zip\
 	ext/pcre ext/pcre/pcre2lib ext/random ext/reflection ext/spl\
 	ext/standard ext/standard/libavifinfo ext/uri\
 	ext/uri/uriparser/src main main/streams sapi/cli
