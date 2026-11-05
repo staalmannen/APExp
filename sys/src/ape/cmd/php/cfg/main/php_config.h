@@ -33,6 +33,41 @@
 #ifndef PHP_CONFIG_H
 #define PHP_CONFIG_H
 
+/*
+ * ***THE PROLOGUE IS UPSTREAM'S OWN, COPIED VERBATIM FROM
+ * `main/php_config.h.in:7-15', AND LEAVING IT OUT BROKE THE BUILD.***
+ * These three are NOT autoconf answers -- autoheader copies them
+ * through from the template -- so they are invisible to anyone
+ * reading the generated file as a list of capabilities, which is how
+ * this file was first written.  `Zend/zend_map_ptr.h:82' then
+ * answered
+ *
+ *	not a function
+ *	not a parameter: zend_map_ptr_reset
+ *	syntax error, last name: ZEND_API
+ *
+ * because `ZEND_API void zend_map_ptr_reset(void);' had an undefined
+ * identifier where a storage class belongs.  *Every `ZEND_API' in php
+ * is that shape*, so the first file to declare anything would have
+ * failed whichever it was.
+ *
+ * The guard is upstream's and is already right for kencc, which is
+ * not `__GNUC__': all three come out empty, which is what a platform
+ * with no visibility attributes and no dynamic linking wants.
+ */
+#if defined(__GNUC__) && __GNUC__ >= 4
+# define ZEND_API __attribute__ ((visibility("default")))
+# define ZEND_DLEXPORT __attribute__ ((visibility("default")))
+#else
+# define ZEND_API
+# define ZEND_DLEXPORT
+#endif
+
+#define ZEND_DLIMPORT
+
+/* `cfg/build-defs.h' is ours; `main/php.h' includes it unguarded. */
+#define HAVE_BUILD_DEFS_H 1
+
 /* ------------------------------------------------------------------ *
  * Type sizes.  **kencc amd64 is LLP64**: `long' is FOUR bytes while
  * pointers and `size_t' are eight.  php survives that because
@@ -62,8 +97,10 @@
  * ------------------------------------------------------------------ */
 /* #undef HAVE_ASM_GOTO */
 /* #undef HAVE_GCC_GLOBAL_REGS */
-/* #undef HAVE_MUSTTAIL */
-/* #undef HAVE_PRESERVE_NONE */
+/* HAVE_MUSTTAIL and HAVE_PRESERVE_NONE are NOT config.h's: they are
+ * set by `Zend/zend_portability.h:342' from `__has_attribute', which
+ * answers 0 for kencc.  Saying anything about them here would only
+ * suggest this file owns a decision it does not. */
 /* #undef HAVE_ALIGNOF */
 /* #undef HAVE_ATTRIBUTE_ALIGNED */
 /* #undef HAVE_FUNC_ATTRIBUTE_IFUNC */
@@ -353,11 +390,21 @@
 #define PHP_OS "Plan9"
 #define PHP_UNAME "Plan9"
 #define PHP_BUILD_SYSTEM "Plan9 APExp"
-#define PHP_OS_FAMILY "BSD"
+/*
+ * ***`PHP_OS_FAMILY' IS NOT OURS TO ANSWER, AND DEFINING IT HERE WAS
+ * A COLLISION.***  `main/php.h:38-51' computes it from the platform
+ * macros and its chain ends in an unconditional
+ * `#else # define PHP_OS_FAMILY "Unknown"', so php.h would have
+ * redefined this one with a different string.  `cfghdr-sweep.py'
+ * reported it as a name the template never asks about, which is what
+ * an invented macro looks like from outside.
+ *
+ * Plan 9 defines none of `BSD', `__linux__', `__sun__' or the rest,
+ * so php answers "Unknown" -- which is simply true.
+ */
 #define DEFAULT_SHORT_OPEN_TAG "1"
 #define PHP_SIGCHILD 0
 #define ZEND_DEBUG 0
-#define ZEND_DLIMPORT
 #define PHP_WRITE_STDOUT 1
 #define PHP_USE_PHP_CRYPT_R 1		/* no crypt.h; php bundles four */
 #define HAVE_BUNDLED_PCRE 1

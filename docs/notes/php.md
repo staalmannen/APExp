@@ -464,6 +464,55 @@ beats meta-rule in every mk, which needs no checking at all.*
 with the real include paths, filtered to `No such file or directory`.
 One sweep instead of 31 round trips.
 
+### The first real C diagnostic, and it was an omission in the config.h
+
+`TSRM/TSRM.c` compiled -- the first object of the port -- and
+`Zend/Optimizer/block_pass.c` then answered, from
+`Zend/zend_map_ptr.h:82`:
+
+```
+not a function
+not a parameter: zend_map_ptr_reset
+syntax error, last name: ZEND_API
+```
+
+`ZEND_API void zend_map_ptr_reset(void);` with `ZEND_API` an
+undefined identifier -- and **every `ZEND_API` in php is that shape**,
+so the first file to declare anything would have failed whichever one
+it was.
+
+***THE CAUSE IS A BLIND SPOT IN HOW THIS FILE WAS WRITTEN.***
+`autoheader` emits only `#undef NAME` lines; anything spelled
+`#define` in a `.h.in` is **text copied straight through**.
+`main/php_config.h.in:7-15` copies three -- `ZEND_API`,
+`ZEND_DLEXPORT`, `ZEND_DLIMPORT` -- under an `#if defined(__GNUC__)`
+whose `#else` arm makes all three empty. *Reading the generated
+config as a list of capabilities, which is exactly the method used
+here, does not show them.* The prologue is copied verbatim now; its
+guard was already right for kencc.
+
+**21 names were missing in all**, and the one check that shows them
+is a diff of the two name sets. That is `sys/lib/tests/cfghdr-sweep.py`
+now, which gates on this class and reports two others -- and found
+two things on its first run beyond the case it was built for:
+
+* **`PHP_OS_FAMILY` was mine and was a collision.** `main/php.h:38-51`
+  computes it from the platform macros, ending in an unconditional
+  `#else "Unknown"`, so php.h would have redefined it with a different
+  string. Plan 9 defines none of `BSD`, `__linux__` or the rest, so
+  php answers `"Unknown"`, which is simply true. Removed.
+* **Five in clisp's hand-answered config** -- `_GL_UNUSED`,
+  `_UNUSED_PARAMETER_`, `__GNUC_STDC_INLINE__` and two under a dead
+  `__SUNPRO_CC` arm. clisp builds and runs, so nothing it compiles
+  uses them; *recorded, not acted on*, which is why clisp is not in
+  the sweep's gating list.
+
+The other 18 are `_GNU_SOURCE` and its family, `__STDC_WANT_*`, and
+two Linux headers. **Left out deliberately**: APE's feature macros are
+`_POSIX_SOURCE`, `_BSD_EXTENSION` and `_PLAN9_SOURCE`, which the
+mkfile already passes, and `_GNU_SOURCE` would be a claim about
+headers this platform does not have.
+
 ## What the config.h decided, and why by hand
 
 The long reasoning is in the file itself; what matters as a summary:
