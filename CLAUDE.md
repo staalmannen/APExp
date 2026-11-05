@@ -366,8 +366,17 @@ which reads like the mkfile's rule and is not it
 (`ext/hash/hash_sha3.c` takes them too, from `ext/hash`), and it
 passed `CFLAGS` through, whose leading **`-c` means "compile only" to
 `pcc` and "print `const if`" to `6c`** -- dozens of lines that read
-exactly like diagnostics. *It cannot ask about the LINK*, which stays
-the VM's.
+exactly like diagnostics.
+***AND `--undefined` ASKS THE LINK'S QUESTION WITHOUT A LINKER, WHICH
+THIS PARAGRAPH FIRST SAID IT COULD NOT***: `6c -S` names every symbol
+each unit DEFINES (`<>` marks a file-local one) and REFERENCES, so
+references minus global definitions minus each unit's own statics,
+over all 515, is what `6l` would complain about -- handed to
+`apfunc-sweep.py` for "does libap have it". **READ, do not gate**: the
+sweep sees C function definitions only, so assembly reads as
+`declared` and DATA as `absent` (ten of php's 283 are one or the
+other, all present). *Its positive control is one command and names
+the three symbols the VM's `6l` actually named.*
 ***AND `hostkencc/` BUILDS ALL TEN C COMPILERS WITH gcc***, from the
 shipped `sys/src/cmd/cc` and `[1-9kqv]c` plus go1.4's `lib9`/`libbio`,
 already vendored at `sys/src/external/go1.4` — which **compiled with gcc
@@ -1195,15 +1204,22 @@ silent:
 
 **php — ***ALL 514 TRANSLATION UNITS COMPILE***, measured on the HOST,
 and the notes are in `docs/notes/php.md`.** 8.5.12, vendored at
-`sys/src/external/php`; `sh sys/lib/tests/hostkencc/php-mirror.sh
---compile` answers `compiled 514, errors 0, missing 0`. **The LINK is
-untouched and is the VM's**: the host has no libap and `hostkencc`
-deliberately does not build the linkers, so the undefined-symbol class
-— a `config.h` claiming a name libap only DECLARES — has not been
-asked. *That question was checked by hand for the resolver family and
-it held*: `res_query.c`'s `weak_alias(res_query, res_search)` is a
-no-op on kencc, and `network/res_aliases.c` exists precisely to define
-the strong forwarders.
+`sys/src/external/php`; `--compile` answers `compiled 515, errors 0,
+missing 0` and **`--undefined` says the program wants 283 symbols
+from outside php, every one of which libap has** (273 the sweep
+names outright; ten it misreports because they are assembly or DATA,
+each opened by hand). **So the link is PREDICTED to succeed and has
+not been run**, and the refutation condition is a name outside those
+283 — which is what a newly reached `static inline` would be.
+***`mk install` DID reach `6l` and named four***: `_volatile__`, from
+`__asm__ __volatile__("")`, which kencc lexed as a function call
+because it knew `__asm__` and not GNU's qualifiers (50 vendored files
+use that spelling, and the two-line test for it found
+`__extension__` eating the next character); and three lexbor
+`lxb_dom_collection_*`, because **kencc emits an unused `static
+inline` where gcc at -O2 discards it**, so a header-only helper
+calling into a file upstream's `config.m4` does not list is a link
+error here and silence there. Both fixed.
 **The first sweep returned EIGHT errors in six files and all six were
 fixed without a VM round trip** — three of them kencc's (a pointer
 assigned to a `bool`; `bool visible;` declaring nothing, because

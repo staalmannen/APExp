@@ -707,11 +707,44 @@ unchanged: **sound for "does it compile" and "what does it diagnose",
 unsound for anything keyed on `long` being 32 bits**, since the host
 build is LP64.
 
-**What it does NOT measure is the LINK**, which is the next class of
-failure and is the VM's: a `config.h` claiming a name libap only
-DECLARES fails there, far from the claim. The resolver family below is
-exactly that shape caught early — `apfunc-sweep`'s middle state — and
-it held, but it had to be checked rather than assumed.
+***AND IT MEASURES THE LINK TOO, WHICH THIS SECTION FIRST SAID IT
+COULD NOT.*** The claim was "the host has no libap and `hostkencc`
+deliberately does not build the linkers, so this one is the VM's" —
+and **neither is needed**. `6c -S` prints, per translation unit, every
+symbol it defines (`TEXT`/`GLOBL`, with `<>` for a file-local one) and
+every symbol it references; the program's undefined set is the
+references minus the global definitions minus each unit's own statics,
+over all of them at once. `php-mirror.sh --undefined` does that and
+hands the result to `apfunc-sweep.py`. *A capability was written off
+from the shape of the tool rather than from the question being asked*
+— the same error as "kencc cannot be compiled on the build host",
+which `cpp-xcheck` then disproved for a whole directory.
+
+### The link: four symbols, two causes
+
+`mk install` reached `6l` and named four undefined names.
+
+**`_volatile__`**, referenced by `__jit_debug_register_code`, is
+kencc's: `__asm__ __volatile__("")` — the scanner knew `__asm__` and
+not GNU's `[volatile] [inline] [goto]` qualifiers, so the qualifier
+was lexed as an identifier and CALLED. 50 vendored files in this tree
+use that spelling. Fixed in `cc/lex.c`, and *writing the two-line test
+for it found that `__extension__` had been eating the first character
+of whatever followed it* — both in `docs/notes/kencc.md`.
+
+**`lxb_dom_collection_create`, `_init` and `_destroy`**, referenced by
+`lxb_dom_collection_make`, are a build-list question with a compiler
+reason underneath. That function is a `static inline` in
+`lexbor/dom/collection.h`, which `node.h` and `element.h` both
+include, so **every one of the many units reaching those headers
+emits it** — *kencc emits an unused static function and gcc at -O2
+discards it*. The three functions it calls live in
+`lexbor/dom/collection.c`, and `ext/lexbor/config.m4:51-63` does not
+list that file, because upstream never needs them. The mkfile
+compiles it; it is lexbor's own code and self-consistent. **The
+general form is worth keeping**: a header-only helper that calls into
+a file the port does not compile is a link error here and silence on
+gcc.
 
 ### The eight, and what each turned out to be
 
@@ -777,10 +810,16 @@ cannot be found by reading the subject.*
 * fibers: **done** — `ucontext` is in libap and `ucontext-test` is 0
   failures on the VM (`docs/notes/libap.md`). What remains is pointing
   php at it: `ZEND_FIBER_UCONTEXT` in the `config.h`
-* **the LINK.** Every object compiles; nothing has been linked, and
-  the undefined-symbol class is untouched. `php-mirror.sh` cannot ask
-  — the host has no libap and `hostkencc` deliberately does not build
-  the linkers — so this one is the VM's.
+* **the LINK: predicted to succeed, not yet run.** All 515 objects
+  compile and `--undefined` says the program wants **283 symbols from
+  outside php**, of which `apfunc-sweep` finds **273 defined in
+  libap** and ten that are present but invisible to it — `getcontext`
+  and `swapcontext` are assembly, `stdin`/`stdout`/`stderr`/`environ`/
+  `h_errno`/`_ctype`/`_errnoloc` are DATA, and `signal` is spelled
+  `(*signal(int, void (*)(int)))(int)`, which no definition-shaped
+  regex matches. Each of the ten was opened. **So nothing is missing,
+  and the refutation condition is a name outside those 283** — which
+  is what a newly reached `static inline` would be.
 * the 474 unanswered questions in the template are still unanswered,
   and `cfghdr-sweep` gates on none of them. A compile is not evidence
   that an answer is right, only that it is consistent.

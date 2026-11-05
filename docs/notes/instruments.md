@@ -1190,9 +1190,34 @@ like diagnostics. *A flag one letter from another flag is checked
 rather than recalled, and these two meanings are in two different
 programs.*
 
-**What it does not measure is the LINK** — the host has no libap and
-`hostkencc` deliberately does not build the linkers — so the
-undefined-symbol class stays the VM's.
+***AND `--undefined` ASKS THE LINK'S QUESTION WITHOUT A LINKER, WHICH
+THIS ENTRY FIRST SAID WAS IMPOSSIBLE.*** The original wording was
+"the host has no libap and `hostkencc` deliberately does not build
+the linkers — so the undefined-symbol class stays the VM's", and
+neither fact is the obstacle it looks like. `6c -S` prints every
+symbol a unit DEFINES (`TEXT`/`GLOBL`, `<>` marking a file-local one)
+and every symbol it REFERENCES; across all 515 units, references
+minus global definitions minus each unit's own statics is exactly
+what `6l` would complain about. The result is handed to
+`apfunc-sweep.py`, which says whether libap has each name.
+
+**Read that answer, do not gate on it.** The sweep looks for C
+function definitions, so ten of the 283 come back wrong in two
+predictable ways — `getcontext` and `swapcontext` are ASSEMBLY and
+read as `declared`; `stdin`, `stdout`, `stderr`, `environ`,
+`h_errno`, `_ctype` and `_errnoloc` are DATA and read as `absent`;
+and `signal`, spelled `(*signal(int, void (*)(int)))(int)`, matches no
+definition-shaped regex. All ten are present. *A sweep over function
+names, asked about a variable, answers `absent` confidently* — the
+caveat CLAUDE.md already carried for `HAVE_TM_ZONE`, arriving in its
+other form.
+
+**Its positive control is a real failure and costs one command**:
+`--undefined ext/lexbor/lexbor/dom/interfaces/node.c` narrows the
+program to one unit and names `lxb_dom_collection_create`, `_init`
+and `_destroy` among its 37 — *the three the VM's `6l` named*. A mode
+that reports an empty set is indistinguishable from one that cannot
+see, which is why the number is written down.
 
 ## `boolptr-test` — a pointer converted to `bool`
 

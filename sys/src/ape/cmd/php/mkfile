@@ -221,6 +221,25 @@ OFILES=\
 	ext/lexbor/lexbor/css/unit.$O\
 	ext/lexbor/lexbor/css/value.$O\
 # ext/lexbor/lexbor/dom\
+# ***`collection.c' IS NOT IN UPSTREAM'S OWN FILE LIST AND THIS BUILD\
+# NEEDS IT, BECAUSE kencc EMITS AN UNUSED `static inline'.***\
+# `lexbor/dom/collection.h:41' defines `lxb_dom_collection_make' as\
+# `lxb_inline', which is `static inline', and `node.h' and\
+# `element.h' both include it -- so every one of the many TUs that\
+# reach those headers emits the function, whether it calls it or not.\
+# It calls `lxb_dom_collection_create', `_init' and `_destroy', which\
+# live in `collection.c', and `ext/lexbor/config.m4:51-63' does NOT\
+# list that file: gcc at -O2 discards the unused static and never\
+# needs them.  The link said so plainly:\
+#\
+#	lxb_dom_collection_make: undefined: lxb_dom_collection_create\
+#\
+# *Compiling the file is the honest fix* -- it is lexbor's own code\
+# and self-consistent -- where the alternative is teaching kencc to\
+# drop unused statics, which is a different and much larger change.\
+# `exception.c' is the other file upstream leaves out and nothing\
+# references it, so it stays out.\
+	ext/lexbor/lexbor/dom/collection.$O\
 	ext/lexbor/lexbor/dom/interface.$O\
 # ext/lexbor/lexbor/dom/interfaces\
 	ext/lexbor/lexbor/dom/interfaces/attr.$O\
