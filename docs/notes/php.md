@@ -295,10 +295,45 @@ Which maps to: `mbstring` (oniguruma), `openssl` (libressl), `curl`,
 `zlib`, `bz2`, `libxml`/`dom`/`simplexml`/`xml`/`xmlreader`/`xmlwriter`,
 `sqlite3` + `pdo_sqlite`, `zip`, `readline`, `gd` (png only), `intl`.
 
+***THESE ARE A DIFFERENT RISK CLASS FROM ANYTHING ON PECL, AND THAT IS
+THE DISTINCTION TO KEEP.*** Every one of them SHIPS WITH php 8.5, is
+tested by upstream against this exact version, and is turned on with a
+`--with-X` against a library this tree already has. A PECL package is
+a separate source tree with its own maintenance state and its own
+target php version. *The first is a flag; the second is a port.*
+
 **`ext/pcre` bundles its own pcre2 and that is what the 29 objects are.**
 `--with-external-pcre` would use `sys/src/ape/lib/pcre2` instead; the
 bundled copy is the better starting point, because it is the version php
 was tested against and it removes a link dependency from the first build.
+
+### php-lua and php-tk: a different risk class, and the answer is no for now
+
+Asked directly, so recorded rather than left to be re-asked. **Neither
+is vendored and neither ships with php** -- `sys/src/external/lua` and
+`external/tk` are the LIBRARIES, and `php/ext/` has no `lua` or `tk`.
+Both would be PECL packages to bring in, and PECL extensions build as
+shared modules by default, which Plan 9 cannot load at all; they would
+have to be linked statically and listed in the mkfile and
+`internal_functions_cli.c` by hand. *That part is mechanical and the
+port directory is already arranged for it.* The problem is upstream.
+
+**`tk` is PECL 0.1.1 beta, dated 2004-11-14, and its own page says the
+package is unmaintained and invites someone to take it over.** That is
+the PHP 4 extension API: no `zend_string`, the PHP 7 zval rework, the
+arginfo requirements and the TSRMLS removal all postdate it. This is
+not an extension to enable, it is a rewrite -- *bigger than most of
+what this tree has ported* -- and a GUI binding additionally needs an
+event loop married to php's request lifecycle, on top of our own
+`external/tk/plan9` backend. No.
+
+**`lua` is less clear and still not first.** The PECL `lua` package
+looks PHP 7-era; **LuaSandbox** is the one actually packaged for PHP
+8.0 through 8.5. *Which also means it is a different extension with a
+different API*, and it is worth checking before any work whether it
+wants Lua **5.1** -- it comes from MediaWiki's Scribunto, which
+standardised there -- because this tree ships **5.5.0**. A version
+mismatch would be its own port.
 
 **No extension should be enabled in the first build.** The order that
 has worked in this tree is: get the thing to compile and print its own
