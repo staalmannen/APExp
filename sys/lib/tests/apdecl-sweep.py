@@ -40,6 +40,20 @@
 #   - a regex for declarations and calls, so a macro, a K&R-style
 #     declaration or a call built by token pasting is invisible.
 #
+# ***AND THE SHARPEST LIMIT IS THE ONE THAT BIT: A FUNCTION DECLARED IN
+# NO HEADER AT ALL IS EXACTLY WHAT THIS CANNOT REPORT.*** The sweep
+# works by comparing a call against a DECLARED return type, so when
+# there is no declaration anywhere there is nothing to compare with and
+# the call reads as an ordinary `int' one. `asctime_r' was in that
+# state -- defined in `time/ctime.c', declared by no APE header, so
+# every caller got the `char *' truncated -- and this sweep ran clean
+# over it. It was found instead by WRITING a caller: `ctime_r', 120
+# lines above the definition in the same file, which answered
+# `incompatible types: "IND CHAR" and "INT" for op "RETURN"'.
+# *A clean run here says nothing about a name no header has ever
+# heard of*, and `apfunc-sweep.py' asks the question from the other
+# end -- but only for names it is GIVEN.
+#
 # **Three earlier versions of this file reported 491, then 79, then 2
 # hits, and the first two were almost entirely NOISE.** The cuts that
 # mattered, in order: strip comments and string literals (the first

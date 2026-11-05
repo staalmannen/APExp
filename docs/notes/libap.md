@@ -3831,3 +3831,43 @@ long way from the claim. Both halves were already reentrant, so
 `return *__asctime_r(*tm, *buf);`, which could not compile anywhere, and
 the file is commented out of `time/mkfile` -- which is why nobody has
 noticed. Recorded so the next reader does not spend a round on it.
+
+### And `asctime_r` was declared by no header, which `ctime_r` found
+
+Adding `ctime_r` broke the libap build, and the break was not in
+`ctime_r`:
+
+```
+ctime.c:80 incompatible types: "IND CHAR" and "INT" for op "RETURN"
+warning: ctime.c:200 redeclaration of: asctime_r
+```
+
+Line 80 is `return asctime_r(&tm, buf);`, and **`asctime_r` was
+declared by no APE header at all** -- defined at `ctime.c:200`, 120
+lines further down its own file, and invisible to every caller
+including the one in the same translation unit. So it was an implicit
+`int` return and the `char *` came back truncated. *This tree's
+oldest invariant, in a POSIX function that has been in libap all
+along.*
+
+**The warning is the tell and says the opposite of what it looks
+like**: `redeclaration of: asctime_r` at the DEFINITION is kencc
+objecting to the implicit declaration *it had just created at line
+80*, not to anything in a header. Read that way it is a second
+statement of the same fact rather than a separate complaint.
+
+`<time.h>` declares it now. `apfunc-sweep.py`'s `external/` grep found
+56 files mentioning the name and every one is gnulib's
+`#undef asctime_r` / `_GL_WARN_ON_USE` pair, which a plain `extern`
+does not disturb; nothing declares it as anything else.
+
+***AND `apdecl-sweep.py` RAN CLEAN OVER IT***, which is not a fault in
+the sweep but its sharpest limit made concrete: it compares a call
+against a DECLARED return type, so a function no header has ever heard
+of has nothing to compare against and reads as an ordinary `int` call.
+Its header says so now. **The question "what does libap DEFINE that no
+header DECLARES?" is the inverse sweep and does not exist yet** --
+`apfunc-sweep.py` asks it only for names it is given. A scan of
+`time/*.c` by hand found `asctime_r` the only real omission there, the
+other 43 unmentioned names being statics or declared in
+`<sys/time.h>`/`<unistd.h>`.
