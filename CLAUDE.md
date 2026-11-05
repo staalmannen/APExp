@@ -303,8 +303,16 @@ it gates if a marker stops matching) and links them against a fake
 a crash in the function but the function freeing a segment the caller
 is still using*, which is invisible from inside and expensive from the
 VM. No external oracle, so its control is a deliberate break and has
-been run twice: the old start-address-only rule gives **8** failures,
-the old `_SEGDETACH` fallback gives **2**.
+been run **four times**: the old start-address-only rule gives **8**
+failures, the old `_SEGDETACH` fallback **2**, deleting the malloc
+arm's page round-up **1**, and `*basep = p` **3**.
+***AND THAT LAST ONE GAVE 0 THE FIRST TIME.*** Its sections read
+`mmap_table[0].base` and then checked that what was released matched
+it — both sides from the same field, so it held however wrong the
+field was. The harness wraps `malloc` now, as it already wrapped
+`free`. *The assertion had been phrased against the thing under test
+instead of against something independent of it*, which is the shape
+to look for when a break does not fire.
 **`hostkencc/clisp-mirror.sh` stages clisp's generated tree on the
 host** so the host kencc can compile and inspect it -- `--flags` prints
 the compile line, `--compile` builds all 31 TUs and GATES. *Its
@@ -469,18 +477,21 @@ regular and whether `select()` then reports them readable; the subject
 is what *rio* serves, so run it in a rio window with no wish running,
 and note that it never READS any of them, since reading `/dev/mouse` is
 the call that hangs),
-**`mmaptrim-probe`** (does a large `mmap` come back 2MB-ALIGNED here —
-which is what decides whether php's Zend allocator ever has to trim an
-over-sized mapping at all. **Two of its four sections can kill the
-process, so it takes an ARGUMENT**: no argument runs the tail trim, `3`
-runs the head trim, and they never share a run, because a section that
-can kill the process hides every section after it. The host is the
-control and has been run: both trims survive there, and **8 of 8
-aligned on Linux is why php works there**, while *section 1's
-over-sized mapping is misaligned on Linux too* — so section 1 is
-information about the trim SIZE and only section 0 can clear or condemn
-anything. Calls `_mmapmark`, since a probe built against stale library
-code reports a lie shaped like the platform's answer), and
+**`mmaptrim-probe`** (**ANSWERED, and the answer it was not built to
+ask is the one that mattered.** Section 0: *0 of 8* 2MB mappings come
+back 2MB-aligned, every one misaligned by exactly `0x1ff000` — a 2MB
+grid, off by one page — so php's Zend allocator does trim; sections 2
+and 3 say both trims survive. **But three of the eight `mmap` calls
+FAILED**, and 10MB is not a memory limit, so **section 0b** asks how
+many mappings a process may HOLD, at three sizes, *with the prediction
+written down first*: slots give the same count at every size, address
+space gives one falling as 1/size. It is **5 at 2MB and 5 at 16MB**,
+and 64 at a size below `SEG_THRESHOLD` — the control. **Two of its
+sections can kill the process, so it takes an ARGUMENT**: no argument
+runs the tail trim, `3` runs the head trim, never sharing a run,
+because a section that can kill the process hides every section after
+it. Calls `_mmapmark`, since a probe built against stale library code
+reports a lie shaped like the platform's answer), and
 `mkrecipe-probe/`, which is a whole mk DIRECTORY because the question is
 what `mk` hands `rc` (`mk -k all`; `-k` is not optional).
 
@@ -1121,9 +1132,12 @@ the 13-file `jit/ir` code generator; opcache only has to COMPILE, since
 `opcache.enable_cli` is off by default, and all three of its shared
 memory macros must be answered NO — *`shm_open` answering success with
 a file in `/tmp` over a per-process `mmap` is `HAVE_WORKING_MPROTECT`
-in its exact shape.* (3) the Zend allocator's partial `munmap`, which
-is **fixed** in libap with one measurement still open
-(`mmaptrim-probe` section 0).
+in its exact shape.* (3) the Zend allocator's memory, which is
+**CLOSED**: the partial `munmap` is fixed and both trims are measured
+to survive on the VM, and the segment-slot ceiling that would have
+capped the Zend heap at about 10MB is gone with `SEG_THRESHOLD` at
+64MB. *The alignment question answered no — 0 of 8 — so the trims do
+run; they just work now.*
 **No extension in the first build**, whatever its library's state.
 
 **Queued**: **tkdesk** gets its mkfile in `sys/src/ape/app` and is **not
@@ -1676,6 +1690,12 @@ the index, so that nothing here is a surprise.
   reason it scrubs `FD_ISTTY` and `FD_ISREG`. `FD_BUFFEREDX` is poison:
   `read()` and `select()` both answer EIO for it without touching the
   fd.
+- **A process gets FIVE spare segment slots, measured**, so `mmap`
+  cannot be backed by `segattach` in general: `mmaptrim-probe` section
+  0b maps until refused at three sizes and answers 5 at 2MB and 5 at
+  16MB -- *the same count for eight times the memory*. `SEG_THRESHOLD`
+  is 64MB for that reason and anything below it is `malloc`-backed,
+  page-aligned by hand since `malloc` is not.
 - `/dev/snarf` is the clipboard and has no concept of ownership.
 - Plan 9 has no loopback unless `ip/ipconfig loopback /dev/null 127.1`
   has been run -- and that belongs in the machine's startup, not in
@@ -1768,10 +1788,22 @@ segment that address is in; *the idiom both of those break is how every
 POSIX program gets an ALIGNED allocation*, php's Zend allocator
 included, and the unknown-address `_SEGDETACH` fallback is gone
 deliberately, because destroying a stranger's segment to free a mapping
-we are not sure we made is worse than leaking; **`ctime_r` declared in
+we are not sure we made is worse than leaking; **`mmap` spending a
+SEGMENT SLOT on every mapping over 1MB when a process has only five**
+— the prose above the constant already said "Plan9 allows only ~8
+segments (NSEG)" and the threshold was set to 1MB anyway, *the limit
+known and the constant chosen as though it were not*; 64MB now, which
+exposed the deviation it had been hiding, namely that the
+`malloc`-backed arm returned a pointer that was **not page-aligned**
+as POSIX requires; **`ctime_r` declared in
 `<time.h>` and implemented nowhere**, found by `apfunc-sweep.py` while
 answering php's `config.h` and already the composition of two functions
-that were there; `poll()`'s three POSIX violations and `select()` on a
+that were there — ***and writing a caller for it found `asctime_r`
+declared by NO header at all***, defined 120 lines down its own file
+and returning implicit `int` to everyone, which `apdecl-sweep.py`
+cannot report because it compares a call against a DECLARED return
+type and there was none (*the inverse question — what does libap define
+that no header declares — has no instrument*); `poll()`'s three POSIX violations and `select()` on a
 regular file; itcl's
 four `sfbug`s; kencc's `false` keyword, the `L`-suffix width cap, the
 wide case label, the compound-literal zero fill, and both bit-field

@@ -194,10 +194,28 @@ about to use, and a tail trim's interior address fell through to
 `p9_munmap` has a partial-unmap arm now; the mechanism, the instruments
 and the two deliberate breaks are in `docs/notes/libap.md`.
 
-**What is still open is the platform half**, and it is cheap:
-`sys/lib/tests/mmaptrim-probe.c` section 0 asks whether `_SEGATTACH`
-already returns 2MB-aligned addresses. If it does, `zend_mm_chunk_alloc_int`
-takes its first branch every time and nothing is trimmed or held.
+**The platform half is measured now and this item is CLOSED**, but not
+the way it was expected to close. `mmaptrim-probe` on 9front/amd64:
+
+* section 0 — **0 of 8** 2MB mappings are 2MB-aligned, every one
+  misaligned by exactly `0x1ff000`, a 2MB grid off by one page. So
+  `zend_mm_chunk_alloc_int` does take its trimming branch.
+* sections 2 and 3 — **both trims survive**. The partial-unmap arm
+  works on the machine as well as on the host.
+* section 1 — the over-sized mapping came back aligned, *contradicting
+  section 0's five*, so the placement rule is size-dependent and one
+  sample of it is not a rule. In zend's real path it means no head
+  trim and one tail trim.
+
+***AND THE RUN FOUND A CEILING THAT WOULD HAVE MATTERED MORE.*** Three
+of section 0's eight `mmap` calls failed, at 10MB total, which is no
+memory limit at all. Section 0b separated it: **five** live mappings
+at 2MB and **five** at 16MB — the same count for eight times the
+memory — so the limit was Plan 9 segment slots, one spent by
+`p9_mmap_impl` on every mapping at or above a 1MB `SEG_THRESHOLD`.
+**Zend grows its heap in 2MB chunks, so php would have died at about
+10MB of heap**, long before any trimming question arose.
+`SEG_THRESHOLD` is 64MB now; `docs/notes/libap.md` has it.
 
 ## Extensions: the ones with a ported library
 
@@ -222,7 +240,6 @@ version, then add one library at a time.
 ## Open, as a list
 
 * fibers: no context switch (§1) — **decide `ucontext` or boost asm**
-* `mmaptrim-probe` section 0 on the VM — the one open measurement
 * `main/php_config.h` not written yet; the inventory is derived, the
   answers are not
 * `memfd_create` is declared with no implementation, which is a libap
@@ -234,6 +251,12 @@ version, then add one library at a time.
   on it.
 
 ## Closed
+
+* **The Zend allocator's memory, §3** — the partial `munmap` is fixed
+  and both trims are measured to survive on the VM, and the
+  segment-slot ceiling that would have capped the Zend heap at about
+  10MB is gone. *The alignment question answered no, so the trims do
+  run; they just work.*
 
 * **`ctime_r`** — declared in `<time.h>` and implemented nowhere, found
   by `apfunc-sweep.py` while answering php's `config.h`. It is the
