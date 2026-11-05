@@ -397,7 +397,16 @@ that the instrument notices.*
 nothing declares), `apehdr-sweep.py` (every `sys/include/ape` header
 standalone, plus a TOGETHER case for collisions only a combination can
 show), `rceq-sweep.py` (**gates**: a bare `=` in an mkfile recipe cannot
-parse), `mkcont-sweep.py` (**gates**: a comment ending a continuation),
+parse), `mkcont-sweep.py` (**gates**: a logical line mk cannot parse. TWO
+shapes, and *the second was added after the first reported 0 over
+it*: a comment ending a continuation, and an INDENTED line that is
+not a recipe — `cmd/php/mkfile` ended its `OFILES` at an ordinary
+entry and left a tab-indented one orphaned five comment lines later.
+**Recipes are the whole difficulty**, since every recipe body is
+indented and has no `:` or `=`, so the discriminator is what the last
+non-indented logical line was; `--control` carries one of each shape
+*and a real recipe*, because a control without one would pass for a
+version that reports every mkfile),
 `ishadow-sweep.py` (does NOT gate — most hits are deliberate),
 `hosthelper-sweep.py` (**does NOT gate, on purpose**: which mkfile
 recipes run a binary the same mkfile builds, and whether it was built
