@@ -344,7 +344,22 @@
 /* #undef HAVE_FOPENCOOKIE */
 /* #undef COOKIE_SEEKER_USES_OFF64_T */
 /* #undef HAVE_FTOK */
-/* #undef HAVE_FUNC_GETHOSTBYNAME_R_6 */
+/*
+ * ***THIS HAS TO AGREE WITH `HAVE_GETHOSTBYNAME_R' ABOVE, AND IT DID
+ * NOT.***  `main/network.c' defines its `gethostname_re' helper in one
+ * of three arms -- `HAVE_FUNC_GETHOSTBYNAME_R_6', `_5' and `_3' -- and
+ * calls it whenever `HAVE_GETHOSTBYNAME_R' is set, so saying yes to the
+ * capability and no to every arity gave
+ *
+ *	network.c:1423 function not declared: gethostname_re
+ *	network.c:1423 incompatible types: "IND STRUCT hostent" and "INT"
+ *
+ * the second line being the implicit `int' return, which is the loud
+ * half of the undeclared-function rule.  libap's is the glibc six-
+ * argument form -- `netdb.h:131', `network/gethostbyname_r.c' -- so
+ * this is the arity, and it is 1.
+ */
+#define HAVE_FUNC_GETHOSTBYNAME_R_6 1
 /* #undef HAVE_GETIFADDRS */
 /* #undef HAVE_GETLOADAVG */
 /* #undef HAVE_GETTID */

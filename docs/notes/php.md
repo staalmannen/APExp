@@ -686,14 +686,104 @@ upstream never compiles on Linux. It is not: **`grep` says all 37 are
 referenced in 0 files** of what this port builds. Nothing reads them,
 so there was nothing to decide.
 
+## ALL 514 TRANSLATION UNITS COMPILE, AND THE MEASUREMENT IS A HOST ONE
+
+`sh sys/lib/tests/hostkencc/php-mirror.sh --compile` answers
+**`compiled 514, errors 0, missing 0`**: the whole build, by a
+host-built `6c`, with the mkfile's own flags.
+
+***THE INSTRUMENT IS THE POINT, NOT THE NUMBER.*** The eight rounds
+before this one each cost a VM rebuild to learn about one compile
+error, the error in the next file being invisible until the first was
+fixed. `php-mirror.sh` reads `DEFS`, `INCS`, `PCRE2FLAGS`,
+`KECCAKFLAGS` and the 514-entry `OFILES` **out of `cmd/php/mkfile`
+with sed** — derived, not transcribed, so a mirror cannot drift from
+the build — stages the one shadowing header the host needs
+(`stddef_arch.h` includes `<stddef.h>`'s body by absolute path), and
+compiles the lot in about a minute. *Eight errors came back in the
+first run, in six files, and all six were fixed and re-measured
+without the VM.* The fidelity limits are `hostkencc.sh`'s and
+unchanged: **sound for "does it compile" and "what does it diagnose",
+unsound for anything keyed on `long` being 32 bits**, since the host
+build is LP64.
+
+**What it does NOT measure is the LINK**, which is the next class of
+failure and is the VM's: a `config.h` claiming a name libap only
+DECLARES fails there, far from the claim. The resolver family below is
+exactly that shape caught early — `apfunc-sweep`'s middle state — and
+it held, but it had to be checked rather than assumed.
+
+### The eight, and what each turned out to be
+
+Three were kencc's, three were APE headers', one was php's and one was
+the instrument's own. All of them are in `docs/notes/kencc.md` or
+`docs/notes/libap.md` with the mechanism; this is the list.
+
+1. **`Zend/zend_lazy_objects.c:117`** — `return` of a `void *` from a
+   `bool` function. `cc/sub.c`'s `stcompat` refused it before
+   `com.c`'s `boolnorm` could convert it. **kencc, fixed**;
+   `sys/lib/tests/boolptr-test.c`.
+2. **`ext/reflection/php_reflection.c:3896`** — `bool visible;`
+   declared nothing, because `cc/lex.c`'s `indeclname` list of type
+   specifiers was missing `LBOOL`, so `visible` was swallowed as a
+   GNU visibility attribute. **kencc, fixed.**
+3. **`main/debug_gdb_scripts.c`** — `<eof> unexpected EOF in
+   __attribute__`: the attribute/`__asm__` argument scanner counted
+   parentheses **inside string literals**, and that file is one
+   `__asm__` holding 1680 `.ascii` lines of gdb's python with one
+   unmatched `(` in the text. **kencc, fixed.**
+4. **`main/network.c:406`** — no `timercmp` in APE's `<sys/time.h>`.
+   The five BSD `struct timeval` macros are there now, each guarded.
+5. **`ext/standard/basic_functions.c`** — `LOG_MAIL` and `LOG_LPR`
+   missing from `<syslog.h>`, which had skipped facilities 2, 6, 7, 8
+   and 11; four of the five are POSIX.
+6. **`ext/standard/dns.c:341`** — no `HEADER`: APE had the `ns_` half
+   of `<arpa/nameser.h>` and none of the BIND 4 compat half.
+   `<arpa/nameser_compat.h>` is new, included from `<arpa/nameser.h>`
+   as every other libc does, and its `HEADER` is byte-for-byte the
+   host's (checked both ways). ***Fixing it uncovered that
+   `<resolv.h>` had its OWN `MAXDNAME`, `T_A`, `C_IN` and the rest***
+   — two definitions of the same constants in two headers, invisible
+   until one translation unit included both.
+7. **`main/network.c:1423`** — `HAVE_GETHOSTBYNAME_R` yes with every
+   arity no, so `gethostname_re` was defined by no arm. libap's is the
+   six-argument form; `HAVE_FUNC_GETHOSTBYNAME_R_6` is 1.
+8. **`ext/random/csprng.c:194`** — arithmetic on a `void *`, a GNU
+   extension. One cast, in the only one of the file's four sites that
+   this platform compiles.
+
+**And the instrument's own faults were two**, both recorded in its
+header because they are the shapes to recognise: it matched the Keccak
+flags on the DIRECTORY, which read as the mkfile's rule but is not it
+(`ext/hash/hash_sha3.c` takes them too), and it passed the mkfile's
+`CFLAGS` through, whose leading **`-c` means "compile only" to `pcc`
+and "print `const if`" to `6c`** — dozens of lines that read exactly
+like diagnostics.
+
+***THE SILENT ONE WAS IN THE HARNESS AND COST THE MOST.*** One file
+made the host `6c` exit 1, delete its own output and print **nothing
+at all**. `strace` showed the `cpp` child exiting 0 and being waited
+for correctly; the cause is `go1.4/src/lib9/await.c`, whose
+`memset(w, 0, sizeof *w)` leaves the message buffer in the same
+allocation **uninitialised**, so a child that exits 0 writes nothing
+to it and `compat-unix.c`'s `mywait` reads whatever `malloc` left
+there as "the child failed". Fixed in the vendored file, which is
+`+build !plan9` and so reaches nothing on the VM. *A harness that
+reports a failure the subject does not have is the one fault that
+cannot be found by reading the subject.*
+
 ## Open, as a list
 
 * fibers: **done** — `ucontext` is in libap and `ucontext-test` is 0
   failures on the VM (`docs/notes/libap.md`). What remains is pointing
   php at it: `ZEND_FIBER_UCONTEXT` in the `config.h`
-* the first build: `cd sys/src/ape/cmd/php && mk`. Nothing has
-  compiled yet, so the object list, the include paths and every
-  answer in the `config.h` are all unmeasured together
+* **the LINK.** Every object compiles; nothing has been linked, and
+  the undefined-symbol class is untouched. `php-mirror.sh` cannot ask
+  — the host has no libap and `hostkencc` deliberately does not build
+  the linkers — so this one is the VM's.
+* the 474 unanswered questions in the template are still unanswered,
+  and `cfghdr-sweep` gates on none of them. A compile is not evidence
+  that an answer is right, only that it is consistent.
 * `memfd_create` is declared with no implementation, which is a libap
   trap independent of php
 * `sys/src/ape/lib/ap/time/asctime_r.c:30` is

@@ -122,7 +122,24 @@ _wait(int pid4, int opt)
 	w = malloc(sizeof *w + 200);
 	if(w == nil)
 		return nil;
-	memset(w, 0, sizeof *w);
+	/*
+	 * APExp: the message buffer is part of this allocation and was
+	 * NOT cleared -- `memset(w, 0, sizeof *w)' stops at the struct.
+	 * A child that exits 0 has nothing written to `w->msg', so
+	 * `msg[0]' was whatever malloc last left there, and a caller
+	 * that reads it as "did the child fail?" fails at random.
+	 *
+	 * `cc/lex.c:349' is such a caller --
+	 *	if(nerrors == 0 && mywait(&status) > 0 && status != 0)
+	 *		nerrors++;
+	 * with `compat-unix.c's mywait setting status from `msg[0]' --
+	 * so a host-built kencc removed its own output file and exited
+	 * 1 with NO DIAGNOSTIC, for some inputs and not others.  It
+	 * took php's `KeccakP-1600-opt64.c' and a full strace to see
+	 * that the child had exited 0 and been waited for correctly.
+	 * This file is `+build !plan9', so nothing on the VM reads it.
+	 */
+	memset(w, 0, sizeof *w + 200);
 	w->msg = (char*)&w[1];
 
 	for(;;){

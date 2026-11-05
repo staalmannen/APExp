@@ -5,14 +5,23 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 
-#define MAXDNAME	1025
-#define MAXCDNAME	255
-#define MAXLABEL	63
-#define NS_MAXDNAME	1025
-#define NS_MAXCDNAME	255
-#define NS_MAXLABEL	63
-#define NS_PACKETSZ	512
-#define NS_MAXMSG	65535
+/*
+ * ***THE WIRE-FORMAT NAMES COME FROM HERE AND ARE NOT REPEATED, WHICH
+ * THEY WERE.***  This header carried its own `MAXDNAME', `NS_PACKETSZ',
+ * `T_A' ... `C_ANY' beside <arpa/nameser.h>'s -- **two definitions of
+ * the same constant in two headers, with nothing making them agree**,
+ * which is the `PATH_MAX' shape from this tree's own rules.  Nothing
+ * noticed while no translation unit included both; php's
+ * `ext/standard/dns.c' includes both and answered `Macro redefinition
+ * of MAXDNAME' sixteen times.
+ *
+ * glibc's <resolv.h> includes <arpa/nameser.h> for exactly this
+ * reason, so that is what happens here.  What stays below is the
+ * resolver's own: the opcodes, the response codes, `RES_*', and the
+ * record types and classes <arpa/nameser.h> does NOT know -- those are
+ * still defined in one place, this one.
+ */
+#include <arpa/nameser.h>
 
 /* DNS opcodes */
 #define QUERY		0
@@ -28,25 +37,20 @@
 #define NOTIMP		4
 #define REFUSED		5
 
-/* DNS record types */
-#define T_A		1
-#define T_NS		2
+/*
+ * DNS record types <arpa/nameser.h> does not list.  T_A, T_NS,
+ * T_CNAME, T_SOA, T_PTR, T_MX, T_TXT, T_AAAA, T_SRV and T_ANY are
+ * <arpa/nameser_compat.h>'s, aliased to that header's `ns_t_' numbers.
+ */
 #define T_MD		3
 #define T_MF		4
-#define T_CNAME		5
-#define T_SOA		6
 #define T_MB		7
 #define T_MG		8
 #define T_MR		9
 #define T_NULL		10
 #define T_WKS		11
-#define T_PTR		12
 #define T_HINFO		13
 #define T_MINFO		14
-#define T_MX		15
-#define T_TXT		16
-#define T_AAAA		28
-#define T_SRV		33
 #define T_NAPTR		35
 #define T_OPT		41
 #define T_TSIG		250
@@ -54,13 +58,10 @@
 #define T_AXFR		252
 #define T_MAILB		253
 #define T_MAILA		254
-#define T_ANY		255
 
-/* DNS record classes */
-#define C_IN		1
+/* DNS record classes; C_IN and C_ANY likewise come from the compat header. */
 #define C_CHAOS		3
 #define C_HS		4
-#define C_ANY		255
 
 /* Resolver options */
 #define RES_INIT	0x00000001
@@ -123,6 +124,13 @@ int __dn_expand(const unsigned char *, const unsigned char *,
 	const unsigned char *, char *, int);
 int dn_expand(const unsigned char *, const unsigned char *,
 	const unsigned char *, char *, int);
+/*
+ * `lib/ap/network/dn_skipname.c' has defined this all along and no
+ * header declared it -- the `asctime_r' shape again, and the same
+ * consequence: every caller got an implicit `int'.  php's
+ * `ext/standard/dns.c:996' is one.
+ */
+int dn_skipname(const unsigned char *, const unsigned char *);
 
 int res_query(const char *, int, int, unsigned char *, int);
 int res_search(const char *, int, int, unsigned char *, int);

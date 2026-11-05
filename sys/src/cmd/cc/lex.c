@@ -1015,12 +1015,75 @@ talph:
 			while(depth > 0) {
 				ac = GETC();
 				if(ac == EOF) {
-					yyerror("unexpected EOF in __attribute__");
+					/*
+					 * The construct's own name, not
+					 * `__attribute__' for all six: this
+					 * message said `__attribute__' for an
+					 * `__asm__' and so named something
+					 * the file did not contain.
+					 */
+					yyerror("unexpected EOF in %s", s->name);
 					break;
+				}
+				if(ac == '\n') {
+					lineno++;
+					continue;
+				}
+				/*
+				 * ***A STRING OR CHARACTER LITERAL IS SKIPPED
+				 * WHOLE, AND COUNTING PARENS INSIDE ONE IS
+				 * WHAT THIS LOOP USED TO DO.***  php's
+				 * `main/debug_gdb_scripts.c' is one `__asm__'
+				 * holding 1680 lines of `.ascii' directives --
+				 * gdb's own python, inlined into a
+				 * `.debug_gdb_scripts' section -- and the text
+				 * has ONE unmatched `(' in it, so `depth' never
+				 * came back to 0 and the whole file was
+				 * consumed:
+				 *
+				 *	<eof> unexpected EOF in __attribute__
+				 *
+				 * The same hazard is an `__attribute__((
+				 * section("a)b") ))' or a `'('' anywhere in an
+				 * attribute argument.  *Not php's bug and not
+				 * the asm's*: a C scanner may not count
+				 * delimiters inside a literal.
+				 */
+				if(ac == '"' || ac == '\'') {
+					int q = ac;
+
+					for(;;) {
+						ac = GETC();
+						if(ac == EOF) {
+							yyerror("unexpected EOF in %s", s->name);
+							break;
+						}
+						if(ac == '\n') {
+							lineno++;
+							continue;
+						}
+						if(ac == '\\') {
+							/* the escaped char,
+							 * whatever it is, is
+							 * not a delimiter */
+							ac = GETC();
+							if(ac == EOF) {
+								yyerror("unexpected EOF in %s", s->name);
+								break;
+							}
+							if(ac == '\n')
+								lineno++;
+							continue;
+						}
+						if(ac == q)
+							break;
+					}
+					if(ac == EOF)
+						break;
+					continue;
 				}
 				if(ac == '(') depth++;
 				else if(ac == ')') depth--;
-				else if(ac == '\n') lineno++;
 			}
 		} else {
 			/* no argument list (e.g. bare __extension__); put char back */
@@ -1099,6 +1162,29 @@ talph:
 	 * a typedef/variable name (LNAME), a member-access operator (. or ->),
 	 * or a pointer star — all positions where the next identifier is a name,
 	 * not an attribute.
+	 *
+	 * ***THE LIST HAS TO HOLD EVERY TYPE SPECIFIER THAT CAN STAND
+	 * IMMEDIATELY BEFORE A DECLARATOR, AND LBOOL WAS MISSING.***
+	 * `bool visible;' had `lasttok == LBOOL', which is not in the
+	 * list, so `visible' was swallowed as an attribute and the
+	 * declaration declared nothing:
+	 *
+	 *	php_reflection.c:3896 name not declared: visible
+	 *
+	 * -- php's `ReflectionMethod::setAccessible', whose whole body
+	 * is `bool visible;' and a `zend_parse_parameters' of it.  The
+	 * same shape in a struct answers `unnamed structure element
+	 * must be struct/union', so it is always LOUD; `bool vis;'
+	 * compiles, which is what makes the message read as being about
+	 * the name rather than the type before it.
+	 *
+	 * LBOOL is in the grammar's `complex' rule beside LSTRUCT,
+	 * LUNION, LENUM and LTYPE -- all four of which ARE listed -- so
+	 * the omission was of one member of a set the list already
+	 * covered.  LCOMPLEX, LIMAGINARY and the two internal
+	 * LCOMPLEXF/LCOMPLEXD that `float _Complex' combines to are the
+	 * rest of that set; `_Complex visible;' is exotic and was added
+	 * from the same reading rather than from a failure.
 	 */
 #define indeclname(t) \
 	((t)=='.' || (t)==LMG || (t)=='*' || (t)==',' || (t)=='(' || (t)==')' || \
@@ -1106,7 +1192,9 @@ talph:
 	 (t)==LCHAR || (t)==LINT || (t)==LFLOAT || (t)==LDOUBLE || \
 	 (t)==LLONG || (t)==LSHORT || (t)==LUNSIGNED || (t)==LSIGNED || \
 	 (t)==LVOID || (t)==LTYPE || (t)==LTYPESTR || (t)==LSTRUCT || \
-	 (t)==LUNION || (t)==LENUM || (t)==LNAME)
+	 (t)==LUNION || (t)==LENUM || (t)==LNAME || (t)==LBOOL || \
+	 (t)==LCOMPLEX || (t)==LIMAGINARY || (t)==LCOMPLEXF || \
+	 (t)==LCOMPLEXD)
 	if(s->lexical == LNAME && (
 	    strcmp(s->name, "__thread")      == 0 ||
 	    strcmp(s->name, "_Thread_local") == 0 ||

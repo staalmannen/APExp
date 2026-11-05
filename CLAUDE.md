@@ -235,7 +235,18 @@ member of the wide-constant family***: x86-64 has `MOV r64, imm64` and
 NO 64-bit `CMP` immediate and NO 64-bit address DISPLACEMENT.
 `6c/cgen.c:346` folds `(x<<k) + C` into `LEAQ C(base)(index*2^k)` and
 refused only a SMALL `C`, never a wide one. **Sections 4 and 5 are
-controls that pass against a broken compiler.**).
+controls that pass against a broken compiler.**),
+**`boolptr-test`** (a POINTER converted to `bool`, at the four sites
+that CONVERT rather than cast — return, initialiser, assignment,
+argument. C99 6.5.16.1 allows it outright; `sub.c`'s `stcompat`
+refused it, **and `com.c`'s `boolnorm` was already there and sat
+behind the check that refused the operand** at all four. *The cast
+form worked all along*, since `tcast[TUCHAR]` carries BIND.
+**Sections 1 and 2 are why it is a test and not a compile**: the
+plausible wrong fix keeps the LOW BYTE, so section 2 uses
+`0x0000555500000000`, non-null and zero in every byte a `char`,
+`short` or `int` conversion would keep — the perl `cBOOL` bug's shape
+by another route).
 **`truefalse-test.c` is the one NATIVE test here** — `6c`/`6l`, not
 `pcc` — and has to be: APE's `<stdbool.h>` `#define`s `true`/`false`, so
 a TU that INCLUDES that header never reaches kencc's own C23 keywords.
@@ -340,6 +351,23 @@ the compile line, `--compile` builds all 31 TUs and GATES. *Its
 `long_bitsize` is patched 64 -> 32 afterwards, and leaving that out
 makes `oint` 32 bits and wastes a round concluding the object
 representation is broken.
+**`hostkencc/php-mirror.sh` is its php counterpart and `--compile`
+answers `compiled 514, errors 0`** -- the whole php build, by a
+host-built `6c`, in about a minute. ***UNLIKE clisp's THERE IS NOTHING
+TO STAGE***, since php's generated parsers, scanners and
+`zend_vm_execute.h` all ship in the tarball -- so the file is the FLAG
+SET and the source list, **both DERIVED from `cmd/php/mkfile` with
+sed** (`DEFS`, `INCS`, `PCRE2FLAGS`, `KECCAKFLAGS`, `OFILES`), with a
+gate if a variable comes back unexpanded. It replaced eight rounds
+that each cost a VM rebuild to learn about ONE compile error; its
+first run returned all eight at once. **Its own two faults are the
+shapes to recognise**: it matched the Keccak flags on the DIRECTORY,
+which reads like the mkfile's rule and is not it
+(`ext/hash/hash_sha3.c` takes them too, from `ext/hash`), and it
+passed `CFLAGS` through, whose leading **`-c` means "compile only" to
+`pcc` and "print `const if`" to `6c`** -- dozens of lines that read
+exactly like diagnostics. *It cannot ask about the LINK*, which stays
+the VM's.
 ***AND `hostkencc/` BUILDS ALL TEN C COMPILERS WITH gcc***, from the
 shipped `sys/src/cmd/cc` and `[1-9kqv]c` plus go1.4's `lib9`/`libbio`,
 already vendored at `sys/src/external/go1.4` — which **compiled with gcc
@@ -1165,8 +1193,30 @@ silent:
 - **itcl** — done. 10 failures, all upstream or Tcl 9's, two settled at
   source, none ours.
 
-**php — SURVEYED, NOTHING BUILT YET, and the survey is in
-`docs/notes/php.md`.** 8.5.12, vendored at `sys/src/external/php`.
+**php — ***ALL 514 TRANSLATION UNITS COMPILE***, measured on the HOST,
+and the notes are in `docs/notes/php.md`.** 8.5.12, vendored at
+`sys/src/external/php`; `sh sys/lib/tests/hostkencc/php-mirror.sh
+--compile` answers `compiled 514, errors 0, missing 0`. **The LINK is
+untouched and is the VM's**: the host has no libap and `hostkencc`
+deliberately does not build the linkers, so the undefined-symbol class
+— a `config.h` claiming a name libap only DECLARES — has not been
+asked. *That question was checked by hand for the resolver family and
+it held*: `res_query.c`'s `weak_alias(res_query, res_search)` is a
+no-op on kencc, and `network/res_aliases.c` exists precisely to define
+the strong forwarders.
+**The first sweep returned EIGHT errors in six files and all six were
+fixed without a VM round trip** — three of them kencc's (a pointer
+assigned to a `bool`; `bool visible;` declaring nothing, because
+`indeclname` had every type specifier but `LBOOL`; and the
+`__attribute__`/`__asm__` paren scanner counting delimiters INSIDE
+string literals, which ate php's 1680-line inlined gdb script), three
+APE headers' (no BSD `timeval` macros, five missing `syslog`
+facilities, no `<arpa/nameser_compat.h>`), one php's (`void *`
+arithmetic) and one the `config.h`'s (`HAVE_GETHOSTBYNAME_R` yes with
+every arity no). ***And the nameser fix uncovered that `<resolv.h>`
+had been defining the same sixteen constants itself*** — two
+definitions with nothing making them agree, invisible until one TU
+included both.
 **508 objects with `--disable-all`**, derived from a real configure run
 on the host rather than guessed, and `ext/lexbor` is 186 of them —
 *`--disable-all` does not mean a small build in 8.5*. **Three things

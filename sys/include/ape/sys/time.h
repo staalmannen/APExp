@@ -43,6 +43,61 @@ struct timezone {
 
 #endif /* __TIMEVAL__ */
 
+/*
+ * The BSD `struct timeval' arithmetic macros.  glibc, musl and every
+ * BSD carry these in <sys/time.h>; APExp had none of them, and
+ * php's `main/network.c:406' answered
+ *
+ *	syntax error, last name: limit_time
+ *
+ * on `timercmp(&time_now, &limit_time, <)' -- an undefined macro, so
+ * the `<' argument reaches the parser as an operator with nothing on
+ * its left.  *The message names the victim*, as it does whenever a
+ * missing macro is called with something that is not an expression.
+ *
+ * ***EVERY ONE IS GUARDED, AND THAT IS NOT CAUTION BUT THE EXISTING
+ * PRACTICE IN THIS TREE.***  `bash/include/posixtime.h',
+ * `readline/posixtime.h' and `libressl/include/compat/sys/time.h' all
+ * define their own under `#ifndef', so an unguarded definition here
+ * would be a `Macro redefinition' for whichever of them is reached
+ * first -- which is how APE's own <sys/param.h> MIN/MAX answered php.
+ *
+ * `timercmp' takes the comparison as a macro argument, so it cannot
+ * be a function, and the three-line form below is BSD's: comparing
+ * `tv_usec' only when the seconds are equal.
+ */
+#ifndef timerisset
+#define timerisset(tvp)		((tvp)->tv_sec || (tvp)->tv_usec)
+#endif
+#ifndef timerclear
+#define timerclear(tvp)		((tvp)->tv_sec = (tvp)->tv_usec = 0)
+#endif
+#ifndef timercmp
+#define timercmp(a, b, CMP) \
+	(((a)->tv_sec == (b)->tv_sec) ? ((a)->tv_usec CMP (b)->tv_usec) \
+				      : ((a)->tv_sec CMP (b)->tv_sec))
+#endif
+#ifndef timeradd
+#define timeradd(a, b, res) do { \
+	(res)->tv_sec = (a)->tv_sec + (b)->tv_sec; \
+	(res)->tv_usec = (a)->tv_usec + (b)->tv_usec; \
+	if((res)->tv_usec >= 1000000) { \
+		(res)->tv_sec++; \
+		(res)->tv_usec -= 1000000; \
+	} \
+} while(0)
+#endif
+#ifndef timersub
+#define timersub(a, b, res) do { \
+	(res)->tv_sec = (a)->tv_sec - (b)->tv_sec; \
+	(res)->tv_usec = (a)->tv_usec - (b)->tv_usec; \
+	if((res)->tv_usec < 0) { \
+		(res)->tv_sec--; \
+		(res)->tv_usec += 1000000; \
+	} \
+} while(0)
+#endif
+
 #define ITIMER_REAL 0
 #define ITIMER_VIRTUAL 1
 #define ITIMER_PROF 3

@@ -25,6 +25,22 @@
 #define NS_MAXDNSRCH	6	/* max domains in search path */
 
 /*
+ * The fixed sizes of the wire format's own records, and the two
+ * address sizes.  Added with <arpa/nameser_compat.h>, which aliases
+ * each of them to its BIND 4 name -- so there is one set of numbers
+ * and the compat header invents none.  They are the protocol's: a
+ * header is 12 octets, a question's fixed part 4, a resource record's
+ * 10, and 0xc0 is the two high bits that mark a compression pointer.
+ */
+#define NS_HFIXEDSZ	12	/* fixed data in header */
+#define NS_QFIXEDSZ	4	/* fixed data in query */
+#define NS_RRFIXEDSZ	10	/* fixed data in r record */
+#define NS_INADDRSZ	4	/* IPv4 address */
+#define NS_IN6ADDRSZ	16	/* IPv6 address */
+#define NS_CMPRSFLGS	0xc0	/* flag bits indicating name compression */
+#define NS_DEFAULTPORT	53	/* for both TCP and UDP */
+
+/*
  * Macros to read big-endian 16- and 32-bit values from a pointer,
  * advancing the pointer past the consumed bytes.
  */
@@ -145,5 +161,13 @@ void ns_put32(unsigned long, unsigned char *);
 #ifdef __cplusplus
 }
 #endif
+
+/*
+ * BIND 4's names, which this header's `ns_' forms replaced.  Included
+ * unconditionally, as glibc, musl and the BSDs all do: `HEADER' and
+ * `C_IN' are reachable by including <arpa/nameser.h> and by nothing
+ * else, which is what portable code expects.
+ */
+#include <arpa/nameser_compat.h>
 
 #endif
