@@ -62,7 +62,22 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 ROOT = os.path.normpath(ROOT)
 TREE = os.path.join(ROOT, 'sys', 'src')
 
-RULE = re.compile(r'^[^=#]*:[A-Z]*:')
+# ***THIS USED TO BE `^[^=#]*:[A-Z]*:' AND SO REQUIRED TWO COLONS.***
+# That matches an ATTRIBUTE rule -- `install:V:', `test:QV:' -- and
+# nothing else, so an ordinary `target: prereq' header was not a rule
+# and its recipe lines were never read.  **A gating sweep reporting 0
+# over recipes it cannot see** is the one failure mode its own header
+# already warns about, two paragraphs down, about backquotes.
+#
+# It was found by control rather than by reading: a bare `=' planted
+# in `cmd/php/mkfile's `clean:V:' was reported, and the same `=' in
+# one of that file's `ext/...$O: $PHPSRC/....c' rules was not.
+# *Planting the break in only one place would have passed.*
+#
+# A rule header is now any non-indented, non-comment line with a colon
+# that is not an assignment -- `[^=#\t]*' stops at the `=', so
+# `CFLAGS=-I/a:/b' cannot match, and a `#' at column 0 cannot either.
+RULE = re.compile(r'^[^=#\t]*:')
 ASSIGN = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*\s*=')
 # an `=' is legal only at the start of a command; these end one
 LEADING = re.compile(r"(^|[;&|{}()]|\|\||&&)\s*[A-Za-z_][A-Za-z0-9_]*\s*=")
@@ -135,7 +150,73 @@ def bare_eq(line):
     return '=' in s
 
 
+CONTROL = """\
+OFILES=\\
+\ta.$O\\
+\tb.$O
+
+install:V: $O.out
+\techo attr=rule
+
+%.$O: $SRC/%.c
+\techo plain=rule
+
+X=`{echo -DSIZE=8}
+
+ok:V:
+\techo '-Dquoted=fine'
+\tFOO=bar echo leading is legal
+"""
+
+
+def control():
+    """***THREE SHAPES, BECAUSE PLANTING THE BREAK IN ONE PLACE PASSED.***
+
+    This sweep GATES, and for a long time it read recipes only under an
+    ATTRIBUTE rule -- `install:V:' -- because `RULE' wanted two colons.
+    A bare `=' planted in `cmd/php/mkfile's `clean:V:' was duly
+    reported, which looked like proof the sweep worked, and the same
+    `=' in one of that file's `target: prereq' rules was not.  989
+    recipe lines across the tree were invisible.
+
+    So the control covers an attribute rule, a PLAIN rule, and a
+    backquoted assignment -- the three ways mk hands text to rc -- and
+    two things that must NOT be reported: a quoted `=' and a LEADING
+    assignment, which rc allows.
+    """
+    import tempfile
+    want = {6: 'attribute rule', 9: 'plain rule', 11: 'backquote'}
+    ok = True
+    with tempfile.TemporaryDirectory() as d:
+        p = os.path.join(d, 'mkfile')
+        open(p, 'w').write(CONTROL)
+        got = set()
+        for lineno, line in recipe_lines(p):
+            if bare_eq(line):
+                got.add(lineno)
+        for lineno, line in enumerate(CONTROL.split('\n'), 1):
+            rc = backquote_rc(line)
+            if rc is not None and bare_eq(rc):
+                got.add(lineno)
+        for ln, what in sorted(want.items()):
+            hit = ln in got
+            print('control: %-18s line %2d -- %s'
+                  % (what, ln, 'ok' if hit else 'FAILED, not reported'))
+            if not hit:
+                ok = False
+        extra = got - set(want)
+        for ln in sorted(extra):
+            print('control: line %d reported and must NOT be '
+                  '(quoted or leading `=\') -- FAILED' % ln)
+            ok = False
+        if not extra:
+            print('control: quoted and leading `=\' correctly ignored -- ok')
+    return 0 if ok else 1
+
+
 def main():
+    if '--control' in sys.argv:
+        return control()
     if not os.path.isdir(os.path.join(ROOT, 'sys', 'include', 'ape')):
         print('rceq-sweep: %s is not an APExp root -- refusing to report' % ROOT)
         print('(a sweep rooted in the wrong tree reports an empty one as a')

@@ -397,7 +397,18 @@ that the instrument notices.*
 nothing declares), `apehdr-sweep.py` (every `sys/include/ape` header
 standalone, plus a TOGETHER case for collisions only a combination can
 show), `rceq-sweep.py` (**gates**: a bare `=` in an mkfile recipe cannot
-parse), `mkcont-sweep.py` (**gates**: a logical line mk cannot parse. TWO
+parse. ***ITS `RULE` WANTED TWO COLONS AND SO READ ONLY ATTRIBUTE
+RULES*** — `install:V:` and nothing else — so every ordinary
+`target: prereq` recipe in the tree was invisible to it: **870
+recipe lines before, 1859 after**, with 0 findings both times. *A
+gating sweep reporting 0 over lines it cannot see* is the failure its
+own header already warned about for backquotes. **Found by control,
+not by reading**: a bare `=` planted in `cmd/php/mkfile`'s `clean:V:`
+was reported and the same `=` in one of that file's `%.$O:` rules was
+not — *planting the break in one place would have passed*, which is
+why `--control` now covers an attribute rule, a PLAIN rule and a
+backquote, plus two that must NOT fire, and fails on exactly the
+plain rule against the old regex), `mkcont-sweep.py` (**gates**: a logical line mk cannot parse. TWO
 shapes, and *the second was added after the first reported 0 over
 it*: a comment ending a continuation, and an INDENTED line that is
 not a recipe — `cmd/php/mkfile` ended its `OFILES` at an ordinary
