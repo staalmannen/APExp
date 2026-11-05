@@ -284,6 +284,47 @@ confidently and wrongly*, which is the clearest single argument in
 this port for hand-answering rather than deriving: the mechanical
 method is right 90 times and this is one of the others.
 
+### The atomics: not worth implementing for this build, and here is why
+
+`#warning No atomics support detected` appears on every file and is
+cosmetic -- `zend_atomic.h:32` falls to `HAVE_NO_ATOMICS`, a plain
+`volatile` implementation. Asked directly whether to implement real
+ones, the answer is **no for this configuration**, and the reasoning
+is worth keeping because it is about THIS build rather than about
+atomics.
+
+**What they actually guard here is two flags.** Across everything
+this port compiles, the only consumers are `EG(vm_interrupt)` and
+`EG(timed_out)` -- `zend_execute_API.c:175-176`, `:1081-1082`,
+`:1466-1553`, and `zend_alloc.c:441`. Both are written from a
+signal or timer handler and read by the VM loop. *That is the
+`sig_atomic_t` case, not the shared-memory case.*
+
+**This build is non-ZTS**, so there are no threads to race: the only
+asynchrony is a Plan 9 note. An aligned naturally-sized load or store
+on x86-64 is already indivisible, which is exactly what the
+`volatile` fallback emits.
+
+***THE ONE GENUINE GAP IS THE READ-MODIFY-WRITE***, not the loads and
+stores: `zend_atomic_bool_exchange_ex` at `zend_execute_API.c:1081`
+is a load then a store, and a note arriving between them could lose
+a flag. The window is two instructions, and *CLI's
+`max_execution_time` is 0 by default so nothing arms the timer that
+would set the one flag at risk* -- so it is a real race that this
+configuration does not reach.
+
+**The cost is a libap project, not a config line.** kencc has no
+`_Atomic`, no `__sync_*` and no `__atomic_*`, so real atomics mean
+assembly -- `LOCK XCHG` and `LOCK CMPXCHG` -- per architecture.
+`arch/amd64/tas.s` already has the primitive, so the shape is the
+same as `ucontext`: amd64 first, the other ten later. **It would not
+change this build at all**, since the volatile path compiles and the
+warning is noise.
+
+*Revisit if ZTS is ever enabled, or if opcache is made to actually
+run with shared memory* -- those are the configurations where real
+concurrency appears, and both are deliberately off here.
+
 ## Extensions: the ones with a ported library
 
 The user's own framing, and the right one: enable what this tree already
@@ -506,6 +547,25 @@ two things on its first run beyond the case it was built for:
   `__SUNPRO_CC` arm. clisp builds and runs, so nothing it compiles
   uses them; *recorded, not acted on*, which is why clisp is not in
   the sweep's gating list.
+
+### `MIN`/`MAX`, and the header at fault was ours
+
+`zend_optimizer.c` stopped on
+`/sys/include/ape/sys/param.h:36 ... Macro redefinition of MIN`.
+php is careful here -- `Zend/zend_portability.h:479-482` is
+`#undef MIN` / `#undef MAX` and then its own spelling -- and
+`main/php.h:215` then includes `<sys/param.h>`, which redefined them
+with a different token sequence. *This tree's own rule that a macro's
+identity includes whether there is white space, arriving from the
+other side.*
+
+**The fix is APE's, not php's.** `MIN`/`MAX` are not POSIX, so a
+program that wants them defines its own; glibc and the BSDs both wrap
+theirs in `#ifndef` for exactly that reason, and APE's copy came from
+musl, which is the odd one out. Guarded now. *The guard can only turn
+an error into a success*, since it changes nothing unless the name is
+already defined and that case is a diagnostic today. A grep for every
+other definition of these names in the APE headers found none.
 
 ### And the same mistake had a second half: the EPILOGUE
 

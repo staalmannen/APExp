@@ -32,9 +32,34 @@ extern "C" {
 
 #define NOFILES_MAX 100
 
-//copied from musl
+/*
+ * Copied from musl -- ***AND THE GUARDS ARE OURS, BECAUSE musl IS THE
+ * ODD ONE OUT HERE.***  glibc and the BSDs both wrap these in
+ * `#ifndef', and they are right to: `MIN'/`MAX' are not in POSIX, so
+ * a program that wants them defines its own, and a header that
+ * redefines afterwards is a hard error rather than a nicety.
+ *
+ * php does exactly that.  `Zend/zend_portability.h:479-482' is
+ * `#undef MIN' / `#undef MAX' and then its own spelling with a space
+ * after the comma; `main/php.h:215' then includes <sys/param.h> and
+ * kencc answered
+ *
+ *	/sys/include/ape/sys/param.h:36 ... Macro redefinition of MIN
+ *
+ * -- *a redefinition with a different token sequence*, which is the
+ * rule this tree already carries as "a macro's identity includes
+ * whether there is white space".
+ *
+ * The guard can only ever turn an error into a success: it changes
+ * nothing unless the name is already defined, and today that case is
+ * a diagnostic.
+ */
+#ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+#ifndef MAX
 #define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
 
 
 #ifdef __cplusplus
