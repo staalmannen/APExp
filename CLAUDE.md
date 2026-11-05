@@ -440,6 +440,29 @@ every answer a confident `absent`, and a missing `\b` that reported
 `fesetenv`. *The second is the worse shape: a hit, naming a real
 file.* The control checks WHERE and not just whether, for that
 reason),
+`cfghdr-sweep.py` (**gates on ONE thing**: a `#define` in an
+autoconf TEMPLATE that the hand-answered `config.h` does not carry.
+`autoheader` emits only `#undef NAME`, so anything spelled `#define`
+in a `.h.in` is text copied STRAIGHT THROUGH -- and *reading the
+GENERATED config as a list of capabilities, which is how php's was
+written, does not show it*. php's template copies three, and without
+them `zend_map_ptr.h:82` answered `not a function` / `syntax error,
+last name: ZEND_API`: an undefined identifier where a storage class
+belongs, in a shape **every `ZEND_API` in php has**. 21 names were
+missing in all. It does NOT gate on an unanswered `#undef` -- php's
+template asks 696 questions and 474 are deliberately silent -- nor on
+a name the answered file invents, which is reported because only the
+author can tell a port's own addition from a typo. *It found one of
+each on its first run*: `PHP_OS_FAMILY`, which `main/php.h:38` computes
+itself so defining it was a collision, and five in clisp's config
+that nobody has looked at. **Its LIMIT is that it reads names and not
+arms** -- a `#define` inside a platform arm nobody takes is reported
+though the omission is right -- so `PAIRS` holds only pairs whose
+findings someone has read. **Its control caught two faults in two
+runs**: the include guard is a `#define` like any other and was
+demanded of the answered file, and a name the template both `#define`s
+in a dead arm and `#undef`s elsewhere is a QUESTION rather than
+verbatim text),
 `truefalse-sweep.py` (**does NOT gate**: which vendored TUs use
 `true`/`false` as an IDENTIFIER without defining the names themselves —
 the shape kencc's C23 keywords break. **Its positive control is
