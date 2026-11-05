@@ -304,13 +304,106 @@ was tested against and it removes a link dependency from the first build.
 has worked in this tree is: get the thing to compile and print its own
 version, then add one library at a time.
 
+## The port directory
+
+`sys/src/ape/cmd/php/` holds six files and **nothing in
+`sys/src/external/php` is touched** -- the vendored tree stays vendor
+source, and the mkfile puts `-I.` first so our copies win:
+
+| file | what it is |
+|---|---|
+| `mkfile` | 513 objects, derived from upstream's configure |
+| `php_config.h` | the hand-answered one |
+| `zend_config.h` | the one line `zend_portability.h:43` wants |
+| `timelib_config.h` | routes timelib through the Zend allocator |
+| `build-defs.h` | the install paths |
+| `internal_functions_cli.c` | the eleven built-in extension entries |
+
+***THE OBJECTS KEEP THEIR PATHS, AND THAT IS NOT COSMETIC.*** Sixteen
+basenames collide across the 43 source directories -- `array.c` is
+both `ext/standard/array.c` and `ext/lexbor/lexbor/core/array.c`, and
+`hash`, `parser`, `state`, `token`, `url` and ten more are the same.
+A flat `OFILES` would build one and link it twice, silently. php is a
+PROGRAM rather than a library, so there is no archive member to
+collide and nested paths cost only a `mkdir` in the rule -- *the
+`ar`-member collision that a library would have had is the same shape
+as the stale `mcontext.6` in `docs/notes/libap.md`, avoided here by
+not having an archive at all.*
+
+Two mkfile details that are rules rather than taste. **Each comment
+inside the `OFILES` list ends with a backslash**, which is
+`mkcont-sweep.py`'s rule: a comment that ends a continuation ends the
+variable, and the rest of the list would vanish without a word. And
+**`HFILES` names the four hand-kept headers**, because mk does not
+scan `#include`s -- without it, editing `php_config.h` rebuilds
+nothing and the next run measures the old binary, which is how
+`HELP_BUILTIN` was turned on and did not reach bash.
+
+`mkcont-sweep` and `rceq-sweep` both pass; `apehdr-sweep` is
+**identical with and without** the new `<ucontext.h>` (151/152
+headers, the same 8 pre-existing TOGETHER errors), which is a control
+rather than a reading of the messages.
+
+**php is deliberately NOT in `sys/src/ape/cmd/mkfile`.** One failing
+entry aborts the whole tree's `mk`, and a port that has never been
+built has not been measured in that position. `cd sys/src/ape/cmd/php
+&& mk` is how to try it.
+
+## What the config.h decided, and why by hand
+
+The long reasoning is in the file itself; what matters as a summary:
+
+***TWO MACROS ARE ANSWERED NO FOR CAPABILITIES THAT ARE PRESENT, LINK,
+AND RETURN SUCCESS.*** This is clisp's `mprotect` rule, twice:
+
+* **`HAVE_MPROTECT`** -- `plan9/mman.c:44` is `return 0`, a stub
+  answering success. Nothing it is asked to protect is protected.
+* **`HAVE_MREMAP`** -- *and this one is worse, because the caller is
+  told it succeeded at something else*. APExp's `mremap` allocates and
+  copies: it MOVES. `zend_mm_chunk_extend` calls
+  `mremap(addr, old, new, 0)` with no `MREMAP_MAYMOVE` precisely
+  because it needs the chunk to stay put, and returns success on
+  anything that is not `MAP_FAILED`. Zend would record a chunk as
+  extended in place while the memory had moved: not a failure, a
+  silently wrong heap.
+
+A configure probe that compiles and links cannot tell either of these
+from the real thing. *That is the whole argument for hand-answering,
+and php supplies it twice without being asked.*
+
+**`STRERROR_R_CHAR_P` is unset and copying the host answer would have
+been a real bug**: glibc's `strerror_r` returns `char *`, APE's is
+POSIX's returning `int` (`<string.h>:45`). php would have used an
+`int` as a pointer.
+
+**`ZEND_CHECK_STACK_LIMIT` is unset, and the cost is recorded rather
+than hidden**: `zend_call_stack.c` finds the stack bounds through
+`pthread_getattr_np`, `pthread_attr_getstack`, `/proc`, `sysctl` or a
+Windows call, and APExp has none. Deep PHP recursion will fault
+instead of raising an error.
+
+**`HAVE_IPV6` is unset and that is a CHOICE, not a finding.**
+`AF_INET6` and `struct sockaddr_in6` both exist. Nothing in this tree
+has ever exercised IPv6 through APE's socket layer, and a port's first
+build is the wrong place to open an unmeasured path. Revisit with a
+test, not with an edit.
+
+***AND A QUESTION ANSWERED ITSELF.*** The sweep found **37 functions
+APE has that the host configure left `#undef`** -- `clock_gettime`,
+`select`, `strndup`, `times`, `utimes`, `pread`, `getlogin` and so on
+-- which looked like a judgement call about enabling code paths
+upstream never compiles on Linux. It is not: **`grep` says all 37 are
+referenced in 0 files** of what this port builds. Nothing reads them,
+so there was nothing to decide.
+
 ## Open, as a list
 
 * fibers: **done** — `ucontext` is in libap and `ucontext-test` is 0
   failures on the VM (`docs/notes/libap.md`). What remains is pointing
   php at it: `ZEND_FIBER_UCONTEXT` in the `config.h`
-* `main/php_config.h` not written yet; the inventory is derived, the
-  answers are not
+* the first build: `cd sys/src/ape/cmd/php && mk`. Nothing has
+  compiled yet, so the object list, the include paths and every
+  answer in the `config.h` are all unmeasured together
 * `memfd_create` is declared with no implementation, which is a libap
   trap independent of php
 * `sys/src/ape/lib/ap/time/asctime_r.c:30` is
