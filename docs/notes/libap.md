@@ -3900,6 +3900,23 @@ anything a program is at all likely to allocate. *The limit was known
 and the constant was chosen as though it were not.* At 1MB, php's Zend
 allocator -- 2MB chunks -- would have stopped at about 10MB of heap.
 
+***AND THE NUMBER IS CONFIRMED INDEPENDENTLY, AT 64KB.*** Section 0c
+calls `_SEGATTACH` in a loop rather than going through `mmap`, and
+gets **5** -- the same five, now over a 256-fold range of sizes and a
+total of 320KB, which leaves no reading in which memory or address
+space is the limit. It also says the ceiling did not move when
+`SEG_THRESHOLD` did, which is the point of asking the kernel rather
+than the library.
+
+*That section exists because the fix disarmed the one that found the
+problem.* With the threshold at 64MB all three of 0b's sizes take the
+malloc arm, so it answers 64/64/64 -- correct, and worth keeping as
+the regression check that `mmap` spends no slot, but **its smallest
+size has stopped being a control and the run says nothing about how
+many slots exist**. Read on its own it is indistinguishable from the
+Linux control. A section whose cases have collapsed onto one path is
+a check that can only pass.
+
 64MB now: a program needs five simultaneous 64MB mappings to reach the
 ceiling, and the detachable path is kept for the only case worth a
 slot, a mapping big enough that leaving it in the data segment for the

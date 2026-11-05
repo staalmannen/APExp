@@ -485,8 +485,16 @@ and 3 say both trims survive. **But three of the eight `mmap` calls
 FAILED**, and 10MB is not a memory limit, so **section 0b** asks how
 many mappings a process may HOLD, at three sizes, *with the prediction
 written down first*: slots give the same count at every size, address
-space gives one falling as 1/size. It is **5 at 2MB and 5 at 16MB**,
-and 64 at a size below `SEG_THRESHOLD` — the control. **Two of its
+space gives one falling as 1/size. It was **5 at 2MB and 5 at 16MB**,
+and 64 at a size below `SEG_THRESHOLD` — the control. ***AND THE FIX
+DISARMED IT***: with `SEG_THRESHOLD` at 64MB all three of 0b's sizes
+take the malloc arm, so it answers 64/64/64 — right, worth keeping as
+the regression check that `mmap` spends no slot, and *unable to say
+how many slots exist*. **Section 0c** asks the platform instead,
+`_SEGATTACH` in a loop at 64KB: **5**, the same number over a 256-fold
+range of sizes for a total of 320KB, which excludes memory outright.
+*A section whose cases have collapsed onto one path is a check that
+can only pass.* **Two of its
 sections can kill the process, so it takes an ARGUMENT**: no argument
 runs the tail trim, `3` runs the head trim, never sharing a run,
 because a section that can kill the process hides every section after
@@ -1690,12 +1698,17 @@ the index, so that nothing here is a surprise.
   reason it scrubs `FD_ISTTY` and `FD_ISREG`. `FD_BUFFEREDX` is poison:
   `read()` and `select()` both answer EIO for it without touching the
   fd.
-- **A process gets FIVE spare segment slots, measured**, so `mmap`
-  cannot be backed by `segattach` in general: `mmaptrim-probe` section
-  0b maps until refused at three sizes and answers 5 at 2MB and 5 at
-  16MB -- *the same count for eight times the memory*. `SEG_THRESHOLD`
-  is 64MB for that reason and anything below it is `malloc`-backed,
-  page-aligned by hand since `malloc` is not.
+- **A process gets FIVE spare segment slots, measured twice and the
+  second time at 64KB**, so `mmap` cannot be backed by `segattach` in
+  general. `mmaptrim-probe` section 0b got 5 at 2MB and 5 at 16MB
+  through `mmap`; **section 0c calls `_SEGATTACH` directly and gets 5
+  at 64KB**. *Five, over a 256-fold range of sizes and a total of
+  320KB* -- so memory and address space are excluded outright, and the
+  number is the kernel's rather than the library's. `SEG_THRESHOLD` is
+  64MB for that reason and anything below it is `malloc`-backed,
+  page-aligned by hand since `malloc` is not. **0c is the one that
+  still asks**: every size 0b uses is now under the threshold, so it
+  answers 64/64/64 and can only confirm that `mmap` spends no slot.
 - `/dev/snarf` is the clipboard and has no concept of ownership.
 - Plan 9 has no loopback unless `ip/ipconfig loopback /dev/null 127.1`
   has been run -- and that belongs in the machine's startup, not in
