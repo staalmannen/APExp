@@ -43,10 +43,10 @@
  * do".  Here it is a stub answering DESTRUCTION where the answer is
  * "not mine".
  *
- * THE CONTROL IS A DELIBERATE BREAK, AND IT HAS BEEN RUN TWICE -- this
- * check has no external oracle, so a clean 0 proves nothing until the
- * instrument has been shown to notice. Both breaks were made in the real
- * source, measured, and reverted:
+ * THE CONTROL IS A DELIBERATE BREAK, AND IT HAS BEEN RUN FOUR TIMES --
+ * this check has no external oracle, so a clean 0 proves nothing until
+ * the instrument has been shown to notice. Each break was made in the
+ * real source, measured, and reverted:
  *
  *   `if(len >= mmap_table[i].len)' -> `if(1)', i.e. the old rule that
  *   matched on the start address alone:            **8 failures**, in
@@ -58,21 +58,60 @@
  *   in section 5, one of them for an address ONE PAGE PAST the end of a
  *   live mapping.
  *
+ *   the malloc arm's round-up deleted, `p = base':  **1 failure**, in
+ *   section 6. Only one, and correctly so: section 7 still passes,
+ *   because zend aligns the chunk from whatever address it is given,
+ *   so a non-page-aligned mmap breaks POSIX without breaking zend.
+ *
+ *   `*basep = base' -> `*basep = p':               **3 failures**, in
+ *   sections 6 and 7 -- a `free' of a pointer `malloc' never returned.
+ *
+ * ***AND THAT LAST CONTROL FAILED TO FIRE THE FIRST TIME, 0 FAILURES.***
+ * Sections 6 and 7 read `mmap_table[0].base' and then checked that what
+ * was released matched it -- which holds however wrong the field is,
+ * since both sides come from the same field. *A check that cannot
+ * fail.* They compare against the pointer `malloc' actually returned
+ * now, which the wrapper below records; the free was already wrapped
+ * for exactly this reason and the malloc was not.
+ *
  * Exit status is the failure count.
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include <stdint.h>
 #include <sys/types.h>
-
-#define SEG_THRESHOLD (1024*1024)
+#include <sys/mman.h>
 
 /* ---- the fakes the extracted code links against ---------------- */
 
 static void *released[16];
 static int   released_seg[16];
 static int   nreleased;
+
+static int nattached;
+
+/*
+ * `_SEGATTACH' models what Plan 9's does and no more: it answers a
+ * PAGE-ALIGNED, zeroed region that `_SEGDETACH' can later take back
+ * whole.  It must return real memory, because the extracted
+ * `p9_mmap_impl' memsets what it is given -- a fake answering NULL
+ * would make the segment arm crash rather than be tested.
+ */
+static void *
+_SEGATTACH(int attr, char *class, void *va, unsigned long len)
+{
+	void *p = NULL;
+	(void)attr; (void)class; (void)va;
+	if(posix_memalign(&p, 4096, len) != 0)
+		return (void*)-1;
+	nattached++;
+	return p;
+}
 
 static void *
 _SEGDETACH(void *p)
@@ -98,14 +137,36 @@ my_free(void *p)
 	}
 }
 
-/* `p9_mmap_tracked' is extracted too, but its allocator half is not
- * wanted here; the harness fills the table through this instead, so the
- * cases can name addresses that mean something when printed. */
+/*
+ * ***AND malloc IS WRAPPED FOR THE SAME REASON THE FREE IS, WHICH THE
+ * FIRST VERSION OF SECTIONS 6 AND 7 MISSED.***  Those sections read
+ * `mmap_table[0].base' and then checked that what was released matched
+ * it -- which is true however wrong `base' is, because both sides come
+ * from the same field.  Breaking the real code's `*basep = base' to
+ * `*basep = p' on purpose produced **0 failures**: a check that cannot
+ * fail.  The harness needs its own handle on the pointer malloc
+ * actually returned, and this is it.
+ */
+static void *last_malloc;
+static int   nmalloc;
+
+/* taken before the macro below hides the name */
+static void *(*real_malloc)(size_t) = malloc;
+
+#define malloc my_malloc
+static void *
+my_malloc(size_t n)
+{
+	last_malloc = real_malloc(n);
+	nmalloc++;
+	return last_malloc;
+}
 
 /* ---- the real code ------------------------------------------- */
 #include "munmaptrim-extract.h"
 
 #undef free
+#undef malloc
 
 /* ---- the harness ---------------------------------------------- */
 
@@ -116,6 +177,7 @@ reset(void)
 {
 	mmap_table_n = 0;
 	nreleased = 0;
+	nattached = 0;
 }
 
 static void
@@ -169,7 +231,20 @@ main(void)
 	expect("entries left", mmap_table_n, 0);
 	expect("releases", nreleased, 1);
 	expect("released the base", released[0] == BASE, 1);
-	expect("released as a segment", released_seg[0], 1);
+	/*
+	 * `track' derives is_seg from the length, as the real code does,
+	 * so which release this expects is a FACT ABOUT THE THRESHOLD.
+	 * It said `segment' while SEG_THRESHOLD was 1MB and the 2MB
+	 * fixture was above it; at 64MB the same fixture is malloc-backed
+	 * and it says the other thing.  *Stated as a dependency rather
+	 * than a constant*, because the first run after the threshold
+	 * moved failed here and the failing line said nothing about
+	 * why.  The segment path is section 8's, through the real
+	 * `p9_mmap_tracked'.
+	 */
+	expect("the 2MB fixture is below SEG_THRESHOLD",
+	       CHUNK < SEG_THRESHOLD, 1);
+	expect("released as malloc, not segment", released_seg[0], 0);
 
 	/* ---- 1: head trim, then free the rest ---- */
 	printf("\nSection 1: head trim keeps the tail live\n");
@@ -240,6 +315,102 @@ main(void)
 	p9_munmap(BASE + CHUNK, PAGE);		/* just past the end */
 	expect("releases, one past the end", nreleased, 0);
 	expect("the real entry is still untouched", mmap_table_n, 1);
+
+	/* ---- 6: the malloc arm must answer a PAGE-ALIGNED address ---- */
+	printf("\nSection 6: p9_mmap_tracked's malloc arm is page-aligned\n");
+	reset();
+	expect("the chunk size is below SEG_THRESHOLD",
+	       CHUNK < SEG_THRESHOLD, 1);
+	{
+		void *a[4];
+		int k, misaligned = 0, basesame = 0, badbase = 0;
+
+		for(k = 0; k < 4; k++){
+			a[k] = p9_mmap_tracked(NULL, CHUNK, 0,
+			                       MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+			if(a[k] == MAP_FAILED){
+				printf("  FAIL mmap %d failed\n", k);
+				fails++;
+				continue;
+			}
+			if((uintptr_t)a[k] & (MMAP_PAGE - 1))
+				misaligned++;
+			if(mmap_table[k].base == mmap_table[k].addr)
+				basesame++;
+			if(mmap_table[k].base != last_malloc)
+				badbase++;
+			/* the whole range must be writable and zeroed */
+			if(((char*)a[k])[0] || ((char*)a[k])[CHUNK-1])
+				printf("  (not zeroed at %d)\n", k);
+			memset(a[k], 0x3c, CHUNK);
+		}
+		expect("misaligned returns", misaligned, 0);
+		expect("base is the pointer malloc returned", badbase, 0);
+		expect("one malloc per mapping", nmalloc, 4);
+		expect("no segment slot spent", nattached, 0);
+		expect("entries recorded", mmap_table_n, 4);
+		/* base == addr only when malloc happened to land on a page;
+		 * this is information, not a rule, so it is printed. */
+		printf("  (base == addr for %d of 4 -- luck, not a rule)\n",
+		       basesame);
+		for(k = 0; k < 4; k++)
+			p9_munmap(a[k], CHUNK);
+		expect("all released", nreleased, 4);
+		expect("released as malloc, not segment", released_seg[0], 0);
+		expect("entries left", mmap_table_n, 0);
+	}
+
+	/* ---- 7: head trim on a malloc-backed mapping frees the BASE ---- */
+	printf("\nSection 7: zend's sequence over the malloc arm\n");
+	reset();
+	{
+		char *q = p9_mmap_tracked(NULL, OVER, 0,
+		                          MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+		size_t o;
+
+		if(q == MAP_FAILED){
+			printf("  FAIL mmap failed\n");
+			fails++;
+		} else {
+			void *b = last_malloc;   /* NOT mmap_table[0].base:
+			                          * see the malloc wrapper */
+
+			o = (uintptr_t)q & (CHUNK-1);
+			o = o ? CHUNK - o : 0;
+			p9_munmap(q, o);
+			p = q + o;
+			expect("chunk is 2MB-aligned",
+			       ((uintptr_t)p & (CHUNK-1)) == 0, 1);
+			expect("nothing released by the trim", nreleased, 0);
+			expect("base is the pointer malloc returned",
+			       mmap_table[0].base == b, 1);
+			memset(p, 0x7e, CHUNK);   /* the kept range must be live */
+			p9_munmap(p, mmap_table[0].len);
+			expect("released", nreleased, 1);
+			expect("released the MALLOC pointer, not the chunk",
+			       released[0] == b, 1);
+			expect("entries left", mmap_table_n, 0);
+		}
+	}
+
+	/* ---- 8: at or above the threshold it is still a segment ---- */
+	printf("\nSection 8: >= SEG_THRESHOLD still takes a segment\n");
+	reset();
+	{
+		void *big = p9_mmap_tracked(NULL, SEG_THRESHOLD, 0,
+		                            MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+		if(big == MAP_FAILED){
+			printf("  FAIL mmap failed\n");
+			fails++;
+		} else {
+			expect("one segment attached", nattached, 1);
+			expect("recorded as a segment", mmap_table[0].is_seg, 1);
+			expect("base == addr for a segment",
+			       mmap_table[0].base == mmap_table[0].addr, 1);
+			p9_munmap(big, SEG_THRESHOLD);
+			expect("detached", released_seg[0], 1);
+		}
+	}
 
 	printf("\nmunmaptrim-xcheck: %d failures\n", fails);
 	return fails;

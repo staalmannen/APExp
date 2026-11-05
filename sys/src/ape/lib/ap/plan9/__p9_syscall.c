@@ -144,30 +144,70 @@ p9retl(long r)
 #endif
 
 /*
- * Plan9 allows only ~8 segments per process (NSEG in the kernel).
- * Using segattach for every mmap quickly exhausts this limit, causing
- * "insufficient physical memory" errors.  Strategy:
+ * Plan 9 gives a process a small fixed number of segments, so segattach
+ * cannot be the general backing for mmap.  Strategy:
  *
  *   anonymous, len < SEG_THRESHOLD: use malloc() (no new segment, sbrk-backed)
- *   anonymous, len >= SEG_THRESHOLD: use segattach() (page-aligned, zeroed)
+ *   anonymous, len >= SEG_THRESHOLD: use segattach() (detachable)
  *   file-backed: always read into malloc'd buffer (MAP_SHARED write-back
  *                is not supported — changes are private)
  *
- * Lowering SEG_THRESHOLD from 65536 to 1MB dramatically reduces the
- * number of segattach calls for programs like bash that use mmap as
- * a general allocator for medium-sized chunks.
+ * ***THE THRESHOLD IS 64MB BECAUSE THE NUMBER OF SLOTS IS FIVE, AND
+ * THAT IS MEASURED RATHER THAN RECALLED.***  `sys/lib/tests/
+ * mmaptrim-probe.c' section 0b maps until it is refused, at three
+ * sizes, and on 9front/amd64 answers:
+ *
+ *	1044480 bytes each: 64 live   (63 MB held)   <- under the old
+ *	                                                threshold: malloc
+ *	2097152 bytes each:  5 live   (10 MB held)
+ *	16777216 bytes each: 5 live   (80 MB held)
+ *
+ * The same count at eight times the size, for eight times the memory,
+ * is what says the limit is SLOTS and not memory or address space --
+ * the prediction was written down before the run, with the opposite
+ * observation (a count falling as 1/size) named as its refutation.
+ * The smallest size is the control and runs to the array's end.
+ *
+ * *The prose above this used to say "~8 segments (NSEG)" and the
+ * threshold was set to 1MB anyway*, which is the whole bug: the limit
+ * was known and the constant was chosen as though it were not.  At 1MB
+ * a program could hold five mappings of a megabyte each and then fail,
+ * and php's Zend allocator -- which grows its heap in 2MB chunks --
+ * would have stopped at about 10MB of heap.
+ *
+ * At 64MB a program needs five simultaneous 64MB mappings to reach the
+ * ceiling, and the detachable path is kept for the case it is actually
+ * worth a slot: a mapping large enough that leaving it in the data
+ * segment for the life of the process would matter.
  */
-#define SEG_THRESHOLD (1024*1024)   /* 1 MB — use segattach only above this */
+#define SEG_THRESHOLD (64*1024*1024)  /* use segattach only above this */
+
+/*
+ * The page size mmap rounds to.  `sysconf(_SC_PAGESIZE)' answers a
+ * hardcoded 4096 (`conf/sysconf.c'), so this is that constant and not
+ * an independent guess; if one moves, both must.
+ */
+#define MMAP_PAGE 4096
 
 /*
  * p9_mmap_impl: core anonymous mmap emulation.
- * Returns the allocated pointer on success, MAP_FAILED on error (sets errno).
- * Uses void* throughout to preserve 64-bit addresses on amd64.
+ * Returns the mapping's address on success, MAP_FAILED on error (sets
+ * errno).  Uses void* throughout to preserve 64-bit addresses on amd64.
+ *
+ * `*basep' is what must eventually be handed to _SEGDETACH()/free(),
+ * and is NOT always the address returned: **POSIX says mmap answers a
+ * page-aligned address and malloc does not**, so the malloc arm
+ * over-allocates by a page and rounds up.  That deviation was live for
+ * everything under the old 1MB threshold and nothing had noticed; the
+ * threshold above makes it the common case, so it is fixed here rather
+ * than inherited.  The base/address split the munmap table already
+ * carries for partial unmaps is exactly what makes it expressible.
  */
 static void *
-p9_mmap_impl(void *addr, size_t len, int prot, int flags, int fd, off_t off)
+p9_mmap_impl(void *addr, size_t len, int prot, int flags, int fd, off_t off,
+             void **basep, int *segp)
 {
-	void *p;
+	void *p, *base;
 	int is_seg;
 	(void)prot;  /* Plan9 has no per-page protection */
 
@@ -179,17 +219,19 @@ p9_mmap_impl(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 
 	is_seg = (len >= SEG_THRESHOLD);
 	if(is_seg){
-		p = _SEGATTACH(0, "memory", 0, len);
+		p = base = _SEGATTACH(0, "memory", 0, len);
 		if(p == (void*)-1){
 			errno = ENOMEM;
 			return MAP_FAILED;
 		}
 	} else {
-		p = malloc(len);
-		if(p == NULL){
+		base = malloc(len + MMAP_PAGE - 1);
+		if(base == NULL){
 			errno = ENOMEM;
 			return MAP_FAILED;
 		}
+		p = (void*)(((uintptr_t)base + MMAP_PAGE - 1)
+		            & ~(uintptr_t)(MMAP_PAGE - 1));
 	}
 	memset(p, 0, len);
 
@@ -200,12 +242,14 @@ p9_mmap_impl(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 			lseek(fd, off, SEEK_SET);
 		n = read(fd, p, len);
 		if(n < 0){
-			if(is_seg) _SEGDETACH(p);
-			else free(p);
+			if(is_seg) _SEGDETACH(base);
+			else free(base);
 			errno = EIO;
 			return MAP_FAILED;
 		}
 	}
+	*basep = base;
+	*segp = is_seg;
 	return p;
 }
 
@@ -239,7 +283,9 @@ static int mmap_table_cap = 0;
 void *
 p9_mmap_tracked(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
-	void *p = p9_mmap_impl(addr, len, prot, flags, fd, off);
+	void *base;
+	int is_seg;
+	void *p = p9_mmap_impl(addr, len, prot, flags, fd, off, &base, &is_seg);
 	if(p == MAP_FAILED)
 		return MAP_FAILED;
 
@@ -257,10 +303,10 @@ p9_mmap_tracked(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 		 * safe direction: see p9_munmap's tail. */
 	}
 	if(mmap_table_n < mmap_table_cap){
-		mmap_table[mmap_table_n].base   = p;
+		mmap_table[mmap_table_n].base   = base;
 		mmap_table[mmap_table_n].addr   = p;
 		mmap_table[mmap_table_n].len    = len;
-		mmap_table[mmap_table_n].is_seg = (len >= SEG_THRESHOLD);
+		mmap_table[mmap_table_n].is_seg = is_seg;
 		mmap_table_n++;
 	}
 	return p;

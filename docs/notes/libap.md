@@ -3871,3 +3871,60 @@ header DECLARES?" is the inverse sweep and does not exist yet** --
 `time/*.c` by hand found `asctime_r` the only real omission there, the
 other 43 unmentioned names being statics or declared in
 `<sys/time.h>`/`<unistd.h>`.
+
+### And the slot ceiling was five, so mmap stopped using segments
+
+`mmaptrim-probe` section 0 failed three of its eight 2MB mappings.
+Five 2MB mappings is 10MB, which is nothing, so the limit was never
+memory. Section 0b separates the two readings, with the prediction
+written down before the run -- *slots give the same small count at
+every size, address space gives a count falling as 1/size* -- and
+9front/amd64 answers:
+
+```
+  1044480 bytes each: 64 live (hit the array's end)  (63 MB held)
+  2097152 bytes each:  5 live                        (10 MB held)
+ 16777216 bytes each:  5 live                        (80 MB held)
+```
+
+**The same count at eight times the size, for eight times the memory.**
+The limit is segment slots, and there are five. The smallest size is
+the control: it is below `SEG_THRESHOLD`, so it is malloc-backed,
+takes no slot, and runs to the array's end.
+
+***THE PROSE ABOVE THE CONSTANT ALREADY SAID SO.*** `__p9_syscall.c`
+opened with "Plan9 allows only ~8 segments per process (NSEG in the
+kernel). Using segattach for every mmap quickly exhausts this limit"
+-- and then set `SEG_THRESHOLD` to 1MB, which spends a slot on
+anything a program is at all likely to allocate. *The limit was known
+and the constant was chosen as though it were not.* At 1MB, php's Zend
+allocator -- 2MB chunks -- would have stopped at about 10MB of heap.
+
+64MB now: a program needs five simultaneous 64MB mappings to reach the
+ceiling, and the detachable path is kept for the only case worth a
+slot, a mapping big enough that leaving it in the data segment for the
+life of the process would matter.
+
+**That exposed a second deviation it had been hiding.** POSIX says
+`mmap` answers a page-aligned address; `malloc` does not, and the
+malloc arm returned the raw `malloc` pointer. That was live for
+everything under the old 1MB threshold and nothing had noticed, and
+raising the threshold would have made it the common case. The arm
+over-allocates by a page and rounds up now -- **expressible only
+because the munmap table already separates `base` from `addr`** for
+partial unmaps, so the two changes pay for each other.
+
+Sections 6, 7 and 8 of `munmaptrim-xcheck` cover the new arms, through
+the real `p9_mmap_tracked` with a `_SEGATTACH` fake that answers
+page-aligned memory.
+
+***AND ONE OF ITS NEW CONTROLS DID NOT FIRE THE FIRST TIME.***
+Breaking `*basep = base` to `*basep = p` -- a `free` of a pointer
+`malloc` never returned -- gave **0 failures**, because sections 6 and
+7 read `mmap_table[0].base` and then checked that what was released
+matched it. Both sides came from the same field, so the check held
+however wrong the field was. The harness wraps `malloc` now, as it
+already wrapped `free`, and the same break gives 3 failures. *A check
+that cannot fail is not a check*, and the way it got written is worth
+naming: the assertion was phrased against the thing under test instead
+of against something independent of it.
