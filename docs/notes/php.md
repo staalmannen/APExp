@@ -410,6 +410,60 @@ anywhere in this port**. `json_scanner.c` and
 parsers and scanners and the 4.2MB `zend_vm_execute.h`. *A question
 that could have cost two more build tools cost one grep.*
 
+### The include layout, and the four headers under `cfg/`
+
+`TSRM/TSRM.h:20` says `#include <main/php_config.h>` while
+`Zend/zend_frameless_function.h` and `ext/opcache/zend_shared_alloc.c`
+say `#include <php_config.h>`. **Both spellings have to work**, and
+upstream gets that for free because the generated config really does
+sit at `main/php_config.h` under the php root.
+
+So the hand-kept headers live in `cmd/php/cfg/`, with the answers in
+`cfg/main/php_config.h` and `cfg/php_config.h` a one-line redirect --
+*two hand-maintained files that must agree are one file too many*,
+which is the warning CLAUDE.md already carries about perl's
+`Config.pm` and its `config.h`. One `-Icfg` answers all four
+spellings.
+
+***AND `-I.' IS DELIBERATELY ABSENT.*** The build writes its objects
+into `main/`, `Zend/`, `TSRM/` and `ext/` in the build directory, so
+`.` on the include path would put directories named after php's own
+source trees in front of php's own source trees. It is also why the
+headers are under `cfg/` rather than in a `main/` beside the mkfile:
+**`clean` does `rm -rf main`**, and a committed header there would be
+deleted by it.
+
+### Per-directory flags, and why they are 32 explicit rules
+
+Preprocessing all 513 sources on the host found **31 with an
+unresolvable include**, in two clusters, and the fix is flags rather
+than files:
+
+* **pcre2, 28 files** -- `pcre2_internal.h:68` includes
+  `<AbandonCompile>` on purpose when `PCRE2_CODE_UNIT_WIDTH` is unset.
+  Upstream passes `-DHAVE_CONFIG_H -DHAVE_MEMMOVE` and
+  `-I.../ext/pcre/pcre2lib`, where pcre2's own `config.h` lives.
+* **Keccak, 3 files** -- `KeccakP-200-SnP.h` is *excluded by a flag*,
+  `-DKeccakP200_excluded` and its two siblings, plus
+  `-I.../ext/hash/sha3/generic64lc`.
+
+***THE FLAGS CANNOT GO IN THE GLOBAL CFLAGS, AND THAT WAS MEASURED
+RATHER THAN FEARED.*** `-DHAVE_CONFIG_H` together with
+`-I.../pcre2lib` would hand `ext/json/json.c:18`,
+`json_encoder.c:18` and `main/php_odbc_utils.c:18` -- each of which
+is `#ifdef HAVE_CONFIG_H / #include <config.h>` -- **pcre2's**
+`config.h`. Not a failure: a different header, silently.
+
+The rules are explicit rather than patterned because mk's precedence
+between a general and a specific meta-rule is something I would be
+recalling rather than reading, there is no mk on the build host to
+check it with, and a wrong guess costs a VM round trip. *Explicit
+beats meta-rule in every mk, which needs no checking at all.*
+
+**All 31 were found in one host pass**, `gcc -E` over every source
+with the real include paths, filtered to `No such file or directory`.
+One sweep instead of 31 round trips.
+
 ## What the config.h decided, and why by hand
 
 The long reasoning is in the file itself; what matters as a summary:
