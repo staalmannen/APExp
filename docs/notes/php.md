@@ -1377,3 +1377,68 @@ control message.
 Phoronix wants sockets only "when running the Phoromatic Server", so
 it is the least valuable of the nine and the only one needing a public
 struct to move. *Deferred on cost, not on possibility.*
+
+## `disk_free_space` on a 9P namespace, and why the config.h is right anyway
+
+Phoronix's `system-info` runs with every module satisfied, and what is
+left on its output is three messages. Only one of them is APExp's.
+
+**`disk_free_space(): Function not implemented`** (and
+`disk_total_space()`, from `phodevi_disk:323`) is `strerror(ENOSYS)`
+coming out of libap's `stat/statvfs.c`, which is a deliberate stub.
+Its own comment makes the case and the case holds: **9P2000 has no
+`Tstatfs`.** The message set is Tversion, Tauth, Tattach, Tflush,
+Twalk, Topen, Tcreate, Tread, Twrite, Tclunk, Tremove, Tstat, Twstat —
+`Tstat` returns a per-file `Dir` and there is no filesystem-level
+query at all. (Linux's v9fs gets one from the `9P2000.L` dialect,
+which Plan 9 servers do not speak.) A 9front file server will tell you
+its free space through its own console — `echo df >>/srv/cwfs.cmd` —
+but that is per-server, needs write access to a `srv` file, and is not
+something a libc call can do generically. *So this is a platform
+limit, established from the protocol rather than from the comment.*
+
+### The config.h claims a capability libap stubs, and that is the shape
+
+`HAVE_SYS_STATVFS_H 1` and `HAVE_STATVFS 1` are both answered yes while
+`statvfs` is `errno = ENOSYS; return -1`. That is clisp's
+`HAVE_WORKING_MPROTECT` and xz's `fsync` for the third time: **a
+hand-answered capability file saying yes to something the library only
+pretends to have.**
+
+***BUT THE ANSWER IS STILL THE RIGHT ONE, AND THE REASON IS WORTH
+KEEPING.*** Read what php does with each answer:
+
+* **`HAVE_STATVFS` yes** — `filestat.c:224` calls `statvfs`, gets -1,
+  does `php_error_docref(E_WARNING, "%s", strerror(errno))` and
+  returns `FAILURE`, so `disk_free_space()` is **`false`** and says
+  why.
+* **`HAVE_STATVFS` no** — neither arm is compiled, `bytesfree` keeps
+  its initialiser, and the function falls through to
+  `*space = bytesfree; return SUCCESS;`. `disk_free_space()` is
+  **`0.0`**, silently.
+
+*Turning the macro off is the SILENT version of the same failure*, and
+`false` is what PHP documents for a platform that cannot answer, which
+a caller can tell from a real zero with `=== false`. **The shape bites
+when a caller does not check the return value; php checks.** Answered
+yes, deliberately, with this paragraph as the reason.
+
+Phoronix then prints `Lock creation failed due to lack of disk space.`
+because `pts_client`'s lock check compares the result against a
+threshold, and `false < 1024`. *It would print the same thing for a
+silent `0.0`*, so there is nothing to gain by changing our side.
+
+### The other two messages are not ours
+
+**`strpos()/substr(): Passing null to parameter #1 ... is deprecated`**
+at `phodevi.php:728` and `pts_client:1659`/`:1661` is Phoronix's own
+code handing `null` where PHP 8.1+ wants a string. The `null` is a
+phodevi probe that found nothing — it reads Linux's `/proc` and `/sys`
+layout, which Plan 9 does not have — and Phoronix does not guard the
+result. **A deprecation, not an error**, and the run continues past it.
+
+**`process exceeds 100 file descriptors`** is not from this tree: the
+phrase occurs nowhere under `sys/src`. It is the 9front kernel's own
+advisory as it grows a process's fd table, and it is a notice rather
+than a limit. Worth a second look only if the number keeps climbing,
+which would be a leak rather than a large working set.

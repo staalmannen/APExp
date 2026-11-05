@@ -1232,6 +1232,21 @@ and upstream's own commented-out direct call is the fix; and
 6.8.6.4p1 forbids -- fixed in php, **deviation recorded in 0.6 and not
 taken**, since `ORETURN` with a left operand means "compute into the
 return location" and accepting void is a statement-tree rewrite.
+***`system-info` RUNS AND ASKS FOR NOTHING MORE.*** What is left on
+its output is three messages and only one is ours:
+`disk_free_space(): Function not implemented`, which is libap's
+`statvfs` stub and **a protocol limit** -- *9P2000 has no `Tstatfs`*,
+the message set simply has no filesystem-level query, so Phoronix's
+`Lock creation failed due to lack of disk space` has no fix on our
+side. **And php's `config.h` answers `HAVE_STATVFS` YES against this
+tree's own rule, deliberately**: with it yes php checks the return and
+gives `false`; with it **no** php compiles neither arm, keeps
+`bytesfree = 0` and returns SUCCESS -- *a silent `0.0`, which is the
+quiet version of the same failure.* The other two are not ours: the
+`strpos()/substr(): Passing null` deprecations are Phoronix's own code
+not guarding a phodevi probe that read a Linux `/proc` path, and
+`process exceeds 100 file descriptors` occurs nowhere under `sys/src`
+-- it is the kernel growing an fd table, a notice and not a limit.
 ***AND THE SECOND ONE WAS EVERY MULTIPLICATION.***
 `zend_multiply.h:135`'s fallback arm -- the one this port takes --
 declared the product `long`, which is 64 bits on LP64 and **32
