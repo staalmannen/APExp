@@ -3289,3 +3289,66 @@ one fault that cannot be found by reading the subject* — and this one
 also explains why `exits()` losing a buffered `diagbuf` was the first
 suspicion and the wrong one: go1.4's `libbio` registers an `atexit`
 flush, so a diagnostic would have appeared.
+
+## The link found two more in the same lexer block
+
+php's objects all compiled, and `6l` then named four undefined
+symbols. Three were a build-list question (`docs/notes/php.md`); the
+fourth was this compiler, and reproducing it exposed a second fault
+beside it that had been there far longer.
+
+### `__asm__ __volatile__("")` called a function named `_volatile__`
+
+`Zend/zend_gdb.c:57` is
+
+	ZEND_API zend_never_inline void __jit_debug_register_code(void)
+	{
+		__asm__ __volatile__("");
+	}
+
+and the link answered
+
+	__jit_debug_register_code: undefined: _volatile__ in ...
+
+`lex.c` makes `__asm__` invisible by consuming from the opening `(` to
+the matching `)`. **GNU's grammar is `asm [volatile] [inline] [goto] (
+... )`**, and nothing here knew about the qualifiers: the scanner
+looked for `(`, found `_`, and handed the identifier to the parser,
+which called it. *A function nobody wrote, in an object file, found at
+the link* — the compile said only `function not declared`, which in a
+C89-tolerant compiler is a warning-shaped line in a sea of them.
+
+The qualifiers are skipped now — `volatile`, `__volatile`,
+`__volatile__`, `inline`, `__inline`, `__inline__`, `goto` — and an
+identifier that is none of them is **diagnosed**, because the
+construct admits nothing else there. **50 vendored files use the
+spelling**, 15 of them php's and the rest spread over pcre2, m4,
+libpng, perl, libressl, gnulib, diffutils, coreutils, zlib and zstd,
+so this was not a php question.
+
+### And `__extension__` had been eating the next character
+
+The `__asm__` fix needed a one-line test, and the test next to it did
+not compile either:
+
+	__extension__ int yy;
+
+became **`nt yy;`** — `6c -S` emitted `GLOBL nt+0(SB)`. The no-argument
+branch of the same block ended `unget(ac); goto l0;`, and that is
+wrong in a way that reads as right: `unget` only sets `peekc`, while
+`l0` is BELOW the `if(peekc != IGN)` test at the top of `yylex`, so
+the next `GETC` reads straight past the character. It is `c = ac;
+goto l1;` now — lex the character already in hand — which is the idiom
+the `__func__` case twenty lines down was already using.
+
+**Nothing in the tree had noticed**, and the reason is worth keeping:
+`__extension__` is almost always followed by a token whose first
+character is not load-bearing to the diagnosis, so the failure reads
+as a syntax error in the code rather than as a lost character. *The
+bug was found by writing a two-line test for a different bug*, which
+is the cheapest way it could have been found and was not deliberate.
+
+Both fixes are in the block the string-literal fix of the previous
+round also touched, and the controls are the same three: `agree.c`
+identical, `--probe` ten `regpair-min` and eight `regpair-probe` with
+`kc` and `vc` at `:242`, clisp's 31 TUs clean.

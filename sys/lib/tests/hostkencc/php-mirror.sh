@@ -1,12 +1,13 @@
 #!/bin/sh
 #
-# php-mirror.sh -- compile php's 513 translation units with the
-# HOST-BUILT kencc, so a compile error costs a second instead of a VM
-# round trip.
+# php-mirror.sh -- compile php's translation units with the HOST-BUILT
+# kencc, so a compile error -- or an undefined symbol -- costs a second
+# instead of a VM round trip.
 #
 #	sh php-mirror.sh --flags      # print the compile flags and exit
-#	sh php-mirror.sh --compile    # all 513; GATES on the error count
+#	sh php-mirror.sh --compile    # all of them; GATES on the error count
 #	sh php-mirror.sh --compile Zend/zend_lazy_objects.c   # just these
+#	sh php-mirror.sh --undefined  # every symbol the LINK will want
 #	eval "$(sh php-mirror.sh --flags)"; $CC6 $CFL -S .../zend.c
 #
 # Depends on `hostkencc.sh' having run.  `clisp-mirror.sh' is the
@@ -37,7 +38,54 @@
 # ABSOLUTE path (`"/sys/include/ape/stddef.h"'), which exists on the VM
 # and not here.
 #
-# WHAT IT FOUND ON ITS FIRST RUN is in `docs/notes/php.md'.
+# ***`--undefined' ASKS THE LINK'S QUESTION WITHOUT A LINKER, AND THIS
+# FILE SAID IT COULD NOT.***  The first version's header ended "it
+# cannot ask about the LINK, which stays the VM's", because the host
+# has no libap and `hostkencc' deliberately does not build `[1-9]l'.
+# **Neither is needed.**  `6c -S' prints, for every translation unit,
+# each symbol it DEFINES (`TEXT name+0(SB)', `GLOBL name+0(SB)' --
+# with `<>' when the definition is file-local) and each symbol it
+# REFERENCES (anything else spelled `name+off(SB)').  The program's
+# undefined set is then the references minus the global definitions
+# minus that unit's own statics, computed over all of them at once --
+# which is the question `6l' answers, minus only the part that is
+# libap's.
+#
+# For that last part it hands the list to `apfunc-sweep.py', which
+# exists to say whether libap DEFINES a name, only DECLARES it, or has
+# neither.  **Read its answer rather than gating on it**, for two
+# reasons the first run demonstrated: the sweep looks for FUNCTION
+# definitions in `.c' files, so `getcontext' and `swapcontext' come
+# back `declared' because they are ASSEMBLY (`arch/amd64/ucontext.s'),
+# and `stdin', `stderr', `stdout', `environ', `h_errno', `_ctype' and
+# `_errnoloc' come back `absent' because they are DATA.  All ten are
+# present; *a sweep over function names, asked about a variable,
+# answers `absent' confidently* -- the caveat CLAUDE.md already
+# carries, arriving here in its other form.  `signal' is a third
+# shape: defined, but spelled
+# `(*signal(int sig, void (*func)(int)))(int)', which no
+# definition-shaped regex matches.
+#
+# **ITS POSITIVE CONTROL IS A REAL FAILURE AND COSTS ONE COMMAND**:
+#
+#	sh php-mirror.sh --undefined ext/lexbor/lexbor/dom/interfaces/node.c
+#
+# narrows the program to one unit, and the answer names
+# `lxb_dom_collection_create', `_init' and `_destroy' among its 37 --
+# **the three the VM's `6l' named**, for the reason below.  *A mode
+# that reports an empty set is indistinguishable from one that cannot
+# see*, which is why this is written down with its number.
+#
+# ***THOSE THREE ARE WHY `collection.c' IS IN THE MKFILE AND NOT IN
+# UPSTREAM'S config.m4.***  `lxb_dom_collection_make' is a `static
+# inline' in `lexbor/dom/collection.h', reached by every unit that
+# includes `node.h' or `element.h'; **kencc emits an unused static
+# function and gcc at -O2 discards it**, so upstream never needs the
+# three functions it calls and this build does.  That asymmetry is
+# general: a header-only helper calling into a file the port does not
+# compile is a link error here and silence there.
+#
+# WHAT IT FOUND is in `docs/notes/php.md'.
 
 set -e
 
@@ -109,7 +157,7 @@ fi
 test -x "$HERE/out/bin/6c" || {
 	echo "php-mirror: run hostkencc.sh first" >&2; exit 2; }
 
-mkdir -p "$OUT/shadow"
+mkdir -p "$OUT/shadow" "$OUT/asm"
 sed 's#"/sys/include/ape/#"#' \
 	"$ROOT/amd64/include/ape/stddef_arch.h" > "$OUT/shadow/stddef_arch.h"
 
@@ -126,12 +174,14 @@ sources() {
 	sed 's/$/.c/'
 }
 
-if [ "${1:-}" != "--compile" ]; then
+case "${1:-}" in
+--compile)	mode=compile; shift;;
+--undefined)	mode=undefined; shift;;
+*)
 	n=$(sources | wc -l)
 	echo "php-mirror: staged $OUT; $n sources; now --compile"
-	exit 0
-fi
-shift
+	exit 0;;
+esac
 
 PATH="$HERE/out/bin:$PATH"; export PATH
 export objtype=amd64
@@ -172,6 +222,20 @@ for s in $list; do
 	ext/hash/hash_sha3.c)		extra=$KECCAKFLAGS;;
 	ext/json/*)			extra=-I$PHP/ext/json;;
 	esac
+	if [ "$mode" = undefined ]; then
+		# `-S' rather than `-o': the assembly carries the symbol
+		# table this mode needs, and nothing else does without a
+		# reader for Plan 9 object files.
+		if $CC6 $extra $CFL -S "$src" \
+		    > "$OUT/asm/$(echo "$s" | tr / _).s" 2> "$OUT/t.log"; then
+			ok=$((ok+1))
+		else
+			bad=$((bad+1))
+			echo "==== $s" >> "$OUT/errors"
+			cat "$OUT/t.log" >> "$OUT/errors"
+		fi
+		continue
+	fi
 	if $CC6 $extra $CFL -o "$OUT/t.6" "$src" > "$OUT/t.log" 2>&1; then
 		ok=$((ok+1))
 	else
@@ -180,6 +244,47 @@ for s in $list; do
 		cat "$OUT/t.log" >> "$OUT/errors"
 	fi
 done
+
+if [ "$mode" = undefined ]; then
+	echo "php-mirror: assembled $ok, errors $bad, missing $missing"
+	test "$bad" -eq 0 || { echo "php-mirror: fix the compile first" >&2; exit 1; }
+	python3 - "$OUT/asm" > "$OUT/undefined" <<'EOF'
+import os, re, sys
+
+D = sys.argv[1]
+# `TEXT name+0(SB)' and `GLOBL name+0(SB)' define; `name<>+0(SB)'
+# defines it FILE-LOCALLY, which satisfies that unit and no other.
+DEF = re.compile(r'^\t(?:TEXT|GLOBL)\t([A-Za-z_.][\w.]*)(<>)?\+')
+REF = re.compile(r'(?<![\w.<])([A-Za-z_.][\w.]*)\+-?\d+\(SB\)')
+
+gdef, statics, refs = set(), {}, {}
+for f in sorted(os.listdir(D)):
+    st, rf = set(), set()
+    for line in open(os.path.join(D, f), errors='ignore'):
+        m = DEF.match(line)
+        if m:
+            (st if m.group(2) else gdef).add(m.group(1))
+            continue
+        rf.update(REF.findall(line))
+    statics[f], refs[f] = st, rf
+
+und = set()
+for f, rf in refs.items():
+    und |= rf - gdef - statics[f]
+for n in sorted(und):
+    print(n)
+EOF
+	rm -rf "$OUT/asm"
+	n=$(wc -l < "$OUT/undefined")
+	echo "php-mirror: $n symbol(s) the link must find outside php"
+	echo "php-mirror: the list is in $OUT/undefined; asking libap --"
+	python3 "$ROOT/sys/lib/tests/apfunc-sweep.py" --file "$OUT/undefined" |
+		grep -v '	*defined   ' || true
+	echo "php-mirror: ^ anything here is READ, not a failure -- the"
+	echo "php-mirror:   sweep sees C function definitions only, so"
+	echo "php-mirror:   assembly reads as 'declared' and DATA as 'absent'."
+	exit 0
+fi
 echo "php-mirror: compiled $ok, errors $bad, missing $missing"
 echo "php-mirror: diagnostics in $OUT/errors"
 test "$bad" -eq 0 && test "$missing" -eq 0

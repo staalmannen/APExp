@@ -992,7 +992,10 @@ talph:
 	    strcmp(s->name, "__extension__") == 0 ||
 	    strcmp(s->name, "__asm__")       == 0 ||
 	    strcmp(s->name, "__asm")         == 0)) {
-		int ac, depth;
+		int ac, depth, asmlike;
+
+		asmlike = strcmp(s->name, "__asm__") == 0
+		       || strcmp(s->name, "__asm") == 0;
 		/*
 		 * After reading the identifier above, peekc holds the char that
 		 * ended the identifier loop (e.g. the first '(' of '((...))').
@@ -1010,6 +1013,57 @@ talph:
 		}
 		while(ac == ' ' || ac == '\t')
 			ac = GETC();
+		/*
+		 * ***`__asm__ __volatile__("")' IS THE COMMON SPELLING AND
+		 * NOTHING HERE KNEW THE QUALIFIER.***  GNU's grammar is
+		 * `asm [volatile] [inline] [goto] ( ... )', and the loop
+		 * below ran straight into `__volatile__', found no `(', and
+		 * handed the identifier to the parser -- which called it:
+		 *
+		 *	zend_gdb.c:59 function not declared: _volatile__
+		 *	__jit_debug_register_code: undefined: _volatile__
+		 *
+		 * at php's LINK, from
+		 * `ZEND_API ... __jit_debug_register_code(void)
+		 * { __asm__ __volatile__(""); }'.
+		 *
+		 * An identifier here is not valid C in any other reading --
+		 * the construct takes qualifiers and then a parenthesised
+		 * argument -- so an unknown one is diagnosed rather than
+		 * guessed at.
+		 */
+		if(asmlike && ac != '(' && (ac == '_' || isalpha(ac))) {
+			char qual[32];
+			int qn;
+
+			for(;;) {
+				qn = 0;
+				while(qn < (int)sizeof(qual)-1 &&
+				    (ac == '_' || isalnum(ac))) {
+					qual[qn++] = ac;
+					ac = GETC();
+				}
+				qual[qn] = 0;
+				if(strcmp(qual, "volatile") != 0
+				&& strcmp(qual, "__volatile") != 0
+				&& strcmp(qual, "__volatile__") != 0
+				&& strcmp(qual, "inline") != 0
+				&& strcmp(qual, "__inline") != 0
+				&& strcmp(qual, "__inline__") != 0
+				&& strcmp(qual, "goto") != 0) {
+					yyerror("unexpected \"%s\" after %s",
+						qual, s->name);
+					break;
+				}
+				while(ac == ' ' || ac == '\t' || ac == '\n') {
+					if(ac == '\n')
+						lineno++;
+					ac = GETC();
+				}
+				if(!(ac == '_' || isalpha(ac)))
+					break;
+			}
+		}
 		if(ac == '(') {
 			depth = 1;
 			while(depth > 0) {
@@ -1085,14 +1139,32 @@ talph:
 				if(ac == '(') depth++;
 				else if(ac == ')') depth--;
 			}
-		} else {
-			/* no argument list (e.g. bare __extension__); put char back */
-			unget(ac);
+			/* Do NOT reset lasttok here: the swallowed keyword is
+			 * invisible to the parser, so the previous type keyword
+			 * (e.g. LDOUBLE before __asm__("sym") _Complex) must
+			 * still be visible for _Complex combining. */
+			goto l0;	/* fetch next real token */
 		}
-		/* Do NOT reset lasttok here: the swallowed keyword is invisible
-		 * to the parser, so the previous type keyword (e.g. LDOUBLE before
-		 * __asm__("sym") _Complex) must still be visible for _Complex combining. */
-		goto l0;	/* fetch next real token */
+		/*
+		 * No argument list -- a bare `__extension__'.
+		 *
+		 * ***THIS USED TO BE `unget(ac); goto l0;' AND THAT LOSES THE
+		 * CHARACTER.***  `unget' only sets `peekc', and `l0' is BELOW
+		 * the `if(peekc != IGN)' test at the top of `yylex', so the
+		 * next `GETC' reads straight past it.  **`__extension__ int
+		 * yy;' compiled as `nt yy;'** -- `6c -S' emitted
+		 * `GLOBL nt+0(SB)' -- so `__extension__' has been eating the
+		 * first character of whatever follows it for as long as it has
+		 * been swallowed here.  *Nothing in the tree had used it where
+		 * the result was not also a syntax error*, which is why it
+		 * surfaced only beside the `__volatile__' fault above.
+		 *
+		 * `l1' is the same entry point one step later: it lexes the
+		 * character already in hand instead of fetching another, which
+		 * is the idiom the `__func__' case below already uses.
+		 */
+		c = ac;
+		goto l1;
 	}
 	/*
 	 * C99 __func__ and GCC __FUNCTION__: predefined string literal
