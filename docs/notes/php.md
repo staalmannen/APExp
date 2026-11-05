@@ -746,6 +746,62 @@ general form is worth keeping**: a header-only helper that calls into
 a file the port does not compile is a link error here and silence on
 gcc.
 
+### The smoke test ran, and it moved the bug
+
+`php-smoke.php` on the VM: **44 of 45 cases pass**, including
+`PHP_INT_SIZE` 8, `PHP_INT_MAX`, `strlen`, `max`, `str_repeat` at
+100k, every arithmetic case, preg, json, and `/net/tcp/stats` read as
+404 bytes. `PHP_OS = Plan9, PHP_VERSION = 8.5.12`. **The interpreter
+evaluates correctly.**
+
+***SO THE PHORONIX DIAGNOSIS WAS WRONG, AND THE TEST IS WHAT SAID
+SO.*** Section 5 reproduces `display_text_table`'s padding loop over
+the exact table php had printed, and it **passes** -- `$m` is 15, not
+2**32. The crash is not in the loop.
+
+**It is in `exit`.** The smoke test's own last line is
+
+	Hard memory limit of 268435456 bytes exhausted
+	(tried to allocate 4294971392 bytes) in php-smoke.php on line 194
+
+and **line 194 is `exit($fails);`** -- printed *after* the test's own
+total, so everything before it ran. Phoronix's line 854 is `exit;` in
+the same `if($do_exit)` block. *Two unrelated programs, same line
+kind, same byte count to the digit.*
+
+**The size decomposes and the decomposition is the lead**:
+4294971392 is 1048577 pages of 4096, i.e. a request of just over
+2**32 rounded up by one page -- a length of **exactly 2**32** plus a
+small header. And `2**32 == (uint32_t)-1 + 1`. So the shape is a
+**32-bit -1 ZERO-extended into a 64-bit size and incremented**, not a
+sign-extended one (that would be `(size_t)-1`, and `len+1` would be
+0). *An identical size in two programs of different sizes is not
+data-dependent.*
+
+**What runs there**: `exit` compiles to ZEND_EXIT, which calls
+`zend_bailout`, which is `LONGJMP(*EG(bailout), FAILURE)` --
+and `zend_portability.h:427` makes that **`siglongjmp` into a
+`sigjmp_buf`, unconditionally on non-Windows**; there is no
+`HAVE_SIGSETJMP` test to answer. APExp's `sigsetjmp` is assembly
+(`arch/amd64/setjmp.s`) and its `siglongjmp` is C
+(`arch/amd64/notetramp.c:83`), and the two agree about the layout on
+inspection -- 30 ints is 120 bytes against the 80 the pair uses, and
+the C side passes `&jmpbuf[0]`, not the base. **So nothing is yet
+ruled in or out**; what is established is that the fault is on the
+bailout-and-shutdown path and not in the engine.
+
+**Three one-liners separate the remaining possibilities**, with no
+rebuild:
+
+	php -r 'echo "no-exit\n";'            # ends without exit()
+	php -r 'echo "exit0\n"; exit(0);'     # bailout
+	php -d memory_limit=-1 -r 'exit(0);'  # same, limit removed
+
+A clean first and a dying second puts it on `zend_bailout`; both
+dying puts it on request shutdown generally; and the third turns a
+clean `_exit(137)` into a real allocation failure or a fault, which
+`acid` can name the way it named `zend_string.h:401`.
+
 ### The first real program: Phoronix, and a 2**32
 
 `php -v` works, `php -h` works, and **the port has still never been
