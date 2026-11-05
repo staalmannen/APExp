@@ -1206,7 +1206,19 @@ silent:
 (NTS)`, and `php-smoke.php` is **44 of 45** on the VM -- PHP_INT_SIZE
 8, strlen, max, str_repeat at 100k, preg, json, and `/net/tcp/stats`
 read as 404 bytes. Notes in `docs/notes/php.md`.**
-***THE ONE THAT MATTERED WAS `exit()`, AND IT WAS kencc's 32-BIT
+***AND THE SECOND ONE WAS EVERY MULTIPLICATION.***
+`zend_multiply.h:135`'s fallback arm -- the one this port takes --
+declared the product `long`, which is 64 bits on LP64 and **32
+here**, so any product over 2**32 was truncated, the overflow check
+fired on an overflow that had not happened, and PHP returned a
+FLOAT: `2000000 * 2000000` was `float(4.0E+12)`. *Every other arm in
+that file is guarded by `SIZEOF_LONG == SIZEOF_ZEND_LONG`; that one
+assumes it.* Found sideways, because php compiles unary minus as
+`(-1) * x` -- **the smoke test covered `+`, `-`, `max`, `strlen` and
+`str_repeat` and not `*`**, and a test with five operators and not
+the sixth catches the sixth only by luck. Section 3b asks directly
+now, with two cases a never-report-overflow fix would fail.
+***THE ONE BEFORE IT WAS `exit()`, AND IT WAS kencc's 32-BIT
 `sizeof`***: `zend_object_properties_size` is `sizeof(zval) * (count -
 1)` with count 0, which C makes 2**64-16 and kencc makes 4294967280 by
 multiplying in 32 bits and zero-extending -- so every `exit()` asked

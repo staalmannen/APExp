@@ -138,6 +138,45 @@ eq("a padding count is never near 2**32",
    (max(0, 1 + 0 + $widths[1]) - strlen($cells[1])) < 1024, true);
 
 /* ---------------------------------------------------------------- */
+echo "\nSection 3b: MULTIPLICATION, which the first version never asked\n";
+/*
+ * ***THE FIRST VERSION OF THIS FILE TESTED +, -, max, strlen AND
+ * str_repeat, AND NOT `*'.***  It still found the bug, but only
+ * through the back door: PHP compiles unary minus as `(-1) * x', so
+ * `-9223372036854775807' was a float and the two PHP_INT_MIN cases
+ * failed while nothing said the word "multiply".
+ *
+ * `zend_multiply.h:135' declared the product `long`, which is 64 bits
+ * on every LP64 platform and **32 on kencc**, so the product was
+ * truncated, the overflow check fired on a product that had not
+ * overflowed, and the answer came back a DOUBLE. **Every integer
+ * multiplication whose result did not fit in 32 bits was a float.**
+ * That is a silent wrong answer in the commonest arithmetic there is,
+ * and a test with five operators and not the sixth could only ever
+ * have caught it sideways.
+ */
+eq("small product is an int", 6 * 7, 42);
+eq("product just under 2**31", 46340 * 46340, 2147395600);
+eq("PRODUCT OVER 2**32 STAYS AN INT", is_int(2000000 * 2000000), true);
+eq("...and is right", 2000000 * 2000000, 4000000000000);
+eq("a product near PHP_INT_MAX stays an int",
+   is_int(1000000007 * 1000000009), true);
+eq("...and is right", 1000000007 * 1000000009, 1000000016000000063);
+eq("a negative product over 2**32 stays an int",
+   is_int(-2000000 * 2000000), true);
+eq("...and is right", -2000000 * 2000000, -4000000000000);
+eq("unary minus on a big literal stays an int",
+   is_int(-9223372036854775807), true);
+/*
+ * And the check must still FIRE when there is a real overflow -- a
+ * fix that simply never reports one would pass everything above.
+ */
+eq("a REAL overflow still becomes a float",
+   is_float(PHP_INT_MAX * 2), true);
+eq("...and so does a real negative overflow",
+   is_float(PHP_INT_MIN * 2), true);
+
+/* ---------------------------------------------------------------- */
 echo "\nSection 4: str_repeat, which is where it died\n";
 eq("str_repeat small", str_repeat("-", 5), "-----");
 eq("str_repeat zero", str_repeat("-", 0), "");

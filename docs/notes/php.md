@@ -746,6 +746,67 @@ general form is worth keeping**: a header-only helper that calls into
 a file the port does not compile is a link error here and silence on
 gcc.
 
+### CLOSED: every multiplication over 2**32 was a float
+
+`exit()` fixed, the smoke test runs to completion and **the exit
+status is usable again** -- the shell printed `2`, which is the count.
+The two that remained were both
+
+	is_int(-9223372036854775807 - 1)   -> false
+	(-9223372036854775807 - 1) === PHP_INT_MIN   -> false
+
+while `PHP_INT_MIN` itself was a clean int and `PHP_INT_MIN +
+PHP_INT_MAX` was -1. So the constant was fine and something in the
+expression produced a float.
+
+***THE SUBTRACTION WAS INNOCENT AND THE COMPILER SAID SO.*** The host
+kencc compiled php's real `Zend/zend_operators.c`, and
+`fast_long_sub_function` is `SUBQ`, then `ANDQ` with the sign mask in
+a register, then `CMPQ` -- 64 bits throughout, and tracing it by hand
+with 0x8000000000000001 and 1 takes the integer arm. *Reading the
+generated code of the real function beat three rounds of reasoning
+about which `#elif` arm the config selects.*
+
+**PHP compiles unary minus as `(-1) * x`**, so the float came from
+the MULTIPLY. `zend_multiply.h:132`'s fallback -- the arm taken when
+there are no `__builtin_*_overflow`, no `__GNUC__` asm and no Win32,
+which is exactly this port -- opens
+
+	long   __lres  = (a) * (b);
+
+**Every other arm in that file is guarded by
+`SIZEOF_LONG == SIZEOF_ZEND_LONG` or `SIZEOF_ZEND_LONG == 4`; this one
+assumes it.** `long` is 32 bits here and `zend_long` is 64, so
+`__lres` held the product's low half, the delta test against
+`__dres` reported an overflow that had not happened, and the answer
+came back a double.
+
+***SO EVERY INTEGER MULTIPLICATION WHOSE PRODUCT DID NOT FIT IN 32
+BITS SILENTLY RETURNED A FLOAT.*** `2000000 * 2000000` was
+`float(4.0E+12)`. That is a wrong answer in the commonest arithmetic
+there is, it is silent, and it would have reached every php program
+ever run here.
+
+`zend_long __lres` now. The before/after `-S` diff is the whole story
+in four lines:
+
+	<  IMULQ  SI,DI          >  IMULQ  SI,CX
+	<  MOVQL  DI,CX             (the product truncated to 32 bits)
+	<  CVTSL2SD CX,X1        >  CVTSQ2SD CX,X1
+	<  MOVLQSX CX,SI         >  MOVQ   CX,(DX)
+
+**And the test is the thing to correct, not just the code.** Its
+first version covered `+`, `-`, `max`, `strlen` and `str_repeat` and
+**not `*`** -- it caught this only sideways, through unary minus, and
+nothing in the failing output said the word multiply. Section 3b asks
+directly now, including two cases that a fix which simply never
+reports an overflow would fail: `PHP_INT_MAX * 2` and `PHP_INT_MIN *
+2` must still be floats.
+
+*This is the tree's most-cited invariant -- `long` is 32 bits on
+amd64 -- arriving in upstream code that is correct on every LP64
+platform, for the second time in two rounds after `sizeof`.*
+
 ### CLOSED: `exit()` was kencc's 32-bit `sizeof`
 
 Three one-liners on the VM settled it with no rebuild:

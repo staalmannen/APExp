@@ -131,8 +131,28 @@
 
 #else
 
+/*
+ * ***`long' HERE MUST BE `zend_long', AND ON LLP64 THEY ARE NOT THE
+ * SAME TYPE.***  Every other arm above is guarded by
+ * `SIZEOF_LONG == SIZEOF_ZEND_LONG' or by `SIZEOF_ZEND_LONG == 4';
+ * this fallback is the one that assumes it. On kencc `long' is 32
+ * bits and `zend_long' is 64 (it is chosen from `__x86_64__' in
+ * `zend_long.h'), so `__lres' held the product's LOW 32 BITS, the
+ * delta test against `__dres' duly reported an overflow that had not
+ * happened, and the result came back a DOUBLE.
+ *
+ * **So every integer multiplication whose product did not fit in 32
+ * bits silently became a float.** PHP compiles unary minus as
+ * `(-1) * x', so `-9223372036854775807' was a float too, which is how
+ * `php-smoke.php' found it: `is_int(-9223372036854775807 - 1)' was
+ * false while `PHP_INT_MIN' itself was a clean int.
+ *
+ * *This is the tree's most-cited invariant* -- `long' is 32 bits on
+ * amd64 and `size_t`/`zend_long` are not -- reaching upstream code
+ * that is correct on every LP64 platform. `docs/notes/php.md'.
+ */
 #define ZEND_SIGNED_MULTIPLY_LONG(a, b, lval, dval, usedval) do {	\
-	long   __lres  = (a) * (b);										\
+	zend_long __lres  = (a) * (b);									\
 	long double __dres  = (long double)(a) * (long double)(b);		\
 	long double __delta = (long double) __lres - __dres;			\
 	if ( ((usedval) = (( __dres + __delta ) != __dres))) {			\
