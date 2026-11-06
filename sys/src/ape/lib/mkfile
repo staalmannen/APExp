@@ -42,6 +42,22 @@ _OPTIONAL_LIBS=\
 	z\
 	zstd\
 
+# libgd, which needs png and z. Both are in _OPTIONAL_LIBS above and
+# the loop below is sequential, so this cannot be alphabetical either
+# -- the same reason _TLS_LIBS and _ZIP_LIBS exist.
+#
+# It is here as an EXERCISE as much as a capability: 47 files of
+# integer-heavy pixel arithmetic are good ground for a compiler whose
+# `long' is 32 bits and whose `sizeof' is 32-bit, and gd needs no
+# display, no X11 and no platform integration at all -- pixel buffers
+# in, file formats out. **Without FreeType there is no scalable text**
+# (gdft.c returns "libgd was not built with FreeType font support"),
+# and without libjpeg/webp/avif/tiff/xpm those formats are absent;
+# PNG, GIF, BMP, WBMP, XBM, TGA and gd/gd2 all work. See
+# `external/libgd/config.h' for every answer and why.
+_IMAGE_LIBS=\
+	gd\
+
 # TLS, and the one client that uses it. The loop below is sequential, so
 # these come after z: libcurl is compiled with HAVE_LIBZ and reaches
 # libz.a through the #pragma lib in <zlib.h>, and it needs libressl.a
@@ -78,6 +94,7 @@ DIRS=\
 	$_CORE_LIBS\
 	$_CORE_APP_DEPENDENCIES\
 	$_OPTIONAL_LIBS\
+	$_IMAGE_LIBS\
 	$_LLP64_ONLY_LIBS\
 	$_TLS_LIBS\
 	$_ZIP_LIBS\

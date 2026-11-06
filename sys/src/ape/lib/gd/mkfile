@@ -1,0 +1,97 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libgd.a
+
+# libgd 2.3.3, vendored whole at sys/src/external/libgd.
+#
+# ***THE 47 OBJECTS BELOW ARE `src/Makefile.am's `libgd_la_SOURCES',
+# READ RATHER THAN RECALLED, AND `ls *.c' WOULD HAVE GIVEN 70.***
+# The other 23 are upstream's own demo and utility PROGRAMS --
+# gddemo.c, gdtest.c, webpng.c, pngtogd.c and the rest -- which have
+# their own `main' and do not belong in an archive. *They all compile
+# under kencc too*, which is a free extra signal and not a reason to
+# link them.
+#
+# No AVIF, HEIF, JPEG, TIFF, WebP or XPM library exists in this tree
+# and no FreeType, so gd_avif.$O, gd_heif.$O, gd_jpeg.$O, gd_tiff.$O,
+# gd_webp.$O, gd_xpm.$O and gdft.$O are built anyway and are nearly
+# empty: each is wrapped in its own `#ifdef HAVE_LIB*', which
+# `external/libgd/config.h' answers no. **They are listed rather than
+# dropped so that turning one on is a config.h edit and not a mkfile
+# edit**, which is how upstream arranges it.
+
+OFILES=\
+	gd.$O\
+	gd_avif.$O\
+	gd_bmp.$O\
+	gd_color.$O\
+	gd_color_map.$O\
+	gd_color_match.$O\
+	gd_crop.$O\
+	gd_filename.$O\
+	gd_filter.$O\
+	gd_gd.$O\
+	gd_gd2.$O\
+	gd_gif_in.$O\
+	gd_gif_out.$O\
+	gd_heif.$O\
+	gd_interpolation.$O\
+	gd_io.$O\
+	gd_io_dp.$O\
+	gd_io_file.$O\
+	gd_io_ss.$O\
+	gd_jpeg.$O\
+	gd_matrix.$O\
+	gd_nnquant.$O\
+	gd_png.$O\
+	gd_rotate.$O\
+	gd_security.$O\
+	gd_ss.$O\
+	gd_tga.$O\
+	gd_tiff.$O\
+	gd_topal.$O\
+	gd_transform.$O\
+	gd_version.$O\
+	gd_wbmp.$O\
+	gd_webp.$O\
+	gd_xbm.$O\
+	gdcache.$O\
+	gdfontg.$O\
+	gdfontl.$O\
+	gdfontmb.$O\
+	gdfonts.$O\
+	gdfontt.$O\
+	gdft.$O\
+	gdfx.$O\
+	gdhelpers.$O\
+	gdkanji.$O\
+	gdtables.$O\
+	gdxpm.$O\
+	wbmp.$O\
+
+# config.h here is HAND-ANSWERED, and mk does not scan #includes --
+# so WITHOUT this line, editing it rebuilds NOTHING and the next run
+# measures the old archive. `lib/png/mkfile' carries the same line for
+# the same reason; see CLAUDE.md.
+HFILES=../../../external/libgd/config.h
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+GDSOURCE=../../../external/libgd
+
+# `-I$GDSOURCE' is what finds the hand-answered config.h at the top of
+# the vendored tree, the same arrangement as lib/png. The sources'
+# own `#include "config.h"' would otherwise find nothing, since
+# upstream generates it into `src/'.
+#
+# **No `-l' anywhere**: libgd needs libpng and libz, and both arrive
+# through `#pragma lib' in `<png.h>' and `<zlib.h>'. A program that
+# links libgd therefore gets all three named in its objects without
+# any mkfile saying so.
+CFLAGS=-c -I$GDSOURCE -I$GDSOURCE/src -D_POSIX_SOURCE -D_BSD_EXTENSION\
+	-DHAVE_CONFIG_H
+
+%.$O: $GDSOURCE/src/%.c
+	$CC $CFLAGS $GDSOURCE/src/$stem.c

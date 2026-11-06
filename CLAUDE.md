@@ -306,6 +306,30 @@ predating its fix. The idiom has paid thirteen times; bump one when a file chang
 it matters most where the bug's whole symptom is that nothing is
 printed.
 
+**`gd-test.c` and `gd-xcheck.sh`** are the newest pair and the shape
+is worth copying: **there is no reference implementation of libgd**,
+so the cross-check builds the SAME vendored sources with gcc and runs
+the SAME test file, making it an A/B of two compilers over one source
+rather than a comparison against an oracle. *All 47 files compiled
+clean under kencc on the first attempt*, which is exactly why the test
+exists — every bug this exercise can still find is a RUNTIME bug.
+Every assertion is exactly checkable without a golden image: rotate 90
+four times is the identity whichever way gd turns it, a PNG round trip
+must return its own pixels, and scaling a FLAT image must leave it
+flat whatever the filter does. ***ITS FIRST TWO DRAFTS WERE BOTH THE
+TEST'S BUG AND gcc FOUND BOTH***: `gdImageRotate90` is INTERNAL
+(`gd_intern.h`, not installed) so the call was implicit-`int`, the
+pointer truncated and the test SEGFAULTED — this tree's own
+undeclared-function invariant, inside a test written to hunt that
+class — and the harness builds the test `-Werror=implicit-function-
+declaration` now; then section 8 asserted that ≤256 distinct colours
+survive palette conversion EXACTLY, and 1024 of 1024 pixels "changed"
+because gd takes colour-cube CENTROIDS, so (0,0,0) comes back (4,2,4).
+*What is exact is that the mapping is a FUNCTION OF COLOUR* — equal
+colours in, equal indices out — and the drift is measured and bounded
+instead. **Its control breaks `gdImageGetPixel` by one column** and
+gates if the `sed` matches nothing.
+
 **Host cross-checks** (not Plan 9 tests — they run on the build host):
 `tz-xcheck`, `ctype-xcheck`, `strtod-xcheck`, `strtof-xcheck`,
 `dtoa-xcheck`, `tty-xcheck` (needs `-I ttystub`), `strftime-xcheck`,
