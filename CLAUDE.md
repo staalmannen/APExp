@@ -1230,15 +1230,29 @@ silent:
 (NTS)`, and `php-smoke.php` is **44 of 45** on the VM -- PHP_INT_SIZE
 8, strlen, max, str_repeat at 100k, preg, json, and `/net/tcp/stats`
 read as 404 bytes. Notes in `docs/notes/php.md`.**
-***AND TWELVE EXTENSIONS ARE BUILT NOW***: the four Phoronix REQUIRES
-(libxml, dom, simplexml, zlib -- `system-info` runs) plus eight of the
-nine it calls OPTIONAL -- posix, pcntl, bz2, readline, openssl
-(LibreSSL), curl, sqlite3, zip. **579 TUs compile and `--undefined`
+***AND THIRTEEN EXTENSIONS ARE BUILT NOW***: the four Phoronix
+REQUIRES (libxml, dom, simplexml, zlib -- `system-info` runs), eight
+of the nine it calls OPTIONAL -- posix, pcntl, bz2, readline, openssl
+(LibreSSL), curl, sqlite3, zip -- **and gd, which was the ninth and
+was impossible until `lib/gd` existed**. php takes upstream's
+EXTERNAL arm, so it is `gd.c` + `gd_compat.c`, **two objects and not
+the forty of php's bundled libgd** -- which is also the copy not
+worth keeping, since it announces `2.0.35` while carrying AVIF, WebP
+and the interpolation code. *`HAVE_LIBGD` is the gate, not
+`HAVE_GD`*, and the first probe got the empty-TU result again.
+***ITS FORMAT ANSWERS ARE A CONFIGURE PROBE THAT WOULD LIE, THE
+FOURTH OF THAT FAMILY***: php asks the installed libgd what it can do
+by LINKING `gdImageCreateFromJpeg`/`...Avif`/`...Webp`/`...Xpm`, and
+**all four link** -- upstream compiles those files with no library
+present and stubs each to `gd_error("... has been disabled")`. `nm`
+over the archive says so. Answered **no** by hand, because otherwise
+`function_exists('imagejpeg')` and `imagetypes() & IMG_JPG`, the two
+documented ways to ask, both lie. *`HAVE_GD_FREETYPE` is the one
+where probe and truth agree* -- `gdFontCacheShutdown` is genuinely
+absent. **579 TUs compile and `--undefined`
 resolves 1120 symbols** against libap and eight library trees, all of
 which come in by `#pragma lib` from their own headers, so `cmd/php`
-still has no `LIB=` line. *GD is impossible* (no libgd here; libpng is
-not a drawing library) and **`ext/sockets` is deferred to a libap
-change**: no `struct cmsghdr`, no `CMSG_*`, no `msg_flags`, `sendmsg`
+still has no `LIB=` line. **`ext/sockets` is deferred to a libap change**: no `struct cmsghdr`, no `CMSG_*`, no `msg_flags`, `sendmsg`
 a stub and **`recvmsg` declared-by-the-header-and-defined-nowhere**.
 ***THE MEASUREMENT THAT NEARLY SHIPPED WAS AN EMPTY TRANSLATION
 UNIT***: five of these wrap their whole body in `#ifdef HAVE_<X>`, so

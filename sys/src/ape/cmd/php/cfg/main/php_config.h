@@ -385,8 +385,9 @@
  * four required ones are in.  Eight of them have a library in this
  * tree already -- `lib/bz2', `lib/readline'+`lib/history',
  * `lib/libressl', `lib/curl', `lib/sqlite', `lib/zip' -- and two need
- * no library at all.  **GD is the one that is impossible**: there is
- * no libgd here, only libpng, and libpng is not a drawing library.
+ * no library at all.  GD was the ninth and needed a libgd this tree
+ * did not have at the time; **it does now** (`lib/gd', 2.3.3), and
+ * `ext/gd' is answered further down.
  *
  * ***FIVE OF THE EIGHT "COMPILED CLEAN" BEFORE A SINGLE LINE BELOW
  * EXISTED, AND THAT WAS AN EMPTY TRANSLATION UNIT EACH TIME.***  Every
@@ -533,6 +534,62 @@
 #define HAVE_PROGRESS_CALLBACK 1
 #define HAVE_CANCEL_CALLBACK 1
 #define HAVE_METHOD_SUPPORTED 1
+
+/*
+ * ---- ext/gd, against the EXTERNAL libgd (`lib/gd', 2.3.3) --------
+ *
+ * **`HAVE_GD_BUNDLED' is deliberately NOT defined.**  php ships its
+ * own copy of libgd under `ext/gd/libgd' and would build 40 objects
+ * from it; this tree has a real `libgd.a' now, so php takes the
+ * external arm and builds TWO -- `gd.c' and `gd_compat.c'.  That
+ * avoids a second, divergent libgd in the tree, and php's bundled
+ * copy is the worse one to keep: it announces `GD_VERSION_STRING
+ * "2.0.35"' while carrying AVIF, WebP, BMP and the interpolation
+ * code, none of which existed in 2.0.35.
+ *
+ * ***`HAVE_LIBGD' IS THE GATE, NOT `HAVE_GD'.***  `php_gd.h:24' is
+ * `#if defined(HAVE_LIBGD) || defined(HAVE_GD_BUNDLED)', so with
+ * neither name the file declares `phpext_gd_ptr NULL' and `gd.c'
+ * compiles to nothing -- the empty-translation-unit shape that cost
+ * a measurement on five extensions already.
+ *
+ * ***AND THE FORMAT ANSWERS ARE WHERE A WORKING configure WOULD GET
+ * THIS WRONG, FOR THE FOURTH TIME.***  php probes the installed
+ * libgd by LINKING `gdImageCreateFromJpeg', `...Avif', `...Webp' and
+ * `...Xpm'.  **All four link.**  Upstream libgd compiles
+ * `gd_jpeg.c', `gd_avif.c', `gd_webp.c' and `gdxpm.c' even with no
+ * such library and gives each a stub -- `gd_jpeg.c:1209's
+ * `_noJpegError()' calls `gd_error("JPEG image support has been
+ * disabled")' and returns.  *So the probe succeeds and the
+ * capability is absent*, which is `HAVE_WORKING_MPROTECT' and
+ * `fsync' and `statvfs' in their exact shape.
+ *
+ * They are answered NO, and the difference is visible to scripts
+ * rather than academic: with them yes php registers `imagejpeg()'
+ * and sets the bit in `imagetypes()', so `function_exists()' and
+ * `imagetypes() & IMG_JPG' -- the two documented ways to ask what gd
+ * can do -- would both LIE, and the failure would arrive later as a
+ * false return from a function that should not exist.
+ *
+ * The three yes answers are link-level facts, checked with `nm' over
+ * the archive this tree builds rather than assumed:
+ * `gdImageCreateFromPng', `gdVersionString' and
+ * `gdImageGetInterpolationMethod' are all defined.
+ * **`HAVE_GD_FREETYPE' is a genuine link-level NO**: php probes
+ * `gdFontCacheShutdown', which exists only inside gdft.c's
+ * `HAVE_LIBFREETYPE' arm, so it is absent from the archive -- the
+ * one format-ish answer where the probe and the truth agree.
+ */
+#define HAVE_LIBGD 1
+#define HAVE_GD_PNG 1
+#define HAVE_GD_LIBVERSION 1
+#define HAVE_GD_GET_INTERPOLATION 1
+/* #undef HAVE_GD_BUNDLED */
+/* #undef HAVE_GD_JPG */
+/* #undef HAVE_GD_AVIF */
+/* #undef HAVE_GD_WEBP */
+/* #undef HAVE_GD_XPM */
+/* #undef HAVE_GD_FREETYPE */
 
 /*
  * ---- ext/sockets is NOT built, and the reason is in libap rather

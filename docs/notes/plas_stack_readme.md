@@ -80,7 +80,7 @@ objects into `OFILES`, the `phpext_*_ptr` into
 and a rebuild.
 
 **Not built**: PDO and `pdo_sqlite` (use the `SQLite3` class instead),
-mbstring, GD (there is no libgd in the tree), and `ext/sockets` (which
+mbstring and `ext/sockets` (which
 needs `struct cmsghdr` and a real `recvmsg` in libap).
 
 To check the build on the machine:

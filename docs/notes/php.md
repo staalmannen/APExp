@@ -1225,8 +1225,12 @@ cannot be found by reading the subject.*
 
 Phoronix's `system-info` lists nine OPTIONAL extensions once the four
 required ones are in: OpenSSL, GD, Bzip2, SQLite3, PCNTL, POSIX, CURL,
-Sockets, Readline. **Eight are built. GD is impossible and Sockets is
-deferred**, and the two reasons are different in kind.
+Sockets, Readline. **Eight were built in that round and GD followed
+once `lib/gd` existed; only Sockets is still deferred.** *This
+paragraph said "GD is impossible" and that was true only of the tree
+as it stood* -- php bundles a libgd and the dependencies were already
+here, so the sentence was about a missing vendored library rather
+than about the platform. See the ext/gd section at the end.
 
 Eight of the nine already had a library in this tree — `lib/bz2`,
 `lib/readline`+`lib/history`, `lib/libressl`, `lib/curl`, `lib/sqlite`,
@@ -1442,3 +1446,105 @@ phrase occurs nowhere under `sys/src`. It is the 9front kernel's own
 advisory as it grows a process's fd table, and it is a notice rather
 than a limit. Worth a second look only if the number keeps climbing,
 which would be a leak rather than a large working set.
+
+## ext/gd, against the external libgd — and a configure probe that lies
+
+With `lib/gd` building a real `libgd.a` (2.3.3, vendored at
+`sys/src/external/libgd`), php takes **upstream's external arm**:
+`ext/gd/gd.c` plus the `gd_compat.c` shim, **two objects instead of
+forty**. 581 translation units compile, 0 errors.
+
+**The bundled copy is the one to not keep.** php ships its own libgd
+under `ext/gd/libgd`, and building it would put a second, divergent
+copy in a tree that now has the real one — and php's is the worse of
+the two to carry: it still announces `GD_VERSION_STRING "2.0.35"`
+while carrying `gd_avif.c`, `gd_webp.c`, `gd_bmp.c` and the whole
+interpolation file, none of which existed in 2.0.35.
+
+**`HAVE_LIBGD` is the gate, not `HAVE_GD`.** `php_gd.h:24` is
+`#if defined(HAVE_LIBGD) || defined(HAVE_GD_BUNDLED)`, and with
+neither name the header defines `phpext_gd_ptr` as `NULL` and `gd.c`
+compiles to nothing. The first probe used `-DHAVE_GD=1` and got the
+empty-translation-unit result that five extensions already produced
+once — *caught by the same `<ext>_module_entry` grep*, which reports
+11 references now.
+
+### The format answers are a configure probe that would lie
+
+php's external arm asks the installed libgd what it can do by
+**linking** `gdImageCreateFromJpeg`, `...Avif`, `...Webp` and
+`...Xpm`. **All four link.** `nm` over the archive this tree builds:
+
+```
+gdImageCreateFromPng    DEFINED      gdImageCreateFromJpeg   DEFINED
+gdImageCreateFromAvif   DEFINED      gdImageCreateFromXpm    DEFINED
+gdImageCreateFromWebp   DEFINED      gdFontCacheShutdown     absent
+```
+
+Upstream libgd compiles `gd_jpeg.c`, `gd_avif.c`, `gd_webp.c` and
+`gdxpm.c` **even with no such library** and gives each a stub:
+`gd_jpeg.c:1209`'s `_noJpegError()` calls
+`gd_error("JPEG image support has been disabled")` and returns. *So
+the probe succeeds and the capability is absent* — which is
+`HAVE_WORKING_MPROTECT`, `fsync` and `statvfs` in their exact shape, a
+fourth time, and the first where the stub is **upstream's deliberate
+design** rather than a gap in this tree.
+
+They are answered **no** by hand, and the difference reaches scripts
+rather than being academic: with them yes, php registers
+`imagejpeg()` and sets the bit in `imagetypes()`, so
+`function_exists('imagejpeg')` and `imagetypes() & IMG_JPG` — the two
+documented ways to ask what gd can do — would **both lie**, and the
+failure would surface later as a false return from a function that
+should not exist.
+
+**`HAVE_GD_FREETYPE` is the one where probe and truth agree**: php
+checks `gdFontCacheShutdown`, which exists only inside `gdft.c`'s
+`HAVE_LIBFREETYPE` arm and so is genuinely absent from the archive.
+The three yes answers — `HAVE_GD_PNG`, `HAVE_GD_LIBVERSION`,
+`HAVE_GD_GET_INTERPOLATION` — are link-level facts from the same `nm`.
+
+### The link, and 110 names that look missing and are not
+
+`--undefined` reports **`defined 1121, declared-only 116, absent 45`**
+over 581 translation units. The `declared-only` figure jumped from 6
+to 116, and **all 110 new ones are `gd*`**.
+
+They are not missing. libgd writes every definition as
+
+```c
+BGD_DECLARE(gdImagePtr) gdImageCreateTrueColor (int sx, int sy)
+```
+
+so the **return type** sits inside a macro call, and a
+definition-shaped regex expecting `type name(` cannot match it. That
+is the `BZ2_*` caveat arriving from the other side: *bzip2 hides the
+NAME in a macro, libgd hides the RETURN TYPE* — two ways to blind the
+same regex, and the sweep's own header already says to read this
+column rather than gate on it.
+
+**Checked rather than assumed**: `nm -g --defined-only` over the
+host-built `libgd.a` against those 110 names gives **110 defined, 0
+missing**. The mirror prints the caveat and that number now, so the
+next reader compares instead of re-deriving.
+
+*An unrelated caution learned here*: re-running `apfunc-sweep.py` by
+hand with only the new `--root` and dropping the other nine reported
+**923** declared-only, which looks exactly like a catastrophic
+finding and is just a short command line.
+
+### What the smoke test adds
+
+`php-smoke.php` grows a gd block that is a **round trip, not a
+version string**: draw into a truecolour image, read a pixel back,
+`imagepng()` to an output buffer, check the 8-byte signature,
+`imagecreatefromstring()` it back, and compare the pixel and the
+width. That exercises `ext/gd`, `libgd.a`, `libpng.a` and `libz.a`
+together, and it is what says `lib/gd` actually linked.
+
+**The two capability assertions are Plan9-only**, by Section 7's
+rule, and *the host proved why*: a build host with a full libgd
+reports JPEG yes and failed both of them — which is the control
+working, not a bug. "JPEG is absent" is a statement about this port's
+libgd, not about php or about gd. 0 failures on host php 8.3.6, which
+happens also to ship GD 2.3.3.

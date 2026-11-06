@@ -70,6 +70,7 @@
 #include "ext/curl/php_curl.h"
 #include "ext/sqlite3/php_sqlite3.h"
 #include "ext/zip/php_zip.h"
+#include "ext/gd/php_gd.h"
 
 
 static zend_module_entry * const php_builtin_extensions[] = {
@@ -100,9 +101,9 @@ static zend_module_entry * const php_builtin_extensions[] = {
 	 * pcre)' -- and pcre is the second entry in this array, so the
 	 * order below is free and is the order the mkfile lists them in.
 	 *
-	 * GD is the ninth and is absent because there is no libgd in
-	 * this tree; ext/sockets is the tenth and is deferred to a libap
-	 * change.  Both are explained in `php_config.h'.
+	 * ext/sockets is the one still missing, deferred to a libap
+	 * change; `php_config.h' explains it.  gd is below, against the
+	 * external `lib/gd'.
 	 */
 	phpext_posix_ptr,
 	phpext_pcntl_ptr,
@@ -112,6 +113,13 @@ static zend_module_entry * const php_builtin_extensions[] = {
 	phpext_curl_ptr,
 	phpext_sqlite3_ptr,
 	phpext_zip_ptr,
+	/*
+	 * gd against the EXTERNAL libgd (`lib/gd'), not php's bundled
+	 * copy -- `php_config.h' leaves HAVE_GD_BUNDLED undefined, and
+	 * the gate for this pointer is HAVE_LIBGD.  It declares no
+	 * dependency on another extension.
+	 */
+	phpext_gd_ptr,
 
 };
 
