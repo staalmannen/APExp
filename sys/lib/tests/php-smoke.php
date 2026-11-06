@@ -288,7 +288,7 @@ echo "\nSection 8: the twelve extensions, and each one DOING something\n";
 $want = ['core', 'date', 'pcre', 'hash', 'json', 'random', 'Reflection',
 	 'SPL', 'standard', 'libxml', 'dom', 'SimpleXML', 'zlib',
 	 'posix', 'pcntl', 'bz2', 'readline', 'openssl', 'curl',
-	 'sqlite3', 'zip'];
+	 'sqlite3', 'zip', 'gd'];
 $missing = [];
 foreach ($want as $e) {
 	if (!extension_loaded($e)) $missing[] = $e;
@@ -414,6 +414,60 @@ if (extension_loaded('readline')) {
 	eq("readline_info returns an array", is_array($i), true);
 	if (is_array($i) && isset($i['library_version']))
 		echo "  INFO readline " . $i['library_version'] . "\n";
+}
+
+/* gd -- against the EXTERNAL libgd, so this also proves lib/gd links. */
+if (extension_loaded('gd')) {
+	$i = gd_info();
+	echo "  INFO GD Version: " . ($i['GD Version'] ?? '?') . "\n";
+	/*
+	 * ***THE CAPABILITY FLAGS ARE THE POINT OF THIS BLOCK, NOT THE
+	 * DRAWING.***  libgd compiles stub entry points for JPEG, WebP,
+	 * AVIF and XPM even with no such library -- they LINK and then
+	 * call `gd_error("... has been disabled")' -- so a configure
+	 * probe answers yes and `imagetypes()' would lie.  APExp answers
+	 * those `HAVE_GD_*' no by hand, and these two lines are what
+	 * says the hand answer reached PHP.
+	 */
+	eq("PNG support is reported", (bool)(imagetypes() & IMG_PNG), true);
+	/*
+	 * Asserted on Plan9 ONLY, by Section 7's rule: "JPEG is absent"
+	 * is a statement about THIS PORT's libgd, not about php or gd,
+	 * and a build host with a full libgd fails it while being
+	 * perfectly correct. It did -- which is the control working.
+	 */
+	if (PHP_OS === 'Plan9') {
+		eq("JPEG is NOT reported (libgd has only a stub)",
+		   (bool)(imagetypes() & IMG_JPG), false);
+		eq("imagejpeg() is absent rather than failing later",
+		   function_exists('imagejpeg'), false);
+	} else {
+		printf("  INFO not on Plan9; this host reports JPEG=%s\n",
+		    (imagetypes() & IMG_JPG) ? 'yes' : 'no');
+	}
+
+	/* A real round trip: draw, encode to PNG, decode, read a pixel. */
+	$im = imagecreatetruecolor(40, 30);
+	eq("imagecreatetruecolor", $im !== false, true);
+	if ($im !== false) {
+		$col = imagecolorallocate($im, 0x20, 0x90, 0xd0);
+		imagefilledrectangle($im, 0, 0, 39, 29, $col);
+		eq("pixel reads back", imagecolorat($im, 10, 10) & 0xffffff, 0x2090d0);
+		ob_start();
+		$wrote = imagepng($im);
+		$png = ob_get_clean();
+		eq("imagepng wrote something", $wrote && strlen($png) > 50, true);
+		eq("PNG signature", substr($png, 0, 8), "\x89PNG\r\n\x1a\n");
+		$im2 = imagecreatefromstring($png);
+		eq("decoded the PNG back", $im2 !== false, true);
+		if ($im2 !== false) {
+			eq("round-tripped width", imagesx($im2), 40);
+			eq("round-tripped pixel",
+			   imagecolorat($im2, 10, 10) & 0xffffff, 0x2090d0);
+			imagedestroy($im2);
+		}
+		imagedestroy($im);
+	}
 }
 
 printf("\nphp-smoke: %d failures\n", $fails);

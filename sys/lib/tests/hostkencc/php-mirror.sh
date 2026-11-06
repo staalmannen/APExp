@@ -301,7 +301,7 @@ EOF
 	n=$(wc -l < "$OUT/undefined")
 	echo "php-mirror: $n symbol(s) the link must find outside php"
 	echo "php-mirror: the list is in $OUT/undefined; asking libap --"
-	# ***NINE LIBRARIES NOW, NOT ONE.***  php pulls each of them
+	# ***TEN LIBRARIES NOW, NOT ONE.***  php pulls each of them
 	# through `#pragma lib' in its own header, so a sweep that knows
 	# only libap answers `absent' for every `xmlParseFile',
 	# `deflateInit_', `SSL_new' and `curl_easy_init' -- 241 of the
@@ -319,6 +319,7 @@ EOF
 		--root sys/src/external/libzip \
 		--root sys/src/external/readline \
 		--root sys/src/external/bzip2 \
+		--root sys/src/external/libgd \
 		--file "$OUT/undefined" |
 		grep -v '	*defined   ' || true
 	echo "php-mirror: ^ anything here is READ, not a failure -- the"
@@ -333,6 +334,13 @@ EOF
 	echo "php-mirror:   the NAME IS INSIDE A MACRO and no regex over"
 	echo "php-mirror:   definition sites can see it.  **A name here"
 	echo "php-mirror:   that is not on that list is the finding.**"
+	echo "php-mirror:   Likewise 110 'declared' gd* names: libgd"
+	echo "php-mirror:   writes every definition as"
+	echo "php-mirror:     BGD_DECLARE(gdImagePtr) gdImageCreateTrueColor(...)"
+	echo "php-mirror:   so the RETURN TYPE is inside a macro where BZ2_"
+	echo "php-mirror:   hides the NAME -- two ways to blind the same"
+	echo "php-mirror:   regex.  All 110 were checked with nm against the"
+	echo "php-mirror:   host-built libgd.a: 110 of 110 defined, 0 missing."
 	exit 0
 fi
 echo "php-mirror: compiled $ok, errors $bad, missing $missing"

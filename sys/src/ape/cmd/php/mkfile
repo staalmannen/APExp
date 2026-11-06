@@ -512,10 +512,10 @@ OFILES=\
 	ext/zlib/zlib.$O\
 	ext/zlib/zlib_fopen_wrapper.$O\
 	ext/zlib/zlib_filter.$O\
-# ***THE EIGHT OPTIONAL EXTENSIONS PHORONIX ASKS FOR.***  Nine are\
-# listed; **GD is the one left out and it is not a choice** -- there\
-# is no libgd in this tree, only libpng, and libpng is not a drawing\
-# library.  `ext/sockets' is the ninth and is deferred: it needs\
+# ***THE OPTIONAL EXTENSIONS PHORONIX ASKS FOR.***  Nine are listed\
+# and eight are here; **gd is the ninth and is further down**, built\
+# against the external `lib/gd' once that existed.  `ext/sockets' is\
+# the one still missing, and is deferred: it needs\
 # `struct cmsghdr', the `CMSG_*' macros, `msg_flags' and a real\
 # `recvmsg' in libap, which is a public-struct change.  The\
 # `php_config.h' entry has the detail.\
@@ -556,6 +556,21 @@ OFILES=\
 # ext/zip\
 	ext/zip/php_zip.$O\
 	ext/zip/zip_stream.$O\
+# ***ext/gd AGAINST THE EXTERNAL libgd, WHICH IS WHY THIS IS TWO\
+# OBJECTS AND NOT FORTY.***  php bundles its own libgd under\
+# `ext/gd/libgd' and `HAVE_GD_BUNDLED' would build all 40 of them;\
+# `lib/gd' builds a real `libgd.a' from `external/libgd' (2.3.3), so\
+# `php_config.h' leaves `HAVE_GD_BUNDLED' undefined and php takes\
+# upstream's external arm: `gd.c' plus the `gd_compat.c' shim, and\
+# nothing else.  *Keeping php's bundled copy instead would put a\
+# second, divergent libgd in the tree* -- and the worse one, since it\
+# still announces version 2.0.35.\
+#\
+# `<gd.h>' carries three `#pragma lib' lines -- libgd, libpng, libz --\
+# so this still needs no `LIB='.\
+# ext/gd\
+	ext/gd/gd.$O\
+	ext/gd/gd_compat.$O\
 # ext/opcache\
 	ext/opcache/ZendAccelerator.$O\
 	ext/opcache/shared_alloc_mmap.$O\
@@ -861,7 +876,7 @@ OBJDIRS=\
 	ext/libxml ext/dom ext/dom/parentnode\
 	ext/dom/lexbor/selectors-adapted ext/simplexml ext/zlib\
 	ext/posix ext/pcntl ext/bz2 ext/readline ext/openssl\
-	ext/curl ext/sqlite3 ext/zip\
+	ext/curl ext/sqlite3 ext/zip ext/gd\
 	ext/pcre ext/pcre/pcre2lib ext/random ext/reflection ext/spl\
 	ext/standard ext/standard/libavifinfo ext/uri\
 	ext/uri/uriparser/src main main/streams sapi/cli
