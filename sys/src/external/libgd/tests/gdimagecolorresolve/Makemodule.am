@@ -1,0 +1,5 @@
+libgd_test_programs += \
+	gdimagecolorresolve/gdimagecolorresolve
+
+EXTRA_DIST += \
+	gdimagecolorresolve/CMakeLists.txt

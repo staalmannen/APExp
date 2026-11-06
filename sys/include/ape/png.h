@@ -262,6 +262,37 @@
 #ifndef PNG_H
 #define PNG_H
 
+/*
+ * APExp: link libpng the Plan 9 way, as <zlib.h> and <libxml/*.h> do.
+ * `cc/macbody:728' reads this and records the archive in the object,
+ * so a program including <png.h> links against it without naming it
+ * in a mkfile.
+ *
+ * **THIS HEADER IS OTHERWISE BYTE-IDENTICAL TO THE VENDORED COPY** at
+ * `sys/src/external/libpng/png.h', so a re-sync silently drops these
+ * lines; re-applying them is the known cost of updating libpng.
+ *
+ * ***AND TWO MORE HEADERS MUST BE INSTALLED BESIDE THIS ONE***, which
+ * for a long time they were not: `:331' includes "pnglibconf.h" and
+ * `:336' includes "pngconf.h", both by QUOTED name, so they are
+ * looked for next to this file and nowhere else.  With either absent
+ * `#include <png.h>' is
+ *
+ *	png.h:331 Could not find include file "pnglibconf.h"
+ *
+ * for every program in the tree.  *Nothing noticed, because nothing
+ * in the tree included <png.h>* -- libpng was built and never
+ * consumed, so the gap was invisible until php's bundled libgd
+ * reached for it.
+ *
+ * Those two are copied VERBATIM from `sys/src/external/libpng' and
+ * must stay so: `lib/png/mkfile' compiles the library with
+ * `-I$PNGSOURCE', so the vendored copies are the ones libpng itself
+ * was built against, and a hand-edited copy here would be a consumer
+ * disagreeing with the library about `PNG_IMAGE_*' sizes and which
+ * features exist.  **They carry no pragma of their own on purpose** --
+ * this is the header every consumer reaches.
+ */
 #pragma lib "/$M/lib/ape/libpng.a"
 
 

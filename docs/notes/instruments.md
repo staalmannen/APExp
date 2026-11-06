@@ -1259,3 +1259,96 @@ the low byte — so section 2 uses `0x0000555500000000`, non-null and
 zero in every byte a `char`, `short` or `int` conversion would keep.
 *That is the shape of the perl `cBOOL` bug `boolnorm` was written for,
 arriving by a different route.*
+
+## `gd-test.c` and `gd-xcheck.sh` — libgd, and a cross-check with no oracle
+
+`sys/lib/tests/gd-test.c` runs on the VM under `pcc`;
+`sys/lib/tests/gd-xcheck.sh` builds the **same vendored sources** with
+gcc on the build host and runs the **same test file** against them.
+`--control` breaks the library on purpose and must fail.
+
+**What it came from**: libgd was vendored (2.3.3, at
+`sys/src/external/libgd`, built by `sys/src/ape/lib/gd`) largely as an
+exercise — 47 files of integer-heavy pixel arithmetic are good ground
+for a compiler whose `long` is 32 bits and whose `sizeof` is 32-bit,
+and gd needs no display, no X11 and no platform integration at all.
+
+***AND ALL 47 COMPILED CLEAN UNDER kencc ON THE FIRST ATTEMPT***,
+which is the whole reason the test exists. A library that builds has
+not been shown to compute, so **every bug this exercise can still find
+is a runtime bug** — and a runtime bug needs a run on each side to
+localise.
+
+### The shape: an A/B of two compilers, not a comparison with an oracle
+
+There is no reference implementation of libgd to link beside it, which
+is what every other cross-check here does. So the comparison is
+gcc-built libgd against kencc-built libgd: one test file, one
+hand-answered `config.h` shared by both sides, two compilers. **A
+failure on the VM that passes on the host is a kencc or libap bug and
+nothing else; a failure on both is the test's bug.**
+
+Its fidelity limits are the usual ones and they are what make a
+difference meaningful rather than noise: the host is LP64 where kencc
+is LLP64, which is the most likely source of a difference and is the
+finding rather than a flaw; and gcc's codegen is not kencc's, so
+**nothing here asserts an inexact value**.
+
+### Every assertion is exactly checkable without a golden image
+
+That constraint shaped the sections, because *a test that needs a
+stored reference image cannot say whether the library or the image is
+wrong*:
+
+* **rotate 90 four times is the identity**, whichever way gd turns it,
+  so the check needs no knowledge of the rotation's direction;
+* a **PNG round trip** must return the pixels it was given — which
+  exercises gd, libpng and libz together;
+* **scaling a FLAT image must leave it flat**, whatever the filter
+  does, since every input to every weighted sum is the same value;
+* crop is exact; truecolour packing is pure bit work with two cases
+  (`0x00ffffff`, `0x7f000000`) that a type one bit too narrow fails.
+
+### Both of its first two drafts were the TEST's bug, and gcc found both
+
+***(1) `gdImageRotate90` IS INTERNAL.*** It is declared in
+`gd_intern.h`, which is not installed, so the call was an implicit
+`int`, the returned `gdImagePtr` was truncated and the test
+**segfaulted on the host**. That is this tree's own
+undeclared-function invariant, met inside a test written to hunt that
+exact class of bug. The public call is `gdImageRotateInterpolated`,
+which special-cases exact multiples of 90 — and it converts a palette
+image to truecolour on the way out, so the section feeds it a
+truecolour image and compares colours rather than indices. **The
+harness now builds the test with
+`-Werror=implicit-function-declaration`**, because a warning buried in
+gcc's output is not how that should announce itself.
+
+***(2) THE PALETTE SECTION ASSERTED SOMETHING FALSE.*** It claimed an
+image using fewer distinct colours than the palette holds must survive
+conversion exactly — "the quantiser has no reason to merge anything".
+gcc reported **1024 of 1024 pixels changed while the palette held
+exactly the right 128 entries**, which is the signature of a wrong
+assertion rather than a wrong library: `gd_topal.c` builds a colour
+cube and takes each bucket's **centroid**, so every colour returns
+offset by half a bucket and `(0,0,0)` came back `(4,2,4)`. *Checking a
+new test against gcc first is what the convention is for, and here it
+caught the test twice.* What is exact, and is what the section asserts
+now, is that the mapping is a **function of colour** — two pixels that
+were the same colour must get the same palette index — with the drift
+measured, reported and bounded instead of assumed away.
+
+### The control
+
+No external oracle, so the control is a deliberate break:
+`gdImageGetPixel` off by one column, which leaves the library
+linkable and is the shape a miscompiled index would have. It fires
+with **4 failures across three sections**. The harness **gates if its
+own `sed` matches nothing**, because a control that cannot break is
+not a control — the `munmaptrim-xcheck` lesson.
+
+It also gates if `Makefile.am` stops yielding exactly 47 library
+sources, since `lib/gd/mkfile` derives its object list the same way
+and the two disagreeing means one of them is wrong. *`ls *.c` gives
+70: the other 23 are upstream's own demo programs, each with its own
+`main`.*
