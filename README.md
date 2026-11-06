@@ -27,6 +27,8 @@ Plan9 with APExp.
 **Fighting the Knights that say NIH**
 
 
+The APExp project is in many ways the spiritual successor of the old ports2plan9
+project [0], which used to live on google code until that got discontinued.
 The Not-invented-here (NIH) attitude is common in fringe hobbyist/research
 software communities. This attitude has a certain virtue to it, because it
 "forces" a development model to adapt to the unique features and advantages
@@ -105,7 +107,11 @@ Install paths have been modified so that libraries and binaries are installed in
 - libbz2 (version 1.0.8)
 - lz4 (version 1.10.0)
 - zstd (version 1.5.7)
+- libfreetype (version 2.15.0)
+- libgd (version 2.3.3)
 - libpng (version 1.6.58)
+- libjpeg (version 10)
+- libwebp (version 1.6.0)
 
 
 ***Utilities***
@@ -186,6 +192,8 @@ Yes, the default build is "bloated" because I enable everything that I believe w
 
 
 **References**
+
+[0] https://code.google.com/archive/p/ports2plan9/
 
 [1] https://9p.io/wiki/plan9/porting_alien_software_to_plan_9/index.html
 
