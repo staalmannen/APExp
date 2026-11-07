@@ -31,6 +31,7 @@
 #include "../metaprogramming/type_properties/is_nothrow_copy_constructible.h"
 #include "../metaprogramming/type_properties/is_nothrow_default_constructible.h"
 #include "../metaprogramming/type_traits/has_input_iterator_category.h"
+#include "../utility/expected/expected.h"
 #include "../utility/tuple/tuple.h"
 #include "../utility/tuple/tuple_forward_as.h"
 #include "extract_key_value_types.h"

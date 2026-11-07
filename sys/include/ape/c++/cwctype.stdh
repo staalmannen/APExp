@@ -25,4 +25,19 @@ using ::wctype;
 using ::iswctype;
 } // namespace std
 
+#undef iswalnum
+#undef iswalpha
+#undef iswblank
+#undef iswcntrl
+#undef iswdigit
+#undef iswgraph
+#undef iswlower
+#undef iswprint
+#undef iswpunct
+#undef iswspace
+#undef iswupper
+#undef iswxdigit
+#undef towlower
+#undef towupper
+
 #endif

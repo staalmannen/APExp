@@ -3,12 +3,10 @@
 
 // C declarations are provided by APExp libc.
 #include <wchar.h>
-#include <stdio.h>
-#include <stddef.h>
+#include <cstdio>
+#include <cstddef>
 
 namespace std {
-using ::FILE;
-using ::size_t;
 using ::mbstate_t;
 using ::btowc;
 using ::wctob;

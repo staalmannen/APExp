@@ -55,4 +55,7 @@ using ::vsnprintf;
 using ::vsprintf;
 } // namespace std
 
+#undef getchar
+#undef putchar
+
 #endif
