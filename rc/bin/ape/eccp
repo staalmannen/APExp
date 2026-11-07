@@ -241,8 +241,7 @@ if(! ~ $STLINCL '') \
 	sysincl = ($sysincl '--sys_include='^$STLINCL)
 
 sysincl = ($sysincl '--sys_include=/'^$objtype^'/include/ape' \
-	            '--sys_include=/sys/include/ape' '--sys_include=/sys/include/ape/c++'\
-				'--sys_include=/sys/include/ape/pstl')
+	            '--sys_include=/sys/include/ape' '--sys_include=/sys/include/ape/c++')
 
 ehopts = ()
 if(~ $ehflag '')   ehopts = ($ehopts --no_exceptions)

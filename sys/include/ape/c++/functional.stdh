@@ -1,0 +1,11 @@
+#ifndef APEXP_STD_FUNCTIONAL_STDH
+#define APEXP_STD_FUNCTIONAL_STDH
+
+#include "functional/equal_to.h"
+#include "functional/function.h"
+#include "functional/identity.h"
+#include "functional/less.h"
+#include "utility/general/functional/invoke.h"
+#include "utility/general/functional/reference_wrapper.h"
+
+#endif

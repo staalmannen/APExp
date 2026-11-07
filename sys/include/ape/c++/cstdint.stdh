@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_CSTDINT_STDH
+#define APEXP_STD_CSTDINT_STDH
+
+#include "common/cstdint.h"
+
+#endif

@@ -1,0 +1,21 @@
+#ifndef APEXP_STD_ALGORITHM_STDH
+#define APEXP_STD_ALGORITHM_STDH
+
+#include "algorithm/any_of.h"
+#include "algorithm/copy.h"
+#include "algorithm/copy_n.h"
+#include "algorithm/equal.h"
+#include "algorithm/fill_n.h"
+#include "algorithm/find.h"
+#include "algorithm/find_if.h"
+#include "algorithm/lexicographical_compare.h"
+#include "algorithm/max.h"
+#include "algorithm/min.h"
+#include "algorithm/move_backward.h"
+#include "algorithm/remove.h"
+#include "algorithm/remove_if.h"
+#include "algorithm/rotate.h"
+#include "algorithm/search.h"
+#include "algorithm/swap_ranges.h"
+
+#endif

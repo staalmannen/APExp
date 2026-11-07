@@ -1,0 +1,10 @@
+#ifndef APEXP_STD_TYPE_TRAITS_STDH
+#define APEXP_STD_TYPE_TRAITS_STDH
+
+#include "metaprogramming/type_relations/is_same.h"
+#include "metaprogramming/type_relations/is_convertible.h"
+#include "metaprogramming/type_relations/is_base_of.h"
+#include "metaprogramming/type_properties/is_const.h"
+#include "metaprogramming/type_properties/is_volatile.h"
+
+#endif

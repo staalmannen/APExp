@@ -1,0 +1,22 @@
+#ifndef APEXP_STD_CONCEPTS_STDH
+#define APEXP_STD_CONCEPTS_STDH
+
+#include "concepts/assignable_from.h"
+#include "concepts/boolean_testable.h"
+#include "concepts/common_reference_with.h"
+#include "concepts/common_with.h"
+#include "concepts/constructible_from.h"
+#include "concepts/convertible_to.h"
+#include "concepts/copy_constructible.h"
+#include "concepts/copyable.h"
+#include "concepts/default_initializable.h"
+#include "concepts/derived_from.h"
+#include "concepts/destructible.h"
+#include "concepts/equality_comparable.h"
+#include "concepts/integral.h"
+#include "concepts/movable.h"
+#include "concepts/same_as.h"
+#include "concepts/swappable.h"
+#include "concepts/totally_ordered.h"
+
+#endif

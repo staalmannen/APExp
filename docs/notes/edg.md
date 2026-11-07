@@ -1044,18 +1044,12 @@ this is the whole record, including the wrong turns.*
     better of the two**, since it is guarded `#ifndef __cplusplus`
     where EDG's defines the eleven macros unconditionally. Correct in
     both languages from one file.
-  - **THE STL STAYS WHERE IT IS, and the reason is an API rather than a
-    namespace.** `paragon_portable_stl` is 720 headers with zero system
-    includes, which makes it the best C++ corpus this tree has -- and
-    `vector::push_back` returns
-    `expected<void, portable_stl_error>` where C++ says `void`, so no
-    aliasing or rename recovers it. Installing it as if it were the
-    standard library would put something called one where
-    `#include <vector>` does not find one: *the
-    capability-present-and-not-declared bug with the sign reversed.*
-    `eccp`'s `$STLINCL` reaches it, and if it is ever installed it
-    wants `sys/include/ape/c++/portable_stl/`, which the one
-    `--sys_include` already covers.
+  - **PSTL IS NOW THE STARTING C++ LIBRARY.** Paragon Portable STL was
+    merged into `sys/include/ape/c++`, with its implementation namespace
+    changed to `std` and `.stdh` public entrypoints for common headers.
+    Its exception-free `expected` return conventions do not match every
+    standard API; see `docs/notes/cxx-library.md` for limitations and
+    the conformance roadmap.
   - **AND `include_c99` WAS A ONE-HEADER GAP THAT WAS REAL:
     `iso646.h` DID NOT EXIST IN APExp AT ALL.** That directory holds
     exactly one file, so "what does it have that our headers do not"
@@ -1105,68 +1099,10 @@ this is the whole record, including the wrong turns.*
     grep says so. The type-trait builtins a modern STL needs ARE in
     cpfe's table, checked (`__is_trivially_copyable`,
     `__is_constructible`, `__is_base_of`, `__underlying_type`, ...).
-    **AND THE AXIS THAT DECIDES A CANDIDATE IS THE NAMESPACE, NOT
-    MAINTENANCE**: APExp exists to build existing software with
-    minimal modification, and code written against `std::vector` does
-    not compile against `etl::` or `eastl::` however good they are.
-    *A renamed STL serves NEW code; only a `std::` one serves a PORT.*
-    STLport fits this compiler best and died in 2008; ETL is
-    maintained but embedded and fixed-capacity; EASTL is more
-    complete; **uClibc++ is the one reported to be `std::` with
-    iostreams**, and is inactive at 0.2.5. Ordering, candidates and
-    **a provenance paragraph saying which lines are measured and
-    which are only recalled or searched** are in the NOTE. *Nothing
-    started; none of it blocks anything already working.*
-    **AND A FIFTH CANDIDATE WAS MEASURED RATHER THAN RECALLED --
-    Paragon's `paragon_portable_stl`, MIT, header-only.** It is the
-    first one whose properties were read out of the source instead of
-    from memory, and on the technical axes it is better than anything
-    on the list above:
-    - **ZERO `#include <...>` in all 720 headers.** No host C++
-      standard library, no C library headers -- the property that
-      disqualifies libc++ and uClibc++ here, satisfied by
-      construction rather than by porting.
-    - **C++14** (`CMakeLists.txt`'s `CXX_STANDARD 14`), well inside
-      what EDG's own self-translation already exercises.
-    - **Exception-free is a real mode, not a flag that stops
-      throwing**: parallel `exception/` and `noexception/` trees and
-      an `expected<T, portable_stl_error>` error channel. *That
-      matters more here than anywhere else*, since EDG's EH is
-      setjmp-based with its own regions and `lib_src`'s EH has never
-      been exercised.
-    - **Every `__builtin_*` sits behind `__has_builtin` with a pure
-      C++ `generic/` fallback** -- 19 builtins, every one guarded --
-      so a compiler with none of them still compiles.
-    - The type-trait intrinsics it uses unguarded
-      (`__is_trivially_copyable`, `__is_constructible`,
-      `__underlying_type`, `__is_class`, `__is_polymorphic`,
-      `__is_aggregate`, ...) are **the ones already checked present
-      in cpfe's table** in the paragraph above. *Two directions, one
-      answer.*
-    **AND IT IS STILL DISQUALIFIED FOR THE JOB, ON THE AXIS THIS
-    FILE ALREADY NAMES, TWICE OVER.** `namespace portable_stl`, 1283
-    occurrences, not `std` -- *a renamed STL serves NEW code; only a
-    `std::` one serves a PORT.* **And a rename would not even be
-    enough**, which is the stronger half and is the measurement
-    rather than the rule: `vector::push_back` returns
-    `::portable_stl::expected<void, ::portable_stl::portable_stl_error>`
-    where C++ says `void`, so the API differs from the standard's and
-    no aliasing recovers it. Coverage is partial too -- string,
-    string_view, vector, list, forward_list, map, set, array,
-    variant, tuple, function, memory, ranges, algorithm, and **no
-    iostreams, locale, regex, threads, deque or unordered
-    containers**.
-    **SO IT IS THE WRONG ANSWER TO THAT QUESTION AND A GOOD ANSWER TO
-    A DIFFERENT ONE: a CONFORMANCE CORPUS for cpfe.** 720 headers of
-    heavy template metaprogramming that need no C++ library, no
-    exceptions and no runtime support, translated by cpfe and
-    compiled by pcc, is a far better measurement of "does this port
-    work on real C++" than the toy the NOTE prescribes -- and it
-    costs a translation run rather than a port. **And the corpus has
-    NO libap SURFACE AT ALL** -- zero system includes -- so a failure
-    is cpfe's or kencc's and cannot be libap's. *That partition is
-    worth as much as the coverage*: every earlier C++ question here
-    has had both halves live at once.
+    PSTL is now integrated as APExp's initial C++ library. Its header-only
+    design and compiler-supported type-trait intrinsics make it a useful
+    foundation; expected-based APIs and incomplete coverage define the
+    follow-up work in `docs/notes/cxx-library.md`.
     **THE SUITE IS BIGGER THAN "a number of tests", AND ITS SHAPE IS
     MEASURED**: 110 `.cpp`, **1253 `TEST(`** plus 16 `TEST_F`, and
     **15,897 assertions** -- almost entirely `ASSERT_EQ/TRUE/FALSE`
@@ -1178,8 +1114,8 @@ this is the whole record, including the wrong turns.*
     be left out. So a gtest SHIM of about ten macros reaches ~92% of
     it -- a behavioural C++ suite this target has never had. *As
     shipped it is not free*: 131 files include `<gtest/gtest.h>`, and
-    gtest itself wants a real `std::`, which is the thing that does
-    not exist here.
+    gtest needs standard-library facilities beyond the current APExp
+    coverage; the C++ library roadmap tracks that work.
     **AND THE 22 THROW ASSERTIONS ARE THE VALUABLE TAIL RATHER THAN
     THE AWKWARD ONE**: `ASSERT_THROW`/`ASSERT_NO_THROW`/
     `ASSERT_ANY_THROW` are the only exercise of EDG's setjmp-based EH

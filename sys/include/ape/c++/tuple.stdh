@@ -1,0 +1,12 @@
+#ifndef APEXP_STD_TUPLE_STDH
+#define APEXP_STD_TUPLE_STDH
+
+#include "utility/tuple/tuple.h"
+#include "utility/tuple/tuple_get.h"
+#include "utility/tuple/tuple_size.h"
+#include "utility/tuple/tuple_element.h"
+#include "utility/tuple/tuple_cat.h"
+#include "utility/tuple/tuple_make.h"
+#include "utility/tuple/tuple_tie.h"
+
+#endif

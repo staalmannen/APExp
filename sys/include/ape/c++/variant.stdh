@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_VARIANT_STDH
+#define APEXP_STD_VARIANT_STDH
+
+#include "variant/variant.h"
+
+#endif

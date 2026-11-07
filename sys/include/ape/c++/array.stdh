@@ -1,0 +1,7 @@
+#ifndef APEXP_STD_ARRAY_STDH
+#define APEXP_STD_ARRAY_STDH
+
+#include "array/array.h"
+#include "array/array_get.h"
+
+#endif

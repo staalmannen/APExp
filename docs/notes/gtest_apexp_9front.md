@@ -1,6 +1,6 @@
 # GTest Integration Strategy for APExp on 9front
 
-Here is the structured strategy for compiling **GoogleTest (gtest)** and **Paragon Portable STL (PSTL)** within the **APExp** environment on **9front**, utilizing the **EDG (Edison Design Group)** C++ frontend port.
+Here is the structured strategy for compiling **GoogleTest (gtest)** and **Paragon Portable STL (PSTL)** within the **APExp** environment on **9front**, utilizing the **EDG (Edison Design Group)** C++ frontend port and the initial PSTL-based library in `sys/include/ape/c++`.
 
 ---
 
@@ -26,10 +26,13 @@ You must pass explicit compiler configuration macros down to your preprocessor t
 
 ## 3. Adapting Paragon Portable STL (PSTL)
 
-Because your target lacks default standard C++ library systems (`libstdc++` or `libc++`), Paragon PSTL serves as the required foundation layer. 
+APExp uses Paragon PSTL as the starting implementation for its C++ library. Common standard header names are exposed through EDC `.stdh` entrypoints under `sys/include/ape/c++`.
 
-1.  **Configure Exception-Free Mode:** Verify that Paragon PSTL is configured to catch container out-of-bounds or allocation failures with standard `abort()` errors or structural print macros rather than throwing `std::out_of_range`.
-2.  **Expose Mapping Layers:** As long as PSTL accurately implements the `std::vector`, `std::string`, and basic container APIs within the `std::` namespace, `gtest` will discover them cleanly.
+The library is an initial integration, not a complete standard-library
+implementation. Its expected-based container APIs differ from standard
+signatures, and broader coverage remains planned. Use the EDC public header
+entrypoints from `sys/include/ape/c++`; see `docs/notes/cxx-library.md` for
+supported headers and follow-up work.
 
 ---
 
@@ -38,7 +41,7 @@ Because your target lacks default standard C++ library systems (`libstdc++` or `
 Since your EDG frontend port acts as a transpiler (lowering C++ source code down into ISO standard C files), the execution chain moves through the following stages:
 
 ```
- [ C++ Source Files ] (Your tests + GTest + PSTL)
+ [ C++ Source Files ] (tests + GTest + APExp C++ headers)
          │
          ▼
  ┌───────────────┐
@@ -75,7 +78,7 @@ To avoid complex CMake toolchains, merge the GoogleTest components together into
 TARG=gtest_apex_run
 OFILES=    gtest-all.o    my_edg_tests.o
 # Core compilation overrides passed to your EDG frontend layer
-CFLAGS=-DGTEST_HAS_RTTI=0 -DGTEST_HAS_EXCEPTIONS=0 -DGTEST_HAS_PTHREAD=0 -I/sys/include/pstl -I./googletest/include -I./googletest
+CFLAGS=-DGTEST_HAS_RTTI=0 -DGTEST_HAS_EXCEPTIONS=0 -DGTEST_HAS_PTHREAD=0 -I/sys/include/ape/c++ -I./googletest/include -I./googletest
 
 include /sys/src/cmd/mkone
 ```

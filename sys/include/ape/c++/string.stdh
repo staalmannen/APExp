@@ -1,0 +1,9 @@
+#ifndef APEXP_STD_STRING_STDH
+#define APEXP_STD_STRING_STDH
+
+#include "string/string.h"
+#include "string/basic_string.h"
+#include "string/char_traits.h"
+#include "string/to_string.h"
+
+#endif

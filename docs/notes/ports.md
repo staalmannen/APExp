@@ -2832,13 +2832,10 @@ templates, virtual dispatch, RAII, `new`/`delete`, plus
 - Later versions reach for `std::vector` and friends in places.
 
 **So the check is one grep on a candidate tarball, not an attempt**:
-count `std::` and `#include <` of the standard C++ headers. A version
-that uses none is a port; a version that uses `std::vector` needs a
-`std::` implementation this tree has decided twice it has not got --
-`paragon_portable_stl` is the best corpus available and is disqualified
-as a LIBRARY, because its namespace is `portable_stl` and
-`vector::push_back` returns `expected<...>`, so no aliasing recovers the
-API.
+count `std::` and `#include <` of the standard C++ headers. A version that uses none is a port; a version that uses `std::vector`
+can now use the initial PSTL-based APExp C++ library. Its expected-based
+container API is not fully standard-conforming yet; see
+`docs/notes/cxx-library.md` for limitations and planned work.
 
 **And the static-constructor gap applies**: nothing calls EDG's
 `__call_ctors`, so a translated program's file-scope constructors do not
