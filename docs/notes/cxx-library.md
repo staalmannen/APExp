@@ -20,6 +20,10 @@ PSTL internal support headers now include EDG's `<exception>`, `<new>`,
 `<initializer_list>`, and `<typeinfo>` declarations; PSTL-only helper
 exceptions remain implementation details.
 
+For the current feature inventory, libc++ versus generated-code assessment,
+and `libap` dependency review, see
+[`docs/notes/cxx-library-strategy.md`](cxx-library-strategy.md).
+
 ## Follow-up roadmap
 
 1. **Make the initial headers build with EDC.** Compile minimal translation
