@@ -1,4 +1,4 @@
-# The PLAS stack: Plan 9, Listener, SQLite, PHP
+# The 9LSP stack: Plan 9, Listener, SQLite, PHP
 
 A web stack on 9front with no dynamic linker, no package manager and no
 database server: PHP 8.5 and SQLite 3.53 as static binaries, served
@@ -243,7 +243,7 @@ on Plan 9 the kernel, the network stack and every process are files.
 
 ```php
 <?php
-$out = ['stack' => 'PLAS', 'metrics' => []];
+$out = ['stack' => '9LSP', 'metrics' => []];
 
 if (is_readable('/dev/sysstat')) {
     $out['metrics']['sysstat'] =
