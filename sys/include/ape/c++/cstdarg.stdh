@@ -1,0 +1,11 @@
+#ifndef APEXP_STD_CSTDARG_STDH
+#define APEXP_STD_CSTDARG_STDH
+
+// C declarations are provided by APExp libc.
+#include <stdarg.h>
+
+namespace std {
+using ::va_list;
+} // namespace std
+
+#endif

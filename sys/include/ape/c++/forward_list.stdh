@@ -1,0 +1,7 @@
+#ifndef APEXP_STD_FORWARD_LIST_STDH
+#define APEXP_STD_FORWARD_LIST_STDH
+
+// Paragon Portable STL implementation.
+#include "forward_list/forward_list.h"
+
+#endif

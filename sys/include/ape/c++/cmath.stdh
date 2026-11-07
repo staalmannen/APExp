@@ -1,0 +1,37 @@
+#ifndef APEXP_STD_CMATH_STDH
+#define APEXP_STD_CMATH_STDH
+
+// APExp currently declares the C double-precision math interface.
+#include <math.h>
+
+namespace std {
+using ::acos;
+using ::asin;
+using ::atan;
+using ::atan2;
+using ::cos;
+using ::cosh;
+using ::exp;
+using ::fabs;
+using ::floor;
+using ::fmod;
+using ::frexp;
+using ::ldexp;
+using ::log;
+using ::log10;
+using ::log2;
+using ::modf;
+using ::pow;
+using ::sin;
+using ::sinh;
+using ::sqrt;
+using ::tan;
+using ::tanh;
+using ::ceil;
+using ::hypot;
+using ::erf;
+using ::erfc;
+using ::fmin;
+} // namespace std
+
+#endif

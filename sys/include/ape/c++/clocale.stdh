@@ -1,0 +1,13 @@
+#ifndef APEXP_STD_CLOCALE_STDH
+#define APEXP_STD_CLOCALE_STDH
+
+// C declarations are provided by APExp libc.
+#include <locale.h>
+
+namespace std {
+using ::lconv;
+using ::setlocale;
+using ::localeconv;
+} // namespace std
+
+#endif

@@ -34,18 +34,22 @@ and [libc++ platform support](https://libcxx.llvm.org/).
 The top-level EDC entrypoints currently cover algorithms, array, compare,
 concepts, size/integer types, functional, iterator, limits, memory, ranges,
 set, strings/string_view, tuple, type traits, utility, variant, and vector,
-alongside EDG language support. The subdirectories also contain
-implementation headers for `list`, `forward_list`, and `map`, but there
-are no corresponding `list.stdh`, `forward_list.stdh`, or `map.stdh`
-entrypoints. PSTL has an `expected` implementation under
-`utility/expected`, but no public `expected.stdh`.
+alongside EDG language support. Public entrypoints for `list`,
+`forward_list`, `map`, and `expected` now expose existing PSTL code. C++
+wrappers for APExp C headers are also present for common facilities such
+as `<cstdio>`, `<cstdlib>`, `<cstring>`, `<ctime>`, `<cctype>`, `<cmath>`,
+`<cwchar>`, `<cwctype>`, and locale/signal/fenv/integer support. These
+wrappers re-export the declarations APExp provides; they do not fill gaps
+in those underlying interfaces. These entrypoints expose existing
+implementation code, but still need EDC compile/use coverage and API
+conformance review.
 
 The major absent components include:
 
 | Priority | Standard facilities missing or incomplete | Notes |
 | --- | --- | --- |
-| P0: expose and stabilize | `<list>`, `<forward_list>`, `<map>`, `<expected>`; public exception types; standard signatures for current containers | Some implementation code already exists. `expected` is currently also used internally as PSTL's error channel. The public exception headers remain EDG language-support stubs or PSTL-specific templated types. |
-| P1: common application code | `<optional>`, `<deque>`, `<queue>`, `<stack>`, `<unordered_map>`, `<unordered_set>`, `<numeric>`, `<bit>`, `<bitset>`, `<charconv>`, `<span>`, `<chrono>`, `<random>`, and the `<c...>` wrappers for APExp C headers | `std::chrono` can build on the existing time API. Several utilities are largely header-only. C++ wrappers such as `<cstdio>` and `<cstdlib>` are absent even where `<stdio.h>` and `<stdlib.h>` exist. |
+| P0: stabilize | Public entrypoints now expose `<list>`, `<forward_list>`, `<map>`, and `<expected>`; remaining work is compile/use coverage, standard signatures for current containers, and public exception types | Entry points are integration only. `expected` is also PSTL's internal error channel. Public exception headers remain EDG language-support stubs or PSTL-specific templated types. |
+| P1: common application code | `<optional>`, `<deque>`, `<queue>`, `<stack>`, `<unordered_map>`, `<unordered_set>`, `<numeric>`, `<bit>`, `<bitset>`, `<charconv>`, `<span>`, `<chrono>`, `<random>` | `std::chrono` can build on the existing time API. Several utilities are largely header-only. Common `<c...>` wrappers now re-export existing APExp C declarations. They remain partial where APExp lacks standard overloads or functions. |
 | P2: hosted facilities | `<iostream>` and stream headers, `<filesystem>`, `<locale>`, `<regex>`, `<format>`/`<print>`, `<valarray>`, and broader wide-character support | These need a clear contract for Plan 9 paths, locale behavior, file errors, formatting, and character encodings. |
 | P3: concurrency and newer standards | `<atomic>`, `<thread>`, `<mutex>`, `<condition_variable>`, `<future>`, `<barrier>`, `<latch>`, `<stop_token>`, `<execution>`, and newer C++23/26 headers | This depends on which C++ language modes and compiler operations EDC can reliably lower, plus the precise guarantees of APE's thread and atomic layers. |
 
@@ -62,9 +66,8 @@ requirements](https://eel.is/c++draft/tab:headers.cpp.fs).
 
 ### 1. Close the cheap surface gaps first
 
-Before importing another large codebase, add public entrypoints for
-already-present `list`, `forward_list`, and `map` code, and inspect the
-`expected` implementation for its public standard header. Treat each
+Before importing another large codebase, validate the new public
+entrypoints for `list`, `forward_list`, `map`, and `expected`. Treat each
 entrypoint as a claim that the header is usable: compile a minimal
 translation unit and a small behavior case under EDC before marking it
 supported. The existing PSTL `vector`, `string`, and associative
@@ -72,11 +75,11 @@ container interfaces need a conformance pass, particularly where
 fallible operations return `expected` instead of following standard
 signatures.
 
-Then add inexpensive, high-demand facilities in dependency order:
-`optional`, `span`, `bit`, `numeric`, `charconv`, and the C++ wrappers
-around existing C headers. Pure templates and constexpr utilities should
-not require new `libap` functions unless a concrete dependency shows
-otherwise.
+The simple facade and C-wrapper layer has been added. Next add
+inexpensive, high-demand implementations in dependency order: `optional`,
+`span`, `bit`, `numeric`, and `charconv`. Pure templates and constexpr
+utilities should not require new `libap` functions unless a concrete
+dependency shows otherwise.
 
 ### 2. Import components, not entire libraries
 
@@ -178,8 +181,8 @@ than adding missing header components.
 1. Establish EDC compile/use fixtures and a per-header support table.
 2. Expose and validate already-present containers and `expected`; fix
    standard-signature deviations in the common containers.
-3. Add `optional`, `span`, `bit`, `numeric`, `charconv`, and C++ C-header
-   wrappers from small audited components.
+3. Add `optional`, `span`, `bit`, `numeric`, and `charconv` from small
+   audited components.
 4. Resolve static initialization and verify exception, RTTI, `new`/`delete`,
    and finalization behavior in the EDC runtime.
 5. Add chrono and stream facilities using existing `libap` time/stdio,

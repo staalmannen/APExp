@@ -1,0 +1,13 @@
+#ifndef APEXP_STD_CSIGNAL_STDH
+#define APEXP_STD_CSIGNAL_STDH
+
+// C declarations are provided by APExp libc.
+#include <signal.h>
+
+namespace std {
+using ::sig_atomic_t;
+using ::signal;
+using ::raise;
+} // namespace std
+
+#endif

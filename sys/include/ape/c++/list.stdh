@@ -1,0 +1,7 @@
+#ifndef APEXP_STD_LIST_STDH
+#define APEXP_STD_LIST_STDH
+
+// Paragon Portable STL implementation.
+#include "list/list.h"
+
+#endif

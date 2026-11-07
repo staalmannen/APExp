@@ -1,0 +1,8 @@
+#ifndef APEXP_STD_MAP_STDH
+#define APEXP_STD_MAP_STDH
+
+// Paragon Portable STL implementation.
+#include "map/map.h"
+#include "map/multimap.h"
+
+#endif

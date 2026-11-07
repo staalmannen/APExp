@@ -1,0 +1,28 @@
+#ifndef APEXP_STD_CWCTYPE_STDH
+#define APEXP_STD_CWCTYPE_STDH
+
+// C declarations are provided by APExp libc.
+#include <wctype.h>
+
+namespace std {
+using ::iswalnum;
+using ::iswalpha;
+using ::iswblank;
+using ::iswcntrl;
+using ::iswdigit;
+using ::iswgraph;
+using ::iswlower;
+using ::iswprint;
+using ::iswpunct;
+using ::iswspace;
+using ::iswupper;
+using ::iswxdigit;
+using ::towlower;
+using ::towupper;
+using ::towctrans;
+using ::wctrans;
+using ::wctype;
+using ::iswctype;
+} // namespace std
+
+#endif

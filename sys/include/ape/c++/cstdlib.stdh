@@ -1,0 +1,50 @@
+#ifndef APEXP_STD_CSTDLIB_STDH
+#define APEXP_STD_CSTDLIB_STDH
+
+// C declarations are provided by APExp libc.
+#include <stdlib.h>
+
+namespace std {
+using ::div_t;
+using ::ldiv_t;
+using ::lldiv_t;
+using ::atof;
+using ::atoi;
+using ::atol;
+using ::atoll;
+using ::strtod;
+using ::strtof;
+using ::strtold;
+using ::strtol;
+using ::strtoll;
+using ::strtoul;
+using ::strtoull;
+using ::rand;
+using ::srand;
+using ::calloc;
+using ::free;
+using ::malloc;
+using ::realloc;
+using ::abort;
+using ::atexit;
+using ::at_quick_exit;
+using ::quick_exit;
+using ::exit;
+using ::getenv;
+using ::system;
+using ::bsearch;
+using ::qsort;
+using ::abs;
+using ::div;
+using ::labs;
+using ::ldiv;
+using ::llabs;
+using ::lldiv;
+using ::mblen;
+using ::mbtowc;
+using ::wctomb;
+using ::mbstowcs;
+using ::wcstombs;
+} // namespace std
+
+#endif

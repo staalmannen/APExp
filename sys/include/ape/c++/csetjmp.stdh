@@ -1,0 +1,13 @@
+#ifndef APEXP_STD_CSETJMP_STDH
+#define APEXP_STD_CSETJMP_STDH
+
+// C declarations are provided by APExp libc.
+#include <setjmp.h>
+
+namespace std {
+using ::jmp_buf;
+using ::setjmp;
+using ::longjmp;
+} // namespace std
+
+#endif

@@ -26,9 +26,9 @@ and `libap` dependency review, see
 
 ## Follow-up roadmap
 
-1. **Make the initial headers build with EDC.** Compile minimal translation
+1. **Validate the public headers with EDC.** Compile minimal translation
    units for every public `.stdh` entrypoint, record unsupported EDG
-   language features, and resolve conflicts with the existing `.stdh`
+   language features, and catch conflicts with the existing `.stdh`
    language-support headers. Add small APExp-specific compile fixtures.
 2. **Integrate allocation and runtime behavior.** Connect allocation,
    deallocation, exceptions or the chosen error model, atomics, threading,
@@ -55,6 +55,8 @@ and `libap` dependency review, see
 The current public entrypoints include algorithms, array, compare,
 concepts, fixed-width and size types, functional, iterator, limits, memory,
 ranges, set, strings/string_view, tuple, type traits, utility, variant,
-and vector. Entry points are a practical starting subset; the imported
+vector, and recently exposed list, forward_list, map, expected, and C++ C
+header wrappers. Entry points are a practical starting subset; the imported
 implementation's header inventory is not evidence that every facility
-builds or conforms under EDC.
+builds or conforms under EDC. The current gap inventory and strategy are
+in [`cxx-library-strategy.md`](cxx-library-strategy.md).

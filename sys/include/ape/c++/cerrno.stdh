@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_CERRNO_STDH
+#define APEXP_STD_CERRNO_STDH
+
+#include <errno.h>
+
+#endif

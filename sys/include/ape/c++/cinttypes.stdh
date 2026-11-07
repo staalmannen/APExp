@@ -1,0 +1,17 @@
+#ifndef APEXP_STD_CINTTYPES_STDH
+#define APEXP_STD_CINTTYPES_STDH
+
+// C declarations are provided by APExp libc.
+#include <inttypes.h>
+
+namespace std {
+using ::imaxdiv_t;
+using ::intmax_t;
+using ::uintmax_t;
+using ::strtoimax;
+using ::strtoumax;
+using ::imaxabs;
+using ::imaxdiv;
+} // namespace std
+
+#endif

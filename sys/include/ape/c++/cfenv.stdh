@@ -1,0 +1,23 @@
+#ifndef APEXP_STD_CFENV_STDH
+#define APEXP_STD_CFENV_STDH
+
+// C declarations are provided by APExp libc.
+#include <fenv.h>
+
+namespace std {
+using ::fenv_t;
+using ::fexcept_t;
+using ::feclearexcept;
+using ::fegetexceptflag;
+using ::feraiseexcept;
+using ::fesetexceptflag;
+using ::fetestexcept;
+using ::fegetround;
+using ::fesetround;
+using ::fegetenv;
+using ::feholdexcept;
+using ::fesetenv;
+using ::feupdateenv;
+} // namespace std
+
+#endif

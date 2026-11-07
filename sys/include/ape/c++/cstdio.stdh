@@ -1,0 +1,58 @@
+#ifndef APEXP_STD_CSTDIO_STDH
+#define APEXP_STD_CSTDIO_STDH
+
+// C declarations are provided by APExp libc.
+#include <stdio.h>
+
+namespace std {
+using ::FILE;
+using ::fpos_t;
+using ::stdin;
+using ::stdout;
+using ::stderr;
+using ::clearerr;
+using ::fclose;
+using ::feof;
+using ::ferror;
+using ::fflush;
+using ::fgetc;
+using ::fgets;
+using ::fopen;
+using ::fprintf;
+using ::fputc;
+using ::fputs;
+using ::fread;
+using ::freopen;
+using ::fscanf;
+using ::fseek;
+using ::fgetpos;
+using ::fsetpos;
+using ::ftell;
+using ::fwrite;
+using ::getc;
+using ::getchar;
+using ::perror;
+using ::printf;
+using ::putc;
+using ::putchar;
+using ::puts;
+using ::remove;
+using ::rename;
+using ::rewind;
+using ::scanf;
+using ::setbuf;
+using ::setvbuf;
+using ::snprintf;
+using ::sprintf;
+using ::sscanf;
+using ::tmpfile;
+using ::tmpnam;
+using ::ungetc;
+using ::vfprintf;
+using ::vfscanf;
+using ::vprintf;
+using ::vsnprintf;
+using ::vsprintf;
+} // namespace std
+
+#endif

@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_CLIMITS_STDH
+#define APEXP_STD_CLIMITS_STDH
+
+#include <limits.h>
+
+#endif

@@ -1,8 +1,11 @@
 #ifndef APEXP_STD_CSTDDEF_STDH
 #define APEXP_STD_CSTDDEF_STDH
 
+#include <stddef.h>
+
 #include "common/max_align_t.h"
 #include "common/nullptr_t.h"
+#include "common/byte.h"
 #include "common/ptrdiff_t.h"
 #include "common/size_t.h"
 

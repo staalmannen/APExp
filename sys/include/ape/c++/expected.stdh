@@ -1,0 +1,7 @@
+#ifndef APEXP_STD_EXPECTED_STDH
+#define APEXP_STD_EXPECTED_STDH
+
+// Paragon Portable STL implementation.
+#include "utility/expected/expected.h"
+
+#endif

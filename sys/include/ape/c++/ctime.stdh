@@ -1,0 +1,22 @@
+#ifndef APEXP_STD_CTIME_STDH
+#define APEXP_STD_CTIME_STDH
+
+// C declarations are provided by APExp libc.
+#include <time.h>
+
+namespace std {
+using ::tm;
+using ::clock_t;
+using ::time_t;
+using ::clock;
+using ::difftime;
+using ::mktime;
+using ::time;
+using ::asctime;
+using ::ctime;
+using ::gmtime;
+using ::localtime;
+using ::strftime;
+} // namespace std
+
+#endif

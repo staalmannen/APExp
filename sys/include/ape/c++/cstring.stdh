@@ -1,0 +1,37 @@
+#ifndef APEXP_STD_CSTRING_STDH
+#define APEXP_STD_CSTRING_STDH
+
+// C declarations are provided by APExp libc.
+#include <string.h>
+
+namespace std {
+using ::memcpy;
+using ::memccpy;
+using ::memmove;
+using ::strcpy;
+using ::strncpy;
+using ::strcat;
+using ::strncat;
+using ::memcmp;
+using ::strcmp;
+using ::strcoll;
+using ::strncmp;
+using ::strdup;
+using ::strndup;
+using ::strxfrm;
+using ::memchr;
+using ::strchr;
+using ::strcspn;
+using ::strpbrk;
+using ::strrchr;
+using ::strspn;
+using ::strstr;
+using ::strtok;
+using ::memset;
+using ::strerror;
+using ::strlen;
+using ::strnlen;
+using ::strtok_r;
+} // namespace std
+
+#endif
