@@ -4,7 +4,8 @@ DIRS=\
 	vts\
 	vts-attach\
 	vtwin\
-	npe
+	npe\
+	fontsrv
 
 none:V:
 	echo mk all, install, installall, clean, or nuke

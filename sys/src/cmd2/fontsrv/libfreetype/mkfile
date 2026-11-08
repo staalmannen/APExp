@@ -1,0 +1,77 @@
+# mkfile for Plan 9 from Bell Labs
+#
+# See builds/plan9/README for usage.
+#
+# Copyright (C) 2026 by Yaroslav Kolomiiets.
+#
+# This file is part of the FreeType project, and may only be used,
+# modified, and distributed under the terms of the FreeType project
+# license, LICENSE.TXT.  By continuing to use, modify, or distribute
+# this file you indicate that you have read the license and understand
+# and accept it fully.
+#
+</$objtype/mkfile
+APEXPROOT=../../../../..
+FTSRC=$APEXPROOT/sys/src/external/libfreetype
+
+LIB=libfreetype.a$O
+
+OFILES=\
+	ftbase.$O \
+	ftsystem.$O \
+	ftinit.$O \
+	ftdebug.$O \
+	ftbitmap.$O \
+	ftglyph.$O \
+	ftmm.$O \
+	autofit.$O \
+	bdf.$O \
+	ftcache.$O \
+	cff.$O \
+	type1cid.$O \
+	ftgzip.$O \
+	hvf.$O \
+	ftlzw.$O \
+	pcf.$O \
+	pfr.$O \
+	psaux.$O \
+	pshinter.$O \
+	psnames.$O \
+	raster.$O \
+	sdf.$O \
+	sfnt.$O \
+	smooth.$O \
+	svg.$O \
+	truetype.$O \
+	type1.$O \
+	type42.$O \
+	winfnt.$O \
+
+HFILES=\
+	$FTSRC/builds/plan9/p9ftopt.h \
+	$FTSRC/builds/plan9/p9lib.h \
+
+CFLAGS=-p -I$FTSRC/builds/plan9 -I$FTSRC/include \
+	-D'FT_CONFIG_OPTIONS_H=<p9ftopt.h>' \
+	-D'FT_CONFIG_STANDARD_LIBRARY_H=<p9lib.h>' \
+	-DFT2_BUILD_LIBRARY \
+
+</sys/src/cmd/mklib
+
+%.$O: $FTSRC/%.c
+	$CC $CFLAGS -o $stem.$O $stem.c
+%.$O:	$FTSRC/src/*/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+
+$FTSRC/plan9/p9ftopt.h:D: $FTSRC/freetype/config/ftoption.h
+	sed '
+		/#define FT_CONFIG_OPTION_USE_LZW/ s!^!// !
+		/#define FT_CONFIG_OPTION_USE_ZLIB/ s!^!// !
+	' $prereq > $target
+
+clean:V:
+	rm -f *.[$OS] $CLEANFILES
+
+nuke:V:
+	rm -f *.[$OS] $CLEANFILES
+	rm -f libfreetype.a[$OS] builds/plan9/p9ftopt.h
