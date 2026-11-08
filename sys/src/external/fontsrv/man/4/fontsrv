@@ -1,0 +1,89 @@
+.TH FONTSRV 4
+.SH NAME
+fontsrv \- file system access to scalable fonts
+.SH SYNOPSIS
+.B fontsrv
+[
+.B -m
+.I mtpt
+]
+[
+.B -s
+.I srvname
+]
+.SH DESCRIPTION
+.I Fontsrv
+presents scalable fonts
+in the standard Plan 9 format
+(see
+.IR font (7)).
+It serves a virtual directory tree mounted at
+.I mtpt
+(default
+.IR /mnt/font )
+and posted at
+.I srvname
+(default
+.IR font ).
+.PP
+The fonts are arranged in a two-level tree.
+The root contains directories named for each system font.
+Each font directory contains subdirectories named for
+a point size and whether the subfonts are anti-aliased:
+.B 10
+(bitmap)
+.BR 10a
+(anti-aliased greyscale)
+.BR 12 ,
+.BR 12a ,
+and so on.
+The font directory will synthesize additional sizes on
+demand: looking up
+.B 19a
+will synthesize the 19-point anti-aliased size
+if possible.
+Each size directory contains a
+.B font
+file and subfont files
+named
+.BR x000000.bit ,
+.BR x000100.bit ,
+and so on
+representing 256-character Unicode ranges.
+.SH EXAMPLES
+List the fonts on the system:
+.IP
+.EX
+% fontsrv
+% ls /mnt/font/
+.EE
+.LP
+Run 
+.IR acme (1)
+using Monaco as the fixed-width font:
+.IP
+.EX
+% acme -F /mnt/font/Monaco/13a/font
+.EE
+.LP
+Run
+.IR sam (1)
+using the same font:
+.IP
+.EX
+% font=/mnt/font/Monaco/13a/font sam
+.EE
+.SH FILES
+.TP
+.B /sys/lib/fontsrv.map
+Font definitions.
+.SH SOURCE
+.B https://github.com/yrk-lab/fontsrv
+.SH SEE ALSO
+.IR font (6)
+.SH BUGS
+.PP
+Sometimes the hinting technique results in better appearance, sometimes in worse;
+the heuristics whether to enable hinting is not perfect.
+.PP
+Subpixel rendering is not available.

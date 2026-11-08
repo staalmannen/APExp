@@ -1,0 +1,16 @@
+README for the builds/plan9 subdirectory.
+
+Copyright (C) 2026 by Yaroslav Kolomiiets.
+
+This file is part of the FreeType project, and may only be used,
+modified, and distributed under the terms of the FreeType project
+license, LICENSE.TXT.  By continuing to use, modify, or distribute
+this file you indicate that you have read the license and understand
+and accept it fully.
+
+
+The mkfile is for the Plan 9 from Bell Labs. To build, run:
+
+	cd ../.. && mk -f builds/plan9/mkfile
+
+It produces a library to link against as ../../libfreetype.a𝑂 archive.

@@ -1,0 +1,50 @@
+mk 'LIBDIR=/usr/glenda/src/freetype'
+mk install
+mk clean
+mk nuke
+mk release
+
+git/diff
+git/fs; git/walk -f M
+git/fs; git/walk -f RMAU
+echo git/add `{rfork n; git/fs; git/walk -c -f U}
+git/fs; echo git/commit -m '''some message'''  `{git/walk -c -f RMA}
+
+git/branch front
+git/commit -m 'libfreetype: upgrade FreeType to 2.15.0' ...
+git/push
+git/push -u github
+9fs sources; 9fs -m sources; cd /n/sources/contrib/yk/fontsrv && git/pull
+git/log -sn10
+window -m
+
+rfork n; rm /srv/font; 6.out; window -m page /mnt/font/URWBookmanL-LighItal/20a/x000060.bit
+rm /srv/font; 6.out
+
+# full freetype checkout - useful for bisecting:
+#
+{
+	v=VER-2-13-3
+	mk freetype-$v
+	bind -c freetype-$v freetype-$v
+	bind -a port freetype-$v
+	bind -a port/builds freetype-$v/builds
+	mk 'LIBDIR=freetype-'$v nuke
+	mk 'LIBDIR=freetype-'$v
+}
+
+git/clone https://github.com/freetype/freetype.git freetype-git
+mk 'LIBDIR=freetype-git'
+ 
+# re-vendor
+#
+mk vendor
+mk vendor 'FT=VER-2-15-0'
+
+# some tests
+rm -f /srv/font; 6.out; file /mnt/font/URWBookmanL-LighItal/18a/x000040.bit
+# expect:
+# /mnt/font/URWBookmanL-LighItal/18a/x000040.bit: plan 9 image, depth 8, size 548x30
+
+9fs sources; git/pull -u contrib
+window -m

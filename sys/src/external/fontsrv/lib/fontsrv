@@ -1,0 +1,223 @@
+# /sys/lib/postscript/font/fontmap
+
+LucidaSans-Demi /sys/lib/postscript/font/LucidaSans-Demi
+LucidaSans-Italic /sys/lib/postscript/font/LucidaSans-Italic
+LucidaSans-Typewriter83 /sys/lib/postscript/font/LucidaSans-Typewriter83
+LucidaTypewriter /sys/lib/postscript/font/LucidaTypewriter
+
+LucidaSansUnicode00		/sys/lib/postscript/font/lsunr00.pfa
+LucidaSansUnicode01		/sys/lib/postscript/font/lsunr01.pfa
+LucidaSansUnicode02		/sys/lib/postscript/font/lsunr02.pfa
+LucidaSansUnicode03		/sys/lib/postscript/font/lsunr03.pfa
+LucidaSansUnicode04		/sys/lib/postscript/font/lsunr04.pfa
+LucidaSansUnicode05		/sys/lib/postscript/font/lsunr05.pfa
+LucidaSansUnicode20		/sys/lib/postscript/font/lsunr20.pfa
+LucidaSansUnicode21		/sys/lib/postscript/font/lsunr21.pfa
+LucidaSansUnicode22		/sys/lib/postscript/font/lsunr22.pfa
+LucidaSansUnicode24		/sys/lib/postscript/font/lsunr24.pfa
+LucidaSansUnicode25		/sys/lib/postscript/font/lsunr25.pfa
+
+# Postscript versions of TeX fonts
+CMB10		/sys/lib/postscript/font/cm/cmb10.pfa
+CMBSY10		/sys/lib/postscript/font/cm/cmbsy10.pfa
+CMBX10		/sys/lib/postscript/font/cm/cmbx10.pfa
+CMBX12		/sys/lib/postscript/font/cm/cmbx12.pfa
+CMBX5		/sys/lib/postscript/font/cm/cmbx5.pfa
+CMBX6		/sys/lib/postscript/font/cm/cmbx6.pfa
+CMBX7		/sys/lib/postscript/font/cm/cmbx7.pfa
+CMBX8		/sys/lib/postscript/font/cm/cmbx8.pfa
+CMBX9		/sys/lib/postscript/font/cm/cmbx9.pfa
+CMBXSL10		/sys/lib/postscript/font/cm/cmbxsl10.pfa
+CMBXTI10		/sys/lib/postscript/font/cm/cmbxti10.pfa
+CMCSC10		/sys/lib/postscript/font/cm/cmcsc10.pfa
+CMDUNH10		/sys/lib/postscript/font/cm/cmdunh10.pfa
+CMEX10		/sys/lib/postscript/font/cm/cmex10.pfa
+CMFF10		/sys/lib/postscript/font/cm/cmff10.pfa
+CMFI10		/sys/lib/postscript/font/cm/cmfi10.pfa
+CMFIB8		/sys/lib/postscript/font/cm/cmfib8.pfa
+CMINCH		/sys/lib/postscript/font/cm/cminch.pfa
+CMITT10		/sys/lib/postscript/font/cm/cmitt10.pfa
+CMMI10		/sys/lib/postscript/font/cm/cmmi10.pfa
+CMMI12		/sys/lib/postscript/font/cm/cmmi12.pfa
+CMMI5		/sys/lib/postscript/font/cm/cmmi5.pfa
+CMMI6		/sys/lib/postscript/font/cm/cmmi6.pfa
+CMMI7		/sys/lib/postscript/font/cm/cmmi7.pfa
+CMMI8		/sys/lib/postscript/font/cm/cmmi8.pfa
+CMMI9		/sys/lib/postscript/font/cm/cmmi9.pfa
+CMMIB10		/sys/lib/postscript/font/cm/cmmib10.pfa
+CMR10		/sys/lib/postscript/font/cm/cmr10.pfa
+CMR12		/sys/lib/postscript/font/cm/cmr12.pfa
+CMR17		/sys/lib/postscript/font/cm/cmr17.pfa
+CMR5		/sys/lib/postscript/font/cm/cmr5.pfa
+CMR6		/sys/lib/postscript/font/cm/cmr6.pfa
+CMR7		/sys/lib/postscript/font/cm/cmr7.pfa
+CMR8		/sys/lib/postscript/font/cm/cmr8.pfa
+CMR9		/sys/lib/postscript/font/cm/cmr9.pfa
+CMSL10		/sys/lib/postscript/font/cm/cmsl10.pfa
+CMSL12		/sys/lib/postscript/font/cm/cmsl12.pfa
+CMSL8		/sys/lib/postscript/font/cm/cmsl8.pfa
+CMSL9		/sys/lib/postscript/font/cm/cmsl9.pfa
+CMSLTT10		/sys/lib/postscript/font/cm/cmsltt10.pfa
+CMSS10		/sys/lib/postscript/font/cm/cmss10.pfa
+CMSS12		/sys/lib/postscript/font/cm/cmss12.pfa
+CMSS17		/sys/lib/postscript/font/cm/cmss17.pfa
+CMSS8		/sys/lib/postscript/font/cm/cmss8.pfa
+CMSS9		/sys/lib/postscript/font/cm/cmss9.pfa
+CMSSBX10		/sys/lib/postscript/font/cm/cmssbx10.pfa
+CMSSDC10		/sys/lib/postscript/font/cm/cmssdc10.pfa
+CMSSI10		/sys/lib/postscript/font/cm/cmssi10.pfa
+CMSSI12		/sys/lib/postscript/font/cm/cmssi12.pfa
+CMSSI17		/sys/lib/postscript/font/cm/cmssi17.pfa
+CMSSI8		/sys/lib/postscript/font/cm/cmssi8.pfa
+CMSSI9		/sys/lib/postscript/font/cm/cmssi9.pfa
+CMSSQ8		/sys/lib/postscript/font/cm/cmssq8.pfa
+CMSSQI8		/sys/lib/postscript/font/cm/cmssqi8.pfa
+CMSY10		/sys/lib/postscript/font/cm/cmsy10.pfa
+CMSY5		/sys/lib/postscript/font/cm/cmsy5.pfa
+CMSY6		/sys/lib/postscript/font/cm/cmsy6.pfa
+CMSY7		/sys/lib/postscript/font/cm/cmsy7.pfa
+CMSY8		/sys/lib/postscript/font/cm/cmsy8.pfa
+CMSY9		/sys/lib/postscript/font/cm/cmsy9.pfa
+CMTCSC10		/sys/lib/postscript/font/cm/cmtcsc10.pfa
+CMTEX10		/sys/lib/postscript/font/cm/cmtex10.pfa
+CMTEX8		/sys/lib/postscript/font/cm/cmtex8.pfa
+CMTEX9		/sys/lib/postscript/font/cm/cmtex9.pfa
+CMTI10		/sys/lib/postscript/font/cm/cmti10.pfa
+CMTI12		/sys/lib/postscript/font/cm/cmti12.pfa
+CMTI7		/sys/lib/postscript/font/cm/cmti7.pfa
+CMTI8		/sys/lib/postscript/font/cm/cmti8.pfa
+CMTI9		/sys/lib/postscript/font/cm/cmti9.pfa
+CMTT10		/sys/lib/postscript/font/cm/cmtt10.pfa
+CMTT12		/sys/lib/postscript/font/cm/cmtt12.pfa
+CMTT8		/sys/lib/postscript/font/cm/cmtt8.pfa
+CMTT9		/sys/lib/postscript/font/cm/cmtt9.pfa
+CMU10		/sys/lib/postscript/font/cm/cmu10.pfa
+CMVTT10		/sys/lib/postscript/font/cm/cmvtt10.pfa
+LASY10		/sys/lib/postscript/font/cm/lasy10.pfa
+LASY5		/sys/lib/postscript/font/cm/lasy5.pfa
+LASY6		/sys/lib/postscript/font/cm/lasy6.pfa
+LASY7		/sys/lib/postscript/font/cm/lasy7.pfa
+LASY8		/sys/lib/postscript/font/cm/lasy8.pfa
+LASY9		/sys/lib/postscript/font/cm/lasy9.pfa
+LASYB10		/sys/lib/postscript/font/cm/lasyb10.pfa
+LCIRCLE1		/sys/lib/postscript/font/cm/lcircle1.pfa
+LCIRCLEW		/sys/lib/postscript/font/cm/lcirclew.pfa
+LCMSS8		/sys/lib/postscript/font/cm/lcmss8.pfa
+LCMSSB8		/sys/lib/postscript/font/cm/lcmssb8.pfa
+LCMSSI8		/sys/lib/postscript/font/cm/lcmssi8.pfa
+LINE10		/sys/lib/postscript/font/cm/line10.pfa
+LINEW10		/sys/lib/postscript/font/cm/linew10.pfa
+LOGO10		/sys/lib/postscript/font/cm/logo10.pfa
+LOGO8		/sys/lib/postscript/font/cm/logo8.pfa
+LOGO9		/sys/lib/postscript/font/cm/logo9.pfa
+LOGOBF10		/sys/lib/postscript/font/cm/logobf10.pfa
+LOGOSL10		/sys/lib/postscript/font/cm/logosl10.pfa
+
+# AMS fonts for TeX
+CMBSY5		/sys/lib/postscript/font/ams/cmbsy5.pfa
+CMBSY7		/sys/lib/postscript/font/ams/cmbsy7.pfa
+CMMIB5		/sys/lib/postscript/font/ams/cmmib5.pfa
+CMMIB7		/sys/lib/postscript/font/ams/cmmib7.pfa
+EUEX10		/sys/lib/postscript/font/ams/euex10.pfa
+EUFB10		/sys/lib/postscript/font/ams/eufb10.pfa
+EUFB5		/sys/lib/postscript/font/ams/eufb5.pfa
+EUFB7		/sys/lib/postscript/font/ams/eufb7.pfa
+EUFM10		/sys/lib/postscript/font/ams/eufm10.pfa
+EUFM5		/sys/lib/postscript/font/ams/eufm5.pfa
+EUFM7		/sys/lib/postscript/font/ams/eufm7.pfa
+EURB10		/sys/lib/postscript/font/ams/eurb10.pfa
+EURB5		/sys/lib/postscript/font/ams/eurb5.pfa
+EURB7		/sys/lib/postscript/font/ams/eurb7.pfa
+EURM10		/sys/lib/postscript/font/ams/eurm10.pfa
+EURM5		/sys/lib/postscript/font/ams/eurm5.pfa
+EURM7		/sys/lib/postscript/font/ams/eurm7.pfa
+EUSB10		/sys/lib/postscript/font/ams/eusb10.pfa
+EUSB5		/sys/lib/postscript/font/ams/eusb5.pfa
+EUSB7		/sys/lib/postscript/font/ams/eusb7.pfa
+EUSM10		/sys/lib/postscript/font/ams/eusm10.pfa
+EUSM5		/sys/lib/postscript/font/ams/eusm5.pfa
+EUSM7		/sys/lib/postscript/font/ams/eusm7.pfa
+MSAM10		/sys/lib/postscript/font/ams/msam10.pfa
+MSAM5		/sys/lib/postscript/font/ams/msam5.pfa
+MSAM7		/sys/lib/postscript/font/ams/msam7.pfa
+MSBM10		/sys/lib/postscript/font/ams/msbm10.pfa
+MSBM5		/sys/lib/postscript/font/ams/msbm5.pfa
+MSBM7		/sys/lib/postscript/font/ams/msbm7.pfa
+WNCYB10		/sys/lib/postscript/font/ams/wncyb10.pfa
+WNCYI10		/sys/lib/postscript/font/ams/wncyi10.pfa
+WNCYR10		/sys/lib/postscript/font/ams/wncyr10.pfa
+WNCYSC10		/sys/lib/postscript/font/ams/wncysc10.pfa
+WNCYSS10		/sys/lib/postscript/font/ams/wncyss10.pfa
+
+# "fonts added by user"
+GaramondNo8-Reg	/sys/lib/postscript/font/useradded/ugmr8a.pfb
+GaramondNo8-RegItal /sys/lib/postscript/font/useradded/ugmri8a.pfb
+GaramondNo8-Med /sys/lib/postscript/font/useradded/ugmm8a.pfb
+GaramondNo8-MedItal /sys/lib/postscript/font/useradded/ugmmi8a.pfb
+
+
+# /sys/lib/ghostscript/font/Fontmap
+# /sys/lib/ghostscript/font/Fontmap.GS
+URWBookmanL-DemiBold	/sys/lib/ghostscript/font/b018015l.pfb
+URWBookmanL-DemiBoldItal	/sys/lib/ghostscript/font/b018035l.pfb
+URWBookmanL-Ligh	/sys/lib/ghostscript/font/b018012l.pfb
+URWBookmanL-LighItal	/sys/lib/ghostscript/font/b018032l.pfb
+
+NimbusMonL-Regu	/sys/lib/ghostscript/font/n022003l.pfb
+NimbusMonL-ReguObli	/sys/lib/ghostscript/font/n022023l.pfb
+NimbusMonL-Bold	/sys/lib/ghostscript/font/n022004l.pfb
+NimbusMonL-BoldObli	/sys/lib/ghostscript/font/n022024l.pfb
+
+URWGothicL-Book /sys/lib/ghostscript/font/a010013l.pfb
+URWGothicL-BookObli	/sys/lib/ghostscript/font/a010033l.pfb
+URWGothicL-Demi	/sys/lib/ghostscript/font/a010015l.pfb
+URWGothicL-DemiObli	/sys/lib/ghostscript/font/a010035l.pfb
+
+NimbusSanL-Regu	/sys/lib/ghostscript/font/n019003l.pfb
+NimbusSanL-ReguItal	/sys/lib/ghostscript/font/n019023l.pfb
+NimbusSanL-Bold	/sys/lib/ghostscript/font/n019004l.pfb
+NimbusSanL-BoldItal	/sys/lib/ghostscript/font/n019024l.pfb
+NimbusSanL-ReguCond	/sys/lib/ghostscript/font/n019043l.pfb
+NimbusSanL-ReguCondItal	/sys/lib/ghostscript/font/n019063l.pfb
+NimbusSanL-BoldCond	/sys/lib/ghostscript/font/n019044l.pfb
+NimbusSanL-BoldCondItal	/sys/lib/ghostscript/font/n019064l.pfb
+
+URWPalladioL-Roma	/sys/lib/ghostscript/font/p052003l.pfb
+URWPalladioL-Ital	/sys/lib/ghostscript/font/p052023l.pfb
+URWPalladioL-Bold	/sys/lib/ghostscript/font/p052004l.pfb
+URWPalladioL-BoldItal	/sys/lib/ghostscript/font/p052024l.pfb
+
+CenturySchL-Roma	/sys/lib/ghostscript/font/c059013l.pfb
+CenturySchL-Ital	/sys/lib/ghostscript/font/c059033l.pfb
+CenturySchL-Bold	/sys/lib/ghostscript/font/c059016l.pfb
+CenturySchL-BoldItal	/sys/lib/ghostscript/font/c059036l.pfb
+
+NimbusRomNo9L-Regu	/sys/lib/ghostscript/font/n021003l.pfb
+NimbusRomNo9L-ReguItal	/sys/lib/ghostscript/font/n021023l.pfb
+NimbusRomNo9L-Medi	/sys/lib/ghostscript/font/n021004l.pfb
+NimbusRomNo9L-MediItal	/sys/lib/ghostscript/font/n021024l.pfb
+
+StandardSymL	/sys/lib/ghostscript/font/s050000l.pfb
+URWChanceryL-MediItal	/sys/lib/ghostscript/font/z003034l.pfb
+Dingbats	/sys/lib/ghostscript/font/d050000l.pfb
+
+
+# see also: /sys/man/fonts /lib/font/bit/MAP
+
+# Go fonts
+#Go-Bold /lib/font/ttf/Go-Bold.ttf
+#Go-Italic /lib/font/ttf/Go-Italic.ttf
+#Go-BoldItalic /lib/font/ttf/Go-Bold-Italic.ttf
+#GoMedium /lib/font/ttf/Go-Medium.ttf
+#GoMedium-Italic /lib/font/ttf/Go-Medium-Italic.ttf
+#GoMono /lib/font/ttf/Go-Mono.ttf
+#GoMono-Bold /lib/font/ttf/Go-Mono-Bold.ttf
+#GoMono-BoldItalic /lib/font/ttf/Go-Mono-Bold-Italic.ttf
+#GoMono-Italic /lib/font/ttf/Go-Mono-Italic.ttf
+#GoRegular /lib/font/ttf/Go-Regular.ttf
+#GoSmallcaps /lib/font/ttf/Go-Smallcaps.ttf
+#GoSmallcaps-Italic /lib/font/ttf/Go-Smallcaps-Italic.ttf
+
+# other
+#Symbola /lib/font/ttf/Symbola.ttf
+#UnifontMedium /lib/font/tt/unifont-13.0.03.ttf

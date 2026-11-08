@@ -1,0 +1,14 @@
+README
+LICENSE.TXT
+mkfile
+docs
+	FTL.TXT
+	GPLv2.TXT
+	CHANGES
+builds
+	plan9
+		+
+include
+	+
+src
+	+
