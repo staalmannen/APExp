@@ -1,0 +1,26 @@
+</$objtype/mkfile
+APEXPROOT=../../../..
+
+LIBS=\
+	libnpe\
+	libnpe_portmidi\
+	libnpe_pthread\
+	libnpe_sdl2\
+
+default:VQ:
+	mk all
+
+%:VQ:
+	for (i in $LIBS) @{
+		cd $i && mk $target
+	}
+
+nuke:VQ: nukeheaders
+
+install:VQ: installheaders
+
+nukeheaders:VQ:
+	rm -rf $APEXPROOT/sys/include/npe
+
+installheaders:VQ:
+	mkdir -p $APEXPROOT/sys/include/npe && dircp include/npe $APEXPROOT/sys/include/npe

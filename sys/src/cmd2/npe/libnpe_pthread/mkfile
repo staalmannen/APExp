@@ -1,0 +1,33 @@
+</$objtype/mkfile
+APEXPROOT=../../../..
+
+LIB=$APEXPROOT/$objtype/lib/libnpe_pthread.a
+CFLAGS=$CFLAGS -p -I../include/npe -D__plan9__ -D__${objtype}__
+
+HFILES=\
+	_pthread.h\
+
+OFILES=\
+	pthread_attr_destroy.$O\
+	pthread_attr_init.$O\
+	pthread_attr_setstacksize.$O\
+	pthread_cond_broadcast.$O\
+	pthread_cond_destroy.$O\
+	pthread_cond_init.$O\
+	pthread_cond_signal.$O\
+	pthread_cond_wait.$O\
+	pthread_create.$O\
+	pthread_join.$O\
+	pthread_mutex_destroy.$O\
+	pthread_mutex_init.$O\
+	pthread_mutex_lock.$O\
+	pthread_mutex_unlock.$O\
+	pthread_once.$O\
+
+UPDATE=\
+	mkfile\
+	$HFILES\
+	${OFILES:%.$O=%.c}\
+	${LIB:/$objtype/%=/386/%}\
+
+<$APEXPROOT/sys/src/cmd/mksyslib

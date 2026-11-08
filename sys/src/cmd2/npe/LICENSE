@@ -1,0 +1,3 @@
+Public domain.
+
+Code in round.c and trunc.c was taken from musl, which is BSD-licensed.

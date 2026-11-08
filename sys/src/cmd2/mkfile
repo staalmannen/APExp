@@ -3,7 +3,8 @@
 DIRS=\
 	vts\
 	vts-attach\
-	vtwin
+	vtwin\
+	npe
 
 none:V:
 	echo mk all, install, installall, clean, or nuke

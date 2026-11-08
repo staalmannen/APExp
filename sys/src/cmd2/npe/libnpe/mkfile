@@ -1,0 +1,81 @@
+</$objtype/mkfile
+APEXPROOT=../../../..
+
+LIB=$APEXPROOT/$objtype/lib/libnpe.a
+CFLAGS=$CFLAGS -p -I../include/npe -D__plan9__ -D__${objtype}__
+
+HFILES=\
+	_iconv.h\
+	_dirent.h\
+	_npe.h\
+	_parg.h\
+
+OFILES=\
+	_main.$O\
+	_npe.$O\
+	_parg.$O\
+	acosh.$O\
+	basename.$O\
+	cbrtf.$O\
+	clock_gettime.$O\
+	closedir.$O\
+	dirfd.$O\
+	dirname.$O\
+	div.$O\
+	fstat.$O\
+	getopt.$O\
+	getopt_long.$O\
+	exp2.$O\
+	fmax.$O\
+	fstatat.$O\
+	fts_children.$O\
+	fts_close.$O\
+	fts_open.$O\
+	fts_read.$O\
+	fts_set.$O\
+	getenv.$O\
+	gettimeofday.$O\
+	gmtime.$O\
+	hypotf.$O\
+	iconv.$O\
+	iconv_close.$O\
+	iconv_open.$O\
+	isatty.$O\
+	isinf.$O\
+	isnormal.$O\
+	ldexpf.$O\
+	log1p.$O\
+	localtime.$O\
+	log2.$O\
+	lrint.$O\
+	lrintf.$O\
+	mkdir.$O\
+	mkstemp.$O\
+	mktime.$O\
+	opendir.$O\
+	pclose.$O\
+	popen.$O\
+	readdir.$O\
+	realpath.$O\
+	rename.$O\
+	round.$O\
+	setenv.$O\
+	sigaction.$O\
+	sigemptyset.$O\
+	stat.$O\
+	strerror.$O\
+	strerror_r.$O\
+	strftime.$O\
+	strlcpy.$O\
+	trunc.$O\
+	unlink.$O\
+	usleep.$O\
+	utime.$O\
+
+UPDATE=\
+	mkfile\
+	$HFILES\
+	${OFILES:%.$O=%.c}\
+	${LIB:/$objtype/%=/386/%}\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
