@@ -3326,6 +3326,83 @@ spelling**, 15 of them php's and the rest spread over pcre2, m4,
 libpng, perl, libressl, gnulib, diffutils, coreutils, zlib and zstd,
 so this was not a php question.
 
+### And swallowing an `__asm__` WITH AN OUTPUT OPERAND returned garbage
+
+The two fixes above made `__asm__` invisible *correctly*. **What
+nothing had asked is what "invisible" costs when the asm WRITES a C
+object**, and the answer is a wrong value with no error.
+`libwebp/src/utils/endian_inl_utils.h:65`:
+
+```c
+#elif defined(__i386__) || defined(__x86_64__)
+  uint32_t swapped_bytes;
+  __asm__ volatile("bswap %0" : "=r"(swapped_bytes) : "0"(x));
+  return swapped_bytes;
+```
+
+Host `6c -S` on exactly that, before the fix:
+
+```
+	TEXT	bswap+0(SB),0,$16
+	MOVL	swapped_bytes+-4(SP),AX
+	RET	,
+```
+
+***A READ OF AN UNINITIALISED STACK SLOT, RETURNED AS THE ANSWER.***
+The only sign was `used and not set: swapped_bytes` beside
+`set and not used: x` — two lines that read like ordinary dead-code
+noise in a build log, and *the second one actively misleads*, since
+"the input is unused" is what you would expect to see if the asm had
+been compiled and the variable consumed.
+
+**It is reachable because APExp defines `__x86_64__` itself**
+(`amd64/include/ape/_apetypes.h:59`). That is right for every
+architecture question — pointer width, endianness, which SIMD exists —
+and it is *also* how a vendored package picks its x86 inline asm, so
+one define serves two purposes and only one of them is true here.
+`__GNUC__` is defined by neither kencc nor APE, which is why packages
+that guard asm on the COMPILER rather than the ARCHITECTURE were never
+affected; php's 50 `__asm__` files are all in that group, measured.
+
+**The fix is to be loud, and narrowly.** `cc/lex.c`'s skipping loop
+now tracks, at depth 1, whether a constraint string beginning `=` or
+`+` appears after the FIRST `:` — the output section — and `yyerror`s
+if one does. *An asm with no outputs loses a FENCE, which is a missed
+guarantee and is recorded rather than fixed; an asm with an output
+loses the VALUE, which is a wrong answer.* So `__asm__
+__volatile__("")`, `int f(void) __asm__("_f");`, `:: "r"(x)` and
+`::: "memory"` are all untouched — none has a constraint in the output
+section.
+
+**The blast radius was measured before the change shipped, with
+`hostkencc`**: php **581 TUs, 0 errors** — it takes no reachable
+output-asm arm at all — and libwebp **7 of 125 files**, from four
+sites (`BSwap32`, `BSwap64`, `GetCPUInfo`, `xgetbv`), 14 occurrences.
+*Every one of the seven was a silent miscompile before.* `cpu.c`'s is
+the worse pair: `GetCPUInfo` fills `cpu_info[4]` from CPUID, so
+libwebp's runtime feature detection was reading uninitialised stack
+and deciding from it.
+
+`sys/lib/tests/asmout-probe.c` must FAIL to compile and
+`asmok-probe.c` must compile; **neither is readable alone**, because a
+compiler that refused every `__asm__` would pass the first and break
+php. They are two files for the `cppelif`/`cppskip` reason — the first
+is required to fail, so anything after the error in the same file
+would be unreported rather than cleared.
+
+***AND THE LIBWEBP FIX EXPOSED ITS OWN SECOND HALF, WHICH THE
+COMPILER DID NOT CATCH.*** Guarding the two `GetCPUInfo` definitions
+on `__GNUC__` left `cpu.c:97`'s `#if defined(__i386__) ||
+defined(__x86_64__) || defined(WEBP_HAVE_MSC_CPUID)` — the caller's
+guard — still true, so `x86CPUInfo` called a function that no longer
+existed. kencc reports that as **`function not declared`, a WARNING**,
+so all 125 files still "compiled" and only a grep for non-warning
+lines found it. *Removing a definition is not removing its callers*,
+and the undeclared-function invariant is the thing that would have
+turned it into an implicit-`int` call at the link. Patched to match;
+the chain then falls to upstream's own `VP8GetCPUInfo = NULL`, which
+is the right answer for a target with no SIMD compiled in.
+
 ### And `__extension__` had been eating the next character
 
 The `__asm__` fix needed a one-line test, and the test next to it did

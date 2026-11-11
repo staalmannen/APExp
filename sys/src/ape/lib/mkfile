@@ -55,7 +55,20 @@ _OPTIONAL_LIBS=\
 # and without libjpeg/webp/avif/tiff/xpm those formats are absent;
 # PNG, GIF, BMP, WBMP, XBM, TGA and gd/gd2 all work. See
 # `external/libgd/config.h' for every answer and why.
+# libwebp 1.6.0, and it comes BEFORE gd for the same sequential-loop
+# reason: gd can be pointed at it later (`HAVE_LIBWEBP' in
+# `external/libgd/config.h'), and a library has to exist before the
+# package that answers yes to it is compiled. **Nothing uses it yet**
+# -- gd's answer is still no and php's gd takes gd's word for it -- so
+# this round builds and installs the library and stops there, which is
+# one change to attribute rather than two.
+#
+# It is the same kind of exercise as gd: 125 files of integer-heavy
+# codec arithmetic under a 32-bit `long'. *It has already paid*, in
+# the compiler rather than in itself -- see `docs/notes/kencc.md' on
+# the GNU extended `__asm__' that was being skipped silently.
 _IMAGE_LIBS=\
+	webp\
 	gd\
 
 # TLS, and the one client that uses it. The loop below is sequential, so

@@ -31,7 +31,8 @@
 //
 
 // apple/darwin gcc-4.0.1 defines __PIC__, but not __pic__ with -fPIC.
-#if (defined(__pic__) || defined(__PIC__)) && defined(__i386__)
+#if (defined(__pic__) || defined(__PIC__)) && defined(__i386__) && \
+    defined(__GNUC__)
 static WEBP_INLINE void GetCPUInfo(int cpu_info[4], int info_type) {
   __asm__ volatile (
     "mov %%ebx, %%edi\n"
@@ -40,7 +41,7 @@ static WEBP_INLINE void GetCPUInfo(int cpu_info[4], int info_type) {
     : "=a"(cpu_info[0]), "=D"(cpu_info[1]), "=c"(cpu_info[2]), "=d"(cpu_info[3])
     : "a"(info_type), "c"(0));
 }
-#elif defined(__i386__) || defined(__x86_64__)
+#elif (defined(__i386__) || defined(__x86_64__)) && defined(__GNUC__)
 static WEBP_INLINE void GetCPUInfo(int cpu_info[4], int info_type) {
   __asm__ volatile (
     "cpuid\n"
@@ -62,7 +63,8 @@ static WEBP_INLINE void GetCPUInfo(int cpu_info[4], int info_type) {
 #endif
 
 // NaCl has no support for xgetbv or the raw opcode.
-#if !defined(__native_client__) && (defined(__i386__) || defined(__x86_64__))
+#if !defined(__native_client__) && \
+    (defined(__i386__) || defined(__x86_64__)) && defined(__GNUC__)
 static WEBP_INLINE uint64_t xgetbv(void) {
   const uint32_t ecx = 0;
   uint32_t eax, edx;
@@ -92,7 +94,8 @@ static WEBP_INLINE uint64_t xgetbv(void) {
 #define xgetbv() 0U  // no AVX for older x64 or unrecognized toolchains.
 #endif
 
-#if defined(__i386__) || defined(__x86_64__) || defined(WEBP_HAVE_MSC_CPUID)
+#if ((defined(__i386__) || defined(__x86_64__)) && defined(__GNUC__)) || \
+    defined(WEBP_HAVE_MSC_CPUID)
 
 // helper function for run-time detection of slow SSSE3 platforms
 static int CheckSlowModel(int info) {

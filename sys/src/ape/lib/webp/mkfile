@@ -1,0 +1,219 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libwebp.a
+
+# libwebp 1.6.0, vendored at sys/src/external/libwebp.
+#
+# ONE ARCHIVE, where upstream builds five (libwebp, libwebpdecoder,
+# libwebpdemux, libwebpmux, libsharpyuv).  Plan 9 has no shared
+# libraries, an unused archive member is never linked in, and a single
+# `#pragma lib' in `<webp/types.h>' -- which every public header
+# includes -- then serves every consumer with no `LIB=' line anywhere.
+# *Splitting them would buy nothing and cost four more pragmas to keep
+# in step.*
+#
+# **THE FILE LIST IS UPSTREAM'S, CHECKED RATHER THAN ASSUMED.**  Every
+# `.c' on disk in these seven directories appears in that directory's
+# own `Makefile.am', and no `Makefile.am' names a `.c' that is not on
+# disk -- so "all of them" and "upstream's list" are the same 125 files
+# here.  The command is
+#
+#	comm -23 <(ls $d/*.c | xargs -n1 basename | sort -u) \
+#	         <(grep -ohE '[a-z0-9_]+\.c' $d/Makefile.am | sort -u)
+#
+# and it is empty for all seven.  *Re-run it after an import*: a new
+# upstream file that nobody adds here compiles for no one and the link
+# fails far away.
+#
+# **The 55 SIMD files (53 in `dsp/', 2 in `sharpyuv/') are in the list
+# ON PURPOSE and compile to nothing.**  Each is wrapped in `#if
+# defined(WEBP_USE_SSE2)' (or SSE41, AVX2, NEON, MSA, MIPS32,
+# MIPS_DSP_R2), and kencc defines none of those, so the object is
+# empty -- which is upstream's own arrangement for a target with no
+# SIMD, not a failure.  `VP8GetCPUInfo' is NULL to match; see
+# `dsp/cpu.c' and the note in docs/notes/ports.md.
+#
+# ***THE OFILES LIST IS GENERATED FROM DISK, NOT TYPED***, and the
+# first hand-written one proves why: it carried `yuv_msa.$O', which
+# does not exist, and omitted `lossless_avx2.c' and
+# `lossless_enc_avx2.c', which do.  The check is two commands and
+# belongs in any round that touches this list:
+#
+#	sed -n '/^OFILES=/,/^$/p' mkfile | grep -oE '[a-z0-9_]+\.\$O'
+#	ls $d/*.c | xargs -n1 basename
+#
+# sorted and `comm'd.  *A missing entry is a link error in another
+# package and a surplus one is a build failure here*, and neither
+# names this file.
+#
+# `-D_POSIX_SOURCE' is the whole flag set, measured: all 125 compile
+# with nothing else, and `WEBP_USE_THREAD' is deliberately OFF, so
+# `thread_utils.c' is the single-threaded stub.  *libap has pthreads
+# now, so that is a choice and can be revisited* -- but a first port
+# that is single-threaded is one fewer thing to attribute.
+
+OFILES=\
+	# src/dec\
+	alpha_dec.$O\
+	buffer_dec.$O\
+	frame_dec.$O\
+	idec_dec.$O\
+	io_dec.$O\
+	quant_dec.$O\
+	tree_dec.$O\
+	vp8_dec.$O\
+	vp8l_dec.$O\
+	webp_dec.$O\
+	# src/demux\
+	anim_decode.$O\
+	demux.$O\
+	# src/dsp\
+	alpha_processing.$O\
+	alpha_processing_mips_dsp_r2.$O\
+	alpha_processing_neon.$O\
+	alpha_processing_sse2.$O\
+	alpha_processing_sse41.$O\
+	cost.$O\
+	cost_mips32.$O\
+	cost_mips_dsp_r2.$O\
+	cost_neon.$O\
+	cost_sse2.$O\
+	cpu.$O\
+	dec.$O\
+	dec_clip_tables.$O\
+	dec_mips32.$O\
+	dec_mips_dsp_r2.$O\
+	dec_msa.$O\
+	dec_neon.$O\
+	dec_sse2.$O\
+	dec_sse41.$O\
+	enc.$O\
+	enc_mips32.$O\
+	enc_mips_dsp_r2.$O\
+	enc_msa.$O\
+	enc_neon.$O\
+	enc_sse2.$O\
+	enc_sse41.$O\
+	filters.$O\
+	filters_mips_dsp_r2.$O\
+	filters_msa.$O\
+	filters_neon.$O\
+	filters_sse2.$O\
+	lossless.$O\
+	lossless_avx2.$O\
+	lossless_enc.$O\
+	lossless_enc_avx2.$O\
+	lossless_enc_mips32.$O\
+	lossless_enc_mips_dsp_r2.$O\
+	lossless_enc_msa.$O\
+	lossless_enc_neon.$O\
+	lossless_enc_sse2.$O\
+	lossless_enc_sse41.$O\
+	lossless_mips_dsp_r2.$O\
+	lossless_msa.$O\
+	lossless_neon.$O\
+	lossless_sse2.$O\
+	lossless_sse41.$O\
+	rescaler.$O\
+	rescaler_mips32.$O\
+	rescaler_mips_dsp_r2.$O\
+	rescaler_msa.$O\
+	rescaler_neon.$O\
+	rescaler_sse2.$O\
+	ssim.$O\
+	ssim_sse2.$O\
+	upsampling.$O\
+	upsampling_mips_dsp_r2.$O\
+	upsampling_msa.$O\
+	upsampling_neon.$O\
+	upsampling_sse2.$O\
+	upsampling_sse41.$O\
+	yuv.$O\
+	yuv_mips32.$O\
+	yuv_mips_dsp_r2.$O\
+	yuv_neon.$O\
+	yuv_sse2.$O\
+	yuv_sse41.$O\
+	# src/enc\
+	alpha_enc.$O\
+	analysis_enc.$O\
+	backward_references_cost_enc.$O\
+	backward_references_enc.$O\
+	config_enc.$O\
+	cost_enc.$O\
+	filter_enc.$O\
+	frame_enc.$O\
+	histogram_enc.$O\
+	iterator_enc.$O\
+	near_lossless_enc.$O\
+	picture_csp_enc.$O\
+	picture_enc.$O\
+	picture_psnr_enc.$O\
+	picture_rescale_enc.$O\
+	picture_tools_enc.$O\
+	predictor_enc.$O\
+	quant_enc.$O\
+	syntax_enc.$O\
+	token_enc.$O\
+	tree_enc.$O\
+	vp8l_enc.$O\
+	webp_enc.$O\
+	# src/mux\
+	anim_encode.$O\
+	muxedit.$O\
+	muxinternal.$O\
+	muxread.$O\
+	# src/utils\
+	bit_reader_utils.$O\
+	bit_writer_utils.$O\
+	color_cache_utils.$O\
+	filters_utils.$O\
+	huffman_encode_utils.$O\
+	huffman_utils.$O\
+	palette.$O\
+	quant_levels_dec_utils.$O\
+	quant_levels_utils.$O\
+	random_utils.$O\
+	rescaler_utils.$O\
+	thread_utils.$O\
+	utils.$O\
+	# sharpyuv\
+	sharpyuv.$O\
+	sharpyuv_cpu.$O\
+	sharpyuv_csp.$O\
+	sharpyuv_dsp.$O\
+	sharpyuv_gamma.$O\
+	sharpyuv_neon.$O\
+	sharpyuv_sse2.$O\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+WEBPSOURCE=../../../external/libwebp
+
+# ONE `-I', and it is the libwebp ROOT rather than `src': every source
+# here spells its own includes from the root (`#include
+# "src/dsp/dsp.h"'), and so does sharpyuv (`"src/webp/types.h"').
+CFLAGS=-c -I$WEBPSOURCE -D_POSIX_SOURCE
+
+%.$O: $WEBPSOURCE/src/dec/%.c
+	$CC $CFLAGS $WEBPSOURCE/src/dec/$stem.c
+
+%.$O: $WEBPSOURCE/src/demux/%.c
+	$CC $CFLAGS $WEBPSOURCE/src/demux/$stem.c
+
+%.$O: $WEBPSOURCE/src/dsp/%.c
+	$CC $CFLAGS $WEBPSOURCE/src/dsp/$stem.c
+
+%.$O: $WEBPSOURCE/src/enc/%.c
+	$CC $CFLAGS $WEBPSOURCE/src/enc/$stem.c
+
+%.$O: $WEBPSOURCE/src/mux/%.c
+	$CC $CFLAGS $WEBPSOURCE/src/mux/$stem.c
+
+%.$O: $WEBPSOURCE/src/utils/%.c
+	$CC $CFLAGS $WEBPSOURCE/src/utils/$stem.c
+
+%.$O: $WEBPSOURCE/sharpyuv/%.c
+	$CC $CFLAGS $WEBPSOURCE/sharpyuv/$stem.c
