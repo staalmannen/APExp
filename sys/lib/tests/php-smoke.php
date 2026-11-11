@@ -373,16 +373,59 @@ if (extension_loaded('curl')) {
 /* zip -- write an archive to a temp file, read it back, delete it. */
 if (extension_loaded('zip')) {
 	echo "  INFO libzip " . (function_exists('zip_libzip_version') ? zip_libzip_version() : ZipArchive::LIBZIP_VERSION) . "\n";
-	$tmp = tempnam(sys_get_temp_dir(), 'apexpzip');
-	$z = new ZipArchive();
-	eq("ZipArchive::open for writing", $z->open($tmp, ZipArchive::OVERWRITE) === true, true);
-	$z->addFromString('hello.txt', 'zip round trip');
-	$z->close();
-	$z2 = new ZipArchive();
-	eq("ZipArchive::open for reading", $z2->open($tmp) === true, true);
-	eq("zip round trip", $z2->getFromName('hello.txt'), "zip round trip");
-	$z2->close();
-	@unlink($tmp);
+	/*
+	 * ***tempnam() IS CHECKED BEFORE IT IS USED, AND THE REASON IS
+	 * THAT IT RETURNED false ON THE VM.***  `ZipArchive::open(false)'
+	 * is `open('')', which in php 8 is a `ValueError' -- an
+	 * UNCAUGHT one, so it killed the interpreter and **every section
+	 * after this one went unmeasured**.  That is this tree's own rule
+	 * about a case that can kill the process arriving in a php
+	 * script: it belongs behind a guard, and what is on the far side
+	 * of the guard has to keep running.
+	 *
+	 * *And a missing tempnam is not a zip bug*, so the zip checks are
+	 * SKIPPED rather than failed -- a count that blames the wrong
+	 * layer is worse than a count with a hole in it.
+	 *
+	 * **The INFO lines are a probe and ask the question in order**:
+	 * php's `php_do_open_temporary_file' resolves the directory with
+	 * `CWD_REALPATH' and then calls `mkstemp' (php's `config.h' here
+	 * answers `HAVE_MKSTEMP 1'), so a failure is in one of three
+	 * places and these separate them in one run with no rebuild:
+	 *   - `sys_get_temp_dir()' wrong -- note APE defines no
+	 *     `P_tmpdir', so php falls through to its own "/tmp"
+	 *     last-ditch default, which is right here but is a FALLBACK
+	 *     and worth seeing;
+	 *   - `realpath()' of it failing, i.e. the CWD_REALPATH step;
+	 *   - plain `fopen()' in it working while `tempnam' does not,
+	 *     which puts it on `mkstemp' and nothing else.
+	 * `tmpfile()' is the fourth line because it takes the same path
+	 * without returning a NAME, so it says whether the name or the
+	 * file is the problem.
+	 */
+	$td = sys_get_temp_dir();
+	$tmp = tempnam($td, 'apexpzip');
+	if ($tmp === false || $tmp === '') {
+		echo "  INFO tempnam() failed; the zip checks are SKIPPED, not failed\n";
+		echo "  INFO sys_get_temp_dir() = " . var_export($td, true) . "\n";
+		echo "  INFO realpath(td)       = " . var_export(@realpath($td), true) . "\n";
+		echo "  INFO is_dir/is_writable = " . var_export(@is_dir($td), true)
+		    . "/" . var_export(@is_writable($td), true) . "\n";
+		$fh = @fopen($td . '/apexpzip-probe', 'w');
+		echo "  INFO fopen in td        = " . var_export($fh !== false, true) . "\n";
+		if ($fh !== false) { fclose($fh); @unlink($td . '/apexpzip-probe'); }
+		echo "  INFO tmpfile()          = " . var_export(@tmpfile() !== false, true) . "\n";
+	} else {
+		$z = new ZipArchive();
+		eq("ZipArchive::open for writing", $z->open($tmp, ZipArchive::OVERWRITE) === true, true);
+		$z->addFromString('hello.txt', 'zip round trip');
+		$z->close();
+		$z2 = new ZipArchive();
+		eq("ZipArchive::open for reading", $z2->open($tmp) === true, true);
+		eq("zip round trip", $z2->getFromName('hello.txt'), "zip round trip");
+		$z2->close();
+		@unlink($tmp);
+	}
 }
 
 /* posix -- ids that must agree with the ones standard php reports. */
