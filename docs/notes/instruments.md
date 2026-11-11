@@ -280,6 +280,33 @@ building that C computes? It is a **reduction** of
 must print 424/440, the numbers `gdb` reads from the DWARF of a real
 `gcc -g -c mem_manage.c`. Run it with plain `pcc`, which is the rule
 the whole APE world is built under; exit status is the mismatch count.
+`edgbaked-xcheck.sh` asks that same question of the WHOLE corpus and
+is a host CROSS-CHECK rather than a probe: 91 folded `sizeof` sites,
+named by the one shape that carries its own type
+(`((T *)(alloc_fe(NULL)))`), each compared against the DWARF of a real
+`gcc -g -c`. **83 agree, 4 are array allocations, 4 disagree -- `+8`,
+`+8`, `+24`, `+8`.** *One direction and one modulus is the finding, not
+the four names*: the corpus is baked for a `long`-is-4 target, so it is
+right for kencc and wrong for gcc, and the host-built cpfe therefore
+cannot be trusted for anything observed at RUN time. **Its `array`
+column is a HEURISTIC and is reported rather than counted as
+agreement**, because from a literal alone `n * sizeof(T)` and a wrong
+size are indistinguishable and exact divisibility is the only
+discriminator -- a real disagreement could be divisible by accident,
+and scoring those as agreement is the quiet direction to be wrong in.
+**Its control has two halves and one alone proves nothing**: a broken
+pattern must report nothing, *and* the real pattern must still find the
+recorded 440 -- the first half alone passes for a regex that matches
+everything, which is the shape `rceq-sweep` paid for. It cost about 35
+seconds and replaced the reading that the host crash was the
+static-init gap.
+***AND IT CAME OUT OF A WRONG NUMBER THAT gdb GAVE CONFIDENTLY***:
+`sizeof(an_il_header)` over the merged 56MB binary answers **160**,
+against the corpus's 184 and this tree's own recorded 208 -- 75
+translation units each carrying a type entry and gdb taking one.
+**Read a size out of ONE object, never out of a link of many**, and a
+size that disagrees with a number already written down is the
+instrument's bug until proved otherwise.
 `random-xcheck.c` is the same idea for `random`/`srandom`/
 `initstate`/`setstate`, and needs TWO compiles for the
 `strftime-xcheck` reason. Its **section 0 is a control of the

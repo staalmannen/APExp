@@ -349,6 +349,22 @@ gates if the `sed` matches nothing.
 header, so it renames the SOURCE with `sed`), and `strerror-xcheck.py`,
 which has to be a script because **APE's errno NUMBERS are its own**, so
 only the NAMES line up.
+**`edgbaked-xcheck.sh` asks which ABI a GENERATED CORPUS is baked
+for**, which is a different question from any of the above: EDG's C
+back end folds `sizeof` into integer literals, so the 2.9M lines can
+only be built by a compiler that lays those structs out the same way.
+91 sites, named by the one shape that carries its own type
+(`((T *)(alloc_fe(NULL)))`), each against the DWARF of a real
+`gcc -g -c`: **83 agree, 4 arrays, 4 disagree — `+8`, `+8`, `+24`,
+`+8`.** *One direction and one modulus is the finding, not the four
+names* — the corpus wants `long` to be 4 bytes, which kencc is and gcc
+is not. **So the host-built cpfe is sound for compile-time questions
+and VOID for anything at run time**, the same bargain `hostkencc`
+strikes; `docs/notes/edg.md` has the watchpoint chain that proved it,
+and the thing it replaced was a confident reading that the crash was
+the static-init gap. Its `array` column is a HEURISTIC, reported and
+not counted, and **its control has two halves because the first alone
+passes for a regex that matches everything**.
 **`munmaptrim-xcheck.{c,sh}`** is the one that checks a function's
 BOOKKEEPING rather than its arithmetic: the script cuts `p9_munmap` and
 its table out of `__p9_syscall.c` **by marker** (never transcribed, and
@@ -835,16 +851,26 @@ from before December 2025 does". *(3)* A compile-time result can only
 name a LINE, so it rots when the file is edited above it; key a
 results table on the CASE and re-key rather than renumber.
 
-**portable_stl: both questions are answered and both answers are no.**
-Its `CMakeLists.txt` has **no `install()` rule and no `configure_file`**
-— the single target is the gtest binary, so *the headers are the
-product* and installing is a copy. And the namespace cannot become
-`std`: **the library already declares `namespace std` itself**, for
-`initializer_list` and `type_info`, which the core language requires to
-live there. Renaming would not buy compatibility anyway —
-`vector::push_back` returns `expected<void, portable_stl_error>`,
-because the library is exception-free by construction. *A conformance
-corpus and a usable library, not a drop-in `std`.*
+**portable_stl: MERGED, and one of the two "no"s this paragraph used to
+carry was wrong.** The install question stands: its `CMakeLists.txt` has
+**no `install()` rule and no `configure_file`** — the single target is
+the gtest binary, so *the headers are the product* and installing is a
+copy, which is what was done (`sys/include/ape/c++`, 80 entries, plus
+`.stdh` public entrypoints for the common headers).
+***THE NAMESPACE ONE WAS WRONG AND IS WITHDRAWN.*** This file said the
+implementation namespace "cannot become `std`" because the library
+already declares `namespace std` itself for `initializer_list` and
+`type_info`. That is true and is **not an obstacle**: those two are
+declarations the core language requires in `std`, so after the rename
+they simply coincide with the rest of the library instead of sitting
+beside it. *A fact about the code was read as a conclusion about the
+change.* It is `std` now.
+**What does NOT go away is the convention underneath**, and that was
+the half worth keeping: `vector::push_back` returns
+`expected<void, ...>` because the library is exception-free by
+construction, so this is a usable library and **not a drop-in `std`**.
+`docs/notes/cxx-library.md` has the limitations and the conformance
+roadmap.
 
 ## What is open, as a list
 
@@ -1114,14 +1140,45 @@ silent:
   silently wrong rather than loudly broken, and one translation unit
   cannot show it. `-C` (COMDAT) stays for the runtime's duplicate
   typeinfo, which `local` does not touch.
-  **Open**: the static-init gap (nothing
-  calls `_Z12__call_ctorsv`), `__thread` silently dropped, and the fact
-  that there is **no C++ standard library here and EDG ships none** — the
-  reachable subset is the one EDG itself is written in. The best corpus
-  available is `paragon_portable_stl` (720 headers, zero system
-  includes), as a CONFORMANCE corpus rather than as an STL: its namespace
-  is `portable_stl` and `vector::push_back` returns `expected<...>`, so
-  no rename recovers it.
+  ***AND IT CRASHES ON EVERYTHING NOW, INCLUDING AN EMPTY FILE.***
+  `sys/lib/tests/cxx-bisect`'s case 0 — an empty translation unit, run
+  before any header — answers `fault read addr=0x1 pc=0x1`, so **this
+  is not about the C++ headers** and the 35 header runs after it would
+  only reprint one crash. *That is what the case-0 control is for*: a
+  bisect that cannot say "everything fails" cannot tell "this header
+  breaks cpfe" from "cpfe is broken", and the first version of the
+  script went straight to the headers.
+  **What bears on it, cheapest first, is that TWO LAYOUT RULES HAVE
+  LANDED since cpfe last translated a toy** — the bit-field
+  head-sharing `follow` rule in `cc/dcl.c` and `gbitagg`'s static
+  initialiser — and EDG's corpus **folds `sizeof` and `offsetof` into
+  integer literals**, so it can only be built by a compiler that
+  agrees with the one that generated it. `mk distclean` before
+  `mk install` (a half-rebuilt 2.9M-line corpus with two struct
+  layouts in it is exactly what a jump to address 1 looks like from
+  outside), then `edgtuoff-probe` for whether pcc still puts those
+  two members at 400/416, then `edgscope-probe` and
+  `structalign-test`.
+  ***THE HOST-BUILT cpfe CRASHES TOO AND IT IS A DIFFERENT BUG, now
+  on a measured mechanism rather than an absence***: it needs `long`
+  to be 8 bytes and kencc's is 4. `edgbaked-xcheck.sh` has the four
+  short allocations and `docs/notes/edg.md` the watchpoint chain. *So
+  the host build is sound for compile-time questions and void at run
+  time*, and **the static-init gap is still open but has stopped being
+  the suspect for either crash** — the only evidence pointing it at one
+  was that backtrace.
+  **Also open**: `__thread` silently dropped.
+  **The C++ LIBRARY is no longer a gap, which is a change from what
+  this file used to say**: EDG ships none, but Paragon Portable STL is
+  merged into `sys/include/ape/c++` now (80 entries) with its
+  implementation namespace changed to **`std`** and `.stdh` public
+  entrypoints for the common headers, so it is the starting library
+  rather than only a conformance corpus. *The rename this file called
+  impossible was done* — what does not go away is the exception-free
+  convention underneath it, `vector::push_back` returning
+  `expected<void, ...>`, so it is not a drop-in `std`.
+  `docs/notes/cxx-library.md` has the limitations and the conformance
+  roadmap.
 - **muon** — builds and prints its own usage. *A port that builds and
   prints a usage is not a port*: `muon setup` on a real `meson.build` is
   the next thing that would say anything.
