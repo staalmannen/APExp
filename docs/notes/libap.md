@@ -4235,3 +4235,84 @@ definition per name, and both include orders compile.
 got an implicit `int`. It is declared in `<resolv.h>` now. *The
 inverse question — what does libap define that no header declares —
 still has no instrument.*
+
+## statvfs: the platform cannot answer, so the answer is a switch
+
+`lib/ap/stat/statvfs.c` used to be `errno = ENOSYS; return -1` for
+both `statvfs` and `fstatvfs`. It now **succeeds by default** with a
+synthetic figure, and `APEXP_STATVFS=strict` restores the old answer.
+
+### Why the platform cannot answer, established twice
+
+**9P2000 has no `Tstatfs`.** The message set is Tversion, Tauth,
+Tattach, Tflush, Twalk, Topen, Tcreate, Tread, Twrite, Tclunk,
+Tremove, Tstat, Twstat; `Tstat` returns a per-file `Dir` with no
+filesystem-level counts. Linux's v9fs gets one only from the
+`9P2000.L` dialect, which Plan 9 servers do not speak.
+
+***AND THE FILE SERVERS DO KNOW, WHICH IS THE REASON THAT ACTUALLY
+CLOSES IT.*** The protocol argument alone is weak — a library can do
+things a protocol cannot. hjfs has a `df` console command reporting
+free, used and total space, invoked as `echo df >>/srv/hjfs.cmd`. It
+still cannot back this call, for four separate reasons:
+
+* **the output goes to the system console**, not to the caller, so
+  there is nothing to read back;
+* it is a **write to a ctl file** — a side effect needing permission,
+  from a function callers expect to be read-only;
+* the spelling is **per-server** (hjfs's is not cwfs's), and 9P gives
+  no way to ask which server backs a given path;
+* hjfs's own manual says it **scans the block table** and is slow on a
+  large disk, from a call programs make casually.
+
+*That is a mechanism argument rather than a protocol one, and it is
+what makes the "no" well-founded.*
+
+### Both honest answers break something
+
+**ENOSYS is correct and becomes ZERO.** POSIX has no way to say
+"unknown", so failing is the truthful reply — and a caller that does
+not check turns it into nothing. php's `disk_free_space()` returns
+`false`; the Phoronix Test Suite evaluates `false < 1024`, which is
+true, and reports `Lock creation failed due to lack of disk space` on
+a disk with plenty. Every program that gates on free space before
+writing stops working, and the message it prints blames the disk.
+
+**Succeeding is a lie and unblocks them.** Not an unprecedented one:
+filesystems that genuinely cannot report — several network and FUSE
+mounts — answer this way for exactly this reason. What it costs is a
+program that checks before writing something huge, which now proceeds
+and learns the truth from the failing `write`. *That program was
+going to fail either way; the difference is where.*
+
+The default is the optimistic answer because that is what a porting
+layer is for; `strict` is one word for anyone who would rather be told
+nothing than told a number.
+
+### Two details worth keeping
+
+**The numbers are deliberately recognisable.** `1<<31` blocks of 4096
+is 8 TiB — plausible enough that no program balks, and a round power
+of two repeated across five fields, so a human reading `stat -f` or a
+debugger sees at once that it is synthetic. *A plausible-looking 7.3
+TiB would have hidden exactly what this most needs to advertise.* The
+product is checked rather than hoped: `f_bavail * f_frsize` is
+`2**31 * 2**12 = 2**43`, which fits a 64-bit `fsblkcnt_t` with twenty
+bits spare and is exact in a double, so the usual
+`(double)f_bavail * (double)f_frsize` in callers cannot round.
+
+**The path is still consulted.** `statvfs` on a missing path returns
+ENOENT and `fstatvfs` on a bad descriptor returns EBADF, because
+reporting success for a path that is not there would be a second lie
+on top of the first, and a caller distinguishing ENOENT from ENOSYS is
+asking something we can answer truthfully.
+
+`sys/lib/tests/statvfs-test.c` is **two runs**, and one alone proves
+nothing — the default must report space and `strict` must answer
+ENOSYS, and a run of only the first cannot tell a working switch from
+a switch that is never read. Its `-DHOSTCHECK` build is the gcc
+control and passes against glibc's real statvfs, which is what says
+the invariants in section 1 are the test's and not the library's.
+**Its version marker earns its keep more than most**: the old
+library's ENOSYS is a legitimate output of the new one under `strict`,
+so a stale libap would look exactly like a working `strict` run.
