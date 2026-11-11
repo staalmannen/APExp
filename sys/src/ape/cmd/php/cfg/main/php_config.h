@@ -685,15 +685,72 @@
 #define ZEND_FIBER_UCONTEXT 1
 
 /*
- * `zend_call_stack.c' finds the stack bounds through
- * `pthread_getattr_np', `pthread_attr_getstack', `/proc', `sysctl' or
- * a Windows call, and APExp has NONE of them.  Answering yes would
+ * ***THIS WAS ANSWERED `no' AND THE ANSWER WAS WRONG, WHICH THE
+ * PHORONIX RUN COLLECTED ON: `php: suicide: sys: trap: stack
+ * exception'.***
+ *
+ * The note that stood here said `zend_call_stack.c' finds the stack
+ * bounds through `pthread_getattr_np', `/proc', `sysctl' or a Windows
+ * call, that APExp has none of them, and that answering yes "would
  * leave `zend_call_stack_get' returning false at run time, which is
- * the same outcome by a longer route; answering no says so at compile
- * time.  **The cost is real and is recorded rather than hidden**: deep
- * PHP recursion faults instead of raising an error.
+ * the same outcome by a longer route".  **Every clause of that is true
+ * except the last one, and the last one is the only one that decided
+ * anything.**  `zend_call_stack_init' (`zend_call_stack.c:84') is
+ *
+ *	if (!zend_call_stack_get(&EG(call_stack)))
+ *		EG(call_stack) = (zend_call_stack){0};
+ *	...
+ *	if (UNEXPECTED(base == (void*)0)) {
+ *		base = zend_call_stack_position();
+ *		size = zend_call_stack_default_size();
+ *		size -= 32 * 1024;
+ *	}
+ *
+ * -- a platform with NO support at all is a case upstream handles on
+ * purpose, taking the address of a local as the base and a per-OS
+ * default as the size, and `zend_call_stack_default_size' ends in a
+ * generic `return 2 * 1024 * 1024'.  *The reasoning stopped at the
+ * function whose name matched and never read its caller*, which is
+ * this tree's "a grep hit is a name, not an implementation" rule one
+ * level up.
+ *
+ * **And the autoconf probe is PORTABLE, so a real configure would have
+ * answered yes.**  `Zend/Zend.m4:250' takes the address of a local,
+ * passes it to a function that compares against one of ITS locals, and
+ * defines the macro if the stack grows downwards.  It asks nothing
+ * about pthreads or `/proc'.  On Plan 9 amd64 the stack grows
+ * downwards, so this is a hand-answered capability that is simply more
+ * pessimistic than the machine -- the rarer direction of that family,
+ * and the one whose cost is a hard trap where there should be a
+ * diagnostic.
+ *
+ * **It can only improve matters, whatever Plan 9's real stack is.**
+ * If the real stack is larger than 2MB, php now raises `Maximum call
+ * stack size ... reached.  Infinite recursion?' where it used to
+ * fault.  If it is smaller, php faults exactly as it does today and
+ * nothing is lost.  There is no third case, because the limit is only
+ * ever consulted to raise an error earlier.
+ *
+ * ***2MB IS php's GENERIC DEFAULT AND NOT A MEASUREMENT OF THIS
+ * PLATFORM.***  Nothing here knows the real figure: libap's
+ * `getrlimit(RLIMIT_STACK)' answers RLIM_INFINITY (a stub claiming an
+ * infinite stack on a platform whose stack is finite), and the number
+ * lives in the kernel, as `USTKSIZE' in /sys/src/9/<arch>/mem.h (the
+ * path is written without a glob on purpose: a `*' followed by a `/'
+ * CLOSES A C COMMENT, which is how the first draft of this block broke
+ * the build -- cpp answered `Unterminated string or char const' five
+ * times and `6c' answered `syntax error, last name: mem', none of
+ * which mentions comments).  When
+ * someone reads it, `zend.max_allowed_stack_size' in php.ini takes it
+ * exactly -- that is the `default:' arm of the same switch, and it
+ * needs no rebuild.
+ *
+ * The TU builds: outside `ZEND_WIN32' the file includes only
+ * `<sys/resource.h>', `<unistd.h>' and `<sys/types.h>'
+ * unconditionally, all of which APExp has, and every other include is
+ * behind a platform macro none of which is defined here.
  */
-/* #undef ZEND_CHECK_STACK_LIMIT */
+#define ZEND_CHECK_STACK_LIMIT 1
 /* #undef ZEND_MAX_EXECUTION_TIMERS */
 /* #undef HAVE_VALGRIND */
 /* #undef HAVE_DTRACE */

@@ -300,6 +300,17 @@ recorded 440 -- the first half alone passes for a regex that matches
 everything, which is the shape `rceq-sweep` paid for. It cost about 35
 seconds and replaced the reading that the host crash was the
 static-init gap.
+***AND ITS FIRST SHIPPED VERSION WAS RUN ON THE VM AND PRINTED A
+RESULT-SHAPED NON-RESULT.*** There is no gcc and no gdb there, so
+every compile failed, every row read `UNREADABLE`, and the summary
+was `agree 0  array 0  disagree 0  unreadable 91` -- **with the zero
+that matters sitting in the `disagree` column.** The header said HOST
+cross-check in three places and *nothing enforced it*. It refuses now
+if `gcc` or `gdb` is absent, and refuses again if 0 of N files
+compiled, because a per-file `WARNING` followed by a summary of zeros
+is the same failure in a second costume. **The rule it broke is this
+tree's own**: a check whose negative result has two explanations is
+not a check, and "0 disagreements" there meant "no compiler".
 ***AND IT CAME OUT OF A WRONG NUMBER THAT gdb GAVE CONFIDENTLY***:
 `sizeof(an_il_header)` over the merged 56MB binary answers **160**,
 against the corpus's 184 and this tree's own recorded 208 -- 75

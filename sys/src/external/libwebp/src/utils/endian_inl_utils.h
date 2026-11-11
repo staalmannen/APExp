@@ -62,7 +62,7 @@ static WEBP_INLINE uint32_t BSwap32(uint32_t x) {
   return ret;
 #elif defined(HAVE_BUILTIN_BSWAP32)
   return __builtin_bswap32(x);
-#elif defined(__i386__) || defined(__x86_64__)
+#elif (defined(__i386__) || defined(__x86_64__)) && defined(__GNUC__)
   uint32_t swapped_bytes;
   __asm__ volatile("bswap %0" : "=r"(swapped_bytes) : "0"(x));
   return swapped_bytes;
@@ -76,7 +76,7 @@ static WEBP_INLINE uint32_t BSwap32(uint32_t x) {
 static WEBP_INLINE uint64_t BSwap64(uint64_t x) {
 #if defined(HAVE_BUILTIN_BSWAP64)
   return __builtin_bswap64(x);
-#elif defined(__x86_64__)
+#elif defined(__x86_64__) && defined(__GNUC__)
   uint64_t swapped_bytes;
   __asm__ volatile("bswapq %0" : "=r"(swapped_bytes) : "0"(x));
   return swapped_bytes;

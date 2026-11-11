@@ -1065,6 +1065,57 @@ talph:
 			}
 		}
 		if(ac == '(') {
+			/*
+			 * ***SKIPPING AN `__asm__' THAT PRODUCES A VALUE IS
+			 * NOT THE SAME AS HAVING NOTHING TO DO, AND IT WAS
+			 * SILENT.***
+			 *
+			 * GNU extended asm names C objects as OUTPUT operands:
+			 *
+			 *	unsigned bswap(unsigned x) {
+			 *		unsigned swapped_bytes;
+			 *		__asm__ volatile("bswap %0"
+			 *		    : "=r"(swapped_bytes) : "0"(x));
+			 *		return swapped_bytes;
+			 *	}
+			 *
+			 * Swallowing that whole leaves `swapped_bytes' never
+			 * assigned, and `6c -S' emitted exactly
+			 *
+			 *	TEXT	bswap+0(SB),0,$16
+			 *	MOVL	swapped_bytes+-4(SP),AX
+			 *	RET	,
+			 *
+			 * -- a read of an uninitialised stack slot, returned
+			 * as the answer.  **No error, and the only sign was a
+			 * `used and not set' warning** in a build log, beside
+			 * a `set and not used' for the input operand, which
+			 * reads like ordinary dead-code noise.
+			 *
+			 * *This is the tree's own "a stub that does nothing is
+			 * not a platform with nothing to do" family, inside the
+			 * compiler.*  An asm with no outputs loses a FENCE,
+			 * which is a missed guarantee; an asm with an output
+			 * loses the VALUE, which is a wrong answer.  Only the
+			 * second is diagnosed, so `__asm__ __volatile__("")'
+			 * and `int f(void) __asm__("_f");' are untouched --
+			 * neither has a `:' at all.
+			 *
+			 * It is reachable because **APExp itself defines
+			 * `__x86_64__'** (`amd64/include/ape/_apetypes.h:59'),
+			 * which is right for every architecture question and is
+			 * also how a vendored package picks its x86 inline asm.
+			 * libwebp's `BSwap32'/`BSwap64' are that shape, reached
+			 * from `lossless.c', `bit_reader_utils.c' and
+			 * `bit_writer_utils.c'.
+			 *
+			 * The rule is deliberately narrow: at depth 1, after
+			 * the FIRST `:', a string literal beginning `=' or `+'
+			 * is an output constraint.  `asm("..." :: "r"(x))' has
+			 * no literal before the second `:' and is allowed.
+			 */
+			int sawcolon = 0, outseen = 0;
+
 			depth = 1;
 			while(depth > 0) {
 				ac = GETC();
@@ -1083,6 +1134,8 @@ talph:
 					lineno++;
 					continue;
 				}
+				if(asmlike && depth == 1 && ac == ':')
+					sawcolon++;
 				/*
 				 * ***A STRING OR CHARACTER LITERAL IS SKIPPED
 				 * WHOLE, AND COUNTING PARENS INSIDE ONE IS
@@ -1104,10 +1157,27 @@ talph:
 				 * delimiters inside a literal.
 				 */
 				if(ac == '"' || ac == '\'') {
-					int q = ac;
+					int q = ac, first = 1;
 
 					for(;;) {
 						ac = GETC();
+						/*
+						 * The constraint's first
+						 * character is what says
+						 * whether the operand is
+						 * written: `=' plain output,
+						 * `+' read-write.  Only
+						 * between the first and
+						 * second `:', which is the
+						 * output section.
+						 */
+						if(first && q == '"'){
+							first = 0;
+							if(asmlike && depth == 1
+							&& sawcolon == 1
+							&& (ac == '=' || ac == '+'))
+								outseen = 1;
+						}
 						if(ac == EOF) {
 							yyerror("unexpected EOF in %s", s->name);
 							break;
@@ -1139,6 +1209,18 @@ talph:
 				if(ac == '(') depth++;
 				else if(ac == ')') depth--;
 			}
+			/*
+			 * Loud, and at the site.  A package reaching this
+			 * wants a non-asm arm selected -- every one of these
+			 * in the wild has a portable `#else', because the asm
+			 * is an optimisation.  See the block above `depth = 1'
+			 * for why a warning would not do.
+			 */
+			if(outseen)
+				yyerror("%s with an output operand: kencc does "
+				    "not implement GNU extended asm, and "
+				    "skipping it would leave the operand unset",
+				    s->name);
 			/* Do NOT reset lasttok here: the swallowed keyword is
 			 * invisible to the parser, so the previous type keyword
 			 * (e.g. LDOUBLE before __asm__("sym") _Complex) must

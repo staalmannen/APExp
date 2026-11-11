@@ -40,6 +40,38 @@ typedef long long fpos_t;
 #define	FOPEN_MAX	90		/* max files open */
 #define	FILENAME_MAX	BUFSIZ		/* silly filename length */
 #define	L_tmpnam	20		/* sizeof "/tmp/abcdefghij9999 */
+/*
+ * P_tmpdir is XSI <stdio.h>, and it was missing here.  Nineteen
+ * vendored packages ask for it -- bash, tcl, gmake, coreutils, m4,
+ * gnulib, diffutils, sljit, perl's File::Temp, php -- and **all but
+ * one of them cope**: each wraps it in `#ifdef' and falls back to
+ * "/tmp", and bash and tcl go further and stat it first.
+ *
+ * ***php DOES NOT, AND THE SHAPE IS WORTH KEEPING.***
+ * `main/php_open_temporary_file.c:49' is
+ *
+ *	#if !defined(P_tmpdir)
+ *	#define P_tmpdir ""
+ *	#endif
+ *
+ * and `:300' is `if (P_tmpdir) { ...estrdup(P_tmpdir); return; }'
+ * with the real "/tmp" default on the line AFTER it.  `if ("")' tests
+ * the ADDRESS of a string literal, which is never null, so **the arm
+ * always wins and the last-ditch default is unreachable** -- and the
+ * comment above that default says "Shouldn't ever(!) end up here".
+ * `sys_get_temp_dir()' therefore answered the EMPTY STRING, `tempnam'
+ * returned false, and php 8 raised an uncaught ValueError out of
+ * `ZipArchive::open('')'.  *The test of a macro's truth is not a test
+ * of its content*, and on glibc `P_tmpdir' is "/tmp" so nobody has
+ * ever reached the dead line.
+ *
+ * Defining it here is the fix for php and a no-op for the other
+ * eighteen, who computed "/tmp" by another route.  Unconditional
+ * because nothing in this header is feature-test gated, and safe
+ * because every `#define P_tmpdir' under `sys/src/external' is behind
+ * an `#ifndef' -- checked, not assumed.
+ */
+#define	P_tmpdir	"/tmp"		/* XSI; see above */
 #define	L_cuserid	32		/* maximum size user name */
 #define	L_ctermid	32		/* size of name of controlling tty */
 #define	SEEK_CUR	1

@@ -3357,3 +3357,75 @@ VM**.
 *The distinction `.gitignore` already states applies to both*: a
 generated file something on the VM must READ gets committed; one the
 build reproduces does not.
+
+## libwebp 1.6.0: a port whose value was paid in the compiler
+
+**125 files, 0 errors, and the library is the smaller half of what it
+found.** `sys/src/ape/lib/webp` builds one archive where upstream
+builds five (libwebp, libwebpdecoder, libwebpdemux, libwebpmux,
+libsharpyuv): Plan 9 has no shared libraries, an unused archive member
+is never linked in, and a single `#pragma lib` in
+`sys/include/ape/webp/types.h` — which every public header includes —
+reaches every consumer, so no `cmd/` mkfile needs a `LIB=` line.
+*Splitting them would buy nothing and cost four more pragmas to keep
+in step.*
+
+**`-D_POSIX_SOURCE` is the whole flag set**, measured rather than
+assumed: all 125 compile with nothing else. `WEBP_USE_THREAD` is
+deliberately off, so `thread_utils.c` is the single-threaded stub —
+libap has pthreads now, so that is a choice and can be revisited, but
+a first port that is single-threaded is one fewer thing to attribute.
+
+**55 of the 125 are SIMD files that compile to nothing**, each wrapped
+in `#if defined(WEBP_USE_SSE2)` (or SSE41, AVX2, NEON, MSA, MIPS32,
+MIPS_DSP_R2). That is upstream's own arrangement for a target without
+SIMD, not a failure, and `VP8GetCPUInfo` is `NULL` to match.
+
+***THE REASON TO BUILD IT WAS THE kencc PREPROCESSOR FIX, AND THAT IS
+CONFIRMED.*** `src/dsp/lossless.c:611` is `(OUT)[0] = IN##0_C;` — the
+pp-number shape that the `cpp/lex.c` FSM used to break, because `_`
+terminated a pp-number so `0_C` would not paste. It compiles, along
+with the other 124, which is what that fix existed for. *`lossless.c`
+is plain C rather than SIMD-gated*, so the shape is reached on every
+target and not only on an SSE2 build.
+
+**But the find was `__asm__`, not `##`.** libwebp's `BSwap32`,
+`BSwap64`, `GetCPUInfo` and `xgetbv` are GNU extended asm gated on
+ARCHITECTURE alone (`defined(__i386__) || defined(__x86_64__)`), and
+APExp defines `__x86_64__` itself — so kencc took those arms, swallowed
+the asm, and returned uninitialised stack. 14 occurrences, 7
+translation units, every one silently wrong. `docs/notes/kencc.md` has
+the mechanism and the diagnostic that now fires; the vendored fix is
+`&& defined(__GNUC__)` on four conditions in two files, which is
+upstream's own bug — GNU syntax gated on the target rather than on the
+compiler — and the smallest patch that is also correct.
+
+***AND THE FOURTH CONDITION WAS THE CALLER, WHICH THE COMPILER DID NOT
+CATCH.*** Guarding the two `GetCPUInfo` definitions left `cpu.c:97`
+guarding the CALLER on architecture alone, so `x86CPUInfo` called a
+function that no longer existed — and kencc reports that as
+`function not declared`, a **warning**, so all 125 files still
+"compiled". Only a grep for non-warning diagnostics found it. *Removing
+a definition is not removing its callers*, and this tree's
+undeclared-function invariant is what it would have cost.
+
+**The OFILES list is generated from disk, and the first hand-written
+one proves why**: it named `yuv_msa.$O`, which does not exist, and
+omitted `lossless_avx2.c` and `lossless_enc_avx2.c`, which do. A
+surplus entry fails the build here; a missing one fails a link in
+another package, and neither message names this mkfile. The two-command
+check is in the mkfile's own header.
+
+**`mkcont-sweep.py` caught the next one**, which is the sweep working
+as built: the generated list carried `# src/dec` comments inside the
+backslash continuation, and a comment ends a logical line. The tree's
+own form is `# intel\` with the trailing backslash, which
+`lib/png/mkfile` already uses — 14 broken continuations reported, 0
+after.
+
+**Not wired to anything yet, on purpose.** gd's `config.h` still
+answers no to `HAVE_LIBWEBP` and php's gd takes gd's word for it, so
+this round builds and installs the library and stops there — one change
+to attribute rather than two. Turning it on in gd is the obvious next
+step and wants its own round, because gd's webp code is then compiled
+for the first time.

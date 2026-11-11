@@ -600,6 +600,22 @@ preprocessor belongs in its own file, the same rule this tree has
 about cases that can hang. The macros are INVENTED because the first
 draft used `__x86_64__`, which gcc defines, so the arm meant to be
 skipped was compiled),
+**`asmout-probe` and `asmok-probe`** (**`pcc -c`, and the result is
+whether they COMPILE — the first MUST FAIL and the second MUST
+NOT.** *Neither is readable alone*: a compiler that refused every
+`__asm__` would pass the first and break php's 50 files. kencc
+swallows `__asm__ ( ... )` whole, which for a barrier loses a FENCE
+and for an asm with an OUTPUT operand loses the VALUE — `6c -S`
+emitted `MOVL swapped_bytes+-4(SP),AX`, *a read of an uninitialised
+stack slot returned as the answer*, with only a `used and not set`
+warning that reads like dead-code noise. Reachable because **APExp
+defines `__x86_64__` itself**, which is right for architecture
+questions and is also how a package picks its x86 asm; `__GNUC__` is
+defined by nobody here, which is why packages guarding on the
+COMPILER were never affected. Blast radius measured with `hostkencc`
+BEFORE shipping: php 581 TUs 0 errors, libwebp 7 of 125. Two files for
+the `cppelif`/`cppskip` reason, and `asmok-probe`'s WARNINGS ARE
+EXPECTED — read the exit status),
 `cppaste-probe` and `cpplimit-probe` (**BOTH ANSWERED AND BOTH
 NEGATIVE, kept as regression ladders.** `cppaste` is 7 paste shapes,
 `cpplimit` is a token limit (16405), a length limit (135221 chars) and
@@ -1477,6 +1493,23 @@ capped the Zend heap at about 10MB is gone with `SEG_THRESHOLD` at
 64MB. *The alignment question answered no — 0 of 8 — so the trims do
 run; they just work now.*
 **No extension in the first build**, whatever its library's state.
+
+- **libwebp 1.6.0** — **125 files, 0 errors, installed as one archive**
+  (`lib/webp`), with the public headers committed to
+  `sys/include/ape/webp` and `sys/include/ape/sharpyuv` and ONE
+  `#pragma lib` in `types.h`, which every other public header
+  includes. 55 of the 125 are SIMD files that compile to nothing,
+  which is upstream's arrangement for a target without SIMD.
+  **It confirmed the cpp pp-number fix** — `src/dsp/lossless.c:611` is
+  `IN##0_C`, plain C rather than SIMD-gated — ***but what it FOUND was
+  `__asm__`***: `BSwap32`/`BSwap64`/`GetCPUInfo`/`xgetbv` are GNU
+  extended asm gated on ARCHITECTURE alone, APExp defines
+  `__x86_64__`, and kencc swallowed them and returned uninitialised
+  stack. 14 occurrences, 7 TUs, every one silently wrong; see
+  `asmout-probe` above. **Not wired to gd yet, on purpose** — gd's
+  `HAVE_LIBWEBP` is still no, so this is one change to attribute
+  rather than two, and enabling it compiles gd's webp code for the
+  first time.
 
 **Queued**: **tkdesk** gets its mkfile in `sys/src/ape/app` and is **not
 built by default**, being a proof-of-concept rather than part of APExp.
