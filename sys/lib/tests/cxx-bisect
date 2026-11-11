@@ -80,6 +80,42 @@ crashed = ()
 errored = ()
 passed = ()
 
+# ***CASE 0: AN EMPTY TRANSLATION UNIT, AND IT COMES FIRST.***
+# The first version of this script went straight to the headers, and
+# the run answered CRASH for all 35 -- including `<ciso646>', which is
+# very nearly an empty file.  **A bisect that cannot say "everything
+# fails" is not a bisect**: it cannot tell "this header breaks cpfe"
+# from "cpfe is broken", and those want completely different work.
+#
+# So: if cpfe cannot translate `int main(void){return 0;}' with no
+# `#include' at all, the headers are not the subject and the rest of
+# this run is noise.  Say so and stop.
+#
+# *This is the control the script should have had on the first day*,
+# and the reason it did not is that the question was framed as "which
+# header" before anything established that any header was involved.
+echo 'int main(void){ return 0; }' > $tmp/empty.cpp
+c++ -F $tmp/empty.cpp >$tmp/out >[2]$tmp/err
+st = $status
+if(grep -qE 'suicide|trap:' $tmp/err){
+	echo 'CRASH  <empty translation unit, no #include at all>'
+	sed 1q $tmp/err
+	echo
+	echo 'cxx-bisect: cpfe cannot translate an EMPTY file, so this is'
+	echo 'cxx-bisect: not about the C++ headers and bisecting them'
+	echo 'cxx-bisect: would only reprint this crash 35 times.'
+	echo 'cxx-bisect: see docs/notes/edg.md -- the host-built cpfe'
+	echo 'cxx-bisect: fails the same way, in fe_translation_unit_init.'
+	rm -rf $tmp
+	echo 'cxx-bisect: done'
+	exit crash
+}
+if(! ~ $st '')
+	echo 'cxx-bisect: NOTE empty file gave an error (not a crash); continuing'
+if not
+	echo 'cxx-bisect: ok     <empty translation unit> -- cpfe itself runs'
+echo
+
 for(h in $headers){
 	echo '#include <'^$h^'>' > $tmp/one.cpp
 	echo 'int main(void){ return 0; }' >> $tmp/one.cpp

@@ -1548,3 +1548,75 @@ reports JPEG yes and failed both of them — which is the control
 working, not a bug. "JPEG is absent" is a statement about this port's
 libgd, not about php or about gd. 0 failures on host php 8.3.6, which
 happens also to ship GD 2.3.3.
+
+## The Phoronix crash after statvfs: further, not broken
+
+With `statvfs` reporting space, `phoronix-test-suite system-info` no
+longer prints `Lock creation failed due to lack of disk space` — it
+gets past the lock, through `phodevi_network`, and **then** two php
+processes die:
+
+```
+php 7603: suicide: sys: trap: general protection violation pc=0x165de0d
+php 7579: suicide: sys: trap: stack exception pc=0x165d82e
+```
+
+***THIS IS NOT A REGRESSION IN php, AND THE DISTINCTION MATTERS.***
+The run reaches `phodevi_network:60` — code it never executed before,
+because the lock check failed first and ended the run. That is this
+tree's own rule arriving on schedule: **a fix that makes a process
+reach code it never reached before can expose anything on that path.**
+
+**Two processes and two different faults**, which is itself the shape
+to read: Phoronix forks, so 7603 and 7579 are a parent and a child.
+*A `stack exception` is a stack OVERFLOW*, not a wild pointer — so one
+of them recursed without bound, and `phodevi_network` walking `/net`
+is the obvious candidate on a system whose network directory is not
+Linux's. The general protection violation in the other is a separate
+symptom that may or may not share a cause.
+
+**What separates "php is broken" from "this path is broken" is three
+commands**, and none of them needs Phoronix:
+
+```
+php -v                                  # does the interpreter start
+php -m                                  # do all 24 modules register
+php /sys/lib/tests/php-smoke.php        # 0 failures expected
+```
+
+*If those pass, php is fine and the fault is in ground Phoronix only
+now reaches.* If they do not, the libap change is implicated and
+`APEXP_STATVFS=strict` restores the old behaviour in one word, which
+is what the switch is for.
+
+### What was cleared on the way, and how
+
+The cpp pp-number fix landed in the same window and was the obvious
+suspect for two simultaneous crashes — it changes the **compiler**, so
+php and cpfe were both recompiled by it.
+
+**It is cleared, by enumerating the sites where its behaviour differs
+rather than by re-reading it.** The change only alters a token that
+begins with a digit and runs into an underscore, so a search for
+exactly that shape — with comments and string literals blanked first —
+answers the question outright:
+
+| tree | real sites |
+|---|---|
+| `sys/src/ape/lib/ap` | **0** |
+| `sys/src/cmd` (the compilers) | **0** |
+| `sys/src/external/edg` | **0** |
+| `sys/src/external/php` | 15, all in `ext/mbstring`, **not built** |
+| `sys/src/external/libwebp` | 20, all in SSE files, **not compiled here** |
+
+***AND THE RAW GREP SAID 60,191 FOR EDG.*** Every one was inside a
+string literal — ARM intrinsic name tables in `sys_predef.c`, which is
+315,616 lines of predefined macro text. **Blanking comments and
+literals took it to zero.** That is the `truefalse-sweep` lesson
+exactly, and it would have been easy to read 60,191 as a confirmation
+of the hypothesis I already held.
+
+*The earlier evidence for this fix was 1129 `lib/ap` files
+preprocessing identically, which was true and much too narrow* — it
+said nothing about php, EDG or the compilers. This is the measurement
+that covers them.
