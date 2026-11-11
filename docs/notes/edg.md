@@ -1396,12 +1396,37 @@ and the 805 `_GLOBAL__N_` hits are anonymous-namespace mangling rather
 than initialiser functions, so where the Plan 9 build gets its
 initialisation from is the next question and is not answered here.
 
-**Do not read this crash as the VM's.** They are different: the VM's
-cpfe translates a toy correctly and returns 8, so its own
-initialisation works. This one is an artifact of a build nobody has
-made before. *A host instrument that crashes differently from the
-target is worse than no instrument until that is understood*, which is
-why nothing here is committed as a harness.
+***THE PARAGRAPH HERE USED TO SAY "DO NOT READ THIS CRASH AS THE
+VM's. THEY ARE DIFFERENT", AND THAT WAS WRITTEN TOO SOON.*** It rested
+on one fact -- the VM's cpfe translated a toy and returned 8 -- which
+was true when it was written and is not the current state.
+`sys/lib/tests/cxx-bisect` on the VM answers **CRASH for all 35
+headers**, every one `fault read addr=0x1 pc=0x1`, **including
+`<ciso646>`, which is very nearly an empty file.** A crash that does
+not discriminate between `<ciso646>` and `<vector>` is not about
+headers.
+
+So the two crashes are now **candidates for the same bug** rather than
+established as different, and the host backtrace is the only
+source-level view anyone has of it:
+
+* host, empty file, no includes: SIGSEGV in `alloc_hash_table`
+  (`memory_region=0`) under `fe_translation_unit_init`;
+* VM, every input: `fault read addr=0x1 pc=0x1`, a jump through a
+  near-null pointer, which is what reaching an uninitialised function
+  table looks like from the outside.
+
+**The one command that settles it** is an empty translation unit on
+the VM -- `cxx-bisect` runs exactly that as its case 0 now, before any
+header, and stops if it crashes. *The first version of that script
+went straight to the headers*, which is why the run cost 35 identical
+crash reports and said nothing: **a bisect that cannot say "everything
+fails" cannot tell "this header breaks cpfe" from "cpfe is broken"**,
+and those want completely different work.
+
+*The lesson is the ordering, not the bug*: the question was framed as
+"which header" before anything had established that a header was
+involved at all.
 
 ### What it would be worth
 
