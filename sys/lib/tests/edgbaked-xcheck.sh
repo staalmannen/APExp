@@ -123,6 +123,37 @@ case "${1-}" in
 *)         echo "usage: $0 [--list|--control]" >&2; exit 2 ;;
 esac
 
+# ***IT MUST REFUSE TO RUN WHERE IT CANNOT WORK, AND THE FIRST VERSION
+# DID NOT.***  Run on the VM -- which has no `gcc' and no `gdb' -- it
+# printed 25 `WARNING ... did not compile' lines, 91 `UNREADABLE' rows
+# and then
+#
+#	edgbaked-xcheck: agree 0  array 0  disagree 0  unreadable 91
+#
+# *which is a summary line shaped exactly like a clean result*, with
+# the zero that matters sitting in the `disagree' column.  The header
+# said HOST cross-check in three places and nothing enforced it: this
+# tree's own rule is that **a check whose negative result has two
+# explanations is not a check**, and "0 disagreements" there meant
+# "no compiler", not "the corpus agrees".
+#
+# So the tools are a precondition, not a warning.  The WARNING lines
+# stay for the case where gcc exists and one file genuinely fails to
+# compile, which is a finding; a run with no gcc at all is not.
+missing=
+for t in gcc gdb; do
+	command -v "$t" >/dev/null 2>&1 || missing="$missing $t"
+done
+if [ -n "$missing" ]; then
+	echo "edgbaked-xcheck: REFUSING TO RUN -- no$missing on this machine." >&2
+	echo "edgbaked-xcheck: this is a HOST cross-check: it reads struct" >&2
+	echo "edgbaked-xcheck: layouts out of DWARF, so it answers only for" >&2
+	echo "edgbaked-xcheck: the compiler in front of it.  On the VM the" >&2
+	echo "edgbaked-xcheck: instrument for this question is edgtuoff-probe," >&2
+	echo "edgbaked-xcheck: which asks it with pcc and no debugger." >&2
+	exit 2
+fi
+
 TMP=${TMPDIR:-/tmp}/edgbaked.$$
 mkdir -p "$TMP/dw" || exit 2
 trap 'rm -rf "$TMP"' 0 1 2 15
@@ -184,11 +215,30 @@ if [ "$n" -eq 0 ]; then
 fi
 
 # ---- one gcc -g object per file that holds a site ------------------
+built=0
+wanted=0
 for f in $(awk '{print $3}' "$TMP/pairs" | sort -u); do
+	wanted=$((wanted + 1))
 	o="$TMP/dw/${f%.c}.o"
-	gcc -w -O0 -g -c -I"$SRC" -I"$INC" -o "$o" "$SRC/$f" 2>/dev/null ||
+	if gcc -w -O0 -g -c -I"$SRC" -I"$INC" -o "$o" "$SRC/$f" 2>/dev/null; then
+		built=$((built + 1))
+	else
 		echo "edgbaked-xcheck: WARNING $f did not compile" >&2
+	fi
 done
+
+# **A warning per file and then a summary of zeros is the same failure
+# in a second costume**, so the count is a gate too: one file that will
+# not compile is a finding worth reading beside the rows, all of them
+# failing is a machine that cannot answer the question.
+if [ "$built" -eq 0 ]; then
+	echo "edgbaked-xcheck: REFUSING TO REPORT -- 0 of $wanted files" >&2
+	echo "edgbaked-xcheck: compiled, so every row would read UNREADABLE" >&2
+	echo "edgbaked-xcheck: and the summary would show 0 disagreements" >&2
+	echo "edgbaked-xcheck: for want of a compiler rather than because" >&2
+	echo "edgbaked-xcheck: the corpus agrees." >&2
+	exit 2
+fi
 
 # ---- ask the DWARF ------------------------------------------------
 # Two spellings: most of these names are typedefs to class types, a

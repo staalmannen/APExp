@@ -1591,6 +1591,71 @@ untested code and the sections after it demonstrably survive it.
 *A guard that has only ever been run on its passing side is a guard
 nobody has read the output of.*
 
+### ANSWERED IN ONE RUN, AND IT IS UPSTREAM php's BUG
+
+The probe's five lines on the VM:
+
+```
+  INFO sys_get_temp_dir() = ''
+  INFO realpath(td)       = '/sys/lib/tests'
+  INFO is_dir/is_writable = false/false
+  INFO fopen in td        = false
+  INFO tmpfile()          = false
+```
+
+**`sys_get_temp_dir()` is the EMPTY STRING**, so `mkstemp` was never
+the question and the three remaining `false`s are all that one fact
+(`realpath('')` is the cwd, which is why that line reads like a real
+directory). *The probe's job was to separate three places and it
+separated them on its first run.*
+
+`main/php_open_temporary_file.c:49` is
+
+```c
+#if !defined(P_tmpdir)
+#define P_tmpdir ""
+#endif
+```
+
+and `:298` is
+
+```c
+#ifdef P_tmpdir
+	if (P_tmpdir) {
+		PG(php_sys_temp_dir) = estrdup(P_tmpdir);
+		return PG(php_sys_temp_dir);
+	}
+#endif
+	/* Shouldn't ever(!) end up here ... last ditch default. */
+	PG(php_sys_temp_dir) = estrdup("/tmp");
+```
+
+***`if ("")` TESTS THE ADDRESS OF A STRING LITERAL, WHICH IS NEVER
+NULL.*** So on any platform without `P_tmpdir` the arm always wins,
+`estrdup("")` is what comes back, and the `/tmp` default one line
+below is unreachable -- the comment beside it saying "Shouldn't
+ever(!) end up here" is upstream telling you it has never been there.
+*The test of a macro's truth is not a test of its content*, and glibc
+defines `P_tmpdir` as `"/tmp"`, so nobody upstream has reached the
+dead line either.
+
+**Fixed in APE's `<stdio.h>`, not in php**, because `P_tmpdir` is XSI
+`<stdio.h>` and **nineteen vendored packages ask for it** -- bash,
+tcl, gmake, coreutils, m4, gnulib, diffutils, sljit, perl's
+`File::Temp`, php. *All but php cope*: each wraps it in `#ifdef` and
+falls back to `"/tmp"`, and bash and tcl go further and `stat` it
+first. So defining it fixes php and is a no-op for the other
+eighteen, who computed the same string by another route. **Every
+`#define P_tmpdir` under `sys/src/external` is behind an `#ifndef`**
+-- checked with a grep, not assumed, because an unguarded one would
+turn this into a redefinition in some other package.
+
+**Confirmed with the target compiler before the VM saw it**: a
+two-line TU through the host-built `6c` emits
+`DATA .string<>+0(SB)/8,$"/tmp\z\z\z\z"`, and `php-mirror.sh`'s
+include list carries `sys/include/ape`, so that is php's own view of
+the macro and not the host's.
+
 ## The Phoronix crash after statvfs: further, not broken
 
 With `statvfs` reporting space, `phoronix-test-suite system-info` no
@@ -1630,6 +1695,90 @@ php /sys/lib/tests/php-smoke.php        # 0 failures expected
 now reaches.* If they do not, the libap change is implicated and
 `APEXP_STATVFS=strict` restores the old behaviour in one word, which
 is what the switch is for.
+
+### THE THREE COMMANDS PASSED, AND THE `stack exception` HAD NO GUARD
+
+`php -v`, `php -m` and `php-smoke.php` (0 failures) all answer on the
+rebuilt tree, so php is fine and the fault is Phoronix's ground.
+The crash is unchanged -- `explode(): Passing null to parameter #2` at
+`phodevi_network:60`, then `general protection violation` in one
+process and `stack exception` in the other.
+
+***AND php's OWN STACK-OVERFLOW GUARD WAS COMPILED OUT, BY THIS
+PORT.*** `ZEND_CHECK_STACK_LIMIT` was `/* #undef */` in the
+hand-answered `config.h`, which removes the whole body of
+`Zend/zend_call_stack.c` and every check in the VM -- so unbounded
+recursion runs off the real stack and traps, where upstream raises
+`Fatal error: Maximum call stack size of N bytes reached.  Infinite
+recursion?`.
+
+**The note that justified the `no` is worth reading as a failure
+mode.** It said the file finds the stack bounds through
+`pthread_getattr_np`, `/proc`, `sysctl` or a Windows call, that APExp
+has none of them, and that answering yes "would leave
+`zend_call_stack_get` returning false at run time, which is the same
+outcome by a longer route". *Every clause is true except the last,
+and the last is the only one that decided anything.*
+`zend_call_stack_init` at `:84` handles a platform with no support **on
+purpose**:
+
+```c
+if (!zend_call_stack_get(&EG(call_stack)))
+	EG(call_stack) = (zend_call_stack){0};
+...
+if (UNEXPECTED(base == (void*)0)) {
+	base = zend_call_stack_position();
+	size = zend_call_stack_default_size();
+	size -= 32 * 1024;
+}
+```
+
+-- the address of a local as the base, and a per-OS default as the
+size, `zend_call_stack_default_size` ending in a generic
+`return 2 * 1024 * 1024`. **The reasoning stopped at the function
+whose name matched and never read its caller**, which is this tree's
+"a grep hit is a name, not an implementation" rule one level up:
+*open the CALLER before concluding what a false return costs.*
+
+**And the autoconf probe is PORTABLE, so a real configure would have
+said yes.** `Zend/Zend.m4:250` takes the address of a local, hands it
+to a function that compares it against one of its own, and defines the
+macro if the stack grows downwards. It asks nothing about pthreads or
+`/proc`. On Plan 9 amd64 the stack grows downwards. *So this is the
+hand-answered-capability family in its rarer direction -- more
+pessimistic than the machine rather than more optimistic -- and its
+cost is a hard trap where there should be a diagnostic.*
+
+**It can only improve matters, whatever Plan 9's real stack is**, and
+that is an argument rather than a hope: the limit is consulted only to
+raise an error EARLIER. Larger real stack than 2MB, php now errors
+cleanly where it faulted; smaller, php faults exactly as today. There
+is no third case.
+
+***2MB IS php's GENERIC DEFAULT AND NOT A MEASUREMENT OF THIS
+PLATFORM, and nothing here can measure it.*** libap's
+`getrlimit(RLIMIT_STACK)` answers `RLIM_INFINITY` -- **a stub
+claiming an infinite stack on a platform whose stack is finite**,
+which is the stub-answers-the-wrong-thing family again and does not
+reach php only because php's sole `getrlimit` arm is `__OpenBSD__`.
+The real figure is the kernel's `USTKSIZE`. Once someone reads it,
+`zend.max_allowed_stack_size` in php.ini takes it exactly -- the
+`default:` arm of the same switch, no rebuild needed.
+
+**Measured on the host with the target compiler, not predicted**:
+`php-mirror.sh --compile` answers `compiled 581, errors 0` with the
+macro on. ***Its first run answered `errors 1` and the fault was in
+the COMMENT I had just written***: `/sys/src/9/*/mem.h` in a C comment
+contains `*/`, which closed the comment, after which the prose became
+C and cpp said `Unterminated string or char const` five times while
+`6c` said `syntax error, last name: mem`. *Not one of the six
+diagnostics mentions a comment*, and the file they named was
+`zend_call_stack.c`, which is the file that includes the config rather
+than the file with the fault -- the message naming the victim, for the
+fourth time in these notes. The path is written `/sys/src/9/<arch>/`
+now, and **this is the round the mirror exists for**: a `config.h`
+edit that would have cost a full VM rebuild to discover cost 52
+seconds.
 
 ### What was cleared on the way, and how
 
