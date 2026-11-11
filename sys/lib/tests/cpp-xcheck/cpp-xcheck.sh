@@ -5,7 +5,11 @@
 #
 #	sh cpp-xcheck.sh                 # the hideset cases
 #	sh cpp-xcheck.sh file.c -- -Dx   # any file, with cpp flags after --
-#	sh cpp-xcheck.sh --regress A B   # diff two builds of cpp over files
+#	sh cpp-xcheck.sh --regress A B FILES...   # diff two cpp builds
+#	sh cpp-xcheck.sh ppnum-cases.c   # `##' onto a pp-number
+#
+# **`--regress' REQUIRES the files** and refuses without them; see the
+# guard below for why.
 #
 # ***THIS IS A CROSS-CHECK, AND IT IS THE CHEAPEST INSTRUMENT THIS TREE
 # HAS EVER HAD FOR THE PREPROCESSOR.*** Everything about `cc/' needs the
@@ -77,6 +81,18 @@ case "${1:-}" in
 	# $2 and $3 are cpp source directories (e.g. a git worktree and HEAD)
 	shift
 	A=$1; B=$2; shift 2
+	# ***`--regress' WITH NO FILES USED TO SUCCEED SILENTLY***, because
+	# the loop below is over `"$@"' and an empty list runs it zero
+	# times: `exit 0', no output, and a reader who has just made a
+	# compiler change sees what looks like "no differences".  It
+	# happened on the pp-number fix.  *A check that cannot fail is not
+	# a check*, and this one could not even run.
+	if [ $# -eq 0 ]; then
+		echo "cpp-xcheck: --regress needs FILES after the two dirs," >&2
+		echo "cpp-xcheck: e.g. \$(find sys/src/ape/lib/ap -name '*.c')" >&2
+		echo "cpp-xcheck: with none, it would compare nothing and pass." >&2
+		exit 2
+	fi
 	build "$A" "$OUT/a"
 	build "$B" "$OUT/b"
 	: "${objtype:=amd64}"; export objtype

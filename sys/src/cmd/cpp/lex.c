@@ -91,17 +91,51 @@ struct	fsm {
 	START,	{ '~' },	ACT(TILDE,S_SELF),
 	START,	{ '^' },	CIRC1,
 
-	/* saw a digit */
+	/*
+	 * saw a digit
+	 *
+	 * ***`_' CONTINUES A pp-number AND MUST NOT END ONE.***  C99
+	 * 6.4.8 is
+	 *	pp-number: digit | . digit | pp-number digit
+	 *		 | pp-number identifier-nondigit | pp-number e sign ...
+	 * and `identifier-nondigit' is a letter OR UNDERSCORE.  `C_ALPH'
+	 * below already covers `_' (see the `j=='_'' in the expansion at
+	 * the foot of this file), so the two lines that used to follow --
+	 *	NUM1,	{ '_' },	ACT(NUMBER,S_SELFB),
+	 *	NUM2,	{ '_' },	ACT(NUMBER,S_SELFB),
+	 * -- were LATER ENTRIES that deliberately overrode it, which the
+	 * header comment above describes as the table's mechanism for
+	 * exactly this.  They are gone.
+	 *
+	 * **The symptom is not a wrong number, it is a wrong PASTE.**
+	 * `IN##0_C' has `0_C' as its right operand, which is one
+	 * pp-number; splitting it made the paste join only `IN' and `0'
+	 * and leave `_C' behind as a separate identifier:
+	 *
+	 *	#define CAT(IN) IN##0_C
+	 *	int CAT(foo);        -> `int foo0 _C;'   (gcc: `int foo0_C;')
+	 *
+	 * which reaches the compiler as `syntax error, last name: _C'.
+	 * ***`IN##_0_C' WAS ALWAYS RIGHT***, because `_0_C' starts with
+	 * `_' and so lexes as an identifier rather than a number -- which
+	 * is what pins the fault on pp-number lexing rather than on `##'.
+	 *
+	 * **MEASURED** against `gcc -E` with `cpp-xcheck/`: three cases,
+	 * all three now agree.  Found in libwebp 1.6.0,
+	 * `src/dsp/lossless.c:630`, whose `COPY_PREDICTOR_ARRAY(IN, OUT)`
+	 * pastes `IN##0_C` through `IN##13_C`; it was the ONE file of 125
+	 * that would not compile.  *These two lines are in this
+	 * repository's root commit, so the defect is inherited rather
+	 * than APExp's.*
+	 */
 	NUM1,	{ C_XX },	ACT(NUMBER,S_SELFB),
 	NUM1,	{ C_NUM, C_ALPH, '.' },	NUM1,
 	NUM1,	{ 'E', 'e', 'P', 'p' },	NUM2,
-	NUM1,	{ '_' },	ACT(NUMBER,S_SELFB),
 
 	/* saw possible start of exponent, digits-e or binary-e (hex float) */
 	NUM2,	{ C_XX },	ACT(NUMBER,S_SELFB),
 	NUM2,	{ '+', '-' },	NUM1,
 	NUM2,	{ C_NUM, C_ALPH },	NUM1,
-	NUM2,	{ '_' },	ACT(NUMBER,S_SELFB),
 
 	/* saw a '.', which could be a number or an operator */
 	NUM3,	{ C_XX },	ACT(DOT,S_SELFB),
