@@ -8,8 +8,24 @@
  * Plan 9 has no equivalent. A file server is reached through the
  * namespace, not through a mount table, and 9P has no operation that
  * reports block or inode counts for the file system behind a path --
- * only the per-file Dir that stat(2) returns. So statvfs() and
- * fstatvfs() here always fail with ENOSYS.
+ * only the per-file Dir that stat(2) returns.
+ *
+ * ***SO THE NUMBERS THESE REPORT ARE SYNTHETIC, AND THAT IS A
+ * DELIBERATE CHOICE WITH A SWITCH.***  By default statvfs() and
+ * fstatvfs() SUCCEED and report a large, recognisable amount of free
+ * space (a round power of two repeated across the block fields), so
+ * that the many POSIX programs which gate on free space before
+ * writing continue to work.  `APEXP_STATVFS=strict' in the
+ * environment restores the truthful answer, which is failure with
+ * ENOSYS.
+ *
+ * **Neither answer is free** and `lib/ap/stat/statvfs.c' carries the
+ * whole argument: ENOSYS is correct and becomes ZERO in any caller
+ * that does not check -- which is how php's `disk_free_space()'
+ * reported a full disk to the Phoronix Test Suite on an empty one --
+ * while succeeding is a lie that costs a program checking before a
+ * very large write, and that program fails at the `write' instead.
+ * *Read that file before changing this behaviour.*
  *
  * The type still has to exist and be complete, because portable code
  * declares a "struct statvfs" on the stack before it ever calls

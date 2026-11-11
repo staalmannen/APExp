@@ -9,33 +9,59 @@
 #	cpfe NNNNN: suicide: sys: trap: fault read addr=0x8 pc=0x8
 #
 # which names no file, no line and no header.  **A crash in cpfe is not
-# a diagnostic**: it is the front end dying, so the usual "read the
-# error" route does not exist and the question has to be asked by
-# ELIMINATION instead.
+# a diagnostic**: the front end is dying, so there is nothing to read
+# and the question has to be asked by ELIMINATION instead.
 #
-# This compiles ONE header at a time, alone, with nothing else in the
-# translation unit, and prints a line per header.  It is rc on purpose,
-# like `bash-runtests' and the ladders: a harness that dies with the
-# thing it is testing cannot report.
+# This compiles ONE header at a time, alone, and prints a line each.
+# It is rc on purpose, like `bash-runtests' and the ladders.
 #
-# ***IT MUST NOT STOP AT THE FIRST CRASH.***  The whole value is the
-# FULL list -- one header crashing tells you where to look, three
-# crashing tells you whether they share a dependency -- and this tree
-# has paid twice for asking one-per-round (bacon's missing headers,
-# bacon's missing link symbols) when the question could have been asked
-# all at once.  So every header is tried whatever the last one did.
+# ***IT MUST NOT STOP AT THE FIRST CRASH.***  The full list is the
+# value -- one header crashing says where to look, three say whether
+# they share a dependency -- and this tree has paid twice for asking
+# one-per-round when the question could have been asked all at once.
 #
 # ***`-F' IS WHAT MAKES THIS cpfe's QUESTION AND NOT cc's.***  It stops
-# after the front end and writes the generated C, so a failure here is
-# cpfe's; without it a later `cc' error would be reported against the
-# header and mean something else entirely.
+# after the front end, so a failure here is cpfe's; without it a later
+# `cc' error would be reported against the header and mean something
+# else entirely.
 #
-# The three outcomes are different findings and the script says which:
-#   ok        -- cpfe translated it
-#   ERROR     -- cpfe rejected it and SAID SO (a diagnostic: read it)
-#   CRASH     -- cpfe died (suicide/trap: no diagnostic exists)
-# *An ERROR and a CRASH are not the same result*, and a script that
-# printed only pass/fail would merge them.
+# Three outcomes, and they are different findings:
+#   ok     -- cpfe translated it
+#   ERROR  -- cpfe rejected it and SAID SO (a diagnostic: read it)
+#   CRASH  -- cpfe died (suicide/trap: no diagnostic exists)
+#
+# ------------------------------------------------------------------
+# ***THE FIRST VERSION OF THIS FILE WAS WRITTEN IN sh AND rc ATE IT***,
+# in the two ways CLAUDE.md already warns about.  Both are recorded
+# here because the file is the natural place to meet them again.
+#
+# 1. **`2>file' IS NOT rc.**  rc spells a stderr redirect `>[2]file';
+#    `2>file' parses as the ARGUMENT `2' followed by a redirect, so the
+#    run answered `eccp: unrecognised argument: 2' -- eccp complaining
+#    about a token this script never meant to pass it.  *The message
+#    named the victim*, which is this tree's oldest reading trap.
+#
+# 2. **A BACKQUOTE THAT MATCHES NOTHING IS A NULL LIST, NOT AN EMPTY
+#    STRING**, and `^' concatenation with a null list is an error:
+#    `cxx-bisect:70: null list in concatenation'.  That is exactly the
+#    `BIN=' bug from `cmd/php/mkfile', in a different file.  Nothing
+#    below concatenates a backquote; the first line of stderr is
+#    printed on its own line instead, which is also easier to read.
+#
+# 3. `grep' inside `apexp-sh' is **GNU grep**, not Plan 9's -- the
+#    union puts APExp's `/bin' first.  So `-s' does NOT mean silent
+#    here (that is Plan 9's spelling; GNU's is `-q'), and `|' needs
+#    `-E'.  Both are used below.
+#
+# 4. No `bc'.  rc has no arithmetic, and the counts are just the
+#    lengths of three lists -- `$#crashed' and friends.
+#
+# 5. It needs `apexp-sh', because it needs `c++'.  That also settles
+#    which `grep' answers -- APExp's, which is POSIX, so `-qE' is
+#    right.  Plan 9's own grep has neither flag and takes `|' in a
+#    plain pattern, so this would have to change if it ever ran
+#    outside.
+# ------------------------------------------------------------------
 
 if(~ $#* 0)
 	headers = (algorithm array cmath cctype cerrno cfloat cfenv \
@@ -47,40 +73,58 @@ if(~ $#* 0)
 if not
 	headers = $*
 
-tmp = /tmp/cxx-bisect.$pid
+tmp = /tmp/cxx-bisect.^$pid
 mkdir -p $tmp
 
-ncrash = 0
-nerr = 0
-nok = 0
+crashed = ()
+errored = ()
+passed = ()
 
 for(h in $headers){
 	echo '#include <'^$h^'>' > $tmp/one.cpp
 	echo 'int main(void){ return 0; }' >> $tmp/one.cpp
 
-	# stderr kept: a CRASH prints `suicide:' there and nowhere else.
-	c++ -F $tmp/one.cpp >$tmp/out 2>$tmp/err
+	# `>[2]file' is rc's stderr redirect, written WITHOUT a space to
+	# match `rc/bin/fdwatch:247' and `rc/bin/vts-bash:99', the two
+	# real uses in this tree.  A CRASH announces itself there and
+	# nowhere else.
+	c++ -F $tmp/one.cpp >$tmp/out >[2]$tmp/err
 	st = $status
 
-	if(grep -s 'suicide|trap:' $tmp/err){
-		echo 'CRASH  '^$h^'  '^`{sed 1q $tmp/err}
-		ncrash = `{echo $ncrash+1 | bc}
-	}
-	if not if(! ~ $st ''){
-		echo 'ERROR  '^$h^'  '^`{sed 1q $tmp/err}
-		nerr = `{echo $nerr+1 | bc}
-	}
-	if not {
-		echo 'ok     '^$h
-		nok = `{echo $nok+1 | bc}
-	}
+	# **Three plain `if's and no `if not'.**  There is no `if not'
+	# anywhere else in this tree, so there is no precedent to copy and
+	# no rc here to test against -- and this file has already been
+	# bitten twice by writing rc from the sh habit.  CRASH is tested
+	# LAST so it wins: a cpfe that dies also leaves a non-empty
+	# status, and the two are not the same finding.
+	kind = ok
+	if(! ~ $st '')
+		kind = ERROR
+	if(grep -qE 'suicide|trap:' $tmp/err)
+		kind = CRASH
+
+	echo $kind $h
+	if(! ~ $kind ok)
+		sed 1q $tmp/err
+
+	# **No spaces around these `='.**  rc allows them in a LEADING
+	# assignment (`apexp-sh' has `LC_ALL = C.UTF-8'), but the only
+	# in-tree precedents for an assignment AFTER `if(...)' are
+	# `libc/9syscall/mkfile''s `if(~ $i seek) j=_seek' and
+	# `rc/bin/ape/install:34''s `*=($1 $2)', and both are tight.
+	# Copy the precedent rather than reason about the grammar.
+	if(~ $kind CRASH) crashed=($crashed $h)
+	if(~ $kind ERROR) errored=($errored $h)
+	if(~ $kind ok) passed=($passed $h)
 }
 
 echo
-echo 'cxx-bisect: '^$nok^' ok, '^$nerr^' error, '^$ncrash^' CRASH'
+echo 'cxx-bisect: '^$#passed^' ok, '^$#errored^' error, '^$#crashed^' CRASH'
+if(! ~ $#crashed 0)
+	echo 'cxx-bisect: crashed on: '^$"crashed
 rm -rf $tmp
 
-# A completion marker, because a harness that is itself killed gives the
-# prompt back exactly like one that finished -- the rule `tk-runall' and
-# `tcl-runall' carry.  If you do not see this line, the run did not end.
+# A completion marker: a harness that is itself killed gives the prompt
+# back exactly like one that finished -- the rule `tk-runall' and
+# `tcl-runall' carry.  No marker, no result.
 echo 'cxx-bisect: done'

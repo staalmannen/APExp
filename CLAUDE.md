@@ -273,7 +273,18 @@ paid once and not on every import.
 `dup-fdinfo-test`, `rmdir-test`, `copyfile-test`, `deeppath-test`,
 `bufexec-test`, `mkstemp-test`, `printfmod-test`, `umask-test`,
 `dupbuf-test`, `dotdir-test`, `getcwd-test`, `progname-test`,
-`select-test`, `cxaatexit-test`, `fsync-test` (**a stub that answers
+`select-test`, `cxaatexit-test`,
+`statvfs-test` (**TWO RUNS, and one alone proves nothing**: the
+default mode must report space and `APEXP_STATVFS=strict` must answer
+ENOSYS, and *a run of only the first cannot tell a working switch
+from a switch that is never read*. Its `-DHOSTCHECK` build is the gcc
+control and drops the APExp-only sections, because the host's statvfs
+reports a real disk and asserting 8 TiB against it would be asserting
+the answer rather than the rule. **The version marker matters more
+here than usual**: the OLD library's ENOSYS is a legitimate output of
+the NEW one under `strict`, so a stale libap looks exactly like a
+working `strict` run),
+`fsync-test` (**a stub that answers
 FAILURE is not one that answers NOTHING TO DO** — and its section 2 is
 there because section 0 passes for an `fsync` that returns 0 to
 everything), `pthread-test` (**the one test here
@@ -301,7 +312,7 @@ so a test built from a fresh pull can run days-old library code and say
 nothing. `_sock_listenmark`, `_execmark`, `_ttymark`, `_getcwdmark`,
 `_printfmark`, `_dupmark`, `_dotdirmark`, `_tempmark`, `_fdinfomark`,
 `_umaskmark`, `_bufmark`, `_rdevmark`, `_selregmark`, `_pthreadmark`,
-`_syncmark`, `_mmapmark`, `_ucmark` each make the test **fail to LINK** against a libap
+`_syncmark`, `_mmapmark`, `_ucmark`, `_statvfsmark` each make the test **fail to LINK** against a libap
 predating its fix. The idiom has paid thirteen times; bump one when a file changes in a way a test must see — and
 it matters most where the bug's whole symptom is that nothing is
 printed.
@@ -1272,11 +1283,16 @@ taken**, since `ORETURN` with a left operand means "compute into the
 return location" and accepting void is a statement-tree rewrite.
 ***`system-info` RUNS AND ASKS FOR NOTHING MORE.*** What is left on
 its output is three messages and only one is ours:
-`disk_free_space(): Function not implemented`, which is libap's
-`statvfs` stub and **a protocol limit** -- *9P2000 has no `Tstatfs`*,
-the message set simply has no filesystem-level query, so Phoronix's
-`Lock creation failed due to lack of disk space` has no fix on our
-side. **And php's `config.h` answers `HAVE_STATVFS` YES against this
+`disk_free_space(): Function not implemented`, which was libap's
+`statvfs` stub. ***THAT IS FIXED AND THE FIX IS A SWITCH***:
+`statvfs` now SUCCEEDS by default with a recognisable synthetic
+figure, and `APEXP_STATVFS=strict` restores ENOSYS. The platform
+limit is real -- *9P2000 has no `Tstatfs`*, and hjfs's `df` console
+command prints to the SYSTEM CONSOLE rather than to the caller, which
+is what closes it rather than the protocol alone -- but ENOSYS
+becomes ZERO in any caller that does not check, which is how
+Phoronix got `Lock creation failed due to lack of disk space` on a
+disk with plenty. `lib/ap/stat/statvfs.c` carries the argument. **And php's `config.h` answers `HAVE_STATVFS` YES against this
 tree's own rule, deliberately**: with it yes php checks the return and
 gives `false`; with it **no** php compiles neither arm, keeps
 `bytesfree = 0` and returns SUCCESS -- *a silent `0.0`, which is the
