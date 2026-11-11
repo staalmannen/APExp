@@ -1549,6 +1549,48 @@ working, not a bug. "JPEG is absent" is a statement about this port's
 libgd, not about php or about gd. 0 failures on host php 8.3.6, which
 happens also to ship GD 2.3.3.
 
+### `tempnam()` RETURNS false ON THE VM, and the first cost was the test's
+
+The zip block did `tempnam(sys_get_temp_dir(), 'apexpzip')` and handed
+the result straight to `ZipArchive::open`. On the VM that result is
+`false`, `open(false)` is `open('')`, and **php 8 raises an uncaught
+`ValueError` for it** -- so the interpreter died and **every section
+after zip went unmeasured**. *A case that can kill the process belongs
+behind a guard*, which is this tree's rule about test ordering arriving
+in a php script, and the unmeasured sections are the cost of not having
+had one.
+
+**Guarded now, and the zip checks are SKIPPED rather than failed**: a
+missing `tempnam` is not a zip bug, and a count that blames the wrong
+layer is worse than a count with a hole in it.
+
+**The guard carries a probe that asks the question in order**, so the
+next run names the layer with no rebuild.
+`php_do_open_temporary_file` resolves the directory with
+`CWD_REALPATH` and then calls `mkstemp` -- this `config.h` answers
+`HAVE_MKSTEMP 1`, so the `mktemp` arm is not compiled -- which leaves
+exactly three places, and the five INFO lines separate them:
+`sys_get_temp_dir()`, `realpath()` of it, `is_dir`/`is_writable`, a
+plain `fopen` inside it, and `tmpfile()`. *`fopen` working while
+`tempnam` does not puts it on `mkstemp` and nothing else*, and
+`tmpfile()` takes the same path without returning a NAME, so it says
+whether the name or the file is the problem.
+
+**One thing is already established and is a FALLBACK rather than a
+fault**: APE defines no `P_tmpdir` anywhere, so php's temp-dir lookup
+falls through `TMPDIR` and the `#ifdef P_tmpdir` arm to its own
+last-ditch `estrdup("/tmp")`. That is the right answer here, but it is
+reached by default rather than chosen, which is worth seeing printed.
+
+**BOTH BRANCHES ARE EXERCISED ON THE HOST, which is the half that
+makes the guard worth having.** Plain `php php-smoke.php` takes the
+zip path and gives 0 failures; `php -d sys_temp_dir=/nonexistent/xyz
+php-smoke.php` makes `tempnam` fail, prints all five INFO lines, and
+**still reaches the end at 0 failures** -- so the guard is not
+untested code and the sections after it demonstrably survive it.
+*A guard that has only ever been run on its passing side is a guard
+nobody has read the output of.*
+
 ## The Phoronix crash after statvfs: further, not broken
 
 With `statvfs` reporting space, `phoronix-test-suite system-info` no

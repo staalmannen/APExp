@@ -1387,51 +1387,148 @@ SIGSEGV in edg::alloc_hash_table (memory_region=0, num_elements=1000)
 ```
 
 on an **empty source file with no includes**, so it is nothing to do
-with the C++ headers. It is early per-translation-unit init, and
-`memory_region=0` reads like state that something was supposed to set
-up first — which points at **the static-init gap this file already
-lists as open**: nothing calls the generated dynamic initialisers.
-*No `__call_ctors`-shaped symbol is defined in any of the 75 objects*,
-and the 805 `_GLOBAL__N_` hits are anonymous-namespace mangling rather
-than initialiser functions, so where the Plan 9 build gets its
-initialisation from is the next question and is not answered here.
+with the C++ headers.
 
-***THE PARAGRAPH HERE USED TO SAY "DO NOT READ THIS CRASH AS THE
-VM's. THEY ARE DIFFERENT", AND THAT WAS WRITTEN TOO SOON.*** It rested
-on one fact -- the VM's cpfe translated a toy and returned 8 -- which
-was true when it was written and is not the current state.
-`sys/lib/tests/cxx-bisect` on the VM answers **CRASH for all 35
-headers**, every one `fault read addr=0x1 pc=0x1`, **including
-`<ciso646>`, which is very nearly an empty file.** A crash that does
-not discriminate between `<ciso646>` and `<vector>` is not about
-headers.
+***AND IT IS NOT THE STATIC-INIT GAP, WHICH IS WHAT THIS SECTION SAID
+FOR TWO ROUNDS. IT IS THE HOST'S OWN ABI, AND THE WHOLE CHAIN IS
+MEASURED.*** The reading that `memory_region=0` "looks like state
+something was supposed to set up first" was a resemblance, and three
+cheap instruments took it apart:
 
-So the two crashes are now **candidates for the same bug** rather than
-established as different, and the host backtrace is the only
-source-level view anyone has of it:
+  - **`alloc_in_region(0, 24)` RETURNS FINE EARLIER IN THE SAME RUN.**
+    A breakpoint shows the first call, from `alloc_fe`, returning
+    `0x5555575e66d0` out of a good region header. So region 0 *is* set
+    up and the table *is* initialised -- `edg::mem_region_table` is a
+    pointer `realloc_buffer`'d by `ensure_mem_region_table_space`, not
+    a static needing a constructor. **The hypothesis was refuted by
+    the first question anyone asked of it.**
+  - **`alloc_in_region` CANNOT FAULT ON A NULL HEADER AND DOES NOT
+    HERE**: it ends `temp_ptr = hdr->next_avail_in_block`, so a header
+    whose `next_avail_in_block` is zero returns **NULL with no
+    diagnostic**, and the caller's `htp->hash_function_index = ...` is
+    where it dies. *The crash is one frame away from the fault.*
+  - **REGION 0's HEADER IS CORRUPT, AND THE PATTERN NAMES THE WIDTH.**
+    At the crash `start_of_block` is `0x555500000000` -- a real
+    pointer with its **low 32 bits zeroed** -- while `after_end_of_block`
+    beside it is a good address. `next_avail_in_block` reads `0x18`,
+    which is the `+= 24` that ran *after* the NULL came back.
+  - **A WATCHPOINT NAMED THE WRITER IN ONE RUN.** `trim_mem_block`
+    carves the tail of a block into a fresh reusable-block header at
+    that address and writes `start_of_block` correctly; **then
+    `alloc_translation_unit` writes through it.**
 
-* host, empty file, no includes: SIGSEGV in `alloc_hash_table`
-  (`memory_region=0`) under `fe_translation_unit_init`;
-* VM, every input: `fault read addr=0x1 pc=0x1`, a jump through a
-  near-null pointer, which is what reaching an uninitialised function
-  table looks like from the outside.
+**And `alloc_translation_unit` is `alloc_fe(440ULL)` — a folded
+`sizeof(a_translation_unit)` — while the host lays that struct out at
+464.** It then runs
 
-**The one command that settles it** is an empty translation unit on
-the VM -- `cxx-bisect` runs exactly that as its case 0 now, before any
-header, and stops if it crashes. *The first version of that script
-went straight to the headers*, which is why the run cost 35 identical
-crash reports and said nothing: **a bisect that cannot say "everything
-fails" cannot tell "this header breaks cpfe" from "cpfe is broken"**,
-and those want completely different work.
+```c
+field = (void **)((char *)tup + vrp->field_offset);
+*field = dest;
+```
 
-*The lesson is the ordering, not the bug*: the question was framed as
-"which header" before anything had established that a header was
-involved at all.
+over the registration list, whose offsets are folded too (400 and 416,
+the pair `edgtuoff-probe` measures). **So it writes 24 bytes past a
+440-byte object, into whatever `alloc_fe` handed out next**, which on
+this run was the header `trim_mem_block` had just put there. *Every
+step of that is a measurement and none of it is EDG's bug.*
 
-### What it would be worth
+**`sys/lib/tests/edgbaked-xcheck.sh` generalises it from two offsets to
+the whole corpus**: 91 folded `sizeof` sites named by the one shape
+that carries its own type, `((T *)(alloc_fe(NULL)))`, each compared
+against the DWARF of a real `gcc -g -c`. **83 agree, 4 are array
+allocations, and 4 disagree -- `+8`, `+8`, `+24`, `+8`, every one in
+the same direction.** One direction and one modulus is the finding, not
+the four names: the corpus was generated for a target whose `long` is
+**4 bytes**, and gcc on x86-64 Linux has 8. *`a_translation_unit`'s +24
+is the same 24 as `edgtuoff-probe`'s 400 -> 424 — the five
+`unsigned long` in `an_il_header` — arrived at from the struct's SIZE
+instead of a member's OFFSET, which is two routes to one number.*
 
-The same leverage `cpp-xcheck` and `hostkencc` gave: every C++
-question becomes a local `gdb` session instead of a VM round trip,
-with source-level debugging over 2.9M lines that `acid` cannot offer.
-The remaining work is one question — what initialises EDG's memory
-regions and who calls it — and the backtrace above is where to start.
+**83 agreeing is why the binary gets as far as it does**, and that is
+the part worth keeping: most of EDG's structs hold no `long`, so most
+allocations are the right length, the front end parses its own command
+line, prints its own diagnostics correctly worded, and reaches
+per-translation-unit init before the first short one bites. *A build
+that runs is not a build whose ABI matches*, and nothing short of
+running it could have said which.
+
+***SO THE TWO CRASHES ARE DIFFERENT, AND THIS TIME FOR A POSITIVE
+REASON RATHER THAN AN ABSENCE.*** The paragraph here once said "do not
+read this crash as the VM's, they are different" and was withdrawn as
+written too soon -- it rested on one fact (the VM's cpfe had translated
+a toy and returned 8) that had stopped being the current state. It is
+re-established now on the mechanism instead: **the fault needs `long`
+to be 8 bytes, and kencc amd64's `long` is 4.** The corpus is correct
+for the VM by construction and wrong here by construction. *The earlier
+claim and this one have the same conclusion and are not the same
+claim*: one generalised from a stale observation, this one names a
+width.
+
+**Two instruments that could not have found it, and both were tried:**
+
+  - **valgrind sees nothing.** `alloc_fe` hands out bytes from EDG's
+    own sub-allocator, so the overrun is *inside* a malloc'd block.
+    One run reports exactly **one** error -- the final null
+    dereference -- and says nothing about the write that caused it.
+    *An allocator of your own is a blind spot in every heap checker.*
+  - **The COMDAT split was a red herring, which does not make it
+    wrong.** 2671 identical template instantiations merged and 498
+    `string literal` symbols localised is the right handling and is
+    still right; it simply could never have fixed this, and the
+    section already recorded that it did not.
+
+**AND gdb's DWARF OVER THE MERGED 56MB BINARY GAVE A WRONG ANSWER THAT
+NEARLY SENT THE ROUND TO THE WRONG STRUCT.** `print
+sizeof(an_il_header)` answered **160** there, against the corpus's
+baked 184 and this file's own recorded 208 for the host -- three
+numbers for one type. The cause is 75 translation units each carrying
+their own type entry and gdb taking one; the same question against a
+single `gcc -g -c` object answers once and correctly. ***Read a size
+out of ONE object, never out of a link of many***, and a size that
+disagrees with a number already written down is the instrument's bug
+until proved otherwise.
+
+### Where it stops being useful, and where it still is
+
+**Sound**: anything decided at compile time. Does a header parse, does
+a TU compile, what does cpfe *say* -- the 75 objects are built from the
+committed corpus by a strict compiler and its diagnostics are real.
+That is the same bargain `hostkencc` strikes (LP64 host, LLP64 target:
+sound for compiles, crashes and diagnostics, unsound for anything keyed
+on `long`), and it is the same sentence for the same reason.
+
+**Void**: anything observed at run time. Not just the crash -- any
+behaviour of a 440-byte object used as a 464-byte one.
+
+**And it cannot be repaired on this machine**, which was checked rather
+than assumed: there is no `long`-is-4 C compiler here (no mingw-w64,
+and `-Dlong=int` dies on the corpus's 7273 `long long` uses), and
+regenerating the corpus for LP64 needs a working cpfe, which is the
+thing being debugged. *So the host build is 80% of an instrument and
+the remaining 20% is unreachable here, for a named reason instead of an
+open question.*
+
+**What the VM's `fault read addr=0x1 pc=0x1` is remains open**, and the
+host has nothing to say about it. What bears on it, cheapest first, is
+that **two layout rules have landed since cpfe last translated a
+toy** -- the bit-field head-sharing `follow` rule in `cc/dcl.c` and
+`gbitagg`'s static-initialiser emission -- so the corpus's folded
+400/416 is a claim about a compiler that has since changed twice:
+
+  - `mk distclean` before `mk install`, the tree's own rule for an ABI
+    change, since `mk install` relinks nothing already built -- and a
+    half-rebuilt 2.9M-line corpus with two struct layouts in it is
+    exactly what a jump to address 1 looks like from outside;
+  - `edgtuoff-probe`, which answers in one command whether pcc still
+    puts those two members at 400 and 416;
+  - `edgscope-probe` (predicted 6 -> 0 under the `follow` rule) and
+    `structalign-test`, which say whether the two rules are right at
+    all.
+
+*The host round's contribution to the VM question is to remove a
+candidate*, which is worth a round on its own. **The static-init gap is
+still open** -- nothing calls `_Z12__call_ctorsv` and that is a real
+fact about the corpus -- but it has stopped being the suspect for a
+crash, because the only evidence pointing it at one was this backtrace.
+*A finding that explains an instrument's own failure also withdraws
+whatever that failure was being used as evidence for.*
