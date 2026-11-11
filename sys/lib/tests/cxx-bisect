@@ -1,0 +1,86 @@
+#!/bin/rc
+# cxx-bisect -- which C++ header makes `cpfe' die?
+#
+#	cd /sys/lib/tests && ./cxx-bisect
+#	./cxx-bisect <header> ...	# only these
+#
+# `cxx-library-test.cpp' includes 46 headers and `c++' answers
+#
+#	cpfe NNNNN: suicide: sys: trap: fault read addr=0x8 pc=0x8
+#
+# which names no file, no line and no header.  **A crash in cpfe is not
+# a diagnostic**: it is the front end dying, so the usual "read the
+# error" route does not exist and the question has to be asked by
+# ELIMINATION instead.
+#
+# This compiles ONE header at a time, alone, with nothing else in the
+# translation unit, and prints a line per header.  It is rc on purpose,
+# like `bash-runtests' and the ladders: a harness that dies with the
+# thing it is testing cannot report.
+#
+# ***IT MUST NOT STOP AT THE FIRST CRASH.***  The whole value is the
+# FULL list -- one header crashing tells you where to look, three
+# crashing tells you whether they share a dependency -- and this tree
+# has paid twice for asking one-per-round (bacon's missing headers,
+# bacon's missing link symbols) when the question could have been asked
+# all at once.  So every header is tried whatever the last one did.
+#
+# ***`-F' IS WHAT MAKES THIS cpfe's QUESTION AND NOT cc's.***  It stops
+# after the front end and writes the generated C, so a failure here is
+# cpfe's; without it a later `cc' error would be reported against the
+# header and mean something else entirely.
+#
+# The three outcomes are different findings and the script says which:
+#   ok        -- cpfe translated it
+#   ERROR     -- cpfe rejected it and SAID SO (a diagnostic: read it)
+#   CRASH     -- cpfe died (suicide/trap: no diagnostic exists)
+# *An ERROR and a CRASH are not the same result*, and a script that
+# printed only pass/fail would merge them.
+
+if(~ $#* 0)
+	headers = (algorithm array cmath cctype cerrno cfloat cfenv \
+		cinttypes ciso646 climits clocale csetjmp csignal \
+		cstdarg cstdio cstdlib cstring ctime cstdbool cstddef \
+		cstdint cwchar cwctype forward_list functional list map \
+		expected memory string string_view tuple utility variant \
+		vector)
+if not
+	headers = $*
+
+tmp = /tmp/cxx-bisect.$pid
+mkdir -p $tmp
+
+ncrash = 0
+nerr = 0
+nok = 0
+
+for(h in $headers){
+	echo '#include <'^$h^'>' > $tmp/one.cpp
+	echo 'int main(void){ return 0; }' >> $tmp/one.cpp
+
+	# stderr kept: a CRASH prints `suicide:' there and nowhere else.
+	c++ -F $tmp/one.cpp >$tmp/out 2>$tmp/err
+	st = $status
+
+	if(grep -s 'suicide|trap:' $tmp/err){
+		echo 'CRASH  '^$h^'  '^`{sed 1q $tmp/err}
+		ncrash = `{echo $ncrash+1 | bc}
+	}
+	if not if(! ~ $st ''){
+		echo 'ERROR  '^$h^'  '^`{sed 1q $tmp/err}
+		nerr = `{echo $nerr+1 | bc}
+	}
+	if not {
+		echo 'ok     '^$h
+		nok = `{echo $nok+1 | bc}
+	}
+}
+
+echo
+echo 'cxx-bisect: '^$nok^' ok, '^$nerr^' error, '^$ncrash^' CRASH'
+rm -rf $tmp
+
+# A completion marker, because a harness that is itself killed gives the
+# prompt back exactly like one that finished -- the rule `tk-runall' and
+# `tcl-runall' carry.  If you do not see this line, the run did not end.
+echo 'cxx-bisect: done'

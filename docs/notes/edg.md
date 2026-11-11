@@ -1338,3 +1338,75 @@ measured and did not measure. `cat /tmp/t.cpp` and `echo $status` settle
 it; **and if it is the second reading, that is a better reproducer for
 the static-init gap than anything written down for it so far**, which
 has only ever been reasoned about from the corpus.
+
+## A host-built cpfe: 80% of an instrument, and where it stops
+
+**It links and it runs.** `gcc -w -O0 -g` over the 75 `src/` TUs that
+`cmd/edg/mkfile` lists, plus `lib_src/placenew.c`, plus a three-name
+shim, produces a 56MB `cpfe` that parses its own command line and
+prints EDG's own diagnostics (`invalid option: --help` comes out
+correctly worded). *That is the first time cpfe has been run anywhere
+but the VM.*
+
+**The three names a host build needs** — the `cpp-xcheck/p9/shim.c`
+pattern, and a short list like that one's eleven:
+
+* `_errnoloc` — APE's errno accessor; `return &errno;`
+* `_ctype` — APE's classification table. **The bit values are read out
+  of `edg/util/decode.c`'s own enum** (`_ISupper = 0x1` … `_ISxdigit =
+  0x80`), not guessed, and filled from the host's `<ctype.h>` in a
+  constructor.
+* `isNaN` — APE spells it with the capitals; `return isnan(d);`
+
+### The link is the COMDAT problem, and it splits in two
+
+3169 mangled names are defined in more than one object. **They are not
+all the same kind**, and that distinction is the whole difficulty:
+
+* **2671 are template instantiations and identical.** Taking one is
+  exactly what a COMDAT linker does, so `-Wl,--allow-multiple-definition`
+  is right for these.
+* **498 are `...::string literal`** — per-function local literal data
+  that EDG's C generation gave colliding external names. **Merging
+  those is wrong**: they hold different bytes. `objcopy
+  --localize-symbols` over every object gives each TU its own copy,
+  which is the COMDAT semantics for them.
+
+*That split was worth finding and did not fix the run*, which is the
+honest result: with both halves handled the binary still dies.
+
+### Where it stops
+
+```
+SIGSEGV in edg::alloc_hash_table (memory_region=0, num_elements=1000)
+  at src/symbol_tbl.c
+  <- edg::attribute_trans_unit_init   (attribute.c:11053)
+  <- edg::fe_translation_unit_init    (fe_init.c:2212)
+  <- edg::process_translation_unit    (trans_unit.c:840)
+  <- cfe_main                         (cfe.c:127)
+```
+
+on an **empty source file with no includes**, so it is nothing to do
+with the C++ headers. It is early per-translation-unit init, and
+`memory_region=0` reads like state that something was supposed to set
+up first — which points at **the static-init gap this file already
+lists as open**: nothing calls the generated dynamic initialisers.
+*No `__call_ctors`-shaped symbol is defined in any of the 75 objects*,
+and the 805 `_GLOBAL__N_` hits are anonymous-namespace mangling rather
+than initialiser functions, so where the Plan 9 build gets its
+initialisation from is the next question and is not answered here.
+
+**Do not read this crash as the VM's.** They are different: the VM's
+cpfe translates a toy correctly and returns 8, so its own
+initialisation works. This one is an artifact of a build nobody has
+made before. *A host instrument that crashes differently from the
+target is worse than no instrument until that is understood*, which is
+why nothing here is committed as a harness.
+
+### What it would be worth
+
+The same leverage `cpp-xcheck` and `hostkencc` gave: every C++
+question becomes a local `gdb` session instead of a VM round trip,
+with source-level debugging over 2.9M lines that `acid` cannot offer.
+The remaining work is one question — what initialises EDG's memory
+regions and who calls it — and the backtrace above is where to start.
