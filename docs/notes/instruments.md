@@ -318,6 +318,36 @@ translation units each carrying a type entry and gdb taking one.
 **Read a size out of ONE object, never out of a link of many**, and a
 size that disagrees with a number already written down is the
 instrument's bug until proved otherwise.
+`asmout-sweep.py` is the companion to `asmout-probe`/`asmok-probe` and
+answers the question making the compiler STRICTER creates: *where
+would the next full build now stop?* 403 GNU extended asm sites with
+an OUTPUT operand under `sys/src/external`, each classified by its
+enclosing `#if`. **278 are guarded by `__GNUC__`/`_MSC_VER` and are
+therefore correct as written**; 97 are other-arch; **28 are the
+dangerous class** -- an x86 guard with no compiler guard, which is
+exactly libwebp's shape -- *and not one of the 28 is compiled by this
+tree*. **It does NOT gate**, because nothing here reads a mkfile, so
+only a build settles reachability and a gate would demand changes to
+code nobody compiles.
+**Two of the 28 were opened by hand and both were already solved**:
+`zstd/lib/common/cpu.h` reads `!defined(Plan9)` and `lib/zstd/mkfile`
+passes `-DPlan9` -- *somebody met this class before and fixed it the
+same way, which is corroboration the shape is real* -- and php's
+`zend_float.h` needs a `config.h` macro left `#undef` **and**
+`!__x86_64__`, excluded twice, with `php-mirror --compile` at 581/0 as
+the whole-package confirmation rather than the two files anyone read.
+***THE PREDICTION HELD WHERE IT COUNTS: A FULL `mk install'
+COMPLETED*** on the VM afterwards, and the sweep was written before
+that run.
+**Its positive control is EXTERNAL and has to be**, since the one real
+finding is fixed: `--control` stages libwebp's pre-fix
+`endian_inl_utils.h` out of git, requires it to classify
+X86-REACHABLE, *and* requires the current file not to -- two halves,
+because the first alone passes for a classifier that says
+X86-REACHABLE to everything.
+**Its root guard fired on the first run**, for the fifth time in this
+directory: `sys/lib/tests` is three levels below the root and the file
+said two. *The guard is the instrument that works.*
 `random-xcheck.c` is the same idea for `random`/`srandom`/
 `initstate`/`setstate`, and needs TWO compiles for the
 `strftime-xcheck` reason. Its **section 0 is a control of the

@@ -551,6 +551,21 @@ runs**: the include guard is a `#define` like any other and was
 demanded of the answered file, and a name the template both `#define`s
 in a dead arm and `#undef`s elsewhere is a QUESTION rather than
 verbatim text),
+`asmout-sweep.py` (**does NOT gate**: 403 GNU extended asm sites
+with an OUTPUT operand under `external/`, classified by their
+enclosing `#if`. **278 are guarded by `__GNUC__`/`_MSC_VER` and so
+are correct as written**, 97 are other-arch, and **28 are the
+dangerous class** -- an x86 guard with no compiler guard, libwebp's
+shape -- *of which not one is compiled by this tree*. It answers the
+question a STRICTER compiler creates, "where would the next build
+stop", and ***the answer was confirmed by a full `mk install`
+completing*** afterwards. It cannot gate because nothing here reads a
+mkfile. **Two of the 28 were already solved independently**: zstd's
+`cpu.h` reads `!defined(Plan9)` and its mkfile passes `-DPlan9`, which
+is corroboration the class is real. **Control in two halves** --
+libwebp's pre-fix header out of git MUST classify X86-REACHABLE and
+the current one must NOT, since the first alone passes for a
+classifier that fires on everything),
 `truefalse-sweep.py` (**does NOT gate**: which vendored TUs use
 `true`/`false` as an IDENTIFIER without defining the names themselves —
 the shape kencc's C23 keywords break. **Its positive control is
