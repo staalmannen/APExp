@@ -700,3 +700,82 @@ the bug is cpfe's file lookup.
 **Phase D** replaces the last include with each of its own, as one
 `sed` substitution keyed on the same input line number the deletions
 use, so the two compose.
+
+## A six-include reproducer, and the guard is load-bearing
+
+Phase C, minimising in place, got to:
+
+```
+baseline (lines 1..28)            -> CRASH
+without the comment block (1..11) -> CRASH      (so it was dropped)
+without the #ifndef/#define guard -> ok         (so it was KEPT)
+dropped lines 19 20 22 23 24 25 26 27
+```
+
+leaving
+
+```c
+#ifndef PSTL_VECTOR_H
+#define PSTL_VECTOR_H
+
+#include "../algorithm/equal.h"
+#include "../algorithm/fill_n.h"
+#include "../algorithm/lexicographical_compare.h"
+#include "../algorithm/min.h"
+#include "../algorithm/rotate.h"
+#include "../iterator/niter_base.h"
+#endif
+int main(void){ return 0; }
+```
+
+**Phase C2 answers CRASH with every include rewritten absolute**, so
+the lookup path is innocent and the content is the cause — which
+retires the spelling hypothesis the previous round raised. **Phase D
+answers `ok` for all five of `niter_base.h`'s own includes**, so that
+file is not an envelope: its own content is the last member.
+
+***AND THE GUARD IS LOAD-BEARING.*** Removing `#ifndef PSTL_VECTOR_H`
+/ `#define PSTL_VECTOR_H` / `#endif` turns CRASH into `ok` — and
+**nothing in the library ever tests that name**; one grep finds only
+its own three lines, and no include is circular. So the guard is not
+changing what is compiled. It changes what the PREPROCESSOR does with
+the file, and the standard thing a preprocessor does with a file
+wrapped entirely in `#ifndef X / #define X ... #endif` is the
+**multiple-inclusion optimisation**: record that the file is guarded
+and skip reopening it. *That is bookkeeping over a file table, which
+is the shape of a fault at a small, input-stable address —* `0x3f4cd`
+then `0x3f4a9`, across two cpfe binaries.
+
+### `cxx-guardgen`, which has no C++ in it at all
+
+Four generated translation units: `flat` (N trivial headers included
+side by side) and `chain` (N deep), **each with and without the
+guard, because the no-guard arm is the control** — a probe that ran
+only the guarded case could not tell "the guard matters" from "this
+many includes matter". Flat and chain are separate because
+`<vector>`'s six includes reach about 230 files transitively, so
+depth and count are different variables and a probe that moved both
+could not say which.
+
+Any CRASH means the bug reproduces with no library, no templates and
+nothing but generated headers, and the whole C++ library is out of
+it. All four `ok` is also an answer: the generated headers are too
+simple, the content matters too, and the next step is to make them
+declare templates.
+
+***THE HOST CHECK PAID FOR ITSELF BEFORE THE VM SAW IT***: at the
+first draft's 300-deep chain, g++ answers
+`#include nested depth 200 exceeds maximum of 200` — a **documented
+limit**, so that arm would have measured the limit rather than the
+bug, and an ERROR there would have been the probe reporting on
+itself. The chain is capped at 150 separately from the flat count,
+and the flat arm carries the count question alone. *A probe generated
+from a round number is a probe whose failure has two explanations.*
+
+### And phase C now runs to a fixpoint
+
+A single greedy pass is not minimal: dropping one include can make a
+later one droppable that was not before. It repeats until a whole
+pass removes nothing, skipping lines already dropped. **Six was the
+answer from one pass**; whether six is the floor is a question only
+the fixpoint answers.

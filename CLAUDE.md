@@ -1415,6 +1415,22 @@ silent:
   found through `-I`, against an absolute one found at once. *This
   port's whole crash history is `stat` in `host_envir.c`.* Phase C2
   asks that directly.
+  ***AND IT IS SIX INCLUDES, AND THE GUARD IS LOAD-BEARING.***
+  Phase C2 answers CRASH with the includes rewritten ABSOLUTE, so the
+  spelling is innocent after all and the content is the cause; phase D
+  answers `ok` for all five of `niter_base.h`'s own includes, so that
+  file is not an envelope. **But removing `#ifndef PSTL_VECTOR_H` /
+  `#define` / `#endif` turns CRASH into `ok`** — and nothing tests
+  that name and no include is circular, so the guard changes what the
+  PREPROCESSOR does and not what is compiled. The standard thing a
+  preprocessor does with a wholly guarded file is the
+  MULTIPLE-INCLUSION OPTIMISATION, bookkeeping over a file table —
+  which is the shape of a fault at a small, input-stable address.
+  **`cxx-guardgen` tests that with no C++ in it at all**: flat and
+  chained generated headers, each with and WITHOUT the guard, since
+  the no-guard arm is the control. *Its chain is capped at 150 because
+  g++ refuses past 200 — a documented limit, so a 300-deep arm would
+  have measured the limit and not the bug.*
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
