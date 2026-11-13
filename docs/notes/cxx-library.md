@@ -227,3 +227,126 @@ powers of two, so both split unevenly.
 to ABSOLUTE paths, so staging a broken copy and pointing `-I` at it
 compiled the real library and reported PASS. To break something on
 purpose here, edit the file in the repository and put it back.
+
+## Second run: 27 ok, 7 error, 1 CRASH -- and the seven were one thing
+
+The sixteen became seven, and **all seven were the same cause**, which
+the first round had met and only half fixed.
+
+### The selectors were half the class
+
+Round one found four files choosing by COMPILER IDENTITY and treated
+that as the whole of it. The other half is a builtin used with **no
+test of any kind** -- no `__has_builtin`, no `#if`, no portable
+sibling. Two files:
+
+  * **`common/numeric_limits.h`, nine sites**:
+    `__builtin_huge_valf`/`_val`, `__builtin_nanf`/`_nan`,
+    `__builtin_nansf`/`_nans`. They sit in the SHARED file, outside
+    both `limits_msvc/` and `limits_clang_gcc/`, so neither selector
+    could ever reach them. This is why `<forward_list>`,
+    `<functional>`, `<list>`, `<map>`, `<memory>`, `<string>`,
+    `<string_view>` and `<vector>` all stopped at one line.
+  * **`memory/addressof.h`**: `__builtin_addressof`, with no sibling
+    implementation anywhere.
+
+***AND `cxxlib-host.sh --portable` COULD NOT HAVE CAUGHT THEM.***
+`PSTL_NO_COMPILER_BUILTINS` forces the SELECTORS; a bare `__builtin_x`
+answers to no macro at all, and g++ has the builtin, so the portable
+run compiled it and reported clean. *A flag that forces the arms you
+know about says nothing about code that has no arms.* The instrument
+for that is text, not compilation: `sys/lib/tests/cxxbuiltin-sweep.py`,
+which **gates** -- unlike `baketype-sweep` there is no
+arms-nobody-takes problem, since a bare builtin is a hard error on any
+compiler lacking it.
+
+**The sweep's own two faults, both caught by its control:**
+
+  * Its first run reported **its own explanatory prose** -- three hits
+    were comments naming the builtin they had just guarded away. It
+    blanks comments and string literals first now, which is the
+    lesson `truefalse-sweep` already paid for.
+  * Its sibling rule hardcoded `builtin/` against `generic/`, and so
+    reported two files that are perfectly guarded: upstream uses the
+    same indirection under `gcc_clang/`/`msvc/` and
+    `buildin_realization/`/`no_realization` as well. *A rule written
+    from the examples in front of you fires on the next naming
+    convention.* It asks structurally now -- does a header in the
+    grandparent include this basename from two or more sister
+    directories.
+
+`source_location.stdh` is the one EXEMPT entry, with its reason in the
+file: `__builtin_FILE`/`LINE`/`FUNCTION`/`COLUMN` are not a shortcut
+there, they are the only possible implementation, and the header
+already `#error`s below C++20.
+
+### A second hole, in the switch itself
+
+The new guards were first written
+`PSTL_HAS_BUILTIN(x) || defined(__GNUC__)` -- and **that bare clause
+is true on the build host whatever `PSTL_NO_COMPILER_BUILTINS` says**,
+so `--portable` would have gone on compiling the builtin arm and
+reporting it clean. *A switch the thing it switches can ignore is not
+a switch.* `PSTL_HAS_GNU_BUILTINS` exists for that, and every such
+clause spells it that way.
+
+**It was caught by measuring the switch rather than trusting it**:
+`g++ -E` with and without the flag, counting surviving builtin uses,
+answered 2 then 1. The residual 1 is glibc's own `<math.h>` defining
+`HUGE_VAL` *as* `__builtin_huge_val()`, which is the portable arm
+working.
+
+### `constexpr`: the same rule, opposite answers
+
+APExp's `<math.h>` spells `HUGE_VAL` as `Inf(1)` and `NAN` as `NaN()`
+-- CALLS. A `constexpr` function returning one can never be evaluated
+as a constant, which [dcl.constexpr]/5 makes ill-formed **no
+diagnostic required**. g++ accepts it with `-Winvalid-constexpr`;
+*probably* is the word to avoid when checking costs a VM rebuild.
+
+  * **`numeric_limits.h` drops the keyword** on the portable arm, via
+    `PSTL_FP_CONSTEXPR`, because a grep finds **0 callers of
+    `infinity()`, `quiet_NaN()` or `signaling_NaN()` outside that
+    file** -- nothing cascades. The conformance loss is real and is
+    recorded here: `constexpr double d = numeric_limits<double>::
+    infinity();` is a diagnostic on this platform and not on gcc, and
+    there is no portable signalling NaN, so `signaling_NaN()` returns
+    the quiet one.
+  * **`addressof.h` keeps it.** The three-cast idiom is equally
+    non-constant, but `addressof` IS called from `constexpr` code
+    throughout `functional/` and the iterators, so removing the
+    keyword would make every one of those callers ill-formed in turn.
+    Ill-formed NDR is the cheaper of the two.
+
+*Same rule, opposite answers, because the callers differ* -- which is
+the thing to carry away rather than either verdict.
+
+### What is NOT fixed: the `vector` CRASH
+
+`cpfe 32385: suicide: sys: trap: fault read addr=0x3f4cd pc=0x90c3a1`.
+**`pc` is a real code address**, so unlike the `struct stat` crash this
+is a genuine dereference inside cpfe and not a smashed return.
+
+**The prediction, written down before the run that will test it: it
+goes away.** In both places it was seen, cpfe had already EMITTED a
+diagnostic and then died -- in `cxx-bisect` after
+`numeric_limits.h:881`, and in `cxx-library-test` after
+`addressof.h:26` under about twelve levels of
+`detected during instantiation`. Seven other headers hit the identical
+error and did NOT crash, so it is the DEPTH of the recovery and not
+the error itself. With nothing erroring, nothing reaches that path.
+
+**The refutation condition: a CRASH with 0 errors.** If `cxx-bisect`
+reports one, this is a cpfe bug on deep instantiation and a different
+investigation -- and the host cannot help with it, since g++ compiles
+the same `<vector>` on both arms.
+
+### And the bisect was printing half its own evidence
+
+`cxx-bisect` used `sed 1q` on cpfe's stderr. **A cpfe diagnostic is
+wrapped**: line 1 is the file and line number ending in a bare
+`error:`, line 2 is the message. So a run reported
+`numeric_limits.h", line 881:` eight times and never said what was
+wrong, and a round went on reading the file to guess while
+`__builtin_huge_valf is undefined` sat on the next line. `sed 3q` now.
+*A summary that cuts the sentence in half is worse than no summary.*

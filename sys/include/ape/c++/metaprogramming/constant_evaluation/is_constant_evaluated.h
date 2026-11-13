@@ -27,7 +27,7 @@
  * optimisation, not a result.
  */
 #if PSTL_HAS_BUILTIN(__builtin_is_constant_evaluated) \
- || (defined(__GNUC__) && !defined(__clang__) && (__GNUC__ >= 9))
+ || (PSTL_HAS_GNU_BUILTINS && !defined(__clang__) && (__GNUC__ >= 9))
     #include "buildin_realization/is_constant_evaluated_impl.h"
 #else
     #include "no_realization/is_constant_evaluated_impl.h"
