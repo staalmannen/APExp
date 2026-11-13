@@ -1273,3 +1273,54 @@ bytes at `prev` were last written by something that stores a *count*
 there — which is exactly why the parent ring is worth having: a carved
 sub-block's header sits one byte past its parent's payload, and a parent
 handed out again re-bumps from `start_of_block` through that payload.
+
+### The ring answers: the store was correct, so something overwrote it
+
+```
+LINKED  slot 996  hdr=0x03cc32c8  next-read-back=0x03cd0cf0  region=0
+CARVED  slot 469  parent=0x03cc0cd0
+parent 0x03cc0cd0 next=0x03c90c70 start=0x03cc0d00 avail=0x03cc32c8 end=0x03cc32c8 msize=0x10000
+prev header at 0x03cc32c8, parent after_end_of_block 0x03cc32c8 -- EQUAL
+```
+
+`prev->next` held **`0x03cd0cf0`** when it was linked — a valid heap
+pointer, and exactly link 995's own `hdr`, which is the block it was
+pushed on top of. *The read-back is what makes that a measurement rather
+than a restatement of intent.* **So the "store never happened" arm is
+dead: something overwrote the field afterwards**, roughly 650 links
+later.
+
+**The parent is innocent by its own bookkeeping.** `avail == end ==
+0x03cc32c8`, the sub-block's header address, so the carve is intact and
+the bump pointer stopped exactly where it should.
+
+And `alloc_in_region` is conservative in a way that explains the numbers
+rather than merely permitting them: `true_size = size + 8`, the block is
+taken only when `true_size <= remaining`, and then `next_avail` advances
+by `size` **alone**. So every block keeps eight bytes of slack — which is
+precisely why `prev` reads `avail = end - 8`. The dedicated-block arm
+(`true_size >= 2096`) then slams `next_avail = after_end_of_block`, which
+is why the parent reads exactly full.
+
+**A write at `after_end_of_block` is therefore past the object and past
+EDG's own slack**, not merely past the object. The eight bytes below
+`prev` (`0x4d1b` at `prev-8`) are inside that slack, so whatever wrote
+them was already at the boundary.
+
+### So bracket it in time
+
+Reading has gone as far as it can: the field was right, the parent is
+right, and the write happens during ordinary compilation where
+`free_memory_region` cannot see it. `alloc_mem_block` now walks region 0
+every sixteenth call and records the **first** moment a link stops being
+a plausible heap pointer — `edg_dbg_bad_at` (link count),
+`edg_dbg_bad_trim` (carve count), `edg_dbg_bad_pos` (chain position),
+plus the offending header and value. About a hundred walks of a chain a
+thousand long, a hundred thousand reads against a compile that does
+millions.
+
+`edg_dbg_checks` counts the clean walks, and it is load-bearing: **a walk
+that never ran and a chain that never went bad print the same `-1`**
+without it. The script then dumps the nine links and nine carves ending
+at that instant, so the rings say what was being allocated when the
+field died — a question no post-mortem can ask.

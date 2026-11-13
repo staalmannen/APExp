@@ -1605,6 +1605,29 @@ silent:
   count, a length or an index. *That sharpens "stale front-end data"
   rather than contradicting it*, and is why the parent ring is worth
   having.
+  ***AND THE RING ANSWERED: THE STORE WAS CORRECT, SO SOMETHING
+  OVERWROTE IT.*** Slot 996 recorded
+  `hdr=0x03cc32c8 next-read-back=0x03cd0cf0` — a valid heap pointer and
+  exactly link 995's own `hdr`, the block it was pushed on top of. *The
+  READ-BACK is what makes that a measurement rather than a restatement
+  of intent.* **The carve ring named the parent and it is innocent by
+  its own bookkeeping**: `avail == end == the sub-block's header
+  address`, so the carve is intact and the bump stopped where it should.
+  **And `alloc_in_region` explains the numbers rather than merely
+  permitting them**: `true_size = size + 8`, the block is taken only
+  when that fits, and `next_avail` then advances by `size` ALONE — so
+  every block keeps eight bytes of slack, which is exactly why `prev`
+  reads `avail = end - 8`, and the dedicated arm (`>= 2096`) slams
+  `next_avail = after_end_of_block`, which is why the parent reads full.
+  ***So a write AT `after_end_of_block` is past the object AND past
+  EDG's own slack.***
+  **Reading has gone as far as it can, so the question is WHEN**:
+  `alloc_mem_block` now walks region 0 every sixteenth call and records
+  the FIRST moment a link stops being a plausible heap pointer
+  (`edg_dbg_bad_at`/`_trim`/`_pos`/`_hdr`/`_val`), and the script dumps
+  the nine links and nine carves ending there. **`edg_dbg_checks` is
+  load-bearing**: a walk that never ran and a chain that never went bad
+  print the same `-1` without it.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
