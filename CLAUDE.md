@@ -1186,12 +1186,22 @@ silent:
   rung 3 was mine to get wrong*: bare `-E` answers
   `check_target_config: must use SoftFloat library`, the DOCUMENTED
   refusal without `--target win64`, so it measured a missing flag
-  rather than the preprocessor. The new rung 3 is **a nonexistent
-  input file**, which is free and splits the only region left:
-  `fe_translation_unit_init` is **27 direct calls with no
-  function-pointer dispatch**, and the input is touched only after
-  them -- a `cannot open` diagnostic puts the fault after the 27, the
-  same `pc=0x1` puts it inside.
+  rather than the preprocessor.
+  ***AND RUNG 3, A NONEXISTENT INPUT FILE, PASSES*** -- so the 27
+  `fe_translation_unit_init` calls (direct, no function-pointer
+  dispatch), `fe_init_part_2` and the LEXER's own `fopen`
+  (`lexical.c:30694` -> `host_envir.c:10072`) all ran, and **the fault
+  is after the source is successfully opened**, on a path common to
+  `-E` and full translation, independent of content. *That also
+  clears `mmap`*, which this release changed heavily:
+  `open_mapped_input_file` serves PCH and IFC modules only, never a
+  source file -- checked, because "EDG maps its input" is a plausible
+  sentence and is not true. **Its pass condition had to be tightened
+  first**: any non-zero exit passed it, which a command-line error
+  gives too, so it now requires a diagnostic NAMING the file. Every
+  crashing rung also reports its stdout byte count now -- cpfe emits
+  a `#line` before any token, so 0 means it died before the first
+  emit and non-zero means inside the output loop.
   ***A FULL REBUILD DID NOT MOVE IT, AND `regs()` SAYS WHY IT WILL
   NOT.*** `PC` is **1 exactly**, `TYPE` 0xe with `ERROR` 0x14 decodes
   to a user-mode **INSTRUCTION FETCH**, and `SP` is an ordinary stack
