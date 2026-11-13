@@ -1,0 +1,176 @@
+#!/bin/rc
+# cxx-guardgen -- is the crash cpfe's INCLUDE-GUARD bookkeeping, with
+# no C++ in it at all?
+#
+#	./cxx-guardgen [count]		default 300 flat, 150 deep
+#
+# ***A PROBE.***  It asserts nothing.  The result is whether cpfe
+# survives four generated translation units that contain no library,
+# no templates and no declarations worth the name.
+#
+# WHERE IT COMES FROM
+# ===================
+#
+# `cxx-vecsplit' minimised `<vector>' to six includes, and the line
+# that makes it a finding rather than a smaller boundary is:
+#
+#	without the comment block (1..11) -> CRASH
+#	without the #ifndef/#define guard -> ok
+#
+# **The guard is LOAD-BEARING.**  Wrapping the same six `#include'
+# lines in `#ifndef PSTL_VECTOR_H' / `#define PSTL_VECTOR_H' ...
+# `#endif' turns `ok' into CRASH -- and **nothing in the library ever
+# tests that name**; one grep finds only its own three lines.  So the
+# guard is not changing what is compiled, it is changing what the
+# PREPROCESSOR does with the file.
+#
+# Two more facts point the same way, and both were free:
+#
+#   * `g++ -E' over the crashing form and over a rebuilt
+#     absolute-path form produces **byte-identical token streams**,
+#     6428 lines each.  Nothing about the C++ differs.
+#   * phase C2 answers CRASH with the includes rewritten ABSOLUTE, so
+#     the lookup path is innocent and the content is not.
+#
+# The standard thing a preprocessor does with a file wrapped entirely
+# in `#ifndef X / #define X ... #endif' is the MULTIPLE-INCLUSION
+# OPTIMISATION: record that the file is guarded by X and skip
+# reopening it. That is bookkeeping over a FILE TABLE, which is
+# exactly the shape of a fault at a small, input-stable address
+# (`0x3f4cd' then `0x3f4a9', across two cpfe binaries).
+#
+# WHAT IT GENERATES, AND WHY FOUR
+# ===============================
+#
+# Two shapes, each with and without the guard, because **the
+# no-guard arm is the control**: a probe that only ran the guarded
+# case could not tell "the guard matters" from "this many includes
+# matter".
+#
+#	flat-guarded     N trivial headers, included inside a guard
+#	flat-plain       the same N, no guard            (CONTROL)
+#	chain-guarded    a CHAIN N deep, included inside a guard
+#	chain-plain      the same chain, no guard        (CONTROL)
+#
+# Flat and chain are separate because `<vector>'s six includes reach
+# about 230 files TRANSITIVELY, so depth and count are different
+# variables and a probe that moved both could not say which.
+#
+# READING IT.  Any `CRASH' means the bug is reproducible with no
+# library at all and the whole thing is the preprocessor.  All four
+# `ok' means the generated headers are too simple -- the content
+# matters as well -- which is also an answer, and the next thing is
+# to make the generated headers declare templates.
+#
+# `awk' writes the headers: rc has no arithmetic and generating three
+# hundred files with a shell loop is slow enough to read as a hang.
+
+count=$1
+if(~ $#count 0)
+	count=300
+
+# ***THE CHAIN IS CAPPED SEPARATELY, AND THE HOST FOUND OUT WHY.***
+# g++ refuses at `#include nested depth 200 exceeds maximum of 200',
+# a DOCUMENTED limit -- so a 300-deep chain measures the limit and
+# not the bug, and a `cxx-guardgen' that reported ERROR there would
+# be reporting on itself.  150 is comfortably under it, and the flat
+# arm carries the COUNT question on its own.  *A probe generated from
+# a round number is a probe whose failure has two explanations.*
+chaindepth=150
+if(~ `{echo $count $chaindepth | awk '{print ($1 < $2)}'} 1)
+	chaindepth=$count
+
+tmp=/tmp/cxx-guardgen.$pid
+mkdir -p $tmp/h
+if(! test -d $tmp/h){
+	echo 'cxx-guardgen: cannot create '^$tmp^'/h' >/fd/2
+	exit nodir
+}
+echo 'cxx-guardgen: generating '^$count^' flat and '^$chaindepth^' chained headers in '^$tmp^'/h'
+
+# **`-v' takes `name=value', and in rc `=' is a SYNTAX CHARACTER**, so
+# it is written by concatenation.  This tree has paid a round for that
+# exact line already, on `fdwatch'.
+awk -v 'n='^$count -v 'c='^$chaindepth -v 'd='^$tmp^'/h' '
+BEGIN {
+	for (i = 1; i <= n; i++) {
+		f = d "/flat" i ".h"
+		print "#ifndef GG_FLAT_" i            > f
+		print "#define GG_FLAT_" i            > f
+		print "struct gg_flat_" i " { int a; };" > f
+		print "#endif"                        > f
+		close(f)
+
+		# the chain: each header includes the NEXT, so one
+		# include reaches DEPTH rather than breadth.
+		if (i <= c) {
+			f2 = d "/chain" i ".h"
+			print "#ifndef GG_CHAIN_" i           > f2
+			print "#define GG_CHAIN_" i           > f2
+			if (i < c)
+				print "#include \"chain" (i+1) ".h\"" > f2
+			print "struct gg_chain_" i " { int a; };" > f2
+			print "#endif"                        > f2
+			close(f2)
+		}
+	}
+}'
+
+fn mktu {	# $1 = output, $2 = guarded|plain, $3 = flat|chain
+	rm -f $1
+	if(~ $2 guarded){
+		echo '#ifndef GG_TU_GUARD' >> $1
+		echo '#define GG_TU_GUARD' >> $1
+	}
+	if(~ $3 flat)
+		awk -v 'n='^$count 'BEGIN{for(i=1;i<=n;i++) print "#include \"flat" i ".h\""}' >> $1
+	if(~ $3 chain)
+		echo '#include "chain1.h"' >> $1
+	if(~ $2 guarded)
+		echo '#endif' >> $1
+	echo 'int main(void){ return 0; }' >> $1
+}
+
+fn try {	# $1 = file; echoes ok / ERROR / CRASH
+	c++ -F -I$tmp/h $1 >$tmp/out >[2]$tmp/err
+	st=$status
+	kind=ok
+	if(! ~ $st '')
+		kind=ERROR
+	if(grep -qE 'suicide|trap:' $tmp/err)
+		kind=CRASH
+	echo $kind
+}
+
+echo
+crashed=()
+for(shape in flat chain){
+	for(mode in guarded plain){
+		mktu $tmp/t.cpp $mode $shape
+		k=`{try $tmp/t.cpp}
+		echo 'cxx-guardgen: '^$shape^'-'^$mode^' -> '^$k
+		if(! ~ $k ok)
+			sed 3q $tmp/err
+		if(~ $k CRASH)
+			crashed=($crashed $shape^'-'^$mode)
+	}
+}
+
+echo
+if(~ $#crashed 0){
+	echo 'cxx-guardgen: all four ok -- the generated headers are too'
+	echo 'cxx-guardgen: simple, so the CONTENT matters as well as the'
+	echo 'cxx-guardgen: guard.  That is an answer: it rules out "a'
+	echo 'cxx-guardgen: guard plus enough files" on its own.'
+}
+if(! ~ $#crashed 0){
+	echo 'cxx-guardgen: ***'^$"crashed^' CRASHED***'
+	echo 'cxx-guardgen: reproduced with NO library, NO templates and'
+	echo 'cxx-guardgen: nothing but generated headers -- so the bug is'
+	echo 'cxx-guardgen: the preprocessor/file table, and the whole C++'
+	echo 'cxx-guardgen: library is out of it.'
+	echo 'cxx-guardgen: the files are left in '^$tmp^' for acid.'
+	exit 0
+}
+rm -rf $tmp
+echo 'cxx-guardgen: done'

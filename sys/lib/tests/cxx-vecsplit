@@ -320,19 +320,33 @@ if(! ~ $k CRASH){
 	GUARD=$sg
 }
 
-# each include line
+# Each include line, TO A FIXPOINT.  **A single greedy pass is not
+# minimal**: dropping one include can make a later one droppable that
+# was not droppable before, so the sweep repeats until a whole pass
+# removes nothing.  The first version passed once and stopped at six
+# includes; whether six is the floor is a question only the fixpoint
+# answers.  A line already in `$DEL' is skipped, which is what makes
+# the repeat cheap.
 incl=`{sed -n '1,'^$CUTLAST^'p' $VEC | grep -n '^[ 	]*#[ 	]*include' | sed 's/:.*//'}
 last=$incl($#incl)
-for(n in $incl){
-	if(! ~ $n $last){
-		save=$DEL
-		DEL=($DEL $n)
-		buildsel
-		k=`{try}
-		if(~ $k CRASH)
-			echo '  dropped line '^$n
-		if(! ~ $k CRASH)
-			DEL=$save
+pass=0
+progress=1
+while(! ~ $progress 0){
+	progress=0
+	pass=`{echo $pass | awk '{print $1 + 1}'}
+	for(n in $incl){
+		if(! ~ $n $last && ! ~ $n $DEL){
+			save=$DEL
+			DEL=($DEL $n)
+			buildsel
+			k=`{try}
+			if(~ $k CRASH){
+				echo '  pass '^$pass^': dropped line '^$n
+				progress=1
+			}
+			if(! ~ $k CRASH)
+				DEL=$save
+		}
 	}
 }
 
