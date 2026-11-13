@@ -1379,8 +1379,22 @@ silent:
   **an ERROR rung STOPS the bisect** rather than counting as clean.
   *The generator's first attempt answered `0 candidates`, because the
   include guard is itself an open `#if` for the whole file.*
-  **What is known is narrower than before: the crash is at or before
-  `vector.h:87`**, so the answer will be one `#include` line.
+  ***AND IT IS ONE LINE: `vector.h:28`,
+  `#include "../iterator/niter_base.h"`*** — seven cpfe runs over 137
+  cut points, line 27 clean and line 28 CRASH. **But a boundary is
+  not a reproducer**: `cxx-vecnarrow` phase 1 compiled that header
+  ALONE and it was fine, so the crash is a COMBINATION and line 28 is
+  only its last member. `cxx-vecsplit` phase C minimises it by greedy
+  removal — **keeping any include whose removal makes the file merely
+  ERROR**, since that says the prefix stopped compiling rather than
+  stopped crashing — and prints the smallest reproducing file.
+  Beside it, **`cxx-niterbase-probe.cpp` is twenty lines of pure
+  C++14 with no library headers**, capturing the one unusual shape in
+  that header: two overloads declared with a **trailing return type
+  that calls the function being declared**, so the overload set the
+  `decltype` resolves against includes it. g++ accepts it as written
+  and instantiated. *It is a guess and the file says so*; `ok` rules
+  the shape out, `CRASH` makes the whole bug twenty lines.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
