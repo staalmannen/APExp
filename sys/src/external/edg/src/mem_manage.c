@@ -6524,6 +6524,145 @@ long edg_dbg_allocs;
 long edg_dbg_bad_site;
 long edg_dbg_bad_allocs;
 
+/*
+ * ***THE PAD, AND WHY IT IS NOW AN INSTRUMENT.***  With it at 64 the
+ * prediction held and cpfe COMPLETED -- so the write is a small overrun
+ * past a parent's object and the carved header had been sitting one
+ * word past it.  But "no crash" is the weakest possible form of that
+ * result: a layout change that moves everything can hide a bug as
+ * easily as it can dodge one.
+ *
+ * So the pad carries a canary.  It is dead space owned by nobody, so a
+ * byte in it that is not 0xA5 was written by something running past the
+ * parent -- which is a POSITIVE measurement of the overrun, with the
+ * count, the offset and the parent's object size, where the absence of
+ * a crash is only an absence.
+ *
+ * cpfe has no diagnostic channel here that reaches a finished run --
+ * `mem_manage.c' declares `free', `malloc', `realloc', `memcpy' and
+ * `memset' and nothing that prints -- so the report is written to fd 2
+ * by hand.  `cmd/edg/mkfile' passes `-c -C' and no `-T', so there are
+ * no type signatures to disagree with this declaration.
+ */
+extern long long write(int, const void *, unsigned long long);
+
+#define EDG_DBG_CARVE_PAD 64
+
+long edg_dbg_padchecked;
+long edg_dbg_pad_dirty;
+
+static char edg_dbg_buf[4096];
+static long edg_dbg_bufn;
+
+static void edg_dbg_putc(int c)
+{
+  if (edg_dbg_bufn < 4000) {
+    edg_dbg_buf[edg_dbg_bufn] = (char)c;
+    edg_dbg_bufn = edg_dbg_bufn + 1;
+  }
+}
+
+static void edg_dbg_puts(const char *s)
+{
+  while (*s != '\0') {
+    edg_dbg_putc((int)(*s));
+    s = s + 1;
+  }
+}
+
+static void edg_dbg_putx(unsigned long long v)
+{
+  char t[24];
+  long n;
+  int d;
+
+  n = 0;
+  if (v == 0ULL) {
+    edg_dbg_putc('0');
+    return;
+  }
+  while (v != 0ULL) {
+    d = (int)(v & 15ULL);
+    t[n] = (char)(d < 10 ? ('0' + d) : ('a' + d - 10));
+    n = n + 1;
+    v = v >> 4;
+  }
+  while (n > 0) {
+    n = n - 1;
+    edg_dbg_putc((int)t[n]);
+  }
+}
+
+/*
+ * Walk every carve recorded and report the pads that were written.
+ * Runs once, at the first `free_memory_region', which is after all the
+ * front end's allocation is done.
+ */
+void edg_dbg_padcheck(void)
+{
+  long i, lim, shown, k, off;
+  unsigned char *p;
+
+  if (edg_dbg_padchecked != 0)
+    return;
+  edg_dbg_padchecked = 1;
+
+  lim = edg_dbg_trim_n;
+  if (lim > 4096)
+    lim = 4096;
+  shown = 0;
+
+  edg_dbg_bufn = 0;
+  edg_dbg_puts("edg-pad: carves=0x");
+  edg_dbg_putx((unsigned long long)edg_dbg_trim_n);
+  edg_dbg_puts(" checked=0x");
+  edg_dbg_putx((unsigned long long)lim);
+  edg_dbg_puts(" chain-bad-at=0x");
+  edg_dbg_putx((unsigned long long)edg_dbg_bad_at);
+  edg_dbg_puts("\n");
+
+  for (i = 0; i < lim; i = i + 1) {
+    p = (unsigned char *)(edg_dbg_trim_new[i]);
+    if (p == ((unsigned char *)0))
+      continue;
+    p = p - EDG_DBG_CARVE_PAD;
+    off = -1;
+    for (k = 0; k < EDG_DBG_CARVE_PAD; k = k + 1) {
+      if (p[k] != 0xA5) {
+        off = k;
+        break;
+      }
+    }
+    if (off < 0)
+      continue;
+    edg_dbg_pad_dirty = edg_dbg_pad_dirty + 1;
+    if (shown < 12) {
+      shown = shown + 1;
+      edg_dbg_puts("edg-pad:  slot 0x");
+      edg_dbg_putx((unsigned long long)i);
+      edg_dbg_puts(" new 0x");
+      edg_dbg_putx((unsigned long long)(edg_dbg_trim_new[i]));
+      edg_dbg_puts(" parent 0x");
+      edg_dbg_putx((unsigned long long)(edg_dbg_trim_par[i]));
+      edg_dbg_puts(" objsize 0x");
+      edg_dbg_putx((unsigned long long)(edg_dbg_trim_size[i]));
+      edg_dbg_puts(" off 0x");
+      edg_dbg_putx((unsigned long long)off);
+      edg_dbg_puts(" bytes");
+      for (k = off; k < EDG_DBG_CARVE_PAD && k < off + 16; k = k + 1) {
+        edg_dbg_puts(" ");
+        edg_dbg_putx((unsigned long long)(p[k]));
+      }
+      edg_dbg_puts("\n");
+    }
+  }
+
+  edg_dbg_puts("edg-pad: dirty=0x");
+  edg_dbg_putx((unsigned long long)edg_dbg_pad_dirty);
+  edg_dbg_puts("\n");
+  write(2, edg_dbg_buf, (unsigned long long)edg_dbg_bufn);
+}
+
 static void edg_dbg_check(long site)
 {
   _ZN3edg22a_mem_block_header_ptrE h;
@@ -7185,7 +7324,6 @@ __144743_26_space_remaining_in_block = ((_ZN3edg8sizeof_tE)((__144738_44_hdr->af
  * arrangement back. The `space_remaining' test is raised by the same
  * amount so a carve still leaves a usable block behind.
  */
-#define EDG_DBG_CARVE_PAD 64
 if (__144743_26_space_remaining_in_block >= (2096ULL + EDG_DBG_CARVE_PAD)) {
 
 
@@ -7212,6 +7350,14 @@ _ZN34_INTERNAL_12_mem_manage_c_b0d968923edg20reusable_blocks_listE = __144744_26
  * handed out again and bump over it" is a question this ring can
  * answer and reading cannot.
  */
+/*
+ * APExp: the pad is dead space owned by nobody, so anything found in it
+ * later was written by something running past the parent's object.
+ * **That turns the pad from a workaround into a MEASUREMENT** -- an
+ * absence of crashes says only that nothing landed on a chain link,
+ * while a dirtied canary says the overrun happened and names where.
+ */
+memset((void *)__144745_27_alloc_addr, 0xA5, (size_t)EDG_DBG_CARVE_PAD);
 edg_dbg_trim_new[edg_dbg_trim_n & 4095] = (void *)__144744_26_new_hdr;
 edg_dbg_trim_par[edg_dbg_trim_n & 4095] = (void *)__144738_44_hdr;
 edg_dbg_trim_size[edg_dbg_trim_n & 4095] =
@@ -7439,6 +7585,7 @@ void _ZN3edg18free_memory_regionEi( _ZN3edg22a_memory_region_numberE __145089_48
 auto _ZN3edg22a_mem_block_header_ptrE __145096_26_hdr; auto _ZN3edg22a_mem_block_header_ptrE __145096_31_next_hdr;
 
 ;
+edg_dbg_padcheck();
 edg_dbg_rn = (long)__145089_48_region_number;
 edg_dbg_n = 0;
 edg_dbg_cur = (void *)0;
