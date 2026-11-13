@@ -241,6 +241,64 @@ echo
 # one built after, `edg_dbg_n' is non-zero.  **A zero `edg_dbg_n' with
 # the names resolving is a cpfe that crashed somewhere else entirely**,
 # which is a different finding and not a failed read.
+# ---- WHEN did it go bad -----------------------------------------------
+# ***THE LINK RING SETTLED WHICH EXPLANATION IT IS.***  Slot 996:
+# `hdr=0x03cc32c8 next-read-back=0x03cd0cf0', a valid pointer and
+# exactly the block it was pushed on top of (link 995's own hdr).  **The
+# store happened and was correct**, so something overwrote it between
+# the link and the teardown -- about 650 links later.  The carve ring
+# named the parent and it is innocent by its own bookkeeping:
+# `avail == end == the sub-block's header address'.
+#
+# So the question is no longer WHICH explanation but WHEN, and
+# `free_memory_region' cannot answer it because the write happens during
+# ordinary compilation.  `alloc_mem_block' now walks region 0 every
+# sixteenth call and records the first moment a link stops being a
+# plausible heap pointer.
+#
+# **`edg_dbg_checks` is why `bad_at == -1` is readable**: a walk that
+# never ran and a chain that never went bad are different answers, and
+# without the count they print the same.
+echo
+echo 'cxx-vecacid: WHEN the chain first went bad'
+echo
+{
+	echo 'print("edg_dbg_checks  = ", *edg_dbg_checks\D, " clean walks\n")'
+	echo 'print("edg_dbg_bad_at  = ", *edg_dbg_bad_at\D, "   (-1 = never seen; with 0 clean walks the check never ran)\n")'
+	echo 'print("edg_dbg_bad_trim= ", *edg_dbg_bad_trim\D, "\n")'
+	echo 'print("edg_dbg_bad_pos = ", *edg_dbg_bad_pos\D, "   (how far down the chain)\n")'
+	echo 'print("edg_dbg_bad_hdr = ", *edg_dbg_bad_hdr\X, "\n")'
+	echo 'print("edg_dbg_bad_val = ", *edg_dbg_bad_val\X, "\n")'
+	echo 'print("link total      = ", *edg_dbg_link_n\D, "   trim total = ", *edg_dbg_trim_n\D, "\n")'
+} | acid $crashpid
+
+echo
+echo 'cxx-vecacid: the links and carves around that instant'
+echo
+{
+	echo 'b = *edg_dbg_bad_at'
+	echo 'if b < 0 then { print("never seen -- nothing to show\n"); }'
+	echo 'if b >= 0 then {
+		k = b - 8;
+		if k < 0 then { k = 0; };
+		while k <= b do {
+			i = k & 4095;
+			print("  link ", k\D, " region=", *(edg_dbg_link_rn+i*4)\D, " hdr=", *(edg_dbg_link_hdr+i*8)\X, " next=", *(edg_dbg_link_next+i*8)\X, "\n");
+			k = k+1;
+		};
+	}'
+	echo 't = *edg_dbg_bad_trim'
+	echo 'if t >= 0 then {
+		k = t - 8;
+		if k < 0 then { k = 0; };
+		while k <= t do {
+			i = k & 4095;
+			print("  carve ", k\D, " new=", *(edg_dbg_trim_new+i*8)\X, " parent=", *(edg_dbg_trim_par+i*8)\X, "\n");
+			k = k+1;
+		};
+	}'
+} | acid $crashpid
+
 echo
 echo 'cxx-vecacid: the recorder (needs an edg rebuild -- see the script)'
 echo

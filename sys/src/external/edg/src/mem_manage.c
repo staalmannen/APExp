@@ -6802,6 +6802,84 @@ void *edg_dbg_trim_new[4096];
 void *edg_dbg_trim_par[4096];
 long edg_dbg_trim_n;
 
+/*
+ * APExp: ***CATCH THE WRITE, since reading cannot find it.***
+ *
+ * The link ring settled which of the two explanations it is: slot 996
+ * recorded `hdr=0x03cc32c8 next-read-back=0x03cd0cf0', a valid pointer
+ * and exactly the block it was pushed on top of.  **The store happened
+ * and was correct, so something OVERWROTE it between the link and the
+ * teardown** -- about 650 links later.
+ *
+ * Reading has gone as far as it can.  The parent is innocent by its own
+ * bookkeeping (`avail == end == the sub-block's header address', so the
+ * carve is intact and the bump stopped where it should), and
+ * `alloc_in_region' is conservative: it needs `remaining >= size + 8'
+ * and then advances by `size' alone, which is why every block keeps
+ * eight bytes of slack and why this one shows `avail = end - 8'.  A
+ * write AT `after_end_of_block' is past the object AND past that slack.
+ *
+ * So bracket it in TIME.  This walks region 0 and reports the FIRST
+ * moment a link stops being a plausible heap pointer, recording the
+ * link count, the chain position and the carve count.  The rings then
+ * name what was allocated and carved around that instant, which is a
+ * question no post-mortem can ask.
+ *
+ * It records once and then stops: the first detection is the only one
+ * whose surroundings mean anything, and leaving it armed would cost a
+ * walk per call for nothing.
+ *
+ *	edg_dbg_bad_at    link count when first seen (-1 = never seen)
+ *	edg_dbg_bad_trim  carve count at that moment
+ *	edg_dbg_bad_pos   how far down the chain
+ *	edg_dbg_bad_hdr   the block whose `next' went bad
+ *	edg_dbg_bad_val   what it held
+ *	edg_dbg_checks    how many clean walks ran, so that
+ *	                  `bad_at == -1' can be told from "never walked"
+ */
+void *edg_dbg_bad_hdr;
+void *edg_dbg_bad_val;
+long edg_dbg_bad_at = -1;
+long edg_dbg_bad_trim;
+long edg_dbg_bad_pos;
+long edg_dbg_checks;
+
+static void edg_dbg_check(void)
+{
+  _ZN3edg22a_mem_block_header_ptrE h;
+  _ZN3edg22a_mem_block_header_ptrE nx;
+  long pos;
+
+  if (edg_dbg_bad_at >= 0)
+    return;
+  if (_ZN3edg16mem_region_tableE == ((_ZN3edg22a_mem_block_header_ptrE *)0))
+    return;
+  h = (_ZN3edg16mem_region_tableE[0]);
+  pos = 0;
+  while (h != ((_ZN3edg22a_mem_block_header_ptrE)0) && pos < 20000) {
+    nx = (h->next);
+    /*
+     * The heap in this process runs from about 0x01c00000 upward, so
+     * anything under a megabyte is not a block header.  The threshold
+     * is deliberately loose: it only has to separate `a quarter of a
+     * megabyte' from `a heap address', which is the whole distance the
+     * observed 0x3f4a1 sits from the heap.
+     */
+    if (nx != ((_ZN3edg22a_mem_block_header_ptrE)0)
+     && ((unsigned long long)nx) < 0x100000ULL) {
+      edg_dbg_bad_hdr = (void *)h;
+      edg_dbg_bad_val = (void *)nx;
+      edg_dbg_bad_at = edg_dbg_link_n;
+      edg_dbg_bad_trim = edg_dbg_trim_n;
+      edg_dbg_bad_pos = pos;
+      return;
+    }
+    h = nx;
+    pos = pos + 1;
+  }
+  edg_dbg_checks = edg_dbg_checks + 1;
+}
+
 #line 635
 _ZN3edg22a_mem_block_header_ptrE _ZN3edg15alloc_mem_blockEiyPcb( _ZN3edg22a_memory_region_numberE __144539_63_region_number,
 _ZN3edg8sizeof_tE __144540_63_min_size, 
@@ -6814,6 +6892,15 @@ auto _ZN3edg8sizeof_tE __144553_26_alloc_size; auto _ZN3edg8sizeof_tE __144553_3
 auto _ZN3edg10a_void_ptrE __144554_26_alloc_addr;
 auto _ZN3edg22a_mem_block_header_ptrE __144555_26_hdr_found = ((_ZN3edg22a_mem_block_header_ptrE)0);
 auto _ZN3edg22a_mem_block_header_ptrE __144556_26_prev_hdr_found = ((_ZN3edg22a_mem_block_header_ptrE)0);
+
+/*
+ * APExp: bracket the corruption in time.  Every sixteenth call, which
+ * over 1647 links is about a hundred walks of a chain a thousand long
+ * -- a hundred thousand pointer reads in all, against a compile that
+ * does millions.
+ */
+if ((edg_dbg_link_n & 15) == 0)
+  edg_dbg_check();
 
 ;
 
