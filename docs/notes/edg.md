@@ -1776,3 +1776,60 @@ for one reason*, and the host's is explained; but it does mean a
 repaired host build would be a debugger pointed at exactly the right
 place, and the four short allocations `edgbaked-xcheck` names are a
 finite list.
+
+### RUNG 3 PASSES: THE INIT LIST IS CLEARED, AND SO IS THE fopen
+
+```
+ok     rung 1: a bad option is DIAGNOSED
+ok     rung 2: --version
+ok     rung 3: a NONEXISTENT input file is diagnosed
+CRASH  rung 4: -E on an empty file, MINIMUM flags
+CRASH  rung 5: -E on an empty file, with eccp flags
+CRASH  rung 6: -E on a file with an #include
+CRASH  rung 7: full translation of an empty file
+highest consecutive rung reached 3
+```
+
+***SO THE 27 INIT CALLS ARE NOT IT, AND NEITHER IS ANYTHING BEFORE THE
+SOURCE IS OPENED.*** Reading `trans_unit.c`'s own order is what makes
+that a measurement rather than an inference:
+
+```c
+fe_translation_unit_init();            /* the 27 */
+...
+if (do_preprocessing_only) { fe_init_part_2(); cpp_driver(); }
+else { fe_init_for_pch_prefix_scan(); precompiled_header_processing();
+       fe_init_part_2(); translation_unit(); }
+```
+
+and **the source file is opened by the LEXER**, not by either caller:
+`lexical.c:30694` calls `open_source_file`, which is
+`host_envir.c:10072` and is a plain `fopen`. So a `cannot open`
+diagnostic means the 27, `fe_init_for_pch_prefix_scan`,
+`precompiled_header_processing`, `fe_init_part_2` and the entry into
+`translation_unit` all ran.
+
+**That also clears `mmap`**, which this release changed heavily
+(`SEG_THRESHOLD` 1MB -> 64MB, the malloc-backed arm, two partial-trim
+fixes) and which would otherwise be a strong candidate.
+`open_mapped_input_file` exists but is used only by PCH and the IFC
+module reader, never for a source file -- *checked, because "EDG maps
+its input" was a plausible sentence and is not true here.*
+
+**So the fault is after a SUCCESSFUL `fopen` of the source**, on a path
+common to `-E` and full translation, and it does not depend on the
+content: an empty file and a file with an `#include` crash alike.
+
+***AND RUNG 3's PASS CONDITION WAS TOO WEAK FOR THE CONCLUSION DRAWN
+FROM IT.*** It accepted any non-zero exit that was not a crash -- which
+a command-line error or a refused target configuration would also give.
+*A check that can pass for the wrong reason*, with a large inference
+resting on it. It now requires a diagnostic that **names the missing
+file**, which is what distinguishes "the lexer reached its `fopen`"
+from "something else failed first".
+
+**Every crashing rung now also reports its byte count on stdout**, which
+is one more free split: cpfe emits a `#line` directive before any
+preprocessed token, so **0 bytes means it died between the open and the
+first emit, and non-zero means it died inside the output loop.** Two
+regions, one `wc`.

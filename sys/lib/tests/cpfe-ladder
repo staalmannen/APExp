@@ -134,6 +134,13 @@ fn rung {
 	if(! ~ $kind ok){
 		stuck=yes
 		sed 1q $tmp/err
+		# **How much it WROTE before dying is a free split.**  cpfe
+		# emits a `#line' directive before any preprocessed token,
+		# so a crash with empty output died between opening the
+		# source and the first emit, and a crash with output in
+		# hand died inside the loop.  *Two different regions, one
+		# `wc'.*
+		echo '       bytes on stdout before the fault: '^`{wc -c <$tmp/out}
 	}
 }
 
@@ -197,11 +204,28 @@ if(! grep -qE 'suicide|trap:' $tmp/err){
 		echo 'ERROR  rung 3: a missing file was NOT diagnosed and did not crash'
 	if(~ $st '')
 		stuck=yes
+	# ***AND THE PASS CONDITION HAS TO NAME THE FILE.***  The first
+	# version accepted any non-zero exit, which a command-line error
+	# or a refused target configuration would also give -- *a check
+	# that can pass for the wrong reason*, and one a big conclusion
+	# was about to rest on.  `open_source_file' (`host_envir.c:10072')
+	# is reached from `lexical.c:30694', inside the lexer, so a
+	# diagnostic that names the missing file is what says the lexer
+	# ran; anything else is a different failure wearing the same
+	# exit status.
 	if(! ~ $st ''){
-		echo 'ok     rung 3: a NONEXISTENT input file is diagnosed'
-		echo '       -> all 27 init calls ran; the fault is AFTER them'
-		if(~ $stuck '')
-			reached=3
+		if(grep -qE 'no-such-file-9f3a|annot open|o such file' $tmp/err $tmp/out){
+			echo 'ok     rung 3: a NONEXISTENT input file is diagnosed'
+			echo '       -> init AND fe_init_part_2 ran, and the lexer'
+			echo '          reached its fopen; the fault is AFTER that'
+			if(~ $stuck '')
+				reached=3
+		}
+		if(! grep -qE 'no-such-file-9f3a|annot open|o such file' $tmp/err $tmp/out){
+			echo 'ERROR  rung 3: non-zero, but the message does not name the file'
+			sed 1q $tmp/err
+			stuck=yes
+		}
 	}
 }
 
