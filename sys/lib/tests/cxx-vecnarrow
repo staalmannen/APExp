@@ -1,0 +1,161 @@
+#!/bin/rc
+# cxx-vecnarrow -- WHERE inside <vector> does cpfe die?
+#
+#	./cxx-vecnarrow
+#
+# `cxx-bisect' says `34 ok, 0 error, 1 CRASH' and the crash is
+# `vector'.  That is as far as a per-header bisect can go: `<vector>'
+# is 356 files and the other 34 headers between them reach 337 of
+# them, so the finding is already narrow and still far too wide to
+# read.  This narrows it inside the one header.
+#
+# ***IT EXISTS BECAUSE A PREDICTION WAS REFUTED.***  The crash was
+# predicted to be cpfe's ERROR RECOVERY -- in both earlier sightings a
+# diagnostic had been emitted first, about twelve instantiation levels
+# deep, and seven other headers hit the identical error without
+# crashing.  The refutation condition written down at the time was "a
+# CRASH with 0 errors", and the next run was exactly that.  *So it is
+# a real cpfe bug and the error-recovery reading is dead.*
+#
+# THREE PHASES, AND PHASE 0 IS A CONTROL
+# ======================================
+#
+# 0. `<vector>' itself must CRASH here.  **If it does not, every
+#    number below is meaningless** -- the same reason `cxx-bisect'
+#    opens with an empty translation unit.  A ladder that cannot
+#    reproduce the fault cannot localise it.
+#
+# 1. Each of `vector/vector.h's includes ALONE.  If one crashes by
+#    itself the search is over.
+#
+# 2. CUMULATIVE prefixes of that list.  If no single include crashes
+#    but a prefix does, the fault is an INTERACTION and the first
+#    failing prefix names the second party.
+#
+# If phase 1 and phase 2 are both clean the answer is itself a
+# finding: the crash is in `vector/vector.h's OWN BODY -- the class
+# template definitions below its last `#include' -- and not in
+# anything it pulls in.  That would be about 2000 lines instead of
+# 356 files.
+#
+# THE INCLUDE LIST IS DERIVED, NOT TRANSCRIBED, out of
+# `vector/vector.h' at run time.  A transcribed list goes stale the
+# first time somebody edits that file, and silently: the ladder would
+# still print rungs.  It gates if the derivation comes back empty.
+#
+# rc notes, each of which has cost this tree a round:
+#   * `>[2]file' is the stderr redirect, written with no space.
+#   * `=' is a syntax character; assignments are tight and leading.
+#   * `} if not {' on ONE line is a parse error -- see
+#     `sys/lib/tests/mkrecipe-probe'.  There is no `if not' here.
+#   * `grep' inside `apexp-sh' is GNU grep, so `-qE' is right.
+
+CXXDIR=/sys/include/ape/c++
+VEC=$CXXDIR/vector/vector.h
+
+if(! test -f $VEC){
+	echo 'cxx-vecnarrow: no '^$VEC >/fd/2
+	echo 'cxx-vecnarrow: APExp is not mounted' >/fd/2
+	exit nofile
+}
+
+tmp=/tmp/cxx-vecnarrow.$pid
+mkdir -p $tmp
+
+# The includes of vector.h, in file order, each made absolute by
+# prefixing the directory they are written relative to.
+incs=`{sed -n 's/^#include "\(.*\)"/\1/p' $VEC}
+if(~ $#incs 0){
+	echo 'cxx-vecnarrow: derived NO includes from '^$VEC >/fd/2
+	echo 'cxx-vecnarrow: the sed no longer matches; fix it rather than' >/fd/2
+	echo 'cxx-vecnarrow: reading a ladder with no rungs' >/fd/2
+	rm -rf $tmp
+	exit noincs
+}
+echo 'cxx-vecnarrow: '^$#incs^' includes derived from vector/vector.h'
+echo
+
+fn try {	# $1 = source file; echoes ok / ERROR / CRASH
+	c++ -F $1 >$tmp/out >[2]$tmp/err
+	st=$status
+	kind=ok
+	if(! ~ $st '')
+		kind=ERROR
+	if(grep -qE 'suicide|trap:' $tmp/err)
+		kind=CRASH
+	echo $kind
+}
+
+# ---- phase 0: the control ----------------------------------------
+echo '#include <vector>' > $tmp/t.cpp
+echo 'int main(void){ return 0; }' >> $tmp/t.cpp
+k=`{try $tmp/t.cpp}
+echo 'cxx-vecnarrow: control  <vector> -> '^$k
+if(! ~ $k CRASH){
+	echo
+	echo 'cxx-vecnarrow: CONTROL FAILED -- <vector> does not crash here,'
+	echo 'cxx-vecnarrow: so this ladder cannot localise anything and'
+	echo 'cxx-vecnarrow: every rung below would be a clean rung for the'
+	echo 'cxx-vecnarrow: wrong reason.  Re-run cxx-bisect first.'
+	rm -rf $tmp
+	exit nocrash
+}
+echo
+
+# ---- phase 1: each include alone ---------------------------------
+echo 'cxx-vecnarrow: phase 1 -- each include ALONE'
+alone=()
+for(i in $incs){
+	echo '#include "'^$CXXDIR^'/vector/'^$i^'"' > $tmp/t.cpp
+	echo 'int main(void){ return 0; }' >> $tmp/t.cpp
+	k=`{try $tmp/t.cpp}
+	if(~ $k CRASH){
+		echo '  CRASH '^$i
+		sed 3q $tmp/err
+		alone=($alone $i)
+	}
+	if(~ $k ERROR)
+		echo '  error '^$i^' (needs a prerequisite; not a crash)'
+}
+if(~ $#alone 0)
+	echo '  no single include crashes'
+echo
+
+# ---- phase 2: cumulative prefixes --------------------------------
+echo 'cxx-vecnarrow: phase 2 -- CUMULATIVE prefixes'
+echo '/* cumulative prefix */' > $tmp/pre.h
+first=''
+# **Counting WITHOUT arithmetic**: rc has none, and `bc' is not
+# something to assume is reachable inside `apexp-sh' -- the union
+# resolves command names and Plan 9's own set is not GNU's.  A list
+# that grows by one element per rung is the rc idiom, and `$#' reads
+# its length.
+count=()
+for(i in $incs){
+	count=($count x)
+	echo '#include "'^$CXXDIR^'/vector/'^$i^'"' >> $tmp/pre.h
+	cp $tmp/pre.h $tmp/t.cpp
+	echo 'int main(void){ return 0; }' >> $tmp/t.cpp
+	k=`{try $tmp/t.cpp}
+	if(~ $k CRASH){
+		echo '  CRASH at prefix '^$#count^', whose last include is '^$i
+		sed 3q $tmp/err
+		first=$i
+		# Stop here: the FIRST failing prefix is the answer, and
+		# every longer one contains it, so the rest would only
+		# reprint this crash forty times.
+		break
+	}
+}
+if(~ $first '')
+	echo '  no prefix of the '^$#incs^' includes crashes'
+echo
+
+# ---- the reading -------------------------------------------------
+if(~ $#alone 0 && ~ $first ''){
+	echo 'cxx-vecnarrow: ***THE CRASH IS IN vector/vector.h ITSELF***,'
+	echo 'cxx-vecnarrow: below its last #include -- not in anything it'
+	echo 'cxx-vecnarrow: pulls in.  That is the class template bodies.'
+}
+rm -rf $tmp
+echo 'cxx-vecnarrow: done'
