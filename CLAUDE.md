@@ -1628,6 +1628,30 @@ silent:
   the nine links and nine carves ending there. **`edg_dbg_checks` is
   load-bearing**: a walk that never ran and a chain that never went bad
   print the same `-1` without it.
+  ***AND THE WINDOW IS SIXTEEN LINKS WIDE.*** `bad_at=1040`,
+  `bad_pos=7`, `bad_hdr` == `prev`, after **65 clean walks** — and since
+  the walk ran at every multiple of sixteen the last clean one was 1024,
+  while `prev` was linked at 996. **So the write happened between link
+  1024 and 1040**, and the value found is already final, so it was
+  written once. *The rings show one shape in that window*: links
+  1033-1040 are eight BRAND-NEW REGIONS, 329 to 336, one per link, each
+  `next = 0`, and the carves beside them are a CHAIN — each new region's
+  block is the carved remainder of the previous one, so eight
+  consecutive regions come out of one 64KB block. **None of those
+  addresses is `prev`**, so the write is not one of those headers being
+  placed. The `& 15` is gone (one interval, not sixteen) and
+  `edg_dbg_bad_site` now says which of five sites saw it first —
+  **site 4, `free_fe_huge`, is the one real suspect reading named**,
+  being the only code besides `alloc_mem_block`/`free_mem_block` that
+  writes a region LINK. **Site 5 is ARMED at link 1000** rather than
+  always on, so the per-allocation resolution is spent inside the
+  measured window: *an instrument aimed by a previous measurement
+  rather than by a guess.* **And the block had to MOVE in the file** —
+  two of its five sites are defined above where it was written, so they
+  referenced an undeclared `edg_dbg_check`, which in C89 is an implicit
+  `int` return: this tree's own undeclared-function trap, inside an
+  instrument written to hunt a memory bug. *Caught by reading the file
+  order, not by a build.*
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.

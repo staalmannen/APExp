@@ -1324,3 +1324,70 @@ that never ran and a chain that never went bad print the same `-1`**
 without it. The script then dumps the nine links and nine carves ending
 at that instant, so the rings say what was being allocated when the
 field died — a question no post-mortem can ask.
+
+### The window is sixteen links wide
+
+```
+edg_dbg_checks   = 65 clean walks
+edg_dbg_bad_at   = 1040
+edg_dbg_bad_trim = 507
+edg_dbg_bad_pos  = 7
+edg_dbg_bad_hdr  = 0x03cc32f8      (== prev this run)
+edg_dbg_bad_val  = 0x0003f4a1
+link total 1647, trim total 1094
+```
+
+`prev` was linked at **996**; the walk ran at every multiple of sixteen
+and the last clean one was **1024**. So **the write happened between link
+1024 and link 1040** — and the value found is already the final one, so it
+was written once rather than drifting.
+
+**What the rings show in that window** is one shape: link 1032 is an
+ordinary region-0 block, and links **1033 to 1040 are eight brand-new
+regions, 329 to 336, one per link, each with `next = 0`** — a region
+created and immediately given its first block, eight times running. The
+carves beside them are a **chain**: `carve 500 new=0x03d41c40
+parent=0x03d417a0`, `501 new=0x03d42400 parent=0x03d41c40`, `502
+new=0x03d42a60 parent=0x03d42400` … each new region's block is the
+*carved remainder of the previous one*. That is the reuse path working as
+designed — `trim_mem_block` pushes a remainder, `alloc_mem_block` takes
+it — but it means eight consecutive regions are all carved out of one
+original 64KB block.
+
+None of those addresses is `prev` (`0x03cc3xxx` against `0x03d4xxxx`), so
+the write is not one of these headers being placed.
+
+### Narrowing to one interval, with the aim taken from the measurement
+
+The `& 15` is gone: the walk runs on **every** call now, which pins the
+event to one allocation interval instead of sixteen. And
+`edg_dbg_bad_site` says which of five call sites saw it first, which
+separates stories the link count cannot:
+
+| site | what it means |
+|---|---|
+| 1 | entry to `alloc_mem_block` — it happened *before* this call |
+| 2 | exit from `alloc_mem_block` — *this* allocation did it |
+| 3 | entry to `trim_mem_block` — the carve chain is implicated |
+| 4 | entry to `free_fe_huge` — it writes `*prev_next`, i.e. **into a link** |
+| 5 | `alloc_in_region` — an ordinary front-end allocation |
+
+**Site 4 is the one real suspect reading named**: besides
+`alloc_mem_block` and `free_mem_block`, `free_fe_huge` is the only code
+that writes a region link at all.
+
+**Site 5 is armed rather than always on**, at link 1000 — just under the
+measured window. `alloc_in_region` runs orders of magnitude more often
+than `alloc_mem_block`, so a walk per call over the whole compile would
+cost more than the answer is worth; armed, it costs only the allocations
+inside the window. *An instrument aimed by a previous measurement rather
+than by a guess.*
+
+**And the block had to move in the file.** It was written beside the
+function it was first called from, and two of the five sites —
+`free_fe_huge` and `alloc_in_region` — are defined *above* that point, so
+they referenced an undeclared `edg_dbg_check` and an undeclared
+`edg_dbg_allocs`. In C89 the first is an implicit `int`-returning
+function, which is this tree's own undeclared-function trap *inside an
+instrument written to hunt a memory bug*. Caught by reading the file
+order, not by a build.
