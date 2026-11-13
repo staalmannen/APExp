@@ -1532,3 +1532,65 @@ fact about the corpus -- but it has stopped being the suspect for a
 crash, because the only evidence pointing it at one was this backtrace.
 *A finding that explains an instrument's own failure also withdraws
 whatever that failure was being used as evidence for.*
+
+### `regs()` AFTER A FULL REBUILD: IT IS A CALL THROUGH A POINTER HOLDING 1
+
+A complete `mk install` did NOT move it -- `cxx-bisect` still answers
+`CRASH <empty translation unit>` -- so the half-rebuilt-corpus reading
+above is **refuted**, and that was the cheapest of the three. What the
+rebuild bought instead is an `acid` dump, and it says more than the
+trap line did:
+
+```
+PC    0x0000000000000001
+SP    0x00007ffffffde7c8
+BP    0x0000000001bef528
+TYPE  0x000000000000000e
+ERROR 0x0000000000000014
+acid: stk()
+<stdin>:5: (error) no stack frame: no SP for PC 1
+```
+
+***EVERY FIELD THERE IS A MEASUREMENT AND THREE OF THEM NARROW IT.***
+
+  - **`PC` is 1 exactly.** Not a small offset off a null pointer --
+    *the program counter itself*. So control was transferred to
+    address 1; nothing was dereferenced to get there.
+  - **`TYPE` 0xe is a page fault and `ERROR` 0x14 decodes to
+    `0b10100`**: bit 2 set is user mode, **bit 4 set is an INSTRUCTION
+    FETCH**. So the processor tried to *execute* at 1, which is what a
+    `CALL` through a function pointer holding 1 looks like and is not
+    what a bad data pointer looks like.
+  - **`SP` is an ordinary stack address and the stack is intact**, so
+    this is not the recursion story and `stk()`'s complaint is only
+    that PC 1 has no frame -- *the unwinder needs a known function to
+    find one, and address 1 is in none.*
+  - **`BP` holds a plausible heap pointer**, and on kencc amd64
+    `REGARG` is `D_BP`, so **BP is argument one at a function's
+    entry** -- this file's own `lstk()` rule, read the useful way
+    round. The call was made with a real argument and a bogus target.
+
+**So the target came from a table, and a table entry of 1 is not an
+uninitialised one.** A static-init gap leaves zeros; this is a 1. EDG's
+generated C carries `a_function_number` precisely because it indexes
+functions rather than naming them -- `alloc_hash_table`'s own
+`hash_function_index=3, compare_function_index=5` are that type -- so
+*a function NUMBER reaching the call site where a function POINTER
+belongs* produces exactly this, and 1 is a plausible number where it is
+not a plausible address.
+
+***THE NEXT COMMAND IS ONE LINE AND NAMES THE CALLER.*** A `CALL`
+pushes the return address before the fetch faults, and the fault
+switches to the kernel stack, so the user `SP` still points at it:
+
+```
+acid: src(*SP)
+```
+
+That is the same verb that named `posix_spawn.c:461` and
+`zend_string.h:401`, applied to the word at `SP` instead of to `PC`.
+If acid will not dereference it that way, `print(*SP)` and then
+`src(` that number `)` is the two-step form. **The caller is what
+turns "a table is wrong" into "THIS table is wrong"**, and nothing
+short of it distinguishes a function-number table from a vtable from
+a bad relocation.

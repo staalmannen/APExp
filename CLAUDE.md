@@ -1179,7 +1179,19 @@ silent:
   bisect that cannot say "everything fails" cannot tell "this header
   breaks cpfe" from "cpfe is broken", and the first version of the
   script went straight to the headers.
-  **What bears on it, cheapest first, is that TWO LAYOUT RULES HAVE
+  ***A FULL REBUILD DID NOT MOVE IT, AND `regs()` SAYS WHY IT WILL
+  NOT.*** `PC` is **1 exactly**, `TYPE` 0xe with `ERROR` 0x14 decodes
+  to a user-mode **INSTRUCTION FETCH**, and `SP` is an ordinary stack
+  address -- so this is a CALL through a function pointer holding 1,
+  not a dereference and not the stack. **A table entry of 1 is not an
+  uninitialised one** (a static-init gap leaves zeros), and EDG's
+  generated C indexes functions by `a_function_number`, so a function
+  NUMBER reaching a call site where a POINTER belongs is the shape
+  that fits. **`acid: src(*SP)` names the caller in one command** --
+  the `CALL` pushed the return address before the fetch faulted.
+  *That also refutes the cheapest of the three readings below*, which
+  was the half-rebuilt corpus.
+  **What bears on it otherwise is that TWO LAYOUT RULES HAVE
   LANDED since cpfe last translated a toy** — the bit-field
   head-sharing `follow` rule in `cc/dcl.c` and `gbitagg`'s static
   initialiser — and EDG's corpus **folds `sizeof` and `offsetof` into
@@ -1508,6 +1520,19 @@ capped the Zend heap at about 10MB is gone with `SEG_THRESHOLD` at
 64MB. *The alignment question answered no — 0 of 8 — so the trims do
 run; they just work now.*
 **No extension in the first build**, whatever its library's state.
+***AND THE PHORONIX CRASH IS libap's `posix_spawn`, LOCALISED BUT NOT
+EXPLAINED.*** `php-smoke.php` is **0 failures** now (the zip block
+included, so `P_tmpdir` reached php), yet `system-info` still ends
+with two php processes dead -- and `acid` puts both in
+`lib/ap/process/posix_spawn.c`, a GP violation at `:461` and a stack
+exception at `:133`. **`FA_FCHDIR` is 4 and php never adds it**, so
+`a->op` came out of something that is not a `Faction`. *Four readings
+refuted four candidates and none found it*, including the obvious
+shared-memory race -- `fork()` is `RFENVG|RFFDG|RFPROC` with no
+`RFMEM`. `posix-spawn-test`'s `test_proc_open_loop` reproduces php's
+call sequence 200 times; 0 on glibc. **And `ZEND_CHECK_STACK_LIMIT` is
+neither confirmed nor refuted by this**: it guards the PHP VM, and a
+C recursion never reaches the check.
 
 - **libwebp 1.6.0** — **125 files, 0 errors, installed as one archive**
   (`lib/webp`), with the public headers committed to
