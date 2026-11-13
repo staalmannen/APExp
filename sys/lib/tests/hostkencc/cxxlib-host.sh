@@ -93,7 +93,7 @@ PORT=""
 for a in "$@"; do
 	case "$a" in
 	--portable) PORT="-DPSTL_NO_COMPILER_BUILTINS=1" ;;
-	--headers|--control|--run|--vecsplit) mode=$a ;;
+	--headers|--control|--run|--vecsplit|--instantiate) mode=$a ;;
 	*) echo "cxxlib-host: unknown argument $a" >&2; exit 2 ;;
 	esac
 done
@@ -131,6 +131,109 @@ run_one() {	# $1 = source, $2 = label
 }
 
 case "$mode" in
+--instantiate)
+	# ***A HEADER THAT COMPILES IS NOT A TEMPLATE THAT INSTANTIATES,
+	# AND THIS MODE EXISTS BECAUSE THAT COST A ROUND.***
+	#
+	# `vector/split_buffer.h' carried three names from upstream put
+	# through the rename with the wrong prefix -- `M_clear',
+	# `M_M_alloc' (the prefix applied twice) and `M_end_cap', where
+	# the members are `clear', `M_alloc' and `end_cap'.  They sit in
+	# a nested class whose uses are on a `split_buffer &', a
+	# DEPENDENT type, so both cpfe and g++ defer the lookup to
+	# instantiation.
+	#
+	# **So neither `--headers' nor `--run' could see them**: the
+	# first compiles each header alone, the second exercises the
+	# public API and never instantiates that nested class.  cpfe
+	# found them on the VM, which is the expensive way round.
+	#
+	# An explicit instantiation DEFINITION instantiates a class
+	# template's member functions and member classes, so it reaches
+	# code no use of the public API happens to touch.
+	#
+	# **It REPORTS and does not gate.**  Some of these templates are
+	# exception-free by convention and have members that are
+	# ill-formed to instantiate for an arbitrary argument; a gate
+	# would demand changes that must not be made.  Read the names.
+	fail=0
+	ctlsrc=""
+	for spec in \
+		'std::split_buffer<int, std::allocator<int> >' \
+		'std::vector<int, std::allocator<int> >' \
+		'std::list<int, std::allocator<int> >' \
+		'std::forward_list<int, std::allocator<int> >' \
+		'std::array<int, 4>' \
+	; do
+		lbl=$(echo "$spec" | tr -cd 'A-Za-z0-9')
+		[ -z "$ctlsrc" ] && ctlsrc="$OUT/inst.$lbl.cpp"
+		{
+			echo '#include <vector.stdh>'
+			echo '#include <list.stdh>'
+			echo '#include <forward_list.stdh>'
+			echo '#include <array.stdh>'
+			echo '#include <memory.stdh>'
+			echo "template class $spec;"
+			echo 'int main(void) { return 0; }'
+		} > "$OUT/inst.$lbl.cpp"
+		if g++ $CXXFL "$OUT/inst.$lbl.cpp" > "$OUT/inst.$lbl.err" 2>&1; then
+			echo "cxxlib-host: ok    instantiate $spec"
+		else
+			fail=$((fail + 1))
+			echo "cxxlib-host: ERROR instantiate $spec -- $(grep -c 'error:' "$OUT/inst.$lbl.err") errors"
+			grep 'error:' "$OUT/inst.$lbl.err" | head -8 | sed 's/^/    /'
+		fi
+	done
+	echo
+	echo "cxxlib-host: $fail of 5 explicit instantiations failed (REPORT, not a gate)"
+
+	# ***THE POSITIVE CONTROL, AND IT SEARCHES HISTORY RATHER THAN
+	# `HEAD'.***  The three names it fires on are FIXED, so staging
+	# `HEAD' would stage the fix and the control would pass for the
+	# wrong reason -- `baketype-sweep.py' learnt this the same way.
+	# It walks back for the last revision of the file that still
+	# carries `M_M_alloc' and instantiates against that.
+	rev=$(git -C "$ROOT" rev-list -n 60 HEAD -- sys/include/ape/c++/vector/split_buffer.h 2>/dev/null |
+	      while read r; do
+		if git -C "$ROOT" show "$r:sys/include/ape/c++/vector/split_buffer.h" 2>/dev/null |
+		   grep -q 'M_M_alloc'; then echo "$r"; break; fi
+	      done)
+	if [ -z "$rev" ]; then
+		echo "cxxlib-host: CONTROL VOID -- no revision of split_buffer.h carries M_M_alloc," >&2
+		echo "cxxlib-host: so this cannot show that the check would fire." >&2
+		exit 2
+	fi
+	rm -rf "$OUT/ctl"; mkdir -p "$OUT/ctl"
+	cp -r "$CXXDIR"/. "$OUT/ctl/" || exit 2
+	git -C "$ROOT" show "$rev:sys/include/ape/c++/vector/split_buffer.h" \
+		> "$OUT/ctl/vector/split_buffer.h" || exit 2
+	if g++ -std=c++14 -nostdinc++ -fno-exceptions -fno-rtti -fsyntax-only \
+	       -I"$SHIM" -I"$OUT/ctl" $EDGDEF $PORT \
+	       "$ctlsrc" > "$OUT/ctl.err" 2>&1; then
+		echo "cxxlib-host: ***CONTROL PASSED, WHICH IS A FAILURE.***"
+		echo "cxxlib-host: the pre-fix split_buffer.h from $rev instantiated cleanly,"
+		echo "cxxlib-host: so this mode is not asking what it claims."
+		exit 1
+	fi
+	# ***AND IT MUST BE THE RIGHT DIAGNOSTIC.***  The first version
+	# of this control named the staged source by a hand-written
+	# label that did not match the one the loop builds, so g++
+	# answered `No such file or directory' -- a NON-ZERO exit, which
+	# the test above reads as "the control fired".  *A control that
+	# passes for the wrong reason is the failure this tree writes
+	# down most often*, and it was caught by reading the output
+	# rather than the status.  So the member name is demanded here.
+	if ! grep -q 'M_M_alloc' "$OUT/ctl.err"; then
+		echo "cxxlib-host: ***THE CONTROL FAILED FOR THE WRONG REASON.***"
+		echo "cxxlib-host: it did not name M_M_alloc, so what it hit is not"
+		echo "cxxlib-host: the rename slip this mode exists for:"
+		head -4 "$OUT/ctl.err" | sed 's/^/    /'
+		exit 1
+	fi
+	echo "cxxlib-host: control ($rev) reports $(grep -c 'error:' "$OUT/ctl.err") errors -- the mode fires:"
+	grep 'error:' "$OUT/ctl.err" | head -4 | sed 's/^/    /'
+	exit 0
+	;;
 --vecsplit)
 	# Regenerate `sys/lib/tests/cxx-vecsplit.cuts': the points in
 	# vector/vector.h at which it can be TRUNCATED and still

@@ -1549,3 +1549,78 @@ inconsistent with "the `+8` is routinely written".
 *This is upstream's arrangement either way*, so if it is a latent bug it
 is one that only shows where a carve lands exactly there — which is what
 this port does.
+
+### blockreq says the block was not one object
+
+```
+slot 0x1d2 new 0x3cb7380 parent 0x3cafd80 objsize 0x7590 blockreq 0x150 rgn 0x0
+```
+
+`blockreq` is `0x150` = **336**, and `objsize` is `0x7590` = **30096**. The
+test stated last round was `blockreq == objsize + 8` for a single
+dedicated object; `336 != 30104`, so **that block was not one allocation**.
+336 is the `true_size` of whatever allocation *first* overflowed the
+previous block and triggered this one; the block then grew to 30096 by
+many small bumps, and the overrun belongs to the **last** of them.
+
+So neither column names the overrunning object. The size that would is the
+last `alloc_in_region` call's — and that function is COMDAT with 41 copies,
+so instrumenting `mem_manage.c`'s measures the one nobody calls. Naming it
+means patching all 41, which is mechanical but is a round of its own.
+
+### The ring wrapped, so `dirty=0` meant nothing
+
+The bigger input (`cxx-library-test.cpp`) answered
+`carves=0x1051 checked=0x1000 dirty=0x0` — **4177 carves into 4096 slots**,
+so the 81 oldest were never looked at. *A count that can only report what
+the ring still holds is a check that cannot fail for anything older*, and a
+zero from it is an unread window rather than a clean one.
+
+A slot is checked when it is **evicted** now, as well as at the end, which
+makes the scan complete whatever the ring size; and the first dirty pad
+found anywhere is kept in full (`edg-pad: FIRST ...`), because that is the
+one whose surroundings mean anything.
+
+### Three C++ library errors no header check could reach
+
+`c++ -o cxx-library-test cxx-library-test.cpp` reported three, all in
+`vector/split_buffer.h`'s nested `M_destroy_buffer`:
+
+| written | the member actually is |
+|---|---|
+| `M_clear()` | `clear()` |
+| `M_M_alloc()` | `M_alloc()` — the prefix applied **twice** |
+| `M_end_cap()` | `end_cap()` |
+
+Upstream's `__clear`, `__alloc` and `__end_cap` put through the rename with
+the wrong prefix. ***And nothing could see them until something
+INSTANTIATED that class***: the uses are on a `split_buffer &`, a dependent
+type, so both cpfe **and g++** defer the lookup to instantiation.
+`cxx-bisect` compiles each header alone; `cxxlib-host.sh --headers` and
+`--run` exercise the public API and never touch that nested class. **A
+header that compiles is not a template that instantiates.**
+
+`cxxlib-host.sh --instantiate` is the instrument: an explicit instantiation
+*definition* reaches a class template's member functions and member
+classes, so it covers code no use of the public API happens to touch. Five
+specialisations, **0 failures** with the fix. It **reports rather than
+gates** — some of these templates are exception-free by convention and have
+members that are ill-formed to instantiate for an arbitrary argument.
+
+**Its control searches git HISTORY rather than `HEAD`**, since the three
+names are now fixed and staging `HEAD` would stage the fix: it walks back
+for the last revision still carrying `M_M_alloc`. ***And the first version
+of that control fired for the wrong reason*** — it named the staged source
+by a hand-written label that did not match the one the loop builds, so g++
+answered `No such file or directory`, a non-zero exit the test read as
+"the control fired". It demands the string `M_M_alloc` in the diagnostic
+now. *Caught by reading the output rather than the exit status.*
+
+### And the crash is back on the bigger input, at a different pc
+
+`cpfe ... fault read addr=0x3f4cd pc=0x90c3a1` — the **same family of
+value** (`0x3f4cd` is one of the three recorded earlier) at a **different
+code address** from `free_memory_region`'s `0x9da331`. `chain-bad-at` is
+`-1`, so the region chain never went bad this time. With the eviction check
+in, the next run's `dirty` count can be read; until then that `0` is only
+the unread window.

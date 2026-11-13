@@ -6551,6 +6551,26 @@ extern long long write(int, const void *, unsigned long long);
 long edg_dbg_padchecked;
 long edg_dbg_pad_dirty;
 
+/*
+ * ***THE RING WRAPS AND `dirty=0' THEN MEANS NOTHING.***  The bigger
+ * input answered `carves=0x1051 checked=0x1000 dirty=0x0' -- 4177
+ * carves into 4096 slots, so the 81 oldest were never looked at and a
+ * zero is an unread window rather than a clean one.  *A count that can
+ * only report what the ring still holds is a check that cannot fail
+ * for anything older.*
+ *
+ * So a slot is checked when it is EVICTED as well as at the end, which
+ * makes the scan complete whatever the ring size.  The first dirty pad
+ * found is kept in full, because that is the one whose surroundings
+ * mean anything.
+ */
+void *edg_dbg_pad1_new;
+void *edg_dbg_pad1_par;
+long edg_dbg_pad1_size;
+long edg_dbg_pad1_off;
+long edg_dbg_pad1_at;
+unsigned char edg_dbg_pad1_bytes[16];
+
 static char edg_dbg_buf[4096];
 static long edg_dbg_bufn;
 
@@ -6594,14 +6614,45 @@ static void edg_dbg_putx(unsigned long long v)
 }
 
 /*
+ * Check ONE carve's pad.  Returns the offset of the first non-canary
+ * byte, or -1.  Called both when a slot is evicted from the ring and
+ * when the ring is walked at the end, so no carve goes unchecked.
+ */
+static long edg_dbg_padone(long i)
+{
+  unsigned char *p;
+  long k;
+
+  p = (unsigned char *)(edg_dbg_trim_new[i]);
+  if (p == ((unsigned char *)0))
+    return -1;
+  p = p - EDG_DBG_CARVE_PAD;
+  for (k = 0; k < EDG_DBG_CARVE_PAD; k = k + 1) {
+    if (p[k] != 0xA5) {
+      edg_dbg_pad_dirty = edg_dbg_pad_dirty + 1;
+      if (edg_dbg_pad1_new == ((void *)0)) {
+        edg_dbg_pad1_new = edg_dbg_trim_new[i];
+        edg_dbg_pad1_par = edg_dbg_trim_par[i];
+        edg_dbg_pad1_size = edg_dbg_trim_size[i];
+        edg_dbg_pad1_off = k;
+        edg_dbg_pad1_at = i;
+        for (k = 0; k < 16 && (edg_dbg_pad1_off + k) < EDG_DBG_CARVE_PAD; k = k + 1)
+          edg_dbg_pad1_bytes[k] = p[edg_dbg_pad1_off + k];
+      }
+      return 0;
+    }
+  }
+  return -1;
+}
+
+/*
  * Walk every carve recorded and report the pads that were written.
  * Runs once, at the first `free_memory_region', which is after all the
  * front end's allocation is done.
  */
 void edg_dbg_padcheck(void)
 {
-  long i, lim, shown, k, off, j;
-  unsigned char *p;
+  long i, lim, shown, k, j;
 
   if (edg_dbg_padchecked != 0)
     return;
@@ -6622,23 +6673,11 @@ void edg_dbg_padcheck(void)
   edg_dbg_puts("\n");
 
   for (i = 0; i < lim; i = i + 1) {
-    p = (unsigned char *)(edg_dbg_trim_new[i]);
-    if (p == ((unsigned char *)0))
+    if (edg_dbg_padone(i) < 0)
       continue;
-    p = p - EDG_DBG_CARVE_PAD;
-    off = -1;
-    for (k = 0; k < EDG_DBG_CARVE_PAD; k = k + 1) {
-      if (p[k] != 0xA5) {
-        off = k;
-        break;
-      }
-    }
-    if (off < 0)
-      continue;
-    edg_dbg_pad_dirty = edg_dbg_pad_dirty + 1;
     if (shown < 12) {
       shown = shown + 1;
-      edg_dbg_puts("edg-pad:  slot 0x");
+      edg_dbg_puts("edg-pad:  live slot 0x");
       edg_dbg_putx((unsigned long long)i);
       edg_dbg_puts(" new 0x");
       edg_dbg_putx((unsigned long long)(edg_dbg_trim_new[i]));
@@ -6646,16 +6685,6 @@ void edg_dbg_padcheck(void)
       edg_dbg_putx((unsigned long long)(edg_dbg_trim_par[i]));
       edg_dbg_puts(" objsize 0x");
       edg_dbg_putx((unsigned long long)(edg_dbg_trim_size[i]));
-      /*
-       * APExp: and what the BLOCK was asked for.  `alloc_in_region's
-       * dedicated arm requests `true_size = size + 8' and then bumps by
-       * `size' alone, so a block whose `min_size' is exactly
-       * `objsize + 8' held ONE allocation of `objsize' bytes -- which
-       * turns "how full the block was" into "how big the object was",
-       * and that is the number that can be matched against EDG's
-       * source.  Anything else means the block was filled by several
-       * small allocations and `objsize' is their total.
-       */
       for (j = 0; j < 4096; j = j + 1) {
         if (edg_dbg_link_hdr[j] == edg_dbg_trim_par[i]) {
           edg_dbg_puts(" blockreq 0x");
@@ -6664,15 +6693,32 @@ void edg_dbg_padcheck(void)
           edg_dbg_putx((unsigned long long)(edg_dbg_link_rn[j]));
         }
       }
-      edg_dbg_puts(" off 0x");
-      edg_dbg_putx((unsigned long long)off);
-      edg_dbg_puts(" bytes");
-      for (k = off; k < EDG_DBG_CARVE_PAD && k < off + 16; k = k + 1) {
-        edg_dbg_puts(" ");
-        edg_dbg_putx((unsigned long long)(p[k]));
-      }
       edg_dbg_puts("\n");
     }
+  }
+
+  /*
+   * The first dirty pad ANYWHERE, evicted ones included.  This is the
+   * line to read when the ring wrapped: the loop above can only speak
+   * for the 4096 carves still in it.
+   */
+  if (edg_dbg_pad1_new != ((void *)0)) {
+    edg_dbg_puts("edg-pad:  FIRST slot 0x");
+    edg_dbg_putx((unsigned long long)edg_dbg_pad1_at);
+    edg_dbg_puts(" new 0x");
+    edg_dbg_putx((unsigned long long)edg_dbg_pad1_new);
+    edg_dbg_puts(" parent 0x");
+    edg_dbg_putx((unsigned long long)edg_dbg_pad1_par);
+    edg_dbg_puts(" objsize 0x");
+    edg_dbg_putx((unsigned long long)edg_dbg_pad1_size);
+    edg_dbg_puts(" off 0x");
+    edg_dbg_putx((unsigned long long)edg_dbg_pad1_off);
+    edg_dbg_puts(" bytes");
+    for (k = 0; k < 16; k = k + 1) {
+      edg_dbg_puts(" ");
+      edg_dbg_putx((unsigned long long)(edg_dbg_pad1_bytes[k]));
+    }
+    edg_dbg_puts("\n");
   }
 
   edg_dbg_puts("edg-pad: dirty=0x");
@@ -7375,6 +7421,13 @@ _ZN34_INTERNAL_12_mem_manage_c_b0d968923edg20reusable_blocks_listE = __144744_26
  * absence of crashes says only that nothing landed on a chain link,
  * while a dirtied canary says the overrun happened and names where.
  */
+/*
+ * APExp: check the slot this carve is about to EVICT, so a wrapped
+ * ring still reports every pad.  `carves=0x1051 checked=0x1000' said
+ * the last run could not.
+ */
+if (edg_dbg_trim_n >= 4096)
+  edg_dbg_padone(edg_dbg_trim_n & 4095);
 memset((void *)__144745_27_alloc_addr, 0xA5, (size_t)EDG_DBG_CARVE_PAD);
 edg_dbg_trim_new[edg_dbg_trim_n & 4095] = (void *)__144744_26_new_hdr;
 edg_dbg_trim_par[edg_dbg_trim_n & 4095] = (void *)__144738_44_hdr;
