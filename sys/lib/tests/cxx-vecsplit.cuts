@@ -1,0 +1,96 @@
+# cxx-vecsplit.cuts -- line numbers in sys/include/ape/c++/vector/vector.h
+# at which that file can be TRUNCATED and still compile.
+#
+# GENERATED AND VALIDATED by `hostkencc/cxxlib-host.sh --vecsplit'.
+# A cut at line N means "lines 1..N-1, then `} // namespace std',
+# `#endif' and a `main'".  Do not edit by hand: regenerate.
+#
+# ***EVERY LINE HERE WAS COMPILED BY g++ BEFORE IT WAS WRITTEN DOWN.***
+# 108 candidates, 81 validated -- the 27 that fail are member templates,
+# two `template<...>' lines where a cut between them leaves a dangling
+# header.  The list is the PROVEN set, so a rung that errors on the VM
+# is cpfe disagreeing with g++ rather than the harness cutting wrongly.
+#
+# `cxx-vecsplit' BISECTS these, so a run is about seven cpfe
+# invocations rather than 81.
+88
+1298
+1306
+1326
+1335
+1357
+1378
+1405
+1414
+1434
+1444
+1466
+1489
+1520
+1537
+1544
+1561
+1572
+1580
+1591
+1598
+1619
+1627
+1646
+1662
+1671
+1688
+1709
+1731
+1737
+1743
+1755
+1777
+1789
+1795
+1819
+1825
+1845
+1855
+1866
+1880
+1885
+1891
+1901
+1912
+1925
+1941
+1960
+1983
+2001
+2019
+2026
+2036
+2042
+2050
+2061
+2085
+2105
+2114
+2134
+2157
+2195
+2236
+2279
+2325
+2332
+2377
+2384
+2428
+2453
+2480
+2505
+2520
+2533
+2543
+2549
+2554
+2559
+2564
+2569
+2574

@@ -1348,13 +1348,28 @@ silent:
   **All 50 public headers compile now on both arms** but `<compare>`
   and `<source_location>`, which `#error` because they are C++20 and
   `eccp` passes `--c++14`; `cxx-library-test.cpp` builds and runs clean.
-  **The one thing NOT fixed is a `vector` CRASH** —
-  `fault read addr=0x3f4cd pc=0x90c3a1`, a real code address and so a
-  genuine dereference inside cpfe. *Predicted to go away*: in both
-  sightings cpfe had already emitted a diagnostic and died in
-  RECOVERY, twelve instantiation levels deep, while seven headers hit
-  the identical error without crashing. **Refutation: a CRASH with 0
-  errors**, which would be a cpfe bug the host cannot help with.
+  **The one thing NOT fixed is a `vector` CRASH**, and ***THE
+  PREDICTION WAS REFUTED BY ITS OWN STATED CONDITION***: it was
+  predicted to be error RECOVERY, the refutation written down was "a
+  CRASH with 0 errors", and the next run was **34 ok, 0 error, 1
+  CRASH**. *The seven headers that hit the identical error without
+  crashing showed the error was not SUFFICIENT, and were read as
+  showing recovery depth was the cause.*
+  **`cxx-vecnarrow` then put it inside `vector/vector.h` itself** — no
+  single include of that file crashes and no cumulative prefix of its
+  56 does. ***And the shape of the question is the bigger finding***:
+  the TU is `#include <vector>` plus an empty `main`, so **nothing
+  instantiates `vector<T>`** and cpfe is dying in PARSING — which
+  rules out deduction, instantiation, `--instantiate local` and the
+  whole back end at once. **`cxx-vecsplit` bisects the 2581 lines**
+  in about seven cpfe runs, over a cut list GENERATED AND VALIDATED
+  by g++ (`cxxlib-host.sh --vecsplit`): 108 candidates, **27 do not
+  compile** because a member template is two `template<...>` lines,
+  so the list is the PROVEN set and a rung that errors on the VM is
+  cpfe disagreeing with g++ rather than the harness cutting wrongly.
+  **The host build is NOT the tool here and nearly became one** —
+  `edgbaked-xcheck`'s verdict is sound-for-compile-time,
+  VOID-at-run-time, and a crash is a run-time question.
   ***`std::variant` IS A NAME AND NOT AN IMPLEMENTATION*** — an empty
   class body, the only one of 53 in the library that is a public
   header's own principal type. What also does not go away is the

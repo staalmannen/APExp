@@ -392,3 +392,73 @@ wrapped**: line 1 is the file and line number ending in a bare
 wrong, and a round went on reading the file to guess while
 `__builtin_huge_valf is undefined` sat on the next line. `sed 3q` now.
 *A summary that cuts the sentence in half is worse than no summary.*
+
+## The ladder answered: it is `vector/vector.h` itself, and cpfe is PARSING
+
+`cxx-vecnarrow` reports:
+
+```
+control  <vector> -> CRASH
+phase 1 -- each include ALONE          no single include crashes
+phase 2 -- CUMULATIVE prefixes         no prefix of the 56 crashes
+***THE CRASH IS IN vector/vector.h ITSELF***
+```
+
+Three errors in phase 1 are correctly classified as `needs a
+prerequisite; not a crash` -- `construct_at_noexcept.h`,
+`make_exception_guard.h` and `split_buffer.h` are not standalone
+headers, which is why the three-way ok/ERROR/CRASH split exists rather
+than a pass/fail.
+
+***THE SECOND FINDING IS IN THE SHAPE OF THE QUESTION AND IS BIGGER
+THAN THE FIRST.*** The translation unit is `#include <vector>` and
+`int main(){return 0;}` -- **nothing instantiates `vector<T>`**. So
+cpfe dies PARSING, not instantiating. That rules out template argument
+deduction, instantiation, the `--instantiate local` machinery and the
+whole back end in one line, and leaves declaration parsing and the
+semantic analysis of declarations. *It also finally kills the
+error-recovery reading, which had already been refuted once*: there is
+no error and nothing to recover from.
+
+### `cxx-vecsplit` bisects the 2581 lines that remain
+
+The file is one class template (88-1297) and 108 out-of-class
+definitions. `cxx-vecsplit.cuts` holds the line numbers at which it can
+be truncated and still compile; `cxx-vecsplit` bisects them, so a run
+costs about **seven cpfe invocations rather than 81**.
+
+**The bisect is sound only because the two ends are measured rather
+than assumed**: rung A requires the shortest prefix NOT to crash --
+which also cross-checks `cxx-vecnarrow`'s phase 2 from the other side
+-- and rung B requires the whole `<vector>` to crash. If either is
+wrong the run is REFUSED instead of answered.
+
+***THE CUT LIST IS GENERATED AND VALIDATED ON THE HOST, and that is the
+part worth copying.*** `cxxlib-host.sh --vecsplit` produces it. The
+obvious rule -- a `template<` at column 0 at brace depth 1 -- gives
+**108 candidates of which 27 DO NOT COMPILE**: a member template is
+`template<class t_type, class t_allocator>` on one line and
+`template<class ...>` on the next, and a cut between the two leaves a
+dangling template header. *The fix is not to teach the rule about that
+case.* The list is the set **g++ proved compiles**, so a rung that
+ERRORS on the VM means cpfe disagrees with g++ -- a finding -- rather
+than the harness cutting in the wrong place, which is noise. **An
+instrument whose failures have two explanations cannot be read.**
+
+**And the first validation run caught the generator rather than the
+library**: all 108 prefixes failed at the same line, because
+`vector.h`'s own includes are QUOTED and relative to its directory
+while the generated file lives in `/tmp`. One `-I` fixed it. *A
+validation pass that reports 108 of 108 is reporting on itself.*
+
+The script carries a **staleness guard**: a cut point is a LINE NUMBER
+and rots silently the moment anybody edits the file above it -- a wrong
+cut still produces a file and cpfe still answers something. Every cut
+must still land on a `template<` at column 0, or the run is refused
+with "regenerate".
+
+Two rc faults were caught before it shipped, both from this tree's own
+list: `while()` with an empty condition is not rc (the span is computed
+before the loop and again at the end of the body), and the nested
+backquote for the script's own directory was replaced with a plain
+`dirname $0`.
