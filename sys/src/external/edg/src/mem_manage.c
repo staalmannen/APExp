@@ -6793,13 +6793,13 @@ return __144429_14_addr;
  * APExp: the link and trim rings.  See the recording sites below and
  * the comment on `edg_dbg_cur' in `free_memory_region'.
  */
-void *edg_dbg_link_hdr[256];
-void *edg_dbg_link_next[256];
-long edg_dbg_link_rn[256];
+void *edg_dbg_link_hdr[4096];
+void *edg_dbg_link_next[4096];
+long edg_dbg_link_rn[4096];
 long edg_dbg_link_n;
 
-void *edg_dbg_trim_new[256];
-void *edg_dbg_trim_par[256];
+void *edg_dbg_trim_new[4096];
+void *edg_dbg_trim_par[4096];
 long edg_dbg_trim_n;
 
 #line 635
@@ -6910,16 +6910,19 @@ __144667_1_have_hdr:;
  *	the store never happened ...... ring_next[i] is also wrong
  *	something overwrote it later ... ring_next[i] is correct
  *
- * The ring is 256 entries and `edg_dbg_link_n' is the untruncated
- * count, so a wrap is visible rather than silent.  `edg_dbg_link_reuse'
+ * ***THE RING WAS 256 AND IT WRAPPED: 1647 LINKS AND 1094 CARVES.***
+ * The untruncated count is what said so -- a silent wrap would have
+ * read as "prev was never linked", which is a DIFFERENT finding and
+ * one I would have had no way to tell apart. 4096 now, which covers
+ * both with room; if a count ever exceeds it the same line says so.  `edg_dbg_link_reuse'
  * says whether the header came off the reusable list (`msize' 0, the
  * `have_hdr' path) or was freshly malloc'd, because the reuse path
  * skips re-initialising `malloc_size', `start_of_block' and
  * `after_end_of_block' -- and the block that failed had `msize' 0.
  */
-edg_dbg_link_hdr[edg_dbg_link_n & 255] = (void *)__144552_26_hdr;
-edg_dbg_link_next[edg_dbg_link_n & 255] = (void *)(__144552_26_hdr->next);
-edg_dbg_link_rn[edg_dbg_link_n & 255] = (long)__144539_63_region_number;
+edg_dbg_link_hdr[edg_dbg_link_n & 4095] = (void *)__144552_26_hdr;
+edg_dbg_link_next[edg_dbg_link_n & 4095] = (void *)(__144552_26_hdr->next);
+edg_dbg_link_rn[edg_dbg_link_n & 4095] = (long)__144539_63_region_number;
 edg_dbg_link_n = edg_dbg_link_n + 1;
 ;
 return __144552_26_hdr;
@@ -7009,8 +7012,8 @@ _ZN34_INTERNAL_12_mem_manage_c_b0d968923edg20reusable_blocks_listE = __144744_26
  * handed out again and bump over it" is a question this ring can
  * answer and reading cannot.
  */
-edg_dbg_trim_new[edg_dbg_trim_n & 255] = (void *)__144744_26_new_hdr;
-edg_dbg_trim_par[edg_dbg_trim_n & 255] = (void *)__144738_44_hdr;
+edg_dbg_trim_new[edg_dbg_trim_n & 4095] = (void *)__144744_26_new_hdr;
+edg_dbg_trim_par[edg_dbg_trim_n & 4095] = (void *)__144738_44_hdr;
 edg_dbg_trim_n = edg_dbg_trim_n + 1;
 }
 (__144738_44_hdr->trimmed) = ((_ZN3edg14a_byte_booleanE)1);
