@@ -102,7 +102,8 @@ full = (--c++14 --no_exceptions --no_rtti --target win64 \
         '--clear_flag=use_predefined_macro_file' \
         --instantiate local $sysincl)
 
-reached = 0
+reached=0
+stuck=''
 
 # Each rung: run it, capture $status FIRST (the next command clobbers
 # it -- the discipline `cmd/c++lib' paid forty empty objects for), and
@@ -121,10 +122,19 @@ fn rung {
 	if(grep -qE 'suicide|trap:' $tmp/err)
 		kind=CRASH
 	echo $kind^'  rung '^$n^': '^$what
-	if(~ $kind ok)
-		reached=$n
-	if(! ~ $kind ok)
+	# **`reached' is the last CONSECUTIVE ok, not the highest.**  A
+	# rung that passes after an earlier one failed says the ladder
+	# is not a ladder there; reporting it as the height reached
+	# would overstate the position, which is the only number this
+	# file produces.
+	if(~ $kind ok){
+		if(~ $stuck '')
+			reached=$n
+	}
+	if(! ~ $kind ok){
+		stuck=yes
 		sed 1q $tmp/err
+	}
 }
 
 echo 'cpfe-ladder: '^$CPFE
@@ -154,15 +164,70 @@ if(! grep -qE 'invalid option' $tmp/err $tmp/out){
 }
 
 rung 2 '--version' $CPFE --version
-rung 3 '-E on an empty file, no other flags' $CPFE -E $tmp/empty.cpp
-rung 4 '-E on an empty file, with eccp flags' $CPFE $full -E $tmp/empty.cpp
-rung 5 '-E on a file with an #include' $CPFE $full -E $tmp/hdr.cpp
-rung 6 'full translation of an empty file' \
+
+# ***RUNG 3 IS THE ONE THAT SPLITS THE REMAINING REGION, AND THE FIRST
+# VERSION OF THIS FILE DID NOT HAVE IT.***
+#
+# `process_translation_unit' allocates the translation unit, calls
+# `fe_translation_unit_init' -- **27 direct calls**, `attribute',
+# `mem_manage', `host_envir', ... `preproc', `sys_predef' -- and only
+# THEN goes near the input.  A file that does not exist therefore
+# separates those two halves with no debugger and no rebuild:
+#
+#   a `cannot open' diagnostic -> all 27 ran; the fault is later
+#   the same pc=0x1            -> the fault is inside the init list
+#
+# *Nothing else available here distinguishes them*, and `-E' does not:
+# preprocessing runs the whole init list too, so rung 4 crashing says
+# only that semantic analysis and the C back end are not involved.
+# **Rung 3 is INVERTED like rung 1 and needs its own arm**: cpfe exits
+# non-zero for a missing file even when it behaves perfectly, so a
+# plain status test would call correct behaviour a failure.  What is
+# tested is that it fails by PRINTING.
+$CPFE $full $tmp/no-such-file-9f3a.cpp >$tmp/out >[2]$tmp/err
+st=$status
+if(grep -qE 'suicide|trap:' $tmp/err){
+	echo 'CRASH  rung 3: a NONEXISTENT input file'
+	sed 1q $tmp/err
+	echo '       -> the fault is INSIDE fe_translation_unit_init''s 27 calls'
+	stuck=yes
+}
+if(! grep -qE 'suicide|trap:' $tmp/err){
+	if(~ $st '')
+		echo 'ERROR  rung 3: a missing file was NOT diagnosed and did not crash'
+	if(~ $st '')
+		stuck=yes
+	if(! ~ $st ''){
+		echo 'ok     rung 3: a NONEXISTENT input file is diagnosed'
+		echo '       -> all 27 init calls ran; the fault is AFTER them'
+		if(~ $stuck '')
+			reached=3
+	}
+}
+
+# ***THE BARE `-E' RUNG WAS MINE TO GET WRONG AND IS GONE.***  Without
+# `--target win64' cpfe answers
+#
+#	Internal error: check_target_config: must use SoftFloat library
+#
+# which `eccp''s own header records as the DOCUMENTED refusal -- cpfe
+# is multi-target and will not run on its built-in configuration.  So
+# the rung was not measuring the preprocessor, it was measuring a flag
+# I had left out, and it reported ERROR for a reason that is not a
+# finding. *A rung whose failure is expected is not a rung.*  The
+# minimum viable set is the target plus the macro-file flag that goes
+# with it, and that is what rung 4 is now.
+rung 4 '-E on an empty file, MINIMUM flags' \
+	$CPFE --target win64 '--clear_flag=use_predefined_macro_file' \
+	-E $tmp/empty.cpp
+rung 5 '-E on an empty file, with eccp flags' $CPFE $full -E $tmp/empty.cpp
+rung 6 '-E on a file with an #include' $CPFE $full -E $tmp/hdr.cpp
+rung 7 'full translation of an empty file' \
 	$CPFE $full '--gen_c_file_name='^$tmp^'/out.c' $tmp/empty.cpp
 
 echo
-echo 'cpfe-ladder: highest rung reached '^$reached
-if(~ $reached 6)
+echo 'cpfe-ladder: highest consecutive rung reached '^$reached
+if(~ $reached 7)
 	echo 'cpfe-ladder: NOTHING FAILED -- read this twice before believing it'
 rm -rf $tmp
 

@@ -1711,3 +1711,68 @@ instead: `=` quoted or `^`-concatenated everywhere, `>[2]` and never
 `2>`, no backquote that can match nothing, no `} if not` on one line,
 and GNU `grep -qE`. *Every assignment is tight, matching `cxx-bisect`,
 because that file has actually run.*
+
+### IT RAN, AND `-E` CRASHES -- SO IT IS NOT THE BACK END
+
+```
+ok     rung 1: a bad option is DIAGNOSED
+ok     rung 2: --version
+ERROR  rung 3: -E on an empty file, no other flags
+       Internal error: check_target_config: must use SoftFloat library
+CRASH  rung 4: -E on an empty file, with eccp flags
+       cpfe 1552: suicide: sys: trap: fault read addr=0x1 pc=0x1
+CRASH  rung 5: -E on a file with an #include
+CRASH  rung 6: full translation of an empty file
+```
+
+***THE RESULT IS RUNG 4: PREPROCESSING ALONE CRASHES.*** `-E` stops
+after the preprocessor, so **semantic analysis, IL construction, IL
+lowering and the whole C back end are cleared in one line** -- none of
+them runs. Together with rung 2 that brackets the fault between
+"cpfe can print its own version" and "cpfe can preprocess an empty
+file".
+
+**Rung 2 is worth its own sentence**: `--version` exercises more static
+data and more of the option machinery than a rejected option does, and
+it passes.
+
+***AND RUNG 3 WAS MINE TO GET WRONG.*** `check_target_config: must use
+SoftFloat library` is the **documented refusal** -- `eccp`'s own header
+records that cpfe is multi-target and will not run on its built-in
+configuration, which is why `--target win64` "IS NOT OPTIONAL". So that
+rung was measuring a flag I had left out rather than the preprocessor,
+and it reported ERROR for something that is not a finding. *A rung
+whose failure is expected is not a rung*, and it is replaced by the
+minimum viable set (`--target` plus the macro-file flag) so that it
+still separates "the target flags" from "all of eccp's flags".
+
+**And the ladder's own arithmetic was wrong in a way the run did not
+expose.** `reached` took the highest `ok`, not the last CONSECUTIVE
+one, so a rung passing after an earlier failure would have overstated
+the position -- the only number the file produces. It tracks a `stuck`
+flag now. *The run happened to be monotone, which is exactly when a
+counting bug does not show.*
+
+**A NEW RUNG 3 SPLITS WHAT IS LEFT, AND IT IS FREE.**
+`process_translation_unit` allocates the translation unit, calls
+`fe_translation_unit_init` -- **27 direct calls** (`attribute`,
+`mem_manage`, `host_envir`, `error`, `folding`, `il`, ... `macro`,
+`preproc`, `sys_predef`), *with no function-pointer dispatch anywhere
+in the list*, checked -- and only then goes near the input. So a file
+that does not exist separates the two halves:
+
+  - a `cannot open` diagnostic means all 27 ran and the fault is after
+    them;
+  - the same `pc=0x1` means the fault is inside the init list.
+
+*Nothing else available distinguishes them*, and `-E` does not:
+preprocessing runs the whole init list too, which is why rung 4
+crashing says what is NOT involved rather than what is.
+
+**And the host build dies in the first of those 27** --
+`attribute_trans_unit_init` -> `alloc_hash_table` -- for its own ABI
+reason. *Two builds failing in one region is not two builds failing
+for one reason*, and the host's is explained; but it does mean a
+repaired host build would be a debugger pointed at exactly the right
+place, and the four short allocations `edgbaked-xcheck` names are a
+finite list.

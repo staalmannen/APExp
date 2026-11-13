@@ -1179,6 +1179,19 @@ silent:
   bisect that cannot say "everything fails" cannot tell "this header
   breaks cpfe" from "cpfe is broken", and the first version of the
   script went straight to the headers.
+  ***`cpfe-ladder` BRACKETS IT: `--version` WORKS AND `-E` CRASHES.***
+  A bad option is diagnosed, `--version` prints, and then
+  **preprocessing an empty file dies with `pc=0x1`** -- so semantic
+  analysis, IL and the whole C back end are cleared in one line. *Its
+  rung 3 was mine to get wrong*: bare `-E` answers
+  `check_target_config: must use SoftFloat library`, the DOCUMENTED
+  refusal without `--target win64`, so it measured a missing flag
+  rather than the preprocessor. The new rung 3 is **a nonexistent
+  input file**, which is free and splits the only region left:
+  `fe_translation_unit_init` is **27 direct calls with no
+  function-pointer dispatch**, and the input is touched only after
+  them -- a `cannot open` diagnostic puts the fault after the 27, the
+  same `pc=0x1` puts it inside.
   ***A FULL REBUILD DID NOT MOVE IT, AND `regs()` SAYS WHY IT WILL
   NOT.*** `PC` is **1 exactly**, `TYPE` 0xe with `ERROR` 0x14 decodes
   to a user-mode **INSTRUCTION FETCH**, and `SP` is an ordinary stack
