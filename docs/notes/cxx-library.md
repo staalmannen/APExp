@@ -929,3 +929,74 @@ recorded the offsets and nothing read them. **An unused array in a
 probe is a check somebody meant to write**; section 2 prints the
 offset beside the address now, so if a later section disagrees about
 which region is which, the offset names it.
+
+## `edgmmap-probe`: the hypothesis it was built for is REFUTED
+
+```
+0: 8 file-backed MAP_PRIVATE mappings of 65536 bytes
+   region 0 at offset 0      -> 0x410000
+   region 1 at offset 65536  -> 0x439000
+   ...
+   region 7 at offset 458752 -> 0x4F9000
+PASS  0: every region mapped          PASS  0: addresses are distinct
+PASS  1: regions do not overlap
+PASS  2: unmapping one region leaves the others intact
+FAIL  3: offset 0 reads the start of the file
+PASS  4: earlier mapping still holds its data
+1 failure
+```
+
+***SECTION 2 PASSES, SO THE NEIGHBOUR-CORRUPTION READING IS DEAD.***
+That is the one the probe existed for — unmap the regions one at a
+time in EDG's own order and re-read every survivor — and a `munmap`
+that released more than it was asked for would have shown there and
+nowhere else. It does not.
+
+**And the addresses are worth keeping**: the mappings come back at
+`0x410000` upward, 128KB apart for a 64KB request (the malloc arm's
+hand page-alignment). So **the heap on this platform starts around
+`0x400000`, and `hdr == 0x3f4a1` is BELOW it** — never a pointer into
+the heap at all, not a corrupted one.
+
+### Section 3 is a real bug and is fixed
+
+`__p9_syscall.c` read `if(off != 0) lseek(fd, off, SEEK_SET)`, which
+assumes the descriptor is already at 0 — true only of a freshly opened
+file. EDG hands over `fileno(tmpfile)` *after* `fseek`/`fputc`/`fflush`
+on the FILE, so the position is past the end and `read` returned 0
+bytes into a buffer the `memset` had zeroed: **a mapping at offset 0
+that sees none of the file.** The seek is unconditional now.
+
+*It is almost certainly not the crash* — EDG's backing file is extended
+with `fputc(0)` and holds nothing but zeros, which is what the buffer
+already had. **A POSIX fix found while hunting something else**, and
+said to be that rather than offered as the answer.
+
+**It needed a marker of its own.** `_mmapmark` already existed, so a
+probe referencing only that one links against a libap predating this
+fix and reports the OLD behaviour as the machine's answer — *the exact
+failure the idiom exists to stop, arriving through a marker that is
+merely too old rather than absent.* **A version marker is only a marker
+for the fix it was added with.** `_mmapoffmark` is the thirteenth use.
+(The first draft also declared it `extern int` and took its address,
+where it is a function; it linked, because the name matches, and was
+simply the wrong declaration.)
+
+### What the next run asks
+
+`fe_wrapup` does **not** call `free_mapped_mem_blocks` before walking
+the table — checked — so "the headers are in already-unmapped memory"
+is out as well.
+
+That leaves exactly two places `hdr` can come from:
+**`mem_region_table[0]`, or a previous `hdr->next`.** Those are
+different bugs — a bad table head means whatever wrote the table, a bad
+link at position N means whatever allocated or freed block N-1 — and
+**no amount of reading separates them, because both end at the same
+instruction.**
+
+So `cxx-vecacid` walks the chain now: acid reaches the global by its
+mangled name, and `next` is the **first** member of
+`a_mem_block_header`, so `*h` is the link. A chain that walks two or
+three good entries and then lands below the heap says the link was
+overwritten; one that is bad at entry 0 says the table was.

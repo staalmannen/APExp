@@ -119,12 +119,44 @@ echo
 	echo 'src(pc)'
 } | acid $crashpid
 
+
+# ---- walk the list the crash was walking -----------------------------
+# ***THE STACK NAMES THE LINE AND NOT THE DEFECT.***  `free_memory_region'
+# faults at `next_hdr = hdr->next' with `hdr == 0x3f4a1', and `hdr' comes
+# from one of exactly two places: `mem_region_table[0]', or a previous
+# `hdr->next'.  **Those are different bugs** -- a bad TABLE HEAD means
+# whatever wrote the table, a bad LINK at position N means whatever
+# allocated or freed block N-1 -- and no amount of reading separates
+# them, because both end at the same instruction.
+#
+# So walk it.  acid reaches a global by its mangled name, and the first
+# word of `a_mem_block_header' IS `next' (`mem_manage.c:124'), so `*h'
+# is the link.  Printing the chain until it leaves the heap says WHICH
+# entry went wrong, and the one before it is the thing to look at.
+#
+# **The heap starts around 0x400000 on this platform** -- the probe's
+# own mappings came back at 0x410000 upward -- so `0x3f4a1' is BELOW
+# the heap and was never a pointer into it.  A chain that walks two or
+# three good entries and then lands there says the LINK was overwritten;
+# one that is bad at entry 0 says the table was.
+echo
+echo 'cxx-vecacid: walking mem_region_table[0] -- which entry is bad?'
+echo
+{
+	echo 'h = *_ZN3edg16mem_region_tableE'
+	echo 'n = 0'
+	echo 'while h != 0 && n < 24 do { print(n, " ", h, "\n"); h = *h; n = n+1 }'
+	echo 'print("walked ", n, " entries\n")'
+} | acid $crashpid
+
 echo
 echo 'cxx-vecacid: if that printed nothing useful, do it by hand:'
 echo 'cxx-vecacid:   acid '^$crashpid
 echo 'cxx-vecacid:   acid: regs()'
 echo 'cxx-vecacid:   acid: stk()'
 echo 'cxx-vecacid:   acid: src(pc)'
+echo 'cxx-vecacid:   acid: h = *_ZN3edg16mem_region_tableE'
+echo 'cxx-vecacid:   acid: while h != 0 do { print(h, "\n"); h = *h }'
 echo 'cxx-vecacid: and remember lstk()''s first argument is garbage here.'
 rm -rf $tmp
 echo 'cxx-vecacid: done'
