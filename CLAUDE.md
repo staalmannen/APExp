@@ -1721,6 +1721,41 @@ silent:
   every allocation wrote its reserved word, 1120 carves would give many
   dirty pads, and one does — so one EDG structure writes a terminator
   past its end and the `+8` is otherwise unused.
+  ***AND `blockreq` SAYS THE BLOCK WAS NOT ONE OBJECT***: `0x150`
+  (336) against `objsize` `0x7590` (30096), where a single dedicated
+  allocation would give `objsize + 8`. 336 is the `true_size` that
+  first overflowed the PREVIOUS block; this one then grew to 30096 by
+  many small bumps and the overrun belongs to the LAST of them. **So
+  neither column names the object** — that needs the last
+  `alloc_in_region` call's size, and it is COMDAT with 41 copies.
+  ***AND THE RING WRAPPED, SO `dirty=0` MEANT NOTHING***:
+  `carves=0x1051 checked=0x1000` on the bigger input — 4177 into 4096,
+  the 81 oldest never looked at. *A count that can only report what
+  the ring still holds cannot fail for anything older.* A slot is
+  checked when EVICTED now, and the first dirty pad anywhere is kept
+  in full.
+  ***AND THREE C++ LIBRARY ERRORS NO HEADER CHECK COULD REACH.***
+  `cxx-library-test.cpp` named them: `split_buffer.h`'s nested
+  `M_destroy_buffer` calls `M_clear`, `M_M_alloc` (the prefix applied
+  TWICE) and `M_end_cap` where the members are `clear`, `M_alloc` and
+  `end_cap` — upstream's `__clear`/`__alloc`/`__end_cap` put through
+  the rename with the wrong prefix. **Nothing could see them until
+  something INSTANTIATED that class**: the uses are on a dependent
+  type, so cpfe AND g++ both defer the lookup. `cxx-bisect` compiles
+  headers alone and `--headers`/`--run` never touch that nested class.
+  ***A HEADER THAT COMPILES IS NOT A TEMPLATE THAT INSTANTIATES.***
+  **`cxxlib-host.sh --instantiate`** is the instrument — an explicit
+  instantiation DEFINITION reaches member functions and member classes
+  — five specialisations, 0 failures, **reports rather than gates**.
+  **Its control searches git HISTORY rather than `HEAD`**, since the
+  names are fixed and `HEAD` would stage the fix; ***and its first
+  version fired for the WRONG REASON***, naming the staged source by a
+  label that did not match the loop's, so `No such file or directory`
+  read as "the control fired". It demands `M_M_alloc` in the
+  diagnostic now — *caught by reading the output, not the status.*
+  ***AND THE CRASH IS BACK ON THE BIGGER INPUT AT A DIFFERENT pc***:
+  `addr=0x3f4cd pc=0x90c3a1`, the same family of value at a different
+  code address, with `chain-bad-at = -1`.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.

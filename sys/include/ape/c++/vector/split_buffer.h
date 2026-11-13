@@ -218,13 +218,28 @@ private:
 
     void operator()() {
       if (m_buffer.m_begin != nullptr) {
-        m_buffer.M_clear();
+        /*
+         * APExp: three names here were upstream's `__clear', `__alloc'
+         * and `__end_cap' put through the rename with the wrong prefix
+         * -- `M_clear', `M_M_alloc' (the prefix applied twice) and
+         * `M_end_cap' -- while the members themselves came out as
+         * `clear', `M_alloc' and `end_cap'.
+         *
+         * **Nothing could see them until something INSTANTIATED this
+         * nested class**: `m_buffer' is a `split_buffer &', a dependent
+         * type, so both cpfe and g++ defer the lookup to instantiation.
+         * `cxx-bisect' compiles each header alone and `cxxlib-host.sh'
+         * compiles them without using them, so neither reaches it --
+         * *a header that compiles is not a template that instantiates*,
+         * and `cxx-library-test.cpp' is what asked the question.
+         */
+        m_buffer.clear();
         // m_buffer.__annotate_delete();
-        t_allocator_traits::deallocate(m_buffer.M_M_alloc(), m_buffer.m_begin, m_buffer.capacity());
+        t_allocator_traits::deallocate(m_buffer.M_alloc(), m_buffer.m_begin, m_buffer.capacity());
 
-        m_buffer.m_begin     = nullptr;
-        m_buffer.m_end       = nullptr;
-        m_buffer.M_end_cap() = nullptr;
+        m_buffer.m_begin   = nullptr;
+        m_buffer.m_end     = nullptr;
+        m_buffer.end_cap() = nullptr;
       }
     }
 
