@@ -15,6 +15,81 @@
 #include "compiler_builtins.h"
 
 /*
+ * ***THE INFINITY AND NaN BUILTINS, WHICH SAT OUTSIDE BOTH LIMITS
+ * DIRECTORIES AND SO OUTSIDE EVERY GUARD.***  Nine call sites in this
+ * file -- `__builtin_huge_valf/_val', `__builtin_nanf/_nan' and
+ * `__builtin_nansf/_nans' -- used directly, with no `__has_builtin'
+ * and no portable sibling.  They are the reason `<forward_list>',
+ * `<functional>', `<list>', `<map>', `<memory>', `<string>',
+ * `<string_view>' and `<vector>' all stopped at `numeric_limits.h'
+ * once the four SELECTORS were fixed: *the selectors were only ever
+ * half the class, and the sweep that would have found the other half
+ * did not exist yet.*  `sys/lib/tests/cxxbuiltin-sweep.py' is it.
+ *
+ * `<math.h>' is the portable answer and APExp's own is
+ * `HUGE_VAL Inf(1)' / `NAN NaN()' -- FUNCTION CALLS, not literals, so
+ * the portable arm cannot be evaluated at compile time.  `constexpr'
+ * is kept all the same, for the reason spelled out in
+ * `../memory/addressof.h': by [dcl.constexpr]/5 a `constexpr'
+ * function no invocation of which can be constant is ill-formed NO
+ * DIAGNOSTIC REQUIRED, and removing the keyword instead would make
+ * every `constexpr' caller ill-formed in turn.
+ *
+ * **There is no portable SIGNALLING NaN**, so `signaling_NaN()'
+ * returns the quiet one on this arm.  That is a conformance loss and
+ * is recorded rather than hidden: nothing can distinguish them
+ * without either a builtin or a bit pattern, and a bit pattern is not
+ * available in a C++14 constant expression either.
+ */
+#if PSTL_HAS_BUILTIN(__builtin_huge_val) || PSTL_HAS_GNU_BUILTINS
+#  define PSTL_HUGE_VALF()  __builtin_huge_valf()
+#  define PSTL_HUGE_VAL()   __builtin_huge_val()
+#  define PSTL_QUIET_NANF() __builtin_nanf("0")
+#  define PSTL_QUIET_NAN()  __builtin_nan("0")
+#  define PSTL_SIG_NANF()   __builtin_nansf("1")
+#  define PSTL_SIG_NAN()    __builtin_nans("1")
+#else
+#  include <math.h>
+#  define PSTL_HUGE_VALF()  HUGE_VALF
+#  define PSTL_HUGE_VAL()   HUGE_VAL
+#  define PSTL_QUIET_NANF() (static_cast<float>(NAN))
+#  define PSTL_QUIET_NAN()  (static_cast<double>(NAN))
+#  define PSTL_SIG_NANF()   (static_cast<float>(NAN))
+#  define PSTL_SIG_NAN()    (static_cast<double>(NAN))
+#endif
+
+/*
+ * `PSTL_FP_CONSTEXPR' IS `constexpr' ON THE BUILTIN ARM AND NOTHING ON
+ * THE PORTABLE ONE, and the asymmetry is measured rather than
+ * squeamish.  APExp's `<math.h>' spells `HUGE_VAL' as `Inf(1)' and
+ * `NAN' as `NaN()' -- CALLS -- so a `constexpr' function returning one
+ * can never be evaluated as a constant, which [dcl.constexpr]/5 makes
+ * ill-formed NO DIAGNOSTIC REQUIRED.  g++ accepts it with
+ * `-Winvalid-constexpr' and cpfe probably would too, but *probably*
+ * is the word to avoid when the check costs a VM rebuild.
+ *
+ * **Dropping the keyword here cascades nowhere**: a grep for
+ * `infinity()', `quiet_NaN()' and `signaling_NaN()' across the whole
+ * library finds **0 callers outside this file**, so no `constexpr'
+ * function is made ill-formed by the change.  *That is the whole
+ * reason this file may do what `../memory/addressof.h' may not* --
+ * there the three casts are equally non-constant, but `addressof' IS
+ * called from `constexpr' code throughout `functional/' and the
+ * iterators, so removing the keyword would break far more than it
+ * fixed.  **Same rule, opposite answer, because the callers differ.**
+ *
+ * The cost is a real conformance loss and belongs in
+ * `docs/notes/cxx-library.md': a user writing
+ * `constexpr double d = numeric_limits<double>::infinity();' gets a
+ * diagnostic on this platform and not on gcc.
+ */
+#if PSTL_HAS_BUILTIN(__builtin_huge_val) || PSTL_HAS_GNU_BUILTINS
+#  define PSTL_FP_CONSTEXPR constexpr
+#else
+#  define PSTL_FP_CONSTEXPR
+#endif
+
+/*
  * BY CAPABILITY, NOT BY COMPILER NAME.  `limits_clang_gcc/' reads
  * gcc's own `__LONG_LONG_MAX__', `__SCHAR_MAX__' and `__UINT8_MAX__'
  * directly; `limits_msvc/' reads `<limits.h>' and `<float.h>', which
@@ -877,16 +952,16 @@ public:
     return numeric_limits_helper::float_true_min_constant;
   }
 
-  constexpr static float infinity() noexcept {
-    return __builtin_huge_valf();
+  PSTL_FP_CONSTEXPR static float infinity() noexcept {
+    return PSTL_HUGE_VALF();
   }
 
-  constexpr static float quiet_NaN() noexcept {
-    return __builtin_nanf("0");
+  PSTL_FP_CONSTEXPR static float quiet_NaN() noexcept {
+    return PSTL_QUIET_NANF();
   }
 
-  constexpr static float signaling_NaN() noexcept {
-    return __builtin_nansf("1");
+  PSTL_FP_CONSTEXPR static float signaling_NaN() noexcept {
+    return PSTL_SIG_NANF();
   }
 
   constexpr static int digits         = numeric_limits_helper::float_mant_digits_constant;
@@ -924,16 +999,16 @@ public:
     return numeric_limits_helper::double_true_min_constant;
   }
 
-  constexpr static double infinity() noexcept {
-    return __builtin_huge_val();
+  PSTL_FP_CONSTEXPR static double infinity() noexcept {
+    return PSTL_HUGE_VAL();
   }
 
-  constexpr static double quiet_NaN() noexcept {
-    return __builtin_nan("0");
+  PSTL_FP_CONSTEXPR static double quiet_NaN() noexcept {
+    return PSTL_QUIET_NAN();
   }
 
-  constexpr static double signaling_NaN() noexcept {
-    return __builtin_nans("1");
+  PSTL_FP_CONSTEXPR static double signaling_NaN() noexcept {
+    return PSTL_SIG_NAN();
   }
 
   constexpr static int digits         = numeric_limits_helper::double_mant_digits_constant;
@@ -971,16 +1046,16 @@ public:
     return numeric_limits_helper::ldouble_true_min_constant;
   }
 
-  constexpr static long double infinity() noexcept {
-    return static_cast<long double>(__builtin_huge_val());
+  PSTL_FP_CONSTEXPR static long double infinity() noexcept {
+    return static_cast<long double>(PSTL_HUGE_VAL());
   }
 
-  constexpr static long double quiet_NaN() noexcept {
-    return static_cast<long double>(__builtin_nan("0"));
+  PSTL_FP_CONSTEXPR static long double quiet_NaN() noexcept {
+    return static_cast<long double>(PSTL_QUIET_NAN());
   }
 
-  constexpr static long double signaling_NaN() noexcept {
-    return static_cast<long double>(__builtin_nans("1"));
+  PSTL_FP_CONSTEXPR static long double signaling_NaN() noexcept {
+    return static_cast<long double>(PSTL_SIG_NAN());
   }
 
   constexpr static int digits         = numeric_limits_helper::ldouble_mant_digits_constant;

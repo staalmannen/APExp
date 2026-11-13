@@ -140,8 +140,16 @@ for(h in $headers){
 		kind = CRASH
 
 	echo $kind $h
+	# **`sed 3q' AND NOT `sed 1q'.**  A cpfe diagnostic is WRAPPED:
+	# line 1 is the file and line number ending in a bare `error:',
+	# line 2 is the message, line 3 the offending source.  With `1q'
+	# a run reported `numeric_limits.h", line 881:' eight times and
+	# NEVER SAID WHAT WAS WRONG -- a whole round was spent reading
+	# the file to guess, when `__builtin_huge_valf is undefined' was
+	# sitting on the next line.  *A summary that cuts the sentence in
+	# half is worse than no summary.*
 	if(! ~ $kind ok)
-		sed 1q $tmp/err
+		sed 3q $tmp/err
 
 	# **No spaces around these `='.**  rc allows them in a LEADING
 	# assignment (`apexp-sh' has `LC_ALL = C.UTF-8'), but the only

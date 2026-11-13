@@ -598,6 +598,21 @@ positive on the first run against the generic arm alone), and it does
 not resolve alias chains. **Control in two halves** -- the pre-fix
 `host_envir.c` out of git MUST come back UNGUARDED+divergent and the
 current one must NOT),
+`cxxbuiltin-sweep.py` (**GATES**, unlike `baketype-sweep`, because
+there is no arms-nobody-takes problem: a `__builtin_x` reached with
+no capability test is a hard error on any compiler without one, and
+cpfe is one. It exists because the four compiler-identity SELECTORS
+were fixed and called the whole class — the other half is a builtin
+with no test at all, nine in `numeric_limits.h` and one in
+`addressof.h`, and ***`cxxlib-host.sh --portable` could not see
+them***. **Its control caught two faults in two runs**: it reported
+its own explanatory PROSE (comments and string literals are blanked
+now, `truefalse-sweep`'s lesson), and its sibling rule hardcoded
+`builtin/`/`generic/` so it reported two files that are perfectly
+guarded — upstream uses the same indirection as `gcc_clang/`/`msvc/`
+and `buildin_realization/`/`no_realization`, *a rule written from the
+examples in front of you fires on the next naming convention*, so it
+asks structurally now. One EXEMPT entry with its reason),
 `truefalse-sweep.py` (**does NOT gate**: which vendored TUs use
 `true`/`false` as an IDENTIFIER without defining the names themselves —
 the shape kencc's C23 keywords break. **Its positive control is
@@ -1310,9 +1325,36 @@ silent:
   `typeid_wrap` called `typeid`, and `move_algo.h` had a stray
   `template` disambiguator — **the one of the sixteen where cpfe is
   right and g++ is lenient**.
+  ***AND THE SELECTORS WERE ONLY HALF THE CLASS***: the next VM run
+  gave **27 ok, 7 error, 1 CRASH**, and all seven errors were a
+  builtin used with NO test of any kind — nine `__builtin_nan`/
+  `huge_val` sites in the SHARED `numeric_limits.h`, outside both
+  limits directories, plus `memory/addressof.h`, which has no sibling
+  at all. **`--portable` could not have caught them**: it forces the
+  SELECTORS, and a bare `__builtin_x` answers to no macro while g++
+  has the builtin — *a flag that forces the arms you know about says
+  nothing about code with no arms*. `cxxbuiltin-sweep.py` is the
+  instrument and it GATES. **A second hole was in the switch itself**:
+  the new guards first read `|| defined(__GNUC__)`, true on the host
+  whatever the flag says, so `PSTL_HAS_GNU_BUILTINS` exists —
+  *a switch the thing it switches can ignore is not a switch*, caught
+  by counting surviving builtins in `g++ -E` rather than trusting it.
+  **`constexpr` went two ways on one rule**: APE's `HUGE_VAL` is
+  `Inf(1)`, a CALL, so the portable arm is ill-formed NDR —
+  `numeric_limits` DROPS the keyword (0 callers outside the file, so
+  nothing cascades) and `addressof` KEEPS it (called from `constexpr`
+  code throughout `functional/`). *Same rule, opposite answers,
+  because the callers differ.*
   **All 50 public headers compile now on both arms** but `<compare>`
   and `<source_location>`, which `#error` because they are C++20 and
   `eccp` passes `--c++14`; `cxx-library-test.cpp` builds and runs clean.
+  **The one thing NOT fixed is a `vector` CRASH** —
+  `fault read addr=0x3f4cd pc=0x90c3a1`, a real code address and so a
+  genuine dereference inside cpfe. *Predicted to go away*: in both
+  sightings cpfe had already emitted a diagnostic and died in
+  RECOVERY, twelve instantiation levels deep, while seven headers hit
+  the identical error without crashing. **Refutation: a CRASH with 0
+  errors**, which would be a cpfe bug the host cannot help with.
   ***`std::variant` IS A NAME AND NOT AN IMPLEMENTATION*** — an empty
   class body, the only one of 53 in the library that is a public
   header's own principal type. What also does not go away is the

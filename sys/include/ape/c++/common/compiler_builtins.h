@@ -42,6 +42,7 @@
 
 #if defined(PSTL_NO_COMPILER_BUILTINS)
 #  define PSTL_HAS_BUILTIN(x)              0
+#  define PSTL_HAS_GNU_BUILTINS             0
 #  define PSTL_HAS_INTEGER_PACK             0
 #  define PSTL_HAS_MAKE_INTEGER_SEQ         0
 #  define PSTL_HAS_GNU_LIMIT_MACROS         0
@@ -51,6 +52,22 @@
 #    define PSTL_HAS_BUILTIN(x) __has_builtin(x)
 #  else
 #    define PSTL_HAS_BUILTIN(x) 0
+#  endif
+
+/*
+ * ***A FALLBACK OF `defined(__GNUC__)' DEFEATS `--portable' AND THAT
+ * IS WHY THIS EXISTS.***  gcc before 10 has no `__has_builtin', so
+ * every capability test here needs a second clause for it -- and a
+ * second clause written as a bare `defined(__GNUC__)' is TRUE on the
+ * build host whatever `PSTL_NO_COMPILER_BUILTINS' says, so
+ * `cxxlib-host.sh --portable' would go on compiling the builtin arm
+ * and reporting it clean.  *A switch that the thing it switches can
+ * ignore is not a switch.*  Every such clause spells it this way.
+ */
+#  if defined(__GNUC__)
+#    define PSTL_HAS_GNU_BUILTINS 1
+#  else
+#    define PSTL_HAS_GNU_BUILTINS 0
 #  endif
 
 /* clang's and MSVC's pack builtin.  Not a function, so `__has_builtin'

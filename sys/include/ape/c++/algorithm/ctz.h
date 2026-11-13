@@ -25,7 +25,7 @@
  * That is recorded rather than fixed, because nothing in this tree
  * is such a compiler.
  */
-#if PSTL_HAS_BUILTIN(__builtin_ctz) || defined(__GNUC__)
+#if PSTL_HAS_BUILTIN(__builtin_ctz) || PSTL_HAS_GNU_BUILTINS
 #  include "gcc_clang/ctz_impl.h"
 #else
 #  include "msvc/ctz_impl.h"
