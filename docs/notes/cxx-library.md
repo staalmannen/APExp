@@ -1167,3 +1167,60 @@ late**. So: the bad value is a heap pointer read one byte high, and
 `prev`'s raw words show an ordinary header with a plainly different
 value in its first slot. *It is guessed from arithmetic on the symptom,
 which is weaker than guessing from code, and is labelled so.*
+
+### The recorder answers, and refutes the prediction on its first datum
+
+```
+edg_dbg_rn    = 0
+edg_dbg_n     = 13
+edg_dbg_cur   = 0x0003f4a1   (the bad value)
+edg_dbg_prev  = 0x03c9f2c8
+edg_dbg_prev2 = 0x03cdcd50
+prev  0x03c9f2c8 next=0x03cdcd50 start=0x03c9f2f8 avail=0x03caccc8 end=0x03caccd0 msize=0
+prev2 0x03cdcd50 next=0x03ce0628 start=0x03cdcd80 avail=0x03ce0628 end=0x03ce0628 msize=0x10000
+```
+
+***The byte-shift prediction is refuted, by `edg_dbg_n` alone.*** It was
+**13**: twelve links were read correctly through the *same instruction*
+before the thirteenth was not. A load generated one byte high would have
+been wrong on the first. *A guess from arithmetic on the symptom, dead
+on the first datum it predicted nothing about* — and the refutation
+condition written down beforehand (`cur << 8` nowhere near the heap) is
+not even the one that fired, which is worth noting: the stated condition
+was the weaker test.
+
+**Two things are corroborated.** `prev->next` now reads `0x03cdcd50`,
+which *is* `prev2` — exactly what `free_mem_block`'s push order predicts,
+so the reusable-list reading of the previous round is confirmed from the
+other side. And `edg_dbg_rn` is 0, measured rather than taken from
+`lstk()`'s first parameter.
+
+**What `prev` is**: a **carved sub-block** — `msize` 0, `trimmed` 1 (the
+raw words show `0x00000001` at `prev+0x28`), payload `0x03c9f2f8` to
+`0x03caccd0` with `avail` **eight bytes short of `end`**, i.e. full. Its
+header is preceded by live-looking data: a pointer, `9`, a pointer,
+`0x4d1b`. So `0x3f4a1` is the kind of value that memory holds as **stale
+front-end data**, not a mangled pointer — which is what makes the two
+remaining explanations the two they are:
+
+| explanation | what the link ring shows |
+|---|---|
+| the store of `hdr->next` never happened | `ring_next` is also wrong |
+| something overwrote it afterwards | `ring_next` is correct |
+
+So `alloc_mem_block` now records every link into a region chain
+**reading the field back** rather than recording what was meant to be
+stored — the read-back is the whole design, since recording the intent
+would answer neither question — and `trim_mem_block` records which
+parent each sub-block was carved from. 256-entry rings with untruncated
+counts, so a wrap is visible rather than silent.
+
+**The parent ring exists because of where a carved header sits.**
+`trim_mem_block` places the new header at the parent's `next_avail` and
+then sets the parent's `after_end_of_block` to that same address — so a
+sub-block's header is exactly **one byte past the parent's payload**. If
+a parent is ever handed out again from the reusable list, its
+`next_avail_in_block` is reset to `start_of_block` and it bumps forward
+through its payload again. Whether that can reach the header of a
+sub-block still live on a region chain is a question the ring answers and
+reading does not.

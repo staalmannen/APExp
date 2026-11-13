@@ -265,6 +265,67 @@ echo
 	echo 'if p != 0 then { while i < 6 do { print("  ", (p+i*8)\X, ": ", *(p+i*8)\X, "\n"); i = i+1; }; }'
 } | acid $crashpid
 
+# ---- which of the two remaining explanations ------------------------
+# ***THE BYTE-SHIFT PREDICTION IS REFUTED, BY `edg_dbg_n' ALONE.***
+# It was 13: twelve links were read correctly through the SAME
+# instruction before the thirteenth was not.  A load generated one byte
+# high would have been wrong on the first.  *A guess from arithmetic on
+# the symptom, dead on the first datum it predicted nothing about.*
+#
+# What the run gave instead: `prev = 0x03c9f2c8`, a CARVED sub-block
+# (`msize` 0, `trimmed` 1) whose payload runs to `0x03caccd0` with
+# `avail` eight bytes short of it, and whose header is preceded by
+# live-looking data -- pointer, 9, pointer, `0x4d1b`.  So `0x3f4a1` is
+# the kind of value that memory would hold as STALE FRONT-END DATA, not
+# a mangled pointer.
+#
+# That leaves exactly two explanations, and they are distinguished by
+# what the field held at LINK time:
+#
+#	the store never happened ....... ring_next is also wrong
+#	something overwrote it later ... ring_next is correct
+#
+# `alloc_mem_block` now records every link READING THE FIELD BACK, and
+# `trim_mem_block` records which parent each sub-block was carved from.
+# **The read-back is the whole design**: recording what was meant to be
+# stored would answer neither question.
+echo
+echo 'cxx-vecacid: what was in prev->next when it was LINKED?'
+echo
+{
+	echo 'p = *edg_dbg_prev'
+	echo 'print("link ring: ", *edg_dbg_link_n\D, " links recorded")'
+	echo 'if *edg_dbg_link_n > 256 then { print("  (WRAPPED -- only the last 256 are present)"); }'
+	echo 'print("\ntrim ring: ", *edg_dbg_trim_n\D, " carves recorded\n\n")'
+	echo 'i = 0'
+	echo 'while i < 256 do {
+		if *(edg_dbg_link_hdr+i*8) == p then {
+			print("  LINKED  slot ", i\D, " hdr=", p\X, " next-read-back=", *(edg_dbg_link_next+i*8)\X, " region=", *(edg_dbg_link_rn+i*4)\D, "\n");
+		};
+		i = i+1;
+	}'
+	echo 'i = 0'
+	echo 'while i < 256 do {
+		if *(edg_dbg_trim_new+i*8) == p then {
+			print("  CARVED  slot ", i\D, " parent=", *(edg_dbg_trim_par+i*8)\X, "\n");
+		};
+		i = i+1;
+	}'
+} | acid $crashpid
+
+echo
+echo 'cxx-vecacid: and the parent that carved prev, if the ring named one'
+echo
+{
+	echo 'p = *edg_dbg_prev'
+	echo 'par = 0'
+	echo 'i = 0'
+	echo 'while i < 256 do { if *(edg_dbg_trim_new+i*8) == p then { par = *(edg_dbg_trim_par+i*8); }; i = i+1; }'
+	echo 'if par == 0 then { print("prev is in no trim slot -- either it was never carved, or the ring wrapped\n"); }'
+	echo 'if par != 0 then { print("parent ", par\X, " next=", *par\X, " start=", *(par+8)\X, " avail=", *(par+16)\X, " end=", *(par+24)\X, " msize=", *(par+32)\X, "\n"); }'
+	echo 'if par != 0 then { print("prev header at ", p\X, ", parent after_end_of_block ", *(par+24)\X, " -- EQUAL means the carve is still intact\n"); }'
+} | acid $crashpid
+
 echo
 echo 'cxx-vecacid: the region table itself'
 echo
