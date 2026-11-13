@@ -1393,8 +1393,14 @@ silent:
   that header: two overloads declared with a **trailing return type
   that calls the function being declared**, so the overload set the
   `decltype` resolves against includes it. g++ accepts it as written
-  and instantiated. *It is a guess and the file says so*; `ok` rules
-  the shape out, `CRASH` makes the whole bug twenty lines.
+  and instantiated. ***ANSWERED `ok`: THE GUESS IS REFUTED*** and the
+  only unusual construct in that header is cleared — *one command
+  where the alternative was a round of reasoning, and one in eight is
+  the recorded tally for mechanisms guessed from code alone*. So the
+  fault is the INTERACTION, and **phase D** now also replaces the
+  culprit with each of ITS own includes, because `reverse_iterator.h`
+  and `wrap_iter.h` are not among the thirteen and line 28 brings in
+  three new things at once.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
