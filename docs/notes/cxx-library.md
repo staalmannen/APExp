@@ -1391,3 +1391,64 @@ they referenced an undeclared `edg_dbg_check` and an undeclared
 function, which is this tree's own undeclared-function trap *inside an
 instrument written to hunt a memory bug*. Caught by reading the file
 order, not by a build.
+
+### Site 3, and the arithmetic lands on one object
+
+```
+edg_dbg_checks  = 3132 clean walks
+edg_dbg_bad_at  = 1026   bad_trim = 496   bad_pos = 1
+edg_dbg_bad_hdr = 0x03cc32f8   bad_val = 0x0003f4a1
+edg_dbg_bad_site= 3      (entry to trim_mem_block)
+edg_dbg_bad_allocs = 0 of 0 alloc_in_region calls
+```
+
+Link 1023 pushed `0x03d00d80` onto region 0 **with `next = 0x03cc32f8`** —
+`prev` — so `prev` sat at position 1. Links 1024 and 1025 created regions
+327 and 328 and both checked clean at entry *and* exit. Then link 1026's
+allocation reached `trim_mem_block` and the check fired. **The write
+happened between the exit of `alloc_mem_block` at link 1025 and the trim
+preceding link 1026.**
+
+***And `alloc_in_region` was never called: 0 of 0.*** It is a COMDAT
+function and **41 of EDG's translation units define their own copy**, so
+instrumenting `mem_manage.c`'s copy measures the one nobody calls. Site 5
+is void, and that is worth recording as an instrument rule rather than a
+detail: *a COMDAT function instrumented in one translation unit is not
+the function the other forty call.*
+
+**The arithmetic is the finding.** `alloc_in_region`'s dedicated arm
+(`true_size >= 2096`) allocates a fresh block, advances `next_avail` by
+`size` **alone**, and then trims — and `trim_mem_block` cuts at
+`next_avail` and sets the parent's `after_end_of_block` there. So a
+dedicated block's payload is **exactly its object, with no slack**: the
+`+ 8` in `true_size` sized the request, and the surplus went into the
+carved remainder.
+
+The measured parent is `start=0x03cc0d30 end=0x03cc32f8`, which is
+`0x25c8` = **9672 bytes = 1209 eight-byte words**, and the carved header
+begins at the object's last byte plus one. **`prev->next` is the word at
+index 1209 of a 1209-word object** — a plain off-by-one — and the `0x4d1b`
+at `prev-8` is the object's *own last word*, not padding. *An earlier note
+here called it padding and that was wrong; the dedicated arm leaves none.*
+
+### An experiment, with its prediction and its refutation
+
+`EDG_DBG_CARVE_PAD` (64) moves the carved header up by that many bytes and
+leaves the gap owned by nobody — the parent still ends at `alloc_addr`, the
+new block starts above the pad, and the pad absorbs a small overrun instead
+of a chain link.
+
+**Prediction**: with the pad, cpfe completes. **Refuted by**: the same fault
+at the same place, which would say the write is not an overrun of the
+parent's object but something aimed at the carved header itself.
+
+*It is an experiment and not a fix.* Padding every carve changes EDG's
+layout everywhere, which is the kind of change that can move a bug rather
+than remove one; set it to 0 for upstream's arrangement. The
+`space_remaining` test is raised by the same amount so a carve still leaves
+a usable block behind.
+
+The rings now also carry sizes — `link_size` is what each block was asked
+for, `trim_size` is `alloc_addr - start_of_block`, the object the carve cut
+behind — so the next run states the 9672 rather than leaving it to
+subtraction, and names the element count of whatever table this is.
