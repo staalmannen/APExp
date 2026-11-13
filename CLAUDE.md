@@ -349,6 +349,29 @@ gates if the `sed` matches nothing.
 header, so it renames the SOURCE with `sed`), and `strerror-xcheck.py`,
 which has to be a script because **APE's errno NUMBERS are its own**, so
 only the NAMES line up.
+**`malloc-xcheck.{c,sh}` is the ALLOCATOR's**, and the one here that
+builds its subject out of the real sources with no extraction at all —
+`malloc.c`, `free.c`, `realloc.c`, `aligned_alloc.c` and
+`mallocwatch.c` compiled by gcc with the public names renamed out of
+glibc's way, against a fake break, under `-fms-extensions` for the
+unnamed `Lock;`/`Header;` members. Five sections, **418 checks, 0
+failures**; section 3 replays EDG's own pattern — 48-byte headers at
+the base of 65536-byte blocks, chained, the region table `realloc`'d
+while blocks are live, then the chain walked as `free_memory_region`
+walks it. **Sound for the allocator's arithmetic; VOID for `sbrk`**,
+whose fake here always succeeds, is always contiguous and is never
+moved by anyone else — and `_malloc_growtop` rests entirely on
+`sbrk(0)` telling the truth about a break something else may have
+moved. ***Its control — grow-in-place with the top-of-heap test
+removed — found TWO of its own checks that could not fail***: the
+first control `abort`ed in section 1 and so NEVER REACHED section 3
+(each section has its own process now, the can-hang rule applied to
+can-abort), and with that fixed it passed everywhere, because section
+1 put the growing buffer at the TOP of the heap, where growing in
+place is correct, and section 3's table-growth condition never fired
+once in 400 blocks. *A section measuring a malloc-only pattern while
+claiming to measure a realloc one, and a clean run that looked
+identical before and after.*
 **`edgbaked-xcheck.sh` asks which ABI a GENERATED CORPUS is baked
 for**, which is a different question from any of the above: EDG's C
 back end folds `sizeof` into integer literals, so the 2.9M lines can
@@ -1448,15 +1471,29 @@ silent:
   `hdr == 0x3f4a1`.*** **So it is TEARDOWN and not parsing** — cpfe
   finishes the translation and dies freeing its memory regions, and
   *six rounds of narrowing had all been looking at the front end*.
-  **And the memory manager is `mmap`**: `alloc_new_mem_block` has no
+  ***AND "THE MEMORY MANAGER IS `mmap`" WAS MINE AND IS WITHDRAWN —
+  THE SAME ERROR AS THE SENTENCE IT CORRECTED, ONE FUNCTION LATER.***
+  Last round these notes said `alloc_new_mem_block` "has no
   alternative path, every block being
-  `mmap(NULL, n, RW, MAP_PRIVATE, fileno(tmpfile), off)` with `off`
-  accumulating. ***THESE NOTES HAD RECORDED mmap AS CLEARED AND THAT
-  WAS TOO STRONG*** — what was checked is `open_mapped_input_file`,
-  which serves PCH only, and *a verdict about one function was
-  generalised to the whole mechanism*, the clisp `~0UL` shape again.
-  libap does not map files: `__p9_syscall.c:239` is malloc-or-segattach
-  plus `memset` plus `read`, all of it rewritten this release.
+  `mmap(NULL, n, RW, MAP_PRIVATE, fileno(tmpfile), off)`". That is
+  true OF THAT FUNCTION and false of the manager, because
+  `mem_manage.c:751` only CALLS it under
+  `if(precompiled_header_processing_required)` — the `else` arm is
+  `malloc_with_check`, and this port uses no PCH. **EDG's blocks are
+  plain `malloc`.** *I read the function and not its caller*, having
+  the round before read `open_mapped_input_file` and generalised it
+  to the mechanism: the identical mistake in the identical paragraph,
+  the clisp `~0UL` shape a third time. So `edgmmap-probe` measured
+  something not on this path at all — its section 3 fix stands on its
+  own merits and its section 2 result says nothing about this crash.
+  **What the crash is reached through is libap's `malloc`/`realloc`**,
+  which this release rewrote (`_malloc_growtop`, the aligned break).
+  *The baked-type class is CLEARED here and was checked rather than
+  assumed*: `mem_manage.c:4652` typedefs EDG's own `size_t` as
+  `unsigned long long`, so the `malloc(size_t)`/`realloc(void*,size_t)`
+  it declares for itself agree with libap's, and `adjusted_header_size`
+  is baked `48ULL`, which is what kencc lays `a_mem_block_header` out
+  as under both rules.
   **`edgmmap-probe.c` reproduces the CALL SEQUENCE**, its section 2
   being EDG's own teardown loop — unmap one, re-read the survivors —
   and **section 3 a bug read out of the source**: `if(off != 0) lseek`
@@ -1476,16 +1513,40 @@ silent:
   probe referencing only that links against a libap predating this fix
   and reports the OLD behaviour — *a version marker is only a marker
   for the fix it was added with*. `_mmapoffmark`, thirteenth use.
-  **The addresses are the other keeper**: mappings come back at
-  `0x410000` upward, so the heap starts near `0x400000` and
-  `hdr == 0x3f4a1` is BELOW it — never a heap pointer at all.
-  `fe_wrapup` does not unmap before walking either, so what remains is
-  exactly two places `hdr` can come from — `mem_region_table[0]` or a
-  previous `hdr->next` — **different bugs that end at the same
-  instruction**, which is why `cxx-vecacid` now WALKS the chain.
+  **The addresses are the other keeper**: `DX` and `BP` in the
+  faulting frame hold `0x3cdcd30` and `0x3c9f2a8`, so the heap is
+  around `0x3c00000` and `hdr == 0x3f4a1` is three orders of magnitude
+  below it — never a heap pointer at all, and below Plan 9 amd64's
+  TEXT base as well. *An earlier line here put the heap at `0x400000`
+  from `edgmmap-probe`'s own mappings, which is a different and much
+  smaller process.* So what remains is exactly two places `hdr` can
+  come from — `mem_region_table[0]` or a previous `hdr->next` —
+  **different bugs that end at the same instruction**, which is why
+  `cxx-vecacid` now WALKS the chain.
+  ***AND THE FIRST WALK DID NOT RUN, WHICH IS THE LUCKY HALF***: acid
+  answered `syntax error, near symbol '1'`, because inside `{ }` every
+  statement needs a trailing `;`, the last one included. **The fault
+  it hid is the one worth remembering** — `mem_region_table` is
+  `a_mem_block_header_ptr *`, a POINTER to a `realloc`'d array
+  (`:455`, grown at `:7030`), so entry 0 is `**table` and the walk
+  asked for `*table`. *A dereference one level short does not fail, it
+  answers*: it would have printed a plausible chain rooted at the table
+  BUFFER's own address. Caught only by opening the declaration.
+  **And `region_number=0x0` in `lstk()` is not evidence** — it is that
+  frame's FIRST parameter, which this tree's own rule says is always
+  garbage on amd64. It is 0 because `fe_wrapup.c:854` passes a literal
+  0 and `acid` resolved the call site to `fe_wrapup+0x109`; *the source
+  is what says so, not the debugger.*
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
+  ***AND THE ALLOCATOR IS CLEARED, WITHOUT A VM ROUND***:
+  `malloc-xcheck.{c,sh}` compiles the REAL
+  `lib/ap/malloc/{malloc,free,realloc,aligned_alloc,mallocwatch}.c`
+  with gcc against a fake break and replays EDG's pattern — **418
+  checks, 0 failures.** See the Host cross-checks paragraph for its
+  limits; ***its control found TWO of its own checks that could not
+  fail***, neither visible in a green run.
   ***`std::variant` IS A NAME AND NOT AN IMPLEMENTATION*** — an empty
   class body, the only one of 53 in the library that is a public
   header's own principal type. What also does not go away is the

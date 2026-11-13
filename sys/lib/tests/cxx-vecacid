@@ -34,6 +34,23 @@
 # **What is left is the guard AND the content together**, which is
 # why guessing further is worth less than one stack.
 #
+# ***AND THE STACK ANSWERED, SO THE PARAGRAPH ABOVE IS HISTORY.***
+# `free_memory_region+0x21' under `fe_wrapup', `mem_manage.c:1208',
+# which is `next_hdr = hdr->next' with `hdr == 0x3f4a1'.  **So this is
+# TEARDOWN and not parsing** -- cpfe finishes the translation and dies
+# freeing its memory regions -- and *six rounds of narrowing had all
+# been looking at the front end*.  Everything in the elimination list
+# above is still true and none of it was ever about the right phase.
+#
+# What the ladder is for NOW is one question: **which entry of the
+# chain is bad.**  See the walk at the bottom.
+#
+# A note on the printing: acid's `\X' is 32-bit hex, so every value
+# here is displayed truncated to its low half.  That is harmless
+# because the heap and the table are both under 4GB on this platform
+# -- but it is the reason not to read a stack address out of this
+# output.
+#
 # READING WHAT IT PRINTS.  This tree's own rule:
 # ***`acid's `lstk()' MISREADS ARGUMENTS in an APExp amd64 binary and
 # the first one is ALWAYS garbage***, because kencc's `REGARG' is
@@ -116,7 +133,7 @@ echo
 	echo 'regs()'
 	echo 'stk()'
 	echo 'lstk()'
-	echo 'src(pc)'
+	echo 'src(*PC)'
 } | acid $crashpid
 
 
@@ -129,24 +146,87 @@ echo
 # allocated or freed block N-1 -- and no amount of reading separates
 # them, because both end at the same instruction.
 #
-# So walk it.  acid reaches a global by its mangled name, and the first
-# word of `a_mem_block_header' IS `next' (`mem_manage.c:124'), so `*h'
-# is the link.  Printing the chain until it leaves the heap says WHICH
-# entry went wrong, and the one before it is the thing to look at.
+# ***`mem_region_table' IS A POINTER, NOT AN ARRAY.***  `mem_manage.c:455'
+# declares `a_mem_block_header_ptr *mem_region_table', grown by
+# `realloc_buffer' (`:7030'), so entry 0 is `**table' and NOT `*table'.
+# **The first version of this walk read `*table' and would have walked
+# the table BUFFER's own address as though it were a block header** --
+# printing a chain, in the right shape, about the wrong object.  *A
+# dereference one level short does not fail, it answers.*  Checked in
+# the generated C rather than assumed, which is the only reason it was
+# caught.
 #
-# **The heap starts around 0x400000 on this platform** -- the probe's
-# own mappings came back at 0x410000 upward -- so `0x3f4a1' is BELOW
-# the heap and was never a pointer into it.  A chain that walks two or
-# three good entries and then lands there says the LINK was overwritten;
-# one that is bad at entry 0 says the table was.
+# The first word of `a_mem_block_header' IS `next' (`:4790'), so `*h' is
+# the link, and `+8/+24/+32' are `start_of_block', `after_end_of_block'
+# and `malloc_size'.  Printing those per entry is what makes a sane
+# chain recognisable as one: `start' just above `hdr', `end' above
+# `start', `msize' either 0 (a block carved out of another by
+# `trim_mem_block') or the whole allocation.
+#
+# **The heap on this platform is around 0x3c00000** -- `DX' and `BP' in
+# the faulting frame hold 0x3cdcd30 and 0x3c9f2a8 -- so `0x3f4a1' is
+# three orders of magnitude below it and was never a pointer into it.
+# *The earlier note here said 0x400000, from `edgmmap-probe's own
+# mappings; that is a different, much smaller process.*  The threshold
+# below is deliberately loose for that reason: it only has to separate
+# `a quarter of a megabyte' from `a heap address'.
+#
+# ***AND THE TABLE BUFFER IS PLAIN `malloc'/`realloc' MEMORY***
+# (`alloc_general' -> `malloc_with_check', `realloc_with_check' ->
+# `realloc'), so if entry 0 is the bad one, the words on either side of
+# the buffer are the next thing to look at: a small integer sitting
+# exactly at `table[0]' is the shape of allocator bookkeeping written
+# one block too far.  That is why the second invocation dumps them.
+#
+# Each acid command set is its OWN invocation, so a syntax error or a
+# faulting read in a later question cannot lose an earlier answer.
+# ***THE LAST RUN LOST THE WHOLE WALK TO ONE MISSING SEMICOLON***:
+# inside `{ }' acid terminates every statement with `;', the final one
+# included, and `n = n+1' without it answers
+# `syntax error, near symbol '1''.
+echo
+echo 'cxx-vecacid: the region table itself'
+echo
+{
+	echo 't = *_ZN3edg16mem_region_tableE'
+	echo 'print("mem_region_table buffer = ", t\X, "\n")'
+	echo 'print("size_of_mem_region_table = ", *_ZN3edg24size_of_mem_region_tableE\D, "\n")'
+	echo 'i = 0'
+	echo 'while i < 8 do { print("  table[", i\D, "] = ", *(t+i*8)\X, "\n"); i = i+1; }'
+} | acid $crashpid
+
 echo
 echo 'cxx-vecacid: walking mem_region_table[0] -- which entry is bad?'
 echo
 {
-	echo 'h = *_ZN3edg16mem_region_tableE'
+	echo 't = *_ZN3edg16mem_region_tableE'
+	echo 'h = *t'
 	echo 'n = 0'
-	echo 'while h != 0 && n < 24 do { print(n, " ", h, "\n"); h = *h; n = n+1 }'
-	echo 'print("walked ", n, " entries\n")'
+	echo 'while h != 0 do {
+		if h < 0x100000 then {
+			print(n\D, " hdr=", h\X, "   <-- NOT A HEAP POINTER: THIS entry is the bad one\n");
+			h = 0;
+		};
+		if h != 0 then {
+			print(n\D, " hdr=", h\X, " next=", *h\X, " start=", *(h+8)\X, " end=", *(h+24)\X, " msize=", *(h+32)\X, "\n");
+			h = *h;
+		};
+		n = n+1;
+		if n > 32 then {
+			print("stopping at 32 entries\n");
+			h = 0;
+		};
+	}'
+	echo 'print("walked ", n\D, " entries\n")'
+} | acid $crashpid
+
+echo
+echo 'cxx-vecacid: words around the table buffer (allocator bookkeeping?)'
+echo
+{
+	echo 't = *_ZN3edg16mem_region_tableE'
+	echo 'i = 0-4'
+	echo 'while i < 4 do { print("  ", (t+i*8)\X, ": ", *(t+i*8)\X, "\n"); i = i+1; }'
 } | acid $crashpid
 
 echo
@@ -154,9 +234,11 @@ echo 'cxx-vecacid: if that printed nothing useful, do it by hand:'
 echo 'cxx-vecacid:   acid '^$crashpid
 echo 'cxx-vecacid:   acid: regs()'
 echo 'cxx-vecacid:   acid: stk()'
-echo 'cxx-vecacid:   acid: src(pc)'
-echo 'cxx-vecacid:   acid: h = *_ZN3edg16mem_region_tableE'
-echo 'cxx-vecacid:   acid: while h != 0 do { print(h, "\n"); h = *h }'
-echo 'cxx-vecacid: and remember lstk()''s first argument is garbage here.'
+echo 'cxx-vecacid:   acid: src(*PC)'
+echo 'cxx-vecacid:   acid: t = *_ZN3edg16mem_region_tableE'
+echo 'cxx-vecacid:   acid: h = *t'
+echo 'cxx-vecacid:   acid: while h != 0 do { print(h\X, "\n"); h = *h; }'
+echo 'cxx-vecacid: note *table is the BUFFER and **table is entry 0, and'
+echo 'cxx-vecacid: remember lstk()''s first argument is garbage here.'
 rm -rf $tmp
 echo 'cxx-vecacid: done'

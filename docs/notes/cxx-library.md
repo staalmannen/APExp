@@ -1000,3 +1000,120 @@ mangled name, and `next` is the **first** member of
 `a_mem_block_header`, so `*h` is the link. A chain that walks two or
 three good entries and then lands below the heap says the link was
 overwritten; one that is bad at entry 0 says the table was.
+
+### The walk did not run, and that is the lucky half
+
+acid answered `syntax error, near symbol '1'` and printed nothing. The
+cause is trivial — inside `{ }` acid terminates **every** statement
+with `;`, the final one included, and the loop body ended
+`n = n+1` — but the fault it hid is not.
+
+**`mem_region_table` is a pointer, not an array.** `mem_manage.c:455`
+declares `a_mem_block_header_ptr *mem_region_table` and `:7030` grows
+it with `realloc_buffer`, so entry 0 is `**table`. The walk asked for
+`*table`. *A dereference one level short does not fail; it answers* —
+it would have printed a chain, in exactly the right shape, rooted at
+the table buffer's own address, and there is nothing in such a listing
+that says it is about the wrong object. Caught by opening the
+declaration, not by reading the output.
+
+The same round fixed `src(pc)`, which acid rejects with
+`pc used but not set`; the idiom is `src(*PC)`, as `/sys/lib/acid/port`
+uses it.
+
+**And `region_number=0x0` out of `lstk()` is not evidence.** It is that
+frame's first parameter, and this tree's own rule is that the first
+parameter is always garbage in an APExp amd64 binary (`REGARG = D_BP`,
+so the caller never writes `0(SP)`). It happens to be right, because
+`fe_wrapup.c:854` passes a literal `0` and acid resolved the call site
+to `fe_wrapup+0x109` — *the source says so, not the debugger*.
+
+### And "the memory manager is mmap" was wrong — the same error one function later
+
+Last round these notes said `alloc_new_mem_block` "has no alternative
+path". That is true of the function and false of the manager:
+`mem_manage.c:751` reaches it only under
+`if (precompiled_header_processing_required)`, and the `else` arm is
+`malloc_with_check`. This port compiles no PCH, so **every EDG memory
+block is plain `malloc`**, and `free_complete_block` is a plain `free`.
+
+The round before, `open_mapped_input_file` was checked and its verdict
+generalised to the whole mechanism; this round `alloc_new_mem_block`
+was read and its verdict generalised to its caller's behaviour. *The
+identical mistake twice in the same paragraph, one level apart.* The
+clisp `~0UL` shape a third time: **a verdict about one function is not
+a verdict about the mechanism it belongs to.**
+
+So `edgmmap-probe` was measuring a path this crash never takes. Its
+section 3 fix stands on its own merits as a POSIX bug; its section 2
+pass says nothing either way about `free_memory_region`.
+
+What the crash is reached through instead is **libap's
+`malloc`/`realloc`**, which this release rewrote — the 16-aligned
+break and `_malloc_growtop`'s grow-in-place, which EDG's region table
+goes straight through (`realloc_with_check` → `realloc`, 16KB and up).
+
+*The baked-type class is cleared here, and was checked rather than
+assumed*: `mem_manage.c:4652` typedefs EDG's own `size_t` as
+`unsigned long long`, so the `malloc(size_t)` and
+`realloc(void *, size_t)` the corpus declares for itself agree with
+libap's; and `adjusted_header_size` is baked `48ULL`, which is what
+kencc makes `sizeof(a_mem_block_header)` under both layout rules
+(`8*5 + 1 + 7`, alignment 8). That matters because the baked-type class
+is what produced the original `pc=0x1` crash, so it is the first thing
+to eliminate and not the last.
+
+### malloc-xcheck: the allocator is cleared, with its limits named
+
+Since the path is `malloc` and not `mmap`, and since this release
+rewrote the allocator, the suspect could be examined without the VM.
+`sys/lib/tests/malloc-xcheck.{c,sh}` compiles the **real**
+`sys/src/ape/lib/ap/malloc/{malloc,free,realloc,aligned_alloc,mallocwatch}.c`
+with gcc — not a copy and not an extract, so there are no markers to
+rot — against a fake break, with the public names renamed out of
+glibc's way. `-fms-extensions` is required for the unnamed `Lock;` and
+`Header;` members.
+
+**418 checks, 0 failures.** Five sections: distinctness and overlap;
+grow-by-doubling with neighbours above *and* below; realloc's contract;
+**EDG's own pattern** — 48-byte headers at the base of 65536-byte
+blocks, chained, with the region table `realloc`'d while blocks are
+live, then the chain walked as `free_memory_region` walks it; and the
+aligned-allocation back door, where `free` must recognise a second
+header shape rather than `abort`.
+
+**Sound** for the allocator's arithmetic over a break it is given.
+**Unsound** for Plan 9's `sbrk`: the fake one always succeeds, is
+always contiguous and is never moved by anyone else, while
+`_malloc_growtop`'s whole correctness rests on `sbrk(0)` telling the
+truth about a break something else may have moved. LP64 host against
+an LLP64 target, and nothing in these files keys on `long` (`BLKSZ`
+casts to `size_t` deliberately, and its comment says why) — but that
+is to re-check rather than assume if a section ever disagrees with the
+VM.
+
+**The control is a deliberate break** — `_malloc_growtop` forced to
+claim success, i.e. grow-in-place with its top-of-heap test removed —
+and ***it found two of my own checks that could not fail.***
+
+*One:* the first control died in section 1 on an `abort()` from a
+destroyed `MAGIC` and **never reached section 3**, the only section
+whose assertion is the one the crash violates. Each section runs in its
+own process now, the same rule this tree already has for a case that
+can hang and for one that can kill the preprocessor.
+
+*Two:* with that fixed, the control passed **everywhere**. Section 1
+had allocated all sixteen neighbours before the growing buffer, which
+puts the buffer at the top of the heap — where growing it in place is
+*correct*; it had only failed in the first draft because section 0 ran
+first and left a tangled heap, which is a reason outside the section.
+And section 3's table-growth condition, `(i+1)*3 > tablesize` with
+`tablesize` 2048 and 400 blocks, **never fired at all**, so the section
+measured a malloc-only pattern while claiming to measure a realloc one.
+Half the neighbours sit above the buffer now and the table grows every
+40 blocks; the control then reports sections **1 and 3**, and section 3's
+failure has the real crash's exact shape — `msize 0 start (nil) end
+(nil)`, a header zeroed by a `realloc`'d neighbour growing over it.
+
+*Neither fault was visible in a green run.* The clean run looked the
+same before and after.
