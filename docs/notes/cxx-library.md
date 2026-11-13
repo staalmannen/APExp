@@ -1493,3 +1493,59 @@ is systematic — which stops being an upstream off-by-one and starts
 pointing at a shared idiom or at the compiler. **`dirty=0` with a nonzero
 carve count refutes the overrun reading outright** and says the pad merely
 moved the layout; `EDG_DBG_CARVE_PAD 0` restores upstream's arrangement.
+
+### The canary fired: one pad in 1120, eight bytes, the same value
+
+```
+edg-pad: carves=0x460 checked=0x460 chain-bad-at=0xffffffffffffffff
+edg-pad:  slot 0x1d2 new 0x3cb7370 parent 0x3cafd70 objsize 0x7590 off 0x0
+          bytes a1 f4 3 0 0 0 0 0 a5 a5 a5 a5 a5 a5 a5
+edg-pad: dirty=0x1
+```
+
+`a1 f4 03 00 00 00 00 00` little-endian is **`0x0003f4a1`** — the exact
+value that had been landing on `prev->next` — written at **offset 0** of
+the pad, eight bytes, with every byte after it still `0xA5`. And
+`chain-bad-at` is `-1`: with the pad in, the chain never went bad at all.
+
+So the overrun reading is **confirmed positively**, not merely by an
+absence: one write, one eight-byte word, at exactly
+`parent->after_end_of_block`.
+
+***And `dirty = 1` of 1120 carves settles the discriminator.*** It is
+**not** systematic. One object runs past its end; the other 1119 carves
+are clean.
+
+**`objsize` is not yet the object's size, and that is a correction to the
+last round.** It is `alloc_addr - start_of_block`, which is *how full the
+block was when it was trimmed* — 0x25c8 (9672) in the unpadded run,
+0x7590 (30096) here. Those are different blocks, not one object changing
+size, and a block filled by many small allocations gives a total rather
+than an object. So the report now also prints **`blockreq`**, the
+`min_size` the block itself was asked for: `alloc_in_region`'s dedicated
+arm requests `true_size = size + 8` and then bumps by `size` alone, so a
+block whose `blockreq` is exactly `objsize + 8` held **one** allocation
+of `objsize` bytes. That is the number that can be matched against EDG's
+source; anything else means the total.
+
+### The leading reading, and what the count does to it
+
+`alloc_in_region` reserves `size + 8` — **exactly one word** — and then
+advances `next_avail` by `size`, so every allocation is followed by eight
+bytes that are checked for but never handed out. `trim_mem_block` cuts
+the block at `next_avail`, which **removes that reservation for the last
+allocation in any trimmed block**.
+
+That makes a coherent story: upstream's `+8` is slack that absorbs a
+one-word write past an object, and it is harmless everywhere *except* at
+a carve boundary, where the carved header now occupies the reserved word.
+
+**And the count is what keeps the story honest.** If every allocation
+wrote its reserved word, 1120 carves would give many dirty pads; one
+does. So the reservation exists and is almost never used — consistent
+with one EDG data structure writing a terminator past its end, and
+inconsistent with "the `+8` is routinely written".
+
+*This is upstream's arrangement either way*, so if it is a latent bug it
+is one that only shows where a carve lands exactly there — which is what
+this port does.

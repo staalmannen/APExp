@@ -6600,7 +6600,7 @@ static void edg_dbg_putx(unsigned long long v)
  */
 void edg_dbg_padcheck(void)
 {
-  long i, lim, shown, k, off;
+  long i, lim, shown, k, off, j;
   unsigned char *p;
 
   if (edg_dbg_padchecked != 0)
@@ -6646,6 +6646,24 @@ void edg_dbg_padcheck(void)
       edg_dbg_putx((unsigned long long)(edg_dbg_trim_par[i]));
       edg_dbg_puts(" objsize 0x");
       edg_dbg_putx((unsigned long long)(edg_dbg_trim_size[i]));
+      /*
+       * APExp: and what the BLOCK was asked for.  `alloc_in_region's
+       * dedicated arm requests `true_size = size + 8' and then bumps by
+       * `size' alone, so a block whose `min_size' is exactly
+       * `objsize + 8' held ONE allocation of `objsize' bytes -- which
+       * turns "how full the block was" into "how big the object was",
+       * and that is the number that can be matched against EDG's
+       * source.  Anything else means the block was filled by several
+       * small allocations and `objsize' is their total.
+       */
+      for (j = 0; j < 4096; j = j + 1) {
+        if (edg_dbg_link_hdr[j] == edg_dbg_trim_par[i]) {
+          edg_dbg_puts(" blockreq 0x");
+          edg_dbg_putx((unsigned long long)(edg_dbg_link_size[j]));
+          edg_dbg_puts(" rgn 0x");
+          edg_dbg_putx((unsigned long long)(edg_dbg_link_rn[j]));
+        }
+      }
       edg_dbg_puts(" off 0x");
       edg_dbg_putx((unsigned long long)off);
       edg_dbg_puts(" bytes");
