@@ -463,6 +463,24 @@ sort agreed with glibc because both reverse runs of ties.
 `sizeof(long)` to size TARGET data. *Its first `--probe` reported all
 ten passing, because kencc's `diag()` writes to STDOUT* — a check that
 passed for the wrong reason, caught only by the recorded number.
+***AND `hostkencc/cxxlib-host.sh` COMPILES THE WHOLE C++ LIBRARY WITH
+g++***, which is possible only because of the rename: with the
+implementation namespace changed to `std`, `sys/include/ape/c++` is a
+REPLACEMENT standard library, so `g++ -nostdinc++` puts it in exactly
+cpfe's position. The one adaptation is the FILE NAMES — cpfe finds
+`<algorithm>` as `algorithm.stdh` and the plain name is a DIRECTORY —
+plus the four predefined macros cpfe has and gcc has not
+(`__EDG_RUNTIME_USES_NAMESPACES` above all, without which
+`class exception` lands in the global namespace). ***`--portable` AND
+`--headers` ARE BOTH LOAD-BEARING AND EACH WAS PROVED BY A RUN THAT
+HID FAILURES***: g++ defines `__GNUC__` so a plain run takes the gcc
+arm of all four selectors, and a combined TU stops at the error limit
+— **combining the flags turned up ten failures the gcc-arm run had not
+shown**, which is why the parser reads every word and not `$1`.
+`--run` builds and executes the test. **Sound for everything that is
+not cpfe itself**; it says nothing about the C output, the template
+model or the ABI. It found `split_buffer.h`, which cpfe never reached.
+
 ***AND `cpp-xcheck/` IS THE CHEAPEST INSTRUMENT IN THIS TREE***:
 `cpp-xcheck.sh` builds kencc's OWN `cpp` with gcc on the build host and
 diffs it against `gcc -E`. **`cpp` needs eleven Plan 9 names in total**
@@ -1185,7 +1203,9 @@ silent:
   silently wrong rather than loudly broken, and one translation unit
   cannot show it. `-C` (COMDAT) stays for the runtime's duplicate
   typeinfo, which `local` does not touch.
-  ***AND IT CRASHES ON EVERYTHING NOW, INCLUDING AN EMPTY FILE.***
+  ***IT CRASHED ON EVERYTHING, INCLUDING AN EMPTY FILE — FIXED, see
+  the `struct stat` entry above; the bracketing below is kept because
+  it is what found it.***
   `sys/lib/tests/cxx-bisect`'s case 0 — an empty translation unit, run
   before any header — answers `fault read addr=0x1 pc=0x1`, so **this
   is not about the C++ headers** and the 35 header runs after it would
@@ -1267,17 +1287,38 @@ silent:
   the suspect for either crash** — the only evidence pointing it at one
   was that backtrace.
   **Also open**: `__thread` silently dropped.
-  **The C++ LIBRARY is no longer a gap, which is a change from what
-  this file used to say**: EDG ships none, but Paragon Portable STL is
-  merged into `sys/include/ape/c++` now (80 entries) with its
-  implementation namespace changed to **`std`** and `.stdh` public
-  entrypoints for the common headers, so it is the starting library
-  rather than only a conformance corpus. *The rename this file called
-  impossible was done* — what does not go away is the exception-free
-  convention underneath it, `vector::push_back` returning
+  ***THE CRASH IS FIXED AND THE C++ LIBRARY IS MEASURED FOR THE FIRST
+  TIME.*** `cxx-bisect` answers **19 ok, 16 error, 0 CRASH**, and all
+  16 are fixed. **Eleven of them were ONE SHAPE**: four files chose an
+  implementation with `#if defined(_MSC_VER)` ... `#else /* clang and
+  gcc */`, a split by COMPILER IDENTITY where the question is
+  CAPABILITY — and cpfe is a third thing, defining neither `_MSC_VER`
+  nor `__GNUC__`, so it took the gcc arm and reached `__integer_pack`,
+  `__builtin_is_constant_evaluated` and `__LONG_LONG_MAX__`.
+  `common/compiler_builtins.h` asks directly now. **Two of the four had
+  no portable arm to select**: `make_integer_seq_generic.h` is new (the
+  doubling recursion, whose obvious shape is ill-formed — a partial
+  specialisation may not have a non-type argument whose type depends on
+  its own parameter), and `limits_msvc/` turned out to BE the portable
+  arm with only its directory name saying otherwise.
+  The rest: `std::std_error` did not exist (the rename rewrote 21 USES
+  and left the 1 DEFINITION), `using max_align_t = ;` was an alias to
+  nothing, `<cstdint>` declared `imaxdiv_t` (`<cinttypes>`'s) and not
+  `int32_t`, five names were re-exported from `::` into `std` that the
+  library defines in `std` itself, EDG's C++98 `std::unexpected`
+  function collided with C++23's class template, the **no-RTTI**
+  `typeid_wrap` called `typeid`, and `move_algo.h` had a stray
+  `template` disambiguator — **the one of the sixteen where cpfe is
+  right and g++ is lenient**.
+  **All 50 public headers compile now on both arms** but `<compare>`
+  and `<source_location>`, which `#error` because they are C++20 and
+  `eccp` passes `--c++14`; `cxx-library-test.cpp` builds and runs clean.
+  ***`std::variant` IS A NAME AND NOT AN IMPLEMENTATION*** — an empty
+  class body, the only one of 53 in the library that is a public
+  header's own principal type. What also does not go away is the
+  exception-free convention, `vector::push_back` returning
   `expected<void, ...>`, so it is not a drop-in `std`.
-  `docs/notes/cxx-library.md` has the limitations and the conformance
-  roadmap.
+  `docs/notes/cxx-library.md` has all sixteen and the instrument.
 - **muon** — builds and prints its own usage. *A port that builds and
   prints a usage is not a port*: `muon setup` on a real `meson.build` is
   the next thing that would say anything.

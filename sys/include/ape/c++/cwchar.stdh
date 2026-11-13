@@ -6,6 +6,14 @@
 #include <cstdio>
 #include <cstddef>
 
+/*
+ * `wmemcmp' is NOT re-exported from `::': this library defines
+ * `std::wmemcmp' itself in `memory/wmemcmp.h', returning
+ * `::std::int32_t' where C returns `int'.  See `cstring.stdh' for
+ * the whole of this shape -- there are five such names.
+ */
+#include "memory/wmemcmp.h"
+
 namespace std {
 using ::mbstate_t;
 using ::btowc;
@@ -55,7 +63,6 @@ using ::wcsstr;
 using ::wcstok;
 using ::wcsxfrm;
 using ::wmemchr;
-using ::wmemcmp;
 using ::wmemcpy;
 using ::wmemmove;
 using ::wmemset;

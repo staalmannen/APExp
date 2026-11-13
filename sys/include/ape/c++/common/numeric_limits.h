@@ -12,12 +12,27 @@
 #ifndef PSTL_NUMERIC_LIMITS_H
 #define PSTL_NUMERIC_LIMITS_H
 
-#if defined(_MSC_VER)
-    #include "limits_msvc/climits_wrapper.h"
-    #include "limits_msvc/float_wrapper.h"
-#else // clang and gcc
+#include "compiler_builtins.h"
+
+/*
+ * BY CAPABILITY, NOT BY COMPILER NAME.  `limits_clang_gcc/' reads
+ * gcc's own `__LONG_LONG_MAX__', `__SCHAR_MAX__' and `__UINT8_MAX__'
+ * directly; `limits_msvc/' reads `<limits.h>' and `<float.h>', which
+ * every hosted implementation has -- so the second is the PORTABLE
+ * one and only its directory name says otherwise.  cpfe defines none
+ * of the gcc macros and took the gcc arm, which is why
+ * `<forward_list>' stopped in `climits_wrapper.h'.
+ *
+ * *The directory names are upstream's and are left alone*: renaming
+ * them would make the next re-import a merge conflict in every file
+ * rather than in this one.
+ */
+#if PSTL_HAS_GNU_LIMIT_MACROS
     #include "limits_clang_gcc/climits_wrapper.h"
     #include "limits_clang_gcc/float_wrapper.h"
+#else
+    #include "limits_msvc/climits_wrapper.h"
+    #include "limits_msvc/float_wrapper.h"
 #endif
 
 #include "../common/int32_t.h"

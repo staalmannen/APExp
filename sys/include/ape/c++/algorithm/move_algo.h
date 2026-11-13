@@ -42,7 +42,15 @@ public:
   template<class t_input_iter, class t_sentinel, class t_output_iter>
   tuple<t_input_iter, t_output_iter> operator()(t_input_iter first, t_sentinel last, t_output_iter result) const {
     while (first != last) {
-      *result = ::std::iterator_operations<t_alg_policy>::template iter_move(first);
+      /*
+       * NO `template' DISAMBIGUATOR, and cpfe is right to refuse it
+       * where g++ lets it pass.  [temp.names]/5 says the keyword must
+       * be followed by a TEMPLATE-ID -- a name with an explicit
+       * `<...>' argument list -- and `iter_move' is called with its
+       * arguments deduced, so there is no list.  cpfe answered
+       * `argument list for template ... is missing'.
+       */
+      *result = ::std::iterator_operations<t_alg_policy>::iter_move(first);
       ++first;
       ++result;
     }

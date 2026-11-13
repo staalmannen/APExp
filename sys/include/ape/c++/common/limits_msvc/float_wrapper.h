@@ -12,6 +12,17 @@
 #ifndef PSTL_FLOAT_WRAPPER_H
 #define PSTL_FLOAT_WRAPPER_H
 
+/*
+ * `<float.h>' IS INCLUDED HERE and was not.  This arm reads the C
+ * library's own macros, so it is the one that needs them; the gcc arm
+ * beside it reads `__FLT_MAX__' and friends, which the compiler
+ * predefines, and so needed nothing.  Nobody noticed because the arm
+ * was only ever selected by `_MSC_VER', where the macros had already
+ * arrived by another route -- it is reached by every compiler with no
+ * gcc macros now, which is cpfe.
+ */
+#include <float.h>
+
 namespace std {
 namespace numeric_limits_helper {
 

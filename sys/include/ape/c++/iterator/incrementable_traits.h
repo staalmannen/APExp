@@ -12,6 +12,7 @@
 #ifndef PSTL_INCREMENTABLE_TRAITS_H
 #define PSTL_INCREMENTABLE_TRAITS_H
 
+#include "../common/ptrdiff_t.h"
 #include "../metaprogramming/composite_type/is_object.h"
 #include "../metaprogramming/logical_operator/conjunction.h"
 #include "../metaprogramming/logical_operator/negation.h"
@@ -81,7 +82,15 @@ public:
   /**
    * @brief Associated difference type.
    */
-  using difference_type = ptrdiff_t;
+  /*
+   * `::std::ptrdiff_t' AND THE INCLUDE THAT SUPPLIES IT.  This said a
+   * bare `ptrdiff_t' and the file included nothing that declares one,
+   * so `<forward_list>' and `<ranges>' answered
+   * `ptrdiff_t does not name a type'.  It compiles elsewhere only
+   * because some other header got there first -- *a name that depends
+   * on include order is not declared, it is lucky*.
+   */
+  using difference_type = ::std::ptrdiff_t;
 };
 
 /**
