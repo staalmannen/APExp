@@ -1594,3 +1594,120 @@ If acid will not dereference it that way, `print(*SP)` and then
 turns "a table is wrong" into "THIS table is wrong"**, and nothing
 short of it distinguishes a function-number table from a vtable from
 a bad relocation.
+
+### THE TABLE EXISTS, AND IT IS NOT THE BUG
+
+`src(*SP)` answered **`no source for ?file?`**, and so did `src(0x1)`
+and `src(SP)`. ***THAT IS NOT THE RESULT IT LOOKS LIKE, AND THE
+MISSING PIECE IS A CONTROL.*** All three inputs are things `src()`
+*should* fail on -- a stack address, the number 1, and a word that may
+be either -- so the run cannot tell "acid resolved nothing because the
+value is not code" from "acid resolves nothing in this binary". *A
+negative result with two explanations is not a measurement*, and the
+one command that separates them was not run: **`src()` on an address
+that is certainly code in cpfe**, its entry point or any named
+function. `src()` worked on php's binary the same day, so it is not
+broken in general.
+
+**The mechanism the hypothesis predicted DOES exist, and reading it
+refutes the hypothesis.** `fe_init.c:53280` is
+
+```c
+a_function_pointer function_pointers[56] = {
+    (a_function_pointer)0,
+    (void (*)(void))(&hash_attribute_kind),
+    (void (*)(void))(&compare_for_attr_corresp_checking_map),
+    ...
+};
+```
+
+and every call through it is bounds-checked first --
+`symbol_tbl.c:40330` is `assert(idx < 55U), function_pointers[idx]`,
+and there are **7 such sites in 3 files, all the same shape**. A sweep
+for a `*_function_index` reaching a call WITHOUT the table finds
+nothing. So a function number cannot become a program counter by this
+route.
+
+***AND THE STATIC INITIALISER COMPILES CORRECTLY, MEASURED WITH THE
+HOST-BUILT `6c` RATHER THAN ASSUMED.*** This was the sharper form of
+the guess -- `cc/dcl.c`'s static-initialiser emitter was changed THIS
+RELEASE for `gbitagg`, and a 56-entry array of function pointers is
+exactly the shape that would expose a fault there. A six-entry
+reduction with the same casts gives
+
+```
+DATA	table+8(SB)/8,$f1<>+0(SB)
+DATA	table+16(SB)/8,$f2<>+0(SB)
+DATA	table+24(SB)/8,$f3<>+0(SB)
+DATA	table+32(SB)/8,$hash_attribute_kind+0(SB)
+GLOBL	table+0(SB),$48
+```
+
+-- real symbol references, eight bytes each, right offsets, the NULL
+entries skipped as `init1` always skips zeros. *Nothing to find.*
+
+**So three readings are now refuted and the position is still
+unknown**: the half-rebuilt corpus (the rebuild did not move it), the
+function-number table (bounds-checked, and its initialiser is right),
+and the static-init gap (which leaves zeros, not ones).
+
+**WHAT TO ASK NEXT IS POSITION, NOT MECHANISM**, and the cheapest
+question needs no acid at all: **does cpfe reach its own option
+processing?** The host build answers `invalid option: --help` correctly
+worded, so
+
+```
+cpfe --no-such-option
+```
+
+splits the search in half -- a diagnostic means `main` ran, the static
+data is intact and the fault is in per-translation-unit work; the same
+`pc=0x1` means it dies before any output. The companion free marker is
+whether `--gen_c_file_name` ever creates its file. *Both are one
+command and neither depends on a format letter.*
+
+### RUNG 1 PASSES: cpfe DIAGNOSES A BAD OPTION
+
+```
+bash-5.3$ cpfe --no_such_option
+Command-line error: invalid option: --no_such_option
+
+1 catastrophic error detected in this compilation.
+Compilation terminated.
+```
+
+***THAT IS A LOT OF FRONT END.*** `main` ran; the option table and the
+message catalogue are intact and correctly indexed; the diagnostic
+formatter works; the catastrophic-error counter works; and the exit
+path works. **So the fault is after command-line processing**, and the
+whole of startup and static data is cleared in one command with no
+debugger.
+
+**`sys/lib/tests/cpfe-ladder` codifies the rest**, and like `go-ladder`
+it **does NOT gate** -- the useful output is the HIGHEST RUNG REACHED,
+which a gate throws away at rung 1. Six rungs, each adding one thing:
+a bad option (1), `--version` (2), `-E` on an empty file with no other
+flags (3), `-E` with eccp's real option set (4), `-E` over an
+`#include` (5), and a full translation (6), which is the one known to
+die.
+
+**Rungs 3 and 4 are split deliberately.** `--target win64` and
+`--clear_flag=use_predefined_macro_file` are not cosmetic -- `eccp`'s
+header records that cpfe refuses its own configuration without the
+first -- so a bare run and a full-flag run can fail for unrelated
+reasons, and conflating them would report one number for two
+questions. **Rung 1 is also INVERTED and has its own arm**: a bad
+option *must* fail, and what is being tested is that it fails by
+PRINTING, so a pass condition of "non-zero status" would be the wrong
+test.
+
+The options are real, read out of `cmd_line.c:8817-8932` rather than
+recalled: `preprocess`/`-E`, `no_line_commands`/`-P`,
+`version`/`-v`.
+
+**It is rc and has not been parse-checked**, there being no rc on the
+build host -- so it was audited against the five recorded traps
+instead: `=` quoted or `^`-concatenated everywhere, `>[2]` and never
+`2>`, no backquote that can match nothing, no `} if not` on one line,
+and GNU `grep -qE`. *Every assignment is tight, matching `cxx-bisect`,
+because that file has actually run.*

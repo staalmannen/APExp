@@ -1,0 +1,172 @@
+#!/bin/rc
+# cpfe-ladder -- how far into cpfe does an empty file get?
+#
+#	cd /sys/lib/tests && ./cpfe-ladder
+#
+# ***IT DOES NOT GATE, AND THE USEFUL OUTPUT IS THE HIGHEST RUNG
+# REACHED.***  `go-ladder' is the precedent and the reason is the same:
+# a gate throws the answer away at rung 1, and the answer here is a
+# POSITION.
+#
+# ------------------------------------------------------------------
+# WHERE IT CAME FROM
+#
+# `cxx-bisect' established that cpfe crashes on an EMPTY translation
+# unit -- `fault read addr=0x1 pc=0x1' -- so it is not about the C++
+# headers.  `acid' then gave the shape rather than the place:
+#
+#	PC    0x0000000000000001      the program counter ITSELF
+#	TYPE  0xe   ERROR 0x14        user-mode INSTRUCTION FETCH
+#	SP    0x00007ffffffde7c8      an ordinary stack address
+#
+# -- a transfer of control to address 1, not a dereference, and not a
+# blown stack.  `stk()' cannot unwind because address 1 is in no
+# function, and `src(*SP)' answered `no source for ?file?'.
+#
+# **Three mechanisms have been refuted and the POSITION was still
+# unknown**, which is why this file asks about position instead:
+#
+#   - a half-rebuilt corpus -- a full `mk install' did not move it;
+#   - EDG's function-number table (`fe_init.c:53280',
+#     `a_function_pointer function_pointers[56]') -- all 7 call sites
+#     bounds-check the index first, and the host-built `6c' emits its
+#     static initialiser as correct symbol references;
+#   - the static-init gap -- that leaves ZEROS, and this is a 1.
+#
+# ***AND RUNG 1 IS ALREADY MEASURED: `cpfe --no_such_option' PRINTS
+# EDG's OWN DIAGNOSTIC***, correctly worded, with the catastrophic-error
+# count and `Compilation terminated.'  So `main' ran, the option and
+# message tables are intact, the diagnostic machinery works and the
+# exit path works.  *That is a great deal of the front end*, and it
+# moves the fault after command-line processing.
+#
+# ------------------------------------------------------------------
+# WHAT EACH RUNG ADDS, which is the whole design
+#
+#   1  bad option      main, option table, diagnostics, exit
+#   2  --version       whatever runs before the version is printed
+#   3  -E bare         the PREPROCESSOR, on a file with no #include:
+#                      file I/O, the token machinery, and the
+#                      per-translation-unit init they need
+#   4  -E full flags   the same with eccp's real option set, so rung 3
+#                      against rung 4 separates "preprocessing" from
+#                      "these options"
+#   5  -E + headers    the preprocessor over a real #include
+#   6  translate       eccp's own command: semantic analysis, IL, the
+#                      C back end.  This is the one known to die.
+#
+# **Rungs 3 and 4 are split deliberately.**  `--target win64' and
+# `--clear_flag=use_predefined_macro_file' are not cosmetic -- `eccp''s
+# header records that cpfe REFUSES its own configuration without the
+# first -- so a bare run and a full-flag run can fail for unrelated
+# reasons, and a ladder that conflated them would report one number for
+# two questions.
+#
+# **A rung that fails for want of a FILE is not a rung that failed**,
+# so each one that needs an input makes it and says so.
+#
+# ------------------------------------------------------------------
+# rc TRAPS THIS FILE MEETS, all of them already in CLAUDE.md
+#
+# 1. **`=' is a syntax character in rc**, legal only as a leading
+#    assignment or inside quotes.  So `--clear_flag=use_...' and every
+#    `--sys_include=...' is QUOTED or built with `^'.  A bare one is
+#    `token '=': syntax error'.
+# 2. **`2>file' is not rc**; the stderr redirect is `>[2]file'.
+# 3. **A backquote matching nothing is a NULL LIST**, and `^' with a
+#    null list is an error -- nothing here concatenates one.
+# 4. **`}' followed by `if not' on ONE line is a parse error**: rc
+#    wants a command separator after the brace.  There is no `if not'
+#    in this file at all.
+# 5. `grep' inside `apexp-sh' is GNU's, so `-qE' is right and Plan 9's
+#    `-s' is not.
+# ------------------------------------------------------------------
+
+tmp = /tmp/cpfe-ladder.^$pid
+mkdir -p $tmp
+
+if(~ $CPFE '') CPFE=cpfe
+if(~ $objtype '') objtype=amd64
+
+echo '' > $tmp/empty.cpp
+echo '#include <cstddef>' > $tmp/hdr.cpp
+echo 'int main(void){ return 0; }' >> $tmp/hdr.cpp
+
+# eccp's own option set, copied from `rc/bin/ape/eccp' rather than
+# recalled.  If that file changes, this goes stale -- which is why the
+# rungs print the command they ran.
+sysincl = ('--sys_include=/sys/include/ape/c++' \
+           '--sys_include=/'^$objtype^'/include/ape' \
+           '--sys_include=/sys/include/ape' )
+full = (--c++14 --no_exceptions --no_rtti --target win64 \
+        '--clear_flag=use_predefined_macro_file' \
+        --instantiate local $sysincl)
+
+reached = 0
+
+# Each rung: run it, capture $status FIRST (the next command clobbers
+# it -- the discipline `cmd/c++lib' paid forty empty objects for), and
+# report CRASH separately from a plain non-zero exit, because a front
+# end that DIAGNOSES is a different finding from one that dies.
+fn rung {
+	n=$1
+	what=$2
+	shift
+	shift
+	$* >$tmp/out >[2]$tmp/err
+	st=$status
+	kind=ok
+	if(! ~ $st '')
+		kind=ERROR
+	if(grep -qE 'suicide|trap:' $tmp/err)
+		kind=CRASH
+	echo $kind^'  rung '^$n^': '^$what
+	if(~ $kind ok)
+		reached=$n
+	if(! ~ $kind ok)
+		sed 1q $tmp/err
+}
+
+echo 'cpfe-ladder: '^$CPFE
+echo
+
+# Rung 1 is INVERTED and that is on purpose: a bad option MUST fail,
+# and what is being tested is that it fails by PRINTING.  A rung whose
+# pass condition is a non-zero status needs its own arm.
+$CPFE --no_such_option >$tmp/out >[2]$tmp/err
+st = $status
+if(grep -qE 'suicide|trap:' $tmp/err){
+	echo 'CRASH  rung 1: a bad option -- cpfe dies before any output'
+	sed 1q $tmp/err
+	echo
+	echo 'cpfe-ladder: highest rung reached 0'
+	rm -rf $tmp
+	echo 'cpfe-ladder: done'
+	exit ''
+}
+if(grep -qE 'invalid option' $tmp/err $tmp/out){
+	echo 'ok     rung 1: a bad option is DIAGNOSED (main, options, messages, exit)'
+	reached=1
+}
+if(! grep -qE 'invalid option' $tmp/err $tmp/out){
+	echo 'ERROR  rung 1: no diagnostic, and no crash either'
+	sed 1q $tmp/err
+}
+
+rung 2 '--version' $CPFE --version
+rung 3 '-E on an empty file, no other flags' $CPFE -E $tmp/empty.cpp
+rung 4 '-E on an empty file, with eccp flags' $CPFE $full -E $tmp/empty.cpp
+rung 5 '-E on a file with an #include' $CPFE $full -E $tmp/hdr.cpp
+rung 6 'full translation of an empty file' \
+	$CPFE $full '--gen_c_file_name='^$tmp^'/out.c' $tmp/empty.cpp
+
+echo
+echo 'cpfe-ladder: highest rung reached '^$reached
+if(~ $reached 6)
+	echo 'cpfe-ladder: NOTHING FAILED -- read this twice before believing it'
+rm -rf $tmp
+
+# A completion marker, the rule `tk-runall' and `cxx-bisect' carry: a
+# harness that is killed gives the prompt back exactly like one that
+# finished.
+echo 'cpfe-ladder: done'

@@ -1843,6 +1843,30 @@ narrows the suspect to php's own heap rather than clearing libap,
 which is why it prints the iteration count it reached instead of only
 a verdict.
 
+***AND IT IS CLEAN ON THE VM: `completed 200 of 200 iterations`, all
+ok.*** So libap's `posix_spawn` survives php's exact call sequence
+two hundred times under the real library, and **the suspect moves to
+php's own heap** -- which is what the section was built to decide and
+is the weaker of its two possible answers, exactly as its header
+says.
+
+*That is a narrowing and not a clearing*, and the difference is worth
+keeping straight: the test allocates nothing but pipes between
+spawns, while php arrives at `proc_open` with a Zend heap that has
+been churning all run. **A `Faction` whose `op` reads 4 is memory
+somebody else wrote**, and the two candidates left are a php-side
+overrun into libap's small allocations and libap's allocator itself
+handing out a block twice. *Neither is reachable from this test*, and
+`malloc-reuse-test` is the instrument for the second.
+
+**The next question is cheap and is php's, not libap's**: whether
+`system-info` still dies with `USE_POSIX_SPAWN` compiled out, since
+`proc_open.c` keeps its `fork`/`execve` arm for platforms without it.
+If it does, posix_spawn is a bystander and the acid lines were only
+where the damage was read; if it does not, the damage is on that path
+and the test is missing the shape that causes it. *One `config.h`
+answer separates them, and the build cost is one package.*
+
 ### What was cleared on the way, and how
 
 The cpp pp-number fix landed in the same window and was the obvious
