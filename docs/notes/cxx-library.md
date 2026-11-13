@@ -639,3 +639,64 @@ header's includes are relative to ITS directory and not to `vector/`,
 and leaves the `..` segments for the compiler rather than normalising
 them by hand — `../iterator/../metaprogramming/x.h` is a good path and
 normalising it is a second thing to get wrong.
+
+## Phase C rebuilt the file instead of shrinking it, and the gap is the finding
+
+```
+phase C -- MINIMISING the reproducer
+  last include before the crash: ../iterator/niter_base.h
+  starting from 14 includes
+  the includes ALONE answer ok, not CRASH
+```
+
+**The report was honest and the method was wrong.** Phase C collected
+the include PATHS out of the crashing prefix and wrote a fresh
+`#include "<abs>/vector/<path>"` per line. *A minimiser must SHRINK
+the input, never reconstruct it* — a reconstruction differs in every
+way you did not think to copy. This one dropped three things: the
+copyright block, the `#ifndef`/`#define` guard, and the **relative**
+include spelling.
+
+Two of the three are cleared by reading: **nothing in the library
+tests `PSTL_VECTOR_H`** (one grep — only its own three lines), and
+lines 1-11 are a `//` comment. **And no include is circular**: the
+transitive closure of each of the fourteen was computed and none
+reaches `vector/vector.h`, so the guard cannot be suppressing a
+back-include either.
+
+### ***THE TWO FORMS ARE THE SAME PROGRAM***
+
+`g++ -E` over the crashing prefix and over the rebuilt absolute-path
+version produce **byte-identical token streams — 6428 lines each**.
+
+So nothing about the C++ differs, and what is left is the file NAMES
+and the search that found them. A relative `#include
+"../algorithm/equal.h"` from a file in `/tmp` misses in the including
+file's own directory and is then found through `-I`; an absolute one
+is found at once. ***This port's entire crash history is `stat` in
+`host_envir.c`*** — the 88-against-104 `struct stat` was exactly
+there — so a failed lookup preceding a successful one is not an idle
+difference.
+
+**That is a different place to look from anywhere this hunt has been**,
+and it was free: one `g++ -E` and a `cmp`.
+
+### What the ladder does now
+
+**Phase C minimises in place**, deleting real lines from `vector.h`:
+the comment block as a unit, the guard pair as a unit (and then the
+trailing `#endif` with it), and each `#include` line. It
+**re-establishes its baseline through its own builder first** — a
+minimiser whose baseline came by a different path is comparing two
+things, which is exactly the fault above — and refuses if that
+baseline does not crash.
+
+**Phase C2 asks the spelling question directly**: the same surviving
+lines with every include rewritten absolute, which is a line-wise
+substitution rather than a reconstruction. `CRASH` clears the
+spelling and blames the content; `ok` says the C++ is innocent and
+the bug is cpfe's file lookup.
+
+**Phase D** replaces the last include with each of its own, as one
+`sed` substitution keyed on the same input line number the deletions
+use, so the two compose.

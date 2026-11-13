@@ -1401,6 +1401,20 @@ silent:
   culprit with each of ITS own includes, because `reverse_iterator.h`
   and `wrap_iter.h` are not among the thirteen and line 28 brings in
   three new things at once.
+  ***AND PHASE C REBUILT THE FILE INSTEAD OF SHRINKING IT***, so "the
+  includes ALONE answer ok" was honest and the method was wrong — *a
+  minimiser must SHRINK the input, never reconstruct it*, since a
+  reconstruction differs in every way you did not think to copy. It
+  minimises in place now and re-establishes its baseline through its
+  own builder first. **But the gap it left is the best lead yet**:
+  nothing tests `PSTL_VECTOR_H`, lines 1-11 are a comment, no include
+  is circular — and ***`g++ -E` over the two forms gives BYTE-IDENTICAL
+  token streams, 6428 lines each***. So nothing about the C++ differs
+  and what is left is the file NAMES and the SEARCH: a relative
+  include that misses in the including file's directory and is then
+  found through `-I`, against an absolute one found at once. *This
+  port's whole crash history is `stat` in `host_envir.c`.* Phase C2
+  asks that directly.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
