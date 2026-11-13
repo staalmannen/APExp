@@ -6402,6 +6402,143 @@ __T354975384))); } }
 (this->n_elems) = (__35674_11_n + 1ULL); 
 }
 #line 1821 "src/mem_manage.c"
+/*
+ * ***THE DEBUG BLOCK BELOW SITS HERE AND NOT BESIDE `alloc_mem_block'.***
+ * It was written next to the function it was first called from, and
+ * two of its five call sites -- `free_fe_huge' and `alloc_in_region'
+ * -- are defined ABOVE that point, so they referenced an undeclared
+ * `edg_dbg_check' and an undeclared `edg_dbg_allocs'.  In C89 the
+ * first is an implicit `int'-returning function and the second is a
+ * hard error; under kencc the implicit call would also have been the
+ * tree's own undeclared-function trap, inside an instrument written
+ * to hunt a memory bug.  *Caught by reading the file order rather
+ * than by a build*, which is the only reason it did not cost a round.
+ */
+/*
+ * APExp: the link and trim rings.  See the recording sites below and
+ * the comment on `edg_dbg_cur' in `free_memory_region'.
+ */
+void *edg_dbg_link_hdr[4096];
+void *edg_dbg_link_next[4096];
+long edg_dbg_link_rn[4096];
+long edg_dbg_link_n;
+
+void *edg_dbg_trim_new[4096];
+void *edg_dbg_trim_par[4096];
+long edg_dbg_trim_n;
+
+/*
+ * APExp: ***CATCH THE WRITE, since reading cannot find it.***
+ *
+ * The link ring settled which of the two explanations it is: slot 996
+ * recorded `hdr=0x03cc32c8 next-read-back=0x03cd0cf0', a valid pointer
+ * and exactly the block it was pushed on top of.  **The store happened
+ * and was correct, so something OVERWROTE it between the link and the
+ * teardown** -- about 650 links later.
+ *
+ * Reading has gone as far as it can.  The parent is innocent by its own
+ * bookkeeping (`avail == end == the sub-block's header address', so the
+ * carve is intact and the bump stopped where it should), and
+ * `alloc_in_region' is conservative: it needs `remaining >= size + 8'
+ * and then advances by `size' alone, which is why every block keeps
+ * eight bytes of slack and why this one shows `avail = end - 8'.  A
+ * write AT `after_end_of_block' is past the object AND past that slack.
+ *
+ * So bracket it in TIME.  This walks region 0 and reports the FIRST
+ * moment a link stops being a plausible heap pointer, recording the
+ * link count, the chain position and the carve count.  The rings then
+ * name what was allocated and carved around that instant, which is a
+ * question no post-mortem can ask.
+ *
+ * It records once and then stops: the first detection is the only one
+ * whose surroundings mean anything, and leaving it armed would cost a
+ * walk per call for nothing.
+ *
+ *	edg_dbg_bad_at    link count when first seen (-1 = never seen)
+ *	edg_dbg_bad_trim  carve count at that moment
+ *	edg_dbg_bad_pos   how far down the chain
+ *	edg_dbg_bad_hdr   the block whose `next' went bad
+ *	edg_dbg_bad_val   what it held
+ *	edg_dbg_checks    how many clean walks ran, so that
+ *	                  `bad_at == -1' can be told from "never walked"
+ */
+void *edg_dbg_bad_hdr;
+void *edg_dbg_bad_val;
+long edg_dbg_bad_at = -1;
+long edg_dbg_bad_trim;
+long edg_dbg_bad_pos;
+long edg_dbg_checks;
+
+/*
+ * ***THE WINDOW IS SIXTEEN LINKS WIDE AND THAT IS WHY THESE EXIST.***
+ * The first run of the check answered `bad_at = 1040, bad_pos = 7,
+ * bad_hdr' equal to `prev', with 65 clean walks before it -- and since
+ * the walk ran at every multiple of sixteen, the last clean one was
+ * link 1024.  `prev' was linked at 996, so **the write happened between
+ * link 1024 and link 1040**.
+ *
+ * So the `& 15' is gone: the walk runs on EVERY call now, which pins
+ * the event to one allocation interval instead of sixteen.
+ *
+ * `edg_dbg_bad_site' says WHICH call site saw it first, which separates
+ * three different stories that the link count alone cannot:
+ *
+ *	1  entry to alloc_mem_block ...... it happened before this call
+ *	2  exit from alloc_mem_block ..... this allocation did it
+ *	3  entry to trim_mem_block ....... the carve chain is implicated
+ *	4  entry to free_fe_huge ......... *prev_next writes into a LINK,
+ *	                                   so this one is a real suspect
+ *	5  alloc_in_region ............... ordinary front-end allocation
+ *
+ * **Site 5 is ARMED rather than always on**, because `alloc_in_region'
+ * runs orders of magnitude more often than `alloc_mem_block' and a walk
+ * per allocation over the whole compile would cost more than the answer
+ * is worth.  It arms at link 1000, just under the measured window, so
+ * the expensive resolution is spent exactly where the event is.  *An
+ * instrument aimed by a previous measurement rather than by a guess.*
+ */
+long edg_dbg_allocs;
+long edg_dbg_bad_site;
+long edg_dbg_bad_allocs;
+
+static void edg_dbg_check(long site)
+{
+  _ZN3edg22a_mem_block_header_ptrE h;
+  _ZN3edg22a_mem_block_header_ptrE nx;
+  long pos;
+
+  if (edg_dbg_bad_at >= 0)
+    return;
+  if (_ZN3edg16mem_region_tableE == ((_ZN3edg22a_mem_block_header_ptrE *)0))
+    return;
+  h = (_ZN3edg16mem_region_tableE[0]);
+  pos = 0;
+  while (h != ((_ZN3edg22a_mem_block_header_ptrE)0) && pos < 20000) {
+    nx = (h->next);
+    /*
+     * The heap in this process runs from about 0x01c00000 upward, so
+     * anything under a megabyte is not a block header.  The threshold
+     * is deliberately loose: it only has to separate `a quarter of a
+     * megabyte' from `a heap address', which is the whole distance the
+     * observed 0x3f4a1 sits from the heap.
+     */
+    if (nx != ((_ZN3edg22a_mem_block_header_ptrE)0)
+     && ((unsigned long long)nx) < 0x100000ULL) {
+      edg_dbg_bad_hdr = (void *)h;
+      edg_dbg_bad_val = (void *)nx;
+      edg_dbg_bad_at = edg_dbg_link_n;
+      edg_dbg_bad_trim = edg_dbg_trim_n;
+      edg_dbg_bad_pos = pos;
+      edg_dbg_bad_site = site;
+      edg_dbg_bad_allocs = edg_dbg_allocs;
+      return;
+    }
+    h = nx;
+    pos = pos + 1;
+  }
+  edg_dbg_checks = edg_dbg_checks + 1;
+}
+
 void _ZN3edg6detail12free_fe_hugeEPvy( _ZN3edg10a_void_ptrE __145725_30_ptr, 
 _ZN3edg8sizeof_tE __145726_30_size)
 #line 1831
@@ -6414,6 +6551,13 @@ auto _ZN3edg18a_mem_block_headerE **__145738_24_prev_next;
 auto _ZN3edg9a_booleanE __145741_22_block_found;
 #line 1832
 (__145726_30_size >= 2096ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/mem_manage.c"), 1832, __T353085504, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+/*
+ * APExp: site 4.  This function writes `*prev_next', which is either
+ * `mem_region_table[0]' or some block's `next' -- the only code besides
+ * `alloc_mem_block' and `free_mem_block' that writes a region LINK at
+ * all, so it is the one real suspect reading named.
+ */
+edg_dbg_check(4);
 __145737_23_hdr = (_ZN3edg16mem_region_tableE[0]);
 __145738_24_prev_next = (_ZN3edg16mem_region_tableE + 0);
 
@@ -6468,6 +6612,15 @@ auto _ZN3edg8sizeof_tE __67600_13_true_size;
 auto _ZN3edg9a_booleanE __67601_13_use_dedicated_mem_block;
 auto _ZN3edg9a_booleanE __67602_13_small_extension;
 auto _ZN3edg9a_booleanE __67603_13_region_trimmed;
+/*
+ * APExp: site 5, ARMED at link 1000 -- just under the measured window.
+ * This runs orders of magnitude more often than alloc_mem_block, so a
+ * walk per call over the whole compile would cost more than the answer
+ * is worth; armed, it costs only the allocations inside the window.
+ */
+edg_dbg_allocs = edg_dbg_allocs + 1;
+if (edg_dbg_link_n >= 1000)
+  edg_dbg_check(5);
 #line 146
 __67568_53_size = (_ZN3edg7max_valIyEET_RKS1_S3_((((const _ZN3edg8sizeof_tE *)&__67568_53_size)), ((((*(_ZN3edg8sizeof_tE *)&__T317616992)) = 1ULL) , (&__T317616992))));
 #line 155
@@ -6789,96 +6942,6 @@ _ZN3edg30mem_alloc_history_entries_usedE = _ZN3edg32num_of_mem_alloc_history_ent
 #line 574
 return __144429_14_addr;
 }
-/*
- * APExp: the link and trim rings.  See the recording sites below and
- * the comment on `edg_dbg_cur' in `free_memory_region'.
- */
-void *edg_dbg_link_hdr[4096];
-void *edg_dbg_link_next[4096];
-long edg_dbg_link_rn[4096];
-long edg_dbg_link_n;
-
-void *edg_dbg_trim_new[4096];
-void *edg_dbg_trim_par[4096];
-long edg_dbg_trim_n;
-
-/*
- * APExp: ***CATCH THE WRITE, since reading cannot find it.***
- *
- * The link ring settled which of the two explanations it is: slot 996
- * recorded `hdr=0x03cc32c8 next-read-back=0x03cd0cf0', a valid pointer
- * and exactly the block it was pushed on top of.  **The store happened
- * and was correct, so something OVERWROTE it between the link and the
- * teardown** -- about 650 links later.
- *
- * Reading has gone as far as it can.  The parent is innocent by its own
- * bookkeeping (`avail == end == the sub-block's header address', so the
- * carve is intact and the bump stopped where it should), and
- * `alloc_in_region' is conservative: it needs `remaining >= size + 8'
- * and then advances by `size' alone, which is why every block keeps
- * eight bytes of slack and why this one shows `avail = end - 8'.  A
- * write AT `after_end_of_block' is past the object AND past that slack.
- *
- * So bracket it in TIME.  This walks region 0 and reports the FIRST
- * moment a link stops being a plausible heap pointer, recording the
- * link count, the chain position and the carve count.  The rings then
- * name what was allocated and carved around that instant, which is a
- * question no post-mortem can ask.
- *
- * It records once and then stops: the first detection is the only one
- * whose surroundings mean anything, and leaving it armed would cost a
- * walk per call for nothing.
- *
- *	edg_dbg_bad_at    link count when first seen (-1 = never seen)
- *	edg_dbg_bad_trim  carve count at that moment
- *	edg_dbg_bad_pos   how far down the chain
- *	edg_dbg_bad_hdr   the block whose `next' went bad
- *	edg_dbg_bad_val   what it held
- *	edg_dbg_checks    how many clean walks ran, so that
- *	                  `bad_at == -1' can be told from "never walked"
- */
-void *edg_dbg_bad_hdr;
-void *edg_dbg_bad_val;
-long edg_dbg_bad_at = -1;
-long edg_dbg_bad_trim;
-long edg_dbg_bad_pos;
-long edg_dbg_checks;
-
-static void edg_dbg_check(void)
-{
-  _ZN3edg22a_mem_block_header_ptrE h;
-  _ZN3edg22a_mem_block_header_ptrE nx;
-  long pos;
-
-  if (edg_dbg_bad_at >= 0)
-    return;
-  if (_ZN3edg16mem_region_tableE == ((_ZN3edg22a_mem_block_header_ptrE *)0))
-    return;
-  h = (_ZN3edg16mem_region_tableE[0]);
-  pos = 0;
-  while (h != ((_ZN3edg22a_mem_block_header_ptrE)0) && pos < 20000) {
-    nx = (h->next);
-    /*
-     * The heap in this process runs from about 0x01c00000 upward, so
-     * anything under a megabyte is not a block header.  The threshold
-     * is deliberately loose: it only has to separate `a quarter of a
-     * megabyte' from `a heap address', which is the whole distance the
-     * observed 0x3f4a1 sits from the heap.
-     */
-    if (nx != ((_ZN3edg22a_mem_block_header_ptrE)0)
-     && ((unsigned long long)nx) < 0x100000ULL) {
-      edg_dbg_bad_hdr = (void *)h;
-      edg_dbg_bad_val = (void *)nx;
-      edg_dbg_bad_at = edg_dbg_link_n;
-      edg_dbg_bad_trim = edg_dbg_trim_n;
-      edg_dbg_bad_pos = pos;
-      return;
-    }
-    h = nx;
-    pos = pos + 1;
-  }
-  edg_dbg_checks = edg_dbg_checks + 1;
-}
 
 #line 635
 _ZN3edg22a_mem_block_header_ptrE _ZN3edg15alloc_mem_blockEiyPcb( _ZN3edg22a_memory_region_numberE __144539_63_region_number,
@@ -6893,14 +6956,8 @@ auto _ZN3edg10a_void_ptrE __144554_26_alloc_addr;
 auto _ZN3edg22a_mem_block_header_ptrE __144555_26_hdr_found = ((_ZN3edg22a_mem_block_header_ptrE)0);
 auto _ZN3edg22a_mem_block_header_ptrE __144556_26_prev_hdr_found = ((_ZN3edg22a_mem_block_header_ptrE)0);
 
-/*
- * APExp: bracket the corruption in time.  Every sixteenth call, which
- * over 1647 links is about a hundred walks of a chain a thousand long
- * -- a hundred thousand pointer reads in all, against a compile that
- * does millions.
- */
-if ((edg_dbg_link_n & 15) == 0)
-  edg_dbg_check();
+/* APExp: site 1 -- the chain as it stood BEFORE this allocation. */
+edg_dbg_check(1);
 
 ;
 
@@ -7007,6 +7064,8 @@ __144667_1_have_hdr:;
  * skips re-initialising `malloc_size', `start_of_block' and
  * `after_end_of_block' -- and the block that failed had `msize' 0.
  */
+/* APExp: site 2 -- did THIS allocation do it? */
+edg_dbg_check(2);
 edg_dbg_link_hdr[edg_dbg_link_n & 4095] = (void *)__144552_26_hdr;
 edg_dbg_link_next[edg_dbg_link_n & 4095] = (void *)(__144552_26_hdr->next);
 edg_dbg_link_rn[edg_dbg_link_n & 4095] = (long)__144539_63_region_number;
@@ -7063,6 +7122,8 @@ auto _ZN3edg8sizeof_tE __144743_26_space_remaining_in_block;
 auto _ZN3edg22a_mem_block_header_ptrE __144744_26_new_hdr;
 auto char *__144745_27_alloc_addr;
 
+/* APExp: site 3 -- the carve chain is implicated by the ring dump. */
+edg_dbg_check(3);
 ;
 
 ((__144738_44_hdr->after_end_of_block) >= (__144738_44_hdr->next_avail_in_block)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/mem_manage.c"), 845, __T352398616, ((

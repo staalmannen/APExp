@@ -269,6 +269,8 @@ echo
 	echo 'print("edg_dbg_bad_pos = ", *edg_dbg_bad_pos\D, "   (how far down the chain)\n")'
 	echo 'print("edg_dbg_bad_hdr = ", *edg_dbg_bad_hdr\X, "\n")'
 	echo 'print("edg_dbg_bad_val = ", *edg_dbg_bad_val\X, "\n")'
+	echo 'print("edg_dbg_bad_site= ", *edg_dbg_bad_site\D, "   1=alloc entry 2=alloc exit 3=trim 4=free_fe_huge 5=alloc_in_region\n")'
+	echo 'print("edg_dbg_bad_allocs = ", *edg_dbg_bad_allocs\D, " of ", *edg_dbg_allocs\D, " alloc_in_region calls\n")'
 	echo 'print("link total      = ", *edg_dbg_link_n\D, "   trim total = ", *edg_dbg_trim_n\D, "\n")'
 } | acid $crashpid
 
