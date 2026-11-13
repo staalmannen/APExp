@@ -119,10 +119,26 @@ cat $tmp/err
 crashpid=`{grep -E 'suicide|trap:' $tmp/err | sed 1q | awk '{print $2}' | sed 's/://'}
 if(~ $#crashpid 0){
 	echo
-	echo 'cxx-vecacid: NO CRASH -- cpfe did not die on this input, so'
-	echo 'cxx-vecacid: there is nothing to attach to.  Re-run'
-	echo 'cxx-vecacid: cxx-vecsplit to regenerate a reproducer that'
-	echo 'cxx-vecacid: does.'
+	echo 'cxx-vecacid: NO CRASH.'
+	echo 'cxx-vecacid:'
+	echo 'cxx-vecacid: ***THAT IS THE EXPERIMENT ANSWERING, NOT A BROKEN'
+	echo 'cxx-vecacid: REPRODUCER.***  EDG_DBG_CARVE_PAD moves the carved'
+	echo 'cxx-vecacid: header 64 bytes out of the way, and the prediction'
+	echo 'cxx-vecacid: written down before the run was that cpfe would then'
+	echo 'cxx-vecacid: complete.  It did.'
+	echo 'cxx-vecacid:'
+	echo 'cxx-vecacid: **The measurement is the `edg-pad:` lines above**,'
+	echo 'cxx-vecacid: not the silence.  The pad is dead space owned by'
+	echo 'cxx-vecacid: nobody and filled with 0xA5, so a dirty byte in it'
+	echo 'cxx-vecacid: is the overrun caught in the act -- with its count,'
+	echo 'cxx-vecacid: its offset, and the parent object size that names'
+	echo 'cxx-vecacid: what ran past.  *An absence of crashes says only'
+	echo 'cxx-vecacid: that nothing landed on a chain link; a dirtied'
+	echo 'cxx-vecacid: canary says the write happened.*'
+	echo 'cxx-vecacid:'
+	echo 'cxx-vecacid: dirty=0 with a nonzero carve count would REFUTE the'
+	echo 'cxx-vecacid: overrun reading and say the pad merely moved the'
+	echo 'cxx-vecacid: layout -- set EDG_DBG_CARVE_PAD to 0 for upstream.'
 	rm -rf $tmp
 	exit nocrash
 }

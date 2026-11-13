@@ -1677,6 +1677,28 @@ silent:
   say the write aims at the carved header rather than running past the
   object. **An experiment and not a fix** — padding every carve changes
   EDG's layout everywhere, which can move a bug rather than remove one.
+  ***AND THE PAD EXPERIMENT'S PREDICTION HELD: NO CRASH.*** With the
+  carved header moved 64 bytes out of the way cpfe COMPLETES the
+  twelve-line reproducer, so the write is a small overrun past a
+  parent's object and the carved `next` had been one word past it.
+  ***But "no crash" is the weakest form of that result*** — a layout
+  change that moves everything can hide a bug as easily as dodge one,
+  which is this tree's own rule about reaching new code read backwards.
+  **So the pad carries a CANARY now**: `0xA5` at carve time, and a walk
+  of the trim ring at the first `free_memory_region` reporting every
+  pad no longer `0xA5`, with the parent's OBJECT SIZE and the bytes
+  found. *An absence of crashes says only that nothing landed on a
+  chain link; a dirtied canary says the write happened.* cpfe has no
+  diagnostic channel that reaches a finished run, so the report is
+  formatted by hand to fd 2 (`-c -C` and no `-T`, so no signature to
+  disagree with the `write` declaration), **and the block was extracted
+  and compiled alone with `gcc -std=c89 -Wall -Wextra` first**.
+  **The next discriminator, stated before the run**: a FEW dirty pads
+  means a specific EDG object and `objsize` names it; MANY means the
+  overrun is systematic, which stops being an upstream off-by-one and
+  starts pointing at a shared idiom or the compiler; **`dirty=0` with a
+  nonzero carve count REFUTES the overrun reading** and says the pad
+  merely moved the layout.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.

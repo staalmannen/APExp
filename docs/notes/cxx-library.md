@@ -1452,3 +1452,44 @@ The rings now also carry sizes — `link_size` is what each block was asked
 for, `trim_size` is `alloc_addr - start_of_block`, the object the carve cut
 behind — so the next run states the 9672 rather than leaving it to
 subtraction, and names the element count of whatever table this is.
+
+### The pad experiment: prediction held, cpfe completes
+
+`cxx-vecacid` answers **NO CRASH**. With `EDG_DBG_CARVE_PAD` at 64 the
+carved header sits 64 bytes above the parent's `after_end_of_block`, the
+gap belongs to nobody, and cpfe finishes the twelve-line reproducer.
+
+**The prediction and its refutation were written down first and the
+refutation did not fire.** So the write is a *small overrun past a
+parent's object*, and the carved block's `next` had been sitting exactly
+one word past that object.
+
+***But "no crash" is the weakest possible form of that result.*** A
+layout change that moves everything can hide a bug as easily as it can
+dodge one — this tree's own rule about a fix that makes a process reach
+code it never reached before, read backwards. An absence is not a
+measurement.
+
+So the pad now carries a **canary**: `memset(alloc_addr, 0xA5, PAD)` at
+carve time, and a walk of the trim ring at the first `free_memory_region`
+reporting every pad that is no longer `0xA5` — with the slot, the carved
+block, its parent, **the parent's object size**, the offset of the first
+dirty byte and the bytes there. That is a positive measurement of the
+overrun where the silence was only an absence.
+
+cpfe has no diagnostic channel that reaches a finished run — `mem_manage.c`
+declares `free`, `malloc`, `realloc`, `memcpy` and `memset` and nothing
+that prints — so the report is formatted by hand and written to fd 2.
+`cmd/edg/mkfile` passes `-c -C` and no `-T`, so there are no type
+signatures for the `write` declaration to disagree with. **The block was
+extracted and compiled alone with `gcc -std=c89 -Wall -Wextra` before
+shipping**, which is this tree's own rule about syntax-checking on the
+host rather than paying a VM round for a typo.
+
+**The next discriminator, stated before the run.** If the report shows
+*one or a few* dirty pads, it is a specific EDG object running past its
+end and the `objsize` column names which. If it shows *many*, the overrun
+is systematic — which stops being an upstream off-by-one and starts
+pointing at a shared idiom or at the compiler. **`dirty=0` with a nonzero
+carve count refutes the overrun reading outright** and says the pad merely
+moved the layout; `EDG_DBG_CARVE_PAD 0` restores upstream's arrangement.
