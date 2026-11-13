@@ -1361,12 +1361,26 @@ silent:
   the TU is `#include <vector>` plus an empty `main`, so **nothing
   instantiates `vector<T>`** and cpfe is dying in PARSING — which
   rules out deduction, instantiation, `--instantiate local` and the
-  whole back end at once. **`cxx-vecsplit` bisects the 2581 lines**
-  in about seven cpfe runs, over a cut list GENERATED AND VALIDATED
-  by g++ (`cxxlib-host.sh --vecsplit`): 108 candidates, **27 do not
-  compile** because a member template is two `template<...>` lines,
-  so the list is the PROVEN set and a rung that errors on the VM is
-  cpfe disagreeing with g++ rather than the harness cutting wrongly.
+  whole back end at once. ***AND `cxx-vecnarrow` WAS WRONG***: `cxx-vecsplit` refused
+  because its SHORTEST prefix already crashed, and the guard that
+  caught the contradiction convicted the earlier harness. Two faults,
+  independent: **phase 2 tested `~ $k CRASH` and nothing else**, so an
+  ERRORED prefix counted as clean though cpfe stops at the first error
+  and never reaches the crash — *a negative result with two
+  explanations* — and **it derived the include list with `#include` at
+  column 0, where the file has 58 directives and not 56**, two being
+  `#  include` inside an `#if`. Both fixed; the script gives NO VERDICT
+  when it stops on an error.
+  **`cxx-vecsplit`'s own fault was the same shape**: its cut list
+  covered only `template<` boundaries, so its first rung was the whole
+  include block in one step — *a ladder whose first rung fails has no
+  rungs*. It spans the file now (`LINE DEPTH`, **137 validated of
+  164**, 56 in the include block), generated and validated by g++, and
+  **an ERROR rung STOPS the bisect** rather than counting as clean.
+  *The generator's first attempt answered `0 candidates`, because the
+  include guard is itself an open `#if` for the whole file.*
+  **What is known is narrower than before: the crash is at or before
+  `vector.h:87`**, so the answer will be one `#include` line.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.

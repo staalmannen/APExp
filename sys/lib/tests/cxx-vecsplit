@@ -1,47 +1,58 @@
 #!/bin/rc
-# cxx-vecsplit -- WHICH DEFINITION in vector/vector.h kills cpfe?
+# cxx-vecsplit -- WHERE in vector/vector.h does cpfe die?
 #
 #	./cxx-vecsplit
 #
-# `cxx-vecnarrow' put the crash inside `vector/vector.h' itself: no
-# single include of that file crashes cpfe and no cumulative prefix of
-# its 56 includes does, so the fault is below its last `#include'.
-# This bisects the 2581 lines that remain.
+# `cxx-bisect' says `34 ok, 0 error, 1 CRASH' and the crash is
+# `<vector>'.  This bisects the file.
 #
-# ***AND THE SHAPE OF THE QUESTION IS ALREADY NARROWER THAN IT LOOKS.***
-# The translation unit is `#include <vector>' and `int main(){return 0;}'
-# -- **nothing instantiates `vector<T>'**.  So cpfe dies PARSING, not
-# instantiating, which rules out the whole template-argument-deduction
-# and instantiation machinery and leaves declaration parsing and
-# semantic analysis of the declarations.
+# ***WHAT THE FIRST VERSION GOT WRONG, BECAUSE IT IS THE WHOLE REASON
+# THIS ONE LOOKS LIKE IT DOES.***  It cut only at top-level
+# `template<' boundaries, so its SHORTEST prefix was the entire
+# include block in one step -- and that prefix CRASHED, so the run
+# refused with "the shortest prefix already crashes, which
+# contradicts cxx-vecnarrow phase 2".  *A ladder whose first rung
+# already fails has no rungs.*
+#
+# **The contradiction was real and `cxx-vecnarrow' was the one that
+# was wrong, in two ways at once:**
+#
+#   1. Its phase 2 tested `~ $k CRASH' and nothing else, so a prefix
+#      that ERRORED counted as clean.  cpfe stops at an error, so
+#      such a prefix never reaches the code that crashes -- *"no
+#      prefix crashes" had two explanations and only one was
+#      reported.*
+#   2. It derived the include list with `#include' anchored at column
+#      0, and **vector.h has 58 include directives, not 56**: two are
+#      written `#  include' inside an `#if'.  Neither was ever
+#      tested, and their absence is a live reason the cumulative
+#      prefixes errored.
+#
+# Both are fixed in `cxx-vecnarrow' now.  This file cuts across the
+# WHOLE file, include block included, so there is always something
+# shorter to bisect against.
 #
 # HOW IT CUTS
 # ===========
 #
-# `cxx-vecsplit.cuts' holds line numbers at which the file can be
-# truncated and still compile.  A cut at N means lines 1..N-1, then
-# `} // namespace std', `#endif' and a `main'.
+# `cxx-vecsplit.cuts' holds `LINE DEPTH' pairs: the prefix is lines
+# 1..LINE, then DEPTH closing braces, then `#endif' and a `main'.
+# ***EVERY ONE WAS COMPILED BY g++ BEFORE IT WAS WRITTEN DOWN***
+# (`hostkencc/cxxlib-host.sh --vecsplit'), so a rung that ERRORS here
+# means cpfe disagrees with g++ -- a finding -- rather than the
+# harness cutting in the wrong place, which is noise.  *An instrument
+# whose failures have two explanations cannot be read*, which is the
+# mistake above, in the harness rather than in the library.
 #
-# ***EVERY ONE WAS COMPILED BY g++ BEFORE IT WAS WRITTEN DOWN***, which
-# is the whole reason the list is a file and not a rule evaluated here.
-# The obvious rule -- a `template<' at column 0 at brace depth 1 --
-# gives 108 candidates and **27 of them do not compile**, because a
-# member template is two `template<...>' lines and a cut between them
-# leaves a dangling header.  With the list pre-validated, a rung that
-# ERRORS on the VM means cpfe disagrees with g++ -- a finding -- rather
-# than the harness cutting in the wrong place.  *An instrument whose
-# failures have two explanations cannot be read.*
-#
-# IT BISECTS, so a run is about seven cpfe invocations and not 81.
-# That is sound only because the property is monotone -- a prefix that
-# crashes is contained in every longer one -- and **the two ends are
-# measured rather than assumed**: rung A requires the SHORTEST prefix
-# not to crash and rung B requires the whole file to.  If either is
-# wrong the bisect is refused instead of answered.
+# AN `ERROR' RUNG STOPS THE BISECT RATHER THAN COUNTING AS CLEAN.
+# cpfe stops at the first error, so an errored prefix says nothing
+# about whether the crash is before or after it; treating one as
+# "no crash" is exactly what made `cxx-vecnarrow' answer wrongly.
 #
 # rc notes: `>[2]file' with no space; `=' is a syntax character and
-# assignments are tight and leading; `} if not {' on one line is a
-# parse error, so there is no `if not' here; `grep' is GNU grep.
+# assignments are tight and leading; `while()' with an empty
+# condition is not rc; `} if not {' on one line is a parse error, so
+# there is no `if not' here; `grep' is GNU grep.
 
 CXXDIR=/sys/include/ape/c++
 VEC=$CXXDIR/vector/vector.h
@@ -59,43 +70,56 @@ if(! test -f $CUTS){
 tmp=/tmp/cxx-vecsplit.$pid
 mkdir -p $tmp
 
-lines=`{grep -v '^#' $CUTS | grep -v '^$'}
-if(~ $#lines 0){
+# One element per cut, each `LINE:DEPTH' so rc keeps the pair
+# together in a list.
+cuts=`{grep -v '^#' $CUTS | grep -v '^$' | awk '{print $1 ":" $2}'}
+if(~ $#cuts 0){
 	echo 'cxx-vecsplit: '^$CUTS^' holds no cut points' >/fd/2
 	rm -rf $tmp
 	exit nocuts
 }
-echo 'cxx-vecsplit: '^$#lines^' cut points, validated on the host'
+echo 'cxx-vecsplit: '^$#cuts^' cut points, validated on the host'
 
-# **STALENESS GUARD.**  A cut point is a LINE NUMBER, and a line number
-# rots the moment anybody edits the file above it -- silently, because
-# a wrong cut still produces a file and cpfe still answers something.
-# Every cut must still land on a `template<' at column 0.  This tree
-# has the rule written down already: *a compile-time result can only
-# name a LINE, so key a table on the CASE and re-key rather than
-# renumber* -- here the re-keying is "regenerate the list".
+# **STALENESS GUARD.**  A cut is a LINE NUMBER and rots silently the
+# moment the file is edited above it: a wrong cut still produces a
+# file and cpfe still answers something.  Each must still be either
+# an `#include' line or the line before a top-level `template<'.
 stale=()
-for(n in $lines){
+for(c in $cuts){
+	n=`{echo $c | sed 's/:.*//'}
 	l=`{sed -n $n^p $VEC}
-	if(! echo $l | grep -q '^template<')
+	m=`{echo $n | awk '{print $1 + 1}'}
+	l2=`{sed -n $m^p $VEC}
+	ok=''
+	if(echo $l | grep -q '^[ 	]*#[ 	]*include')
+		ok=1
+	if(echo $l2 | grep -q '^template<')
+		ok=1
+	if(~ $ok '')
 		stale=($stale $n)
 }
 if(! ~ $#stale 0){
-	echo 'cxx-vecsplit: STALE -- these cut points no longer land on a'
-	echo 'cxx-vecsplit: top-level template<: '^$"stale
-	echo 'cxx-vecsplit: regenerate with hostkencc/cxxlib-host.sh --vecsplit'
+	echo 'cxx-vecsplit: STALE -- these cut points no longer land on an'
+	echo 'cxx-vecsplit: #include or before a top-level template<:'
+	echo 'cxx-vecsplit:   '^$"stale
+	echo 'cxx-vecsplit: regenerate with cxxlib-host.sh --vecsplit'
 	rm -rf $tmp
 	exit stale
 }
-echo 'cxx-vecsplit: all '^$#lines^' still land on a top-level template<'
+echo 'cxx-vecsplit: all '^$#cuts^' still land where the generator put them'
 echo
 
-# `-I' is NOT optional: vector.h's own includes are QUOTED and relative
-# to its directory, and the generated file lives in /tmp.
-fn build {	# $1 = cut line; writes $tmp/p.cpp
-	n=`{echo $1}
+# `-I' is NOT optional: vector.h's own includes are QUOTED and
+# relative to its directory, and the generated file lives in /tmp.
+fn build {	# $1 = LINE:DEPTH
+	n=`{echo $1 | sed 's/:.*//'}
+	d=`{echo $1 | sed 's/.*://'}
 	sed -n '1,'^$n^'p' $VEC > $tmp/p.cpp
-	echo '} // namespace std' >> $tmp/p.cpp
+	i=0
+	while(! ~ $i $d){
+		echo '}' >> $tmp/p.cpp
+		i=`{echo $i | awk '{print $1 + 1}'}
+	}
 	echo '#endif' >> $tmp/p.cpp
 	echo 'int main(void){ return 0; }' >> $tmp/p.cpp
 }
@@ -111,27 +135,15 @@ fn try {	# echoes ok / ERROR / CRASH for $tmp/p.cpp
 	echo $kind
 }
 
-fn cutbefore {	# $1 = index (1-based) -> the line BEFORE that cut
-	i=`{echo $1}
-	n=$lines($i)
-	echo `{echo $n | awk '{print $1 - 1}'}
-}
-
 # ---- rung A: the shortest prefix must NOT crash -------------------
-build `{cutbefore 1}
+build $cuts(1)
 a=`{try}
-echo 'cxx-vecsplit: rung A  shortest prefix (includes only) -> '^$a
-if(~ $a CRASH){
-	echo 'cxx-vecsplit: REFUSED -- the shortest prefix already crashes,'
-	echo 'cxx-vecsplit: which contradicts cxx-vecnarrow phase 2 and means'
-	echo 'cxx-vecsplit: the two harnesses are not asking the same thing.'
-	rm -rf $tmp
-	exit badlow
-}
-if(~ $a ERROR){
-	echo 'cxx-vecsplit: REFUSED -- the shortest prefix does not COMPILE'
-	echo 'cxx-vecsplit: under cpfe, though g++ accepted it.  That is a'
-	echo 'cxx-vecsplit: finding in itself; read it before bisecting.'
+echo 'cxx-vecsplit: rung A  shortest prefix (through line '^`{echo $cuts(1) | sed 's/:.*//'}^') -> '^$a
+if(! ~ $a ok){
+	echo 'cxx-vecsplit: REFUSED -- the shortest prefix is already '^$a^'.'
+	echo 'cxx-vecsplit: There is nothing shorter to bisect against, so'
+	echo 'cxx-vecsplit: the fault is at or before that line and this'
+	echo 'cxx-vecsplit: ladder cannot localise it further.'
 	sed 3q $tmp/err
 	rm -rf $tmp
 	exit badlow
@@ -141,7 +153,7 @@ if(~ $a ERROR){
 echo '#include <vector>' > $tmp/p.cpp
 echo 'int main(void){ return 0; }' >> $tmp/p.cpp
 b=`{try}
-echo 'cxx-vecsplit: rung B  the whole <vector>      -> '^$b
+echo 'cxx-vecsplit: rung B  the whole <vector>  -> '^$b
 if(! ~ $b CRASH){
 	echo 'cxx-vecsplit: REFUSED -- <vector> no longer crashes, so there'
 	echo 'cxx-vecsplit: is nothing to bisect.  Re-run cxx-bisect.'
@@ -151,40 +163,57 @@ if(! ~ $b CRASH){
 echo
 
 # ---- bisect -------------------------------------------------------
-# lo = an index known NOT to crash, hi = one known to (0 and N+1 are
-# the virtual ends: 0 is rung A, N+1 is the whole file).
+# lo = an index known NOT to crash, hi = one known to.  Index $#cuts+1
+# is the virtual end: the whole file, measured by rung B.
 lo=1
-hi=`{echo $#lines | awk '{print $1 + 1}'}
-echo 'cxx-vecsplit: bisecting '^$#lines^' cut points'
-# **`while()' WITH AN EMPTY CONDITION IS NOT rc.**  rc's `while' takes a
-# command, so the span is computed before the loop and again at the end
-# of the body rather than tested inside it with a `break'.
+hi=`{echo $#cuts | awk '{print $1 + 1}'}
+echo 'cxx-vecsplit: bisecting '^$#cuts^' cut points'
 span=`{echo $lo $hi | awk '{print $2 - $1}'}
+stopped=''
 while(! ~ $span 1){
 	mid=`{echo $lo $hi | awk '{print int(($1 + $2) / 2)}'}
-	build `{cutbefore $mid}
+	build $cuts($mid)
 	k=`{try}
-	echo '  cut '^$mid^' (line '^$lines($mid)^') -> '^$k
+	echo '  cut '^$mid^' (line '^`{echo $cuts($mid) | sed 's/:.*//'}^') -> '^$k
+	if(~ $k ERROR){
+		echo
+		echo 'cxx-vecsplit: STOPPED -- that rung does not COMPILE under'
+		echo 'cxx-vecsplit: cpfe, though g++ accepted it.  An errored'
+		echo 'cxx-vecsplit: prefix says nothing about which side the'
+		echo 'cxx-vecsplit: crash is on, and counting one as clean is'
+		echo 'cxx-vecsplit: what made cxx-vecnarrow answer wrongly.'
+		echo 'cxx-vecsplit: **This is itself a finding**: read it.'
+		sed 3q $tmp/err
+		stopped=1
+		span=1
+	}
 	if(~ $k CRASH)
 		hi=$mid
-	if(! ~ $k CRASH)
+	if(~ $k ok)
 		lo=$mid
-	span=`{echo $lo $hi | awk '{print $2 - $1}'}
+	if(~ $stopped '')
+		span=`{echo $lo $hi | awk '{print $2 - $1}'}
+}
+
+if(! ~ $stopped ''){
+	rm -rf $tmp
+	echo 'cxx-vecsplit: done'
+	exit errrung
 }
 
 echo
-if(~ $hi `{echo $#lines | awk '{print $1 + 1}'}){
-	echo 'cxx-vecsplit: every cut point is clean, so the crash is in the'
-	echo 'cxx-vecsplit: LAST definition, after line '^$lines($#lines)^'.'
+from=`{echo $cuts($lo) | sed 's/:.*//'}
+if(~ $hi `{echo $#cuts | awk '{print $1 + 1}'}){
+	echo 'cxx-vecsplit: every cut point is clean, so the crash is AFTER'
+	echo 'cxx-vecsplit: line '^$from^' -- the last definition in the file.'
 	rm -rf $tmp
 	echo 'cxx-vecsplit: done'
 	exit 0
 }
-from=$lines($lo)
-to=$lines($hi)
+to=`{echo $cuts($hi) | sed 's/:.*//'}
 echo 'cxx-vecsplit: ***THE CRASH IS IN vector/vector.h BETWEEN LINE'
-echo 'cxx-vecsplit: '^$from^' AND LINE '^$to^'***, which is one definition.'
+echo 'cxx-vecsplit: '^$from^' AND LINE '^$to^'***'
 echo
-sed -n $from^','^$to^p $VEC | sed 20q
+sed -n $from^','^$to^p $VEC | sed 25q
 rm -rf $tmp
 echo 'cxx-vecsplit: done'
