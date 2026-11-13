@@ -7,6 +7,7 @@
 #	sh cxxlib-host.sh --headers       # each public header on its own
 #	sh cxxlib-host.sh --run           # ... and RUN it
 #	sh cxxlib-host.sh --control       # MUST fire
+#	sh cxxlib-host.sh --vecsplit      # regenerate cxx-vecsplit.cuts
 #
 # A HOST instrument: g++ on the build host, never the VM.
 #
@@ -92,7 +93,7 @@ PORT=""
 for a in "$@"; do
 	case "$a" in
 	--portable) PORT="-DPSTL_NO_COMPILER_BUILTINS=1" ;;
-	--headers|--control|--run) mode=$a ;;
+	--headers|--control|--run|--vecsplit) mode=$a ;;
 	*) echo "cxxlib-host: unknown argument $a" >&2; exit 2 ;;
 	esac
 done
@@ -130,6 +131,80 @@ run_one() {	# $1 = source, $2 = label
 }
 
 case "$mode" in
+--vecsplit)
+	# Regenerate `sys/lib/tests/cxx-vecsplit.cuts': the line numbers
+	# in vector/vector.h at which it can be TRUNCATED and still
+	# compile.  **The validation is the point.**  The rule that
+	# produces the candidates -- a `template<' at column 0 at brace
+	# depth 1 -- gives 108 and 27 of them do not compile, because a
+	# member template is two `template<...>' lines and a cut between
+	# them leaves a dangling header.  Teaching the rule about that
+	# case would be the wrong fix: the list is the set g++ PROVED
+	# compiles, so a rung that errors on the VM means cpfe disagrees
+	# with g++, which is a finding, instead of meaning the harness
+	# cut in the wrong place, which is noise.
+	python3 - "$ROOT" "$SHIM" "$CXXDIR" <<'PYEOF'
+import pathlib, subprocess, sys
+root, shim, cxxdir = (pathlib.Path(a) for a in sys.argv[1:4])
+src = cxxdir / 'vector/vector.h'
+lines = src.read_text().split('\n')
+depth = 0; incomment = False; depths = []
+for line in lines:
+    s = []; j = 0
+    while j < len(line):
+        if incomment:
+            k = line.find('*/', j)
+            if k < 0: j = len(line); break
+            incomment = False; j = k + 2; continue
+        if line[j:j+2] == '/*': incomment = True; j += 2; continue
+        if line[j:j+2] == '//': break
+        if line[j] in '"\'':
+            q = line[j]; j += 1
+            while j < len(line) and line[j] != q:
+                j += 2 if line[j] == '\\' else 1
+            j += 1; continue
+        s.append(line[j]); j += 1
+    depths.append(depth)
+    depth += ''.join(s).count('{') - ''.join(s).count('}')
+cand = [i for i, l in enumerate(lines, 1)
+        if l.startswith('template<') and depths[i-1] == 1]
+tmp = pathlib.Path('/tmp/cxxlib-host'); tmp.mkdir(parents=True, exist_ok=True)
+CXX = ['g++', '-std=c++14', '-nostdinc++', '-fno-exceptions', '-fno-rtti',
+       '-fsyntax-only', '-I' + str(shim), '-I' + str(cxxdir),
+       '-I' + str(cxxdir / 'vector'),
+       '-D__EDG_RUNTIME_USES_NAMESPACES=1', '-D__EDG_STD_NAMESPACE=std',
+       '-D__EDG_CONSTEXPR_ENABLED__=1',
+       '-D__EDG_SIZE_TYPE__=decltype(sizeof(0))',
+       '-DPSTL_NO_COMPILER_BUILTINS=1']
+good = []
+for c in cand:
+    body = '\n'.join(lines[:c-1]) + '\n} // namespace std\n#endif\nint main(void){return 0;}\n'
+    f = tmp / 'vs.cpp'; f.write_text(body)
+    if subprocess.run(CXX + [str(f)], capture_output=True).returncode == 0:
+        good.append(c)
+hdr = ("""# cxx-vecsplit.cuts -- line numbers in sys/include/ape/c++/vector/vector.h
+# at which that file can be TRUNCATED and still compile.
+#
+# GENERATED AND VALIDATED by `hostkencc/cxxlib-host.sh --vecsplit'.
+# A cut at line N means "lines 1..N-1, then `} // namespace std',
+# `#endif' and a `main'".  Do not edit by hand: regenerate.
+#
+# ***EVERY LINE HERE WAS COMPILED BY g++ BEFORE IT WAS WRITTEN DOWN.***
+# %d candidates, %d validated -- the %d that fail are member templates,
+# two `template<...>' lines where a cut between them leaves a dangling
+# header.  The list is the PROVEN set, so a rung that errors on the VM
+# is cpfe disagreeing with g++ rather than the harness cutting wrongly.
+#
+# `cxx-vecsplit' BISECTS these, so a run is about seven cpfe
+# invocations rather than %d.
+""" % (len(cand), len(good), len(cand) - len(good), len(good)))
+out = root / 'sys/lib/tests/cxx-vecsplit.cuts'
+out.write_text(hdr + '\n'.join(map(str, good)) + '\n')
+print('cxxlib-host: %d candidates, %d validated -> %s'
+      % (len(cand), len(good), out))
+PYEOF
+	exit $?
+	;;
 --run)
 	# **THE SHIM FORWARDS TO ABSOLUTE PATHS**, so `-I' cannot
 	# redirect this at a modified copy of the library: a control
