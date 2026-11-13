@@ -1584,6 +1584,27 @@ silent:
   answer neither) and `trim_mem_block` records each sub-block's parent,
   because a carved header sits exactly ONE BYTE PAST the parent's
   payload and a reused parent re-bumps from `start_of_block`.
+  ***AND THE RINGS WRAPPED — 1647 LINKS AND 1094 CARVES INTO 256
+  SLOTS.*** A sizing error of mine, and **the untruncated count is what
+  made it legible**: a silent wrap would have read as "prev was never
+  linked", a completely different finding with no way to tell it apart.
+  4096 now. *The numbers beside it are the keeper*: the chain faults at
+  entry 13 and pushes go at the HEAD, so entry 13 is the thirteenth
+  most recent surviving link — `prev` should have been inside even a
+  256-slot window, so the next run separates THREE things, the third
+  being "absent from a ring that did not wrap", i.e. prev reached that
+  chain by some route other than `alloc_mem_block`. It also dumps the
+  last two dozen region-0 links in order, which reconstructs the top of
+  the chain **from a record the teardown loop never touches**.
+  ***AND THE BAD VALUE IS IDENTICAL IN EVERY RUN WHILE EVERY ADDRESS
+  MOVES***: `0x0003f4a1` from four binaries whose `pc` differs
+  (`0x9da331`/`0x9da39d`/`0x9da451`), whose heap sits elsewhere each
+  time, and whose `prev` was `0x03c9f2c8` then `0x03ca16c8`. **A value
+  stable across builds while the addresses around it are not is not an
+  address** — it is computed from the input, which is fixed. 259233: a
+  count, a length or an index. *That sharpens "stale front-end data"
+  rather than contradicting it*, and is why the parent ring is worth
+  having.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.

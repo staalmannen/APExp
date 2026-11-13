@@ -279,6 +279,18 @@ echo
 # the kind of value that memory would hold as STALE FRONT-END DATA, not
 # a mangled pointer.
 #
+# ***AND THE VALUE IS THE SAME IN EVERY RUN WHILE EVERY ADDRESS MOVES.***
+# `0x0003f4a1' has now come back from four cpfe binaries whose `pc'
+# differs (0x9da331, 0x9da39d, 0x9da451), whose heap sits at a
+# different offset each time, and whose `prev' was 0x03c9f2c8 then
+# 0x03ca16c8.  **A value that is stable across builds while the
+# addresses around it are not is not an address** -- it is something
+# computed from the input, which is itself fixed: a count, a length, an
+# index.  259233 in decimal.  *That is consistent with "stale
+# front-end data" and sharpens it*: the memory was last written by
+# something that stores a count there, which is what makes the parent
+# ring worth having.
+#
 # That leaves exactly two explanations, and they are distinguished by
 # what the field held at LINK time:
 #
@@ -295,22 +307,54 @@ echo
 {
 	echo 'p = *edg_dbg_prev'
 	echo 'print("link ring: ", *edg_dbg_link_n\D, " links recorded")'
-	echo 'if *edg_dbg_link_n > 256 then { print("  (WRAPPED -- only the last 256 are present)"); }'
-	echo 'print("\ntrim ring: ", *edg_dbg_trim_n\D, " carves recorded\n\n")'
+	echo 'if *edg_dbg_link_n > 4096 then { print("  (WRAPPED -- only the last 4096 are present)"); }'
+	echo 'print("\ntrim ring: ", *edg_dbg_trim_n\D, " carves recorded")'
+	echo 'if *edg_dbg_trim_n > 4096 then { print("  (WRAPPED)"); }'
+	echo 'print("\n\n")'
 	echo 'i = 0'
-	echo 'while i < 256 do {
+	echo 'while i < 4096 do {
 		if *(edg_dbg_link_hdr+i*8) == p then {
 			print("  LINKED  slot ", i\D, " hdr=", p\X, " next-read-back=", *(edg_dbg_link_next+i*8)\X, " region=", *(edg_dbg_link_rn+i*4)\D, "\n");
 		};
 		i = i+1;
 	}'
 	echo 'i = 0'
-	echo 'while i < 256 do {
+	echo 'while i < 4096 do {
 		if *(edg_dbg_trim_new+i*8) == p then {
 			print("  CARVED  slot ", i\D, " parent=", *(edg_dbg_trim_par+i*8)\X, "\n");
 		};
 		i = i+1;
 	}'
+} | acid $crashpid
+
+# ***THE CHAIN AS BUILT, which is the thing the teardown walk destroys.***
+# Pushes go at the HEAD, so the Nth entry of the chain is the Nth most
+# recent surviving link to that region -- and the fault is at entry 13.
+# Printing the last two dozen region-0 links in order therefore
+# reconstructs the top of the chain from a record the loop never
+# touches, and `prev' should be among them.  **If it is not, prev
+# reached that chain by some route other than `alloc_mem_block'**,
+# which is a finding in itself and not a failed read.
+echo
+echo 'cxx-vecacid: the last region-0 links, newest last'
+echo
+{
+	echo 'n = *edg_dbg_link_n'
+	echo 'lo = n - 4096'
+	echo 'if lo < 0 then { lo = 0; }'
+	echo 'k = n - 1'
+	echo 'shown = 0'
+	echo 'while k >= lo do {
+		i = k & 4095;
+		if *(edg_dbg_link_rn+i*4) == 0 then {
+			if shown < 24 then {
+				print("  link ", k\D, " hdr=", *(edg_dbg_link_hdr+i*8)\X, " next-read-back=", *(edg_dbg_link_next+i*8)\X, "\n");
+				shown = shown+1;
+			};
+		};
+		k = k-1;
+	}'
+	echo 'print("printed ", shown\D, " region-0 links, newest first\n")'
 } | acid $crashpid
 
 echo
@@ -320,7 +364,7 @@ echo
 	echo 'p = *edg_dbg_prev'
 	echo 'par = 0'
 	echo 'i = 0'
-	echo 'while i < 256 do { if *(edg_dbg_trim_new+i*8) == p then { par = *(edg_dbg_trim_par+i*8); }; i = i+1; }'
+	echo 'while i < 4096 do { if *(edg_dbg_trim_new+i*8) == p then { par = *(edg_dbg_trim_par+i*8); }; i = i+1; }'
 	echo 'if par == 0 then { print("prev is in no trim slot -- either it was never carved, or the ring wrapped\n"); }'
 	echo 'if par != 0 then { print("parent ", par\X, " next=", *par\X, " start=", *(par+8)\X, " avail=", *(par+16)\X, " end=", *(par+24)\X, " msize=", *(par+32)\X, "\n"); }'
 	echo 'if par != 0 then { print("prev header at ", p\X, ", parent after_end_of_block ", *(par+24)\X, " -- EQUAL means the carve is still intact\n"); }'

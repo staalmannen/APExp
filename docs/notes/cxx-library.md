@@ -1224,3 +1224,52 @@ a parent is ever handed out again from the reusable list, its
 through its payload again. Whether that can reach the header of a
 sub-block still live on a region chain is a question the ring answers and
 reading does not.
+
+### The rings wrapped, and the counts are the finding
+
+```
+link ring: 1647 links recorded   (WRAPPED -- only the last 256 are present)
+trim ring: 1094 carves recorded
+prev is in no trim slot -- either it was never carved, or the ring wrapped
+```
+
+256 was far too small and that is my sizing error, not a subtlety. **The
+untruncated count is what made it legible**: a ring that wrapped
+silently would have read as *"prev was never linked"*, which is a
+completely different finding and one there would have been no way to
+tell apart. 4096 now, which covers 1647 and 1094 with room, and the same
+line still reports a wrap if one ever happens.
+
+**But the numbers beside it are worth keeping.** 1647 links and 1094
+carves against a chain that faults at **entry 13** — and pushes go at the
+head, so entry 13 is the *thirteenth most recent surviving link* to
+region 0. Unless hundreds of links went to region 1 after it, `prev`
+should have been inside even a 256-entry window. So the next run
+distinguishes three things rather than two: a correct read-back (a later
+overwrite), a wrong one (the store never happened), and **absent from a
+4096-entry ring that did not wrap** — which would say `prev` reached that
+chain by some route other than `alloc_mem_block`, and is a finding in
+itself.
+
+The run also adds a dump of the last two dozen region-0 links in order,
+newest first. That reconstructs the top of the chain **from a record the
+teardown loop never touches**, which is the one thing the post-mortem
+walk cannot do.
+
+### The bad value is identical in every run while every address moves
+
+`0x0003f4a1` has now come back from **four** cpfe binaries. Their `pc`
+differs (`0x9da331`, `0x9da39d`, `0x9da451`), the heap sits at a
+different offset each time, and `prev` was `0x03c9f2c8` in one run and
+`0x03ca16c8` in the next.
+
+**A value that is stable across builds while the addresses around it are
+not is not an address.** It is something computed from the input, and the
+input is fixed — twelve lines plus about 6400 lines of headers. 259233 in
+decimal: a count, a length, or an index.
+
+That is consistent with "stale front-end data" and sharpens it. The eight
+bytes at `prev` were last written by something that stores a *count*
+there — which is exactly why the parent ring is worth having: a carved
+sub-block's header sits one byte past its parent's payload, and a parent
+handed out again re-bumps from `start_of_block` through that payload.
