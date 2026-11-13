@@ -6789,8 +6789,21 @@ _ZN3edg30mem_alloc_history_entries_usedE = _ZN3edg32num_of_mem_alloc_history_ent
 #line 574
 return __144429_14_addr;
 }
+/*
+ * APExp: the link and trim rings.  See the recording sites below and
+ * the comment on `edg_dbg_cur' in `free_memory_region'.
+ */
+void *edg_dbg_link_hdr[256];
+void *edg_dbg_link_next[256];
+long edg_dbg_link_rn[256];
+long edg_dbg_link_n;
+
+void *edg_dbg_trim_new[256];
+void *edg_dbg_trim_par[256];
+long edg_dbg_trim_n;
+
 #line 635
-_ZN3edg22a_mem_block_header_ptrE _ZN3edg15alloc_mem_blockEiyPcb( _ZN3edg22a_memory_region_numberE __144539_63_region_number, 
+_ZN3edg22a_mem_block_header_ptrE _ZN3edg15alloc_mem_blockEiyPcb( _ZN3edg22a_memory_region_numberE __144539_63_region_number,
 _ZN3edg8sizeof_tE __144540_63_min_size, 
 char *__144541_64_desired_addr, 
 _ZN3edg9a_booleanE __144542_63_small_extension)
@@ -6888,6 +6901,26 @@ __144667_1_have_hdr:;
 #line 776
 (__144552_26_hdr->next) = (_ZN3edg16mem_region_tableE[__144539_63_region_number]);
 (_ZN3edg16mem_region_tableE[__144539_63_region_number]) = __144552_26_hdr;
+/*
+ * APExp: record every link into a region chain, READING THE FIELD BACK
+ * rather than recording what was meant to be stored.  That is the
+ * whole point: it separates the two remaining explanations for a
+ * chain link holding 0x3f4a1, which no amount of reading can.
+ *
+ *	the store never happened ...... ring_next[i] is also wrong
+ *	something overwrote it later ... ring_next[i] is correct
+ *
+ * The ring is 256 entries and `edg_dbg_link_n' is the untruncated
+ * count, so a wrap is visible rather than silent.  `edg_dbg_link_reuse'
+ * says whether the header came off the reusable list (`msize' 0, the
+ * `have_hdr' path) or was freshly malloc'd, because the reuse path
+ * skips re-initialising `malloc_size', `start_of_block' and
+ * `after_end_of_block' -- and the block that failed had `msize' 0.
+ */
+edg_dbg_link_hdr[edg_dbg_link_n & 255] = (void *)__144552_26_hdr;
+edg_dbg_link_next[edg_dbg_link_n & 255] = (void *)(__144552_26_hdr->next);
+edg_dbg_link_rn[edg_dbg_link_n & 255] = (long)__144539_63_region_number;
+edg_dbg_link_n = edg_dbg_link_n + 1;
 ;
 return __144552_26_hdr;
 }
@@ -6968,6 +7001,17 @@ __144744_26_new_hdr = ((_ZN3edg22a_mem_block_header_ptrE)__144745_27_alloc_addr)
 _ZN34_INTERNAL_12_mem_manage_c_b0d968923edg20reusable_blocks_listE = __144744_26_new_hdr;
 
 (__144738_44_hdr->after_end_of_block) = __144745_27_alloc_addr;
+/*
+ * APExp: which parent each carved sub-block came out of.  The block
+ * whose link failed had `malloc_size' 0, i.e. it was carved here, and
+ * **its header sits exactly AT the parent's new `after_end_of_block'**
+ * -- one byte past the parent's payload.  So "did the parent get
+ * handed out again and bump over it" is a question this ring can
+ * answer and reading cannot.
+ */
+edg_dbg_trim_new[edg_dbg_trim_n & 255] = (void *)__144744_26_new_hdr;
+edg_dbg_trim_par[edg_dbg_trim_n & 255] = (void *)__144738_44_hdr;
+edg_dbg_trim_n = edg_dbg_trim_n + 1;
 }
 (__144738_44_hdr->trimmed) = ((_ZN3edg14a_byte_booleanE)1);
 ; 

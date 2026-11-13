@@ -1563,6 +1563,27 @@ silent:
   refuted if `cur << 8` is nowhere near the heap or `prev` is far from
   it. *Guessed from arithmetic on the symptom, which is weaker than
   guessing from code.*
+  ***AND THE RECORDER ANSWERED AND REFUTED IT ON ITS FIRST DATUM.***
+  `rn=0`, **`n=13`**, `cur=0x0003f4a1`, `prev=0x03c9f2c8`,
+  `prev2=0x03cdcd50` — twelve links read correctly through the SAME
+  instruction before the thirteenth was not, where a load generated one
+  byte high would have been wrong on the first. *And the refutation
+  condition I wrote down is not the one that fired*, which is the part
+  to notice: the stated condition was the weaker test. **Two things
+  corroborated**: `prev->next` now reads `prev2` exactly as
+  `free_mem_block`'s push order predicts, confirming the reusable-list
+  reading from the other side, and `rn` is measured rather than taken
+  from `lstk()`. **`prev` is a CARVED sub-block** — `msize` 0,
+  `trimmed` 1, payload full to within eight bytes, header preceded by
+  live-looking data (a pointer, `9`, a pointer, `0x4d1b`) — so
+  `0x3f4a1` is **stale front-end data**, not a mangled pointer. That
+  leaves two explanations, separated by what the field held at LINK
+  time: a store that never happened makes the ring's read-back wrong
+  too, a later overwrite leaves it right. `alloc_mem_block` now records
+  every link **reading the field back** (recording the intent would
+  answer neither) and `trim_mem_block` records each sub-block's parent,
+  because a carved header sits exactly ONE BYTE PAST the parent's
+  payload and a reused parent re-bumps from `start_of_block`.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
