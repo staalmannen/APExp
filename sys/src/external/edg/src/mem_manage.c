@@ -7153,14 +7153,54 @@ return __145059_9_ptr;
 
 
 
+/*
+ * APExp: four globals so that a fault in the walk below can be read
+ * afterwards.  ***THE LOOP DESTROYS ITS OWN EVIDENCE***:
+ * `free_mem_block' overwrites `hdr->next' (it pushes the block onto
+ * `reusable_blocks_list'), and `mem_region_table[rn]' is cleared only
+ * AFTER the loop -- so a post-mortem walk from the table head follows
+ * the REUSABLE LIST and not the region chain.  `cxx-vecacid' did
+ * exactly that and printed 33 perfectly healthy entries about the
+ * wrong object.
+ *
+ * These cost one store each per block freed, no formatting and no
+ * output, and they are read with `acid' after the fault:
+ *
+ *	edg_dbg_cur   the hdr the loop is about to dereference -- i.e.
+ *	              the bad value itself when it faults
+ *	edg_dbg_prev  the block whose `next' field produced it.  That
+ *	              field has since been overwritten, but knowing
+ *	              WHICH block it is gives its size, its position in
+ *	              the chain and its neighbourhood in memory.
+ *	edg_dbg_prev2 the one before that, for the same reason.
+ *	edg_dbg_n     how far down the chain the fault is.
+ *	edg_dbg_rn    which region, measured rather than inferred from
+ *	              `lstk()', whose first parameter is always garbage
+ *	              on amd64.
+ */
+void *edg_dbg_cur;
+void *edg_dbg_prev;
+void *edg_dbg_prev2;
+long edg_dbg_n;
+long edg_dbg_rn;
+
 void _ZN3edg18free_memory_regionEi( _ZN3edg22a_memory_region_numberE __145089_48_region_number)
 #line 1191
 {
 auto _ZN3edg22a_mem_block_header_ptrE __145096_26_hdr; auto _ZN3edg22a_mem_block_header_ptrE __145096_31_next_hdr;
 
 ;
+edg_dbg_rn = (long)__145089_48_region_number;
+edg_dbg_n = 0;
+edg_dbg_cur = (void *)0;
+edg_dbg_prev = (void *)0;
+edg_dbg_prev2 = (void *)0;
 #line 1207
 for (__145096_26_hdr = (_ZN3edg16mem_region_tableE[__145089_48_region_number]); __145096_26_hdr != ((_ZN3edg22a_mem_block_header_ptrE)0); ) {
+edg_dbg_prev2 = edg_dbg_prev;
+edg_dbg_prev = edg_dbg_cur;
+edg_dbg_cur = (void *)__145096_26_hdr;
+edg_dbg_n = edg_dbg_n + 1;
 __145096_31_next_hdr = (__145096_26_hdr->next);
 _ZN34_INTERNAL_12_mem_manage_c_b0d968923edg14free_mem_blockEPNS0_18a_mem_block_headerE(__145096_26_hdr);
 __145096_26_hdr = __145096_31_next_hdr;

@@ -1537,6 +1537,32 @@ silent:
   garbage on amd64. It is 0 because `fe_wrapup.c:854` passes a literal
   0 and `acid` resolved the call site to `fe_wrapup+0x109`; *the source
   is what says so, not the debugger.*
+  ***AND THEN THE WALK RAN AND ANSWERED ABOUT THE WRONG OBJECT.***
+  **33 entries in perfect order** — `start` exactly `hdr+0x30`, each
+  entry's `end` equal to the NEXT entry's `hdr`, `msize` 0 for a block
+  carved by `trim_mem_block` and 0x10000 for its parent. **It is not
+  the region chain**: `free_mem_block` pushes every visited block onto
+  `reusable_blocks_list`, *overwriting `hdr->next`*, and the table head
+  is cleared only AFTER the loop — so a post-mortem walk from
+  `mem_region_table[0]` follows blocks already freed. ***The loop
+  destroys its own evidence as it goes***, so NO post-mortem walk can
+  name the bad entry however carefully written. *The third time in
+  this hunt that an instrument answered confidently about something
+  adjacent to the question.* **What it does establish**: 33 well-formed
+  headers and a sane table say the heap is not generally scribbled,
+  which corroborates `malloc-xcheck` from inside the real process. So
+  `free_memory_region` now RECORDS five globals as it walks —
+  `edg_dbg_cur`/`prev`/`prev2`/`n`/`rn`, five stores per block, no
+  output — and `cxx-vecacid` reads them first. **`rn` is there because
+  `lstk()` cannot say**, and `prev`'s own `next` is overwritten by
+  then, so only its IDENTITY survives.
+  **A prediction with its refutation, written before the run**: the
+  three bad values across three builds (`0x3f4cd`, `0x3f4a9`,
+  `0x3f4a1`) each shifted LEFT BY EIGHT land just above the live
+  blocks, so the value may be a heap pointer **read one byte late**;
+  refuted if `cur << 8` is nowhere near the heap or `prev` is far from
+  it. *Guessed from arithmetic on the symptom, which is weaker than
+  guessing from code.*
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.

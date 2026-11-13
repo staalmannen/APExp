@@ -1117,3 +1117,53 @@ failure has the real crash's exact shape — `msize 0 start (nil) end
 
 *Neither fault was visible in a green run.* The clean run looked the
 same before and after.
+
+### The walk answered, about the wrong object — the loop destroys its own evidence
+
+`cxx-vecacid`'s chain walk ran and printed **33 entries in perfect
+order**: `start` exactly `hdr+0x30`, each entry's `end` equal to the
+*next* entry's `hdr`, `msize` 0 for a block carved by `trim_mem_block`
+and `0x10000` for its parent. That is not what a chain containing
+`0x3f4a1` looks like.
+
+**It is not the region chain.** `free_mem_block` (`mem_manage.c:817`)
+pushes each visited block onto `reusable_blocks_list`, which *overwrites
+`hdr->next`*, and `mem_region_table[rn]` is cleared only **after** the
+loop. So once the loop has faulted, the table head still points at block
+0 — whose `next` now points into the reusable list. A post-mortem walk
+from the table head follows blocks that were already freed.
+
+*The loop destroys its own evidence as it goes.* No post-mortem walk can
+name the bad entry, however carefully it is written. **A healthy chain,
+printed about the wrong object** — the third time in this hunt that an
+instrument answered confidently about something adjacent to the question.
+
+What the run does establish is worth keeping: 33 well-formed headers say
+the heap is not generally scribbled, which is independent corroboration
+of `malloc-xcheck`'s clean result from inside the real process. The
+table is sane too — `size_of_mem_region_table` 2048, `table[0]` and
+`table[1]` live, `table[2..7]` zero, and the eight words around the
+buffer hold nothing resembling allocator bookkeeping.
+
+So `free_memory_region` now records five globals as it walks —
+`edg_dbg_cur` (the hdr about to be dereferenced, i.e. the bad value),
+`edg_dbg_prev` and `edg_dbg_prev2`, `edg_dbg_n` (how far down the chain)
+and `edg_dbg_rn` (which region, **measured**, since `lstk()` cannot say:
+`region_number` is the first parameter and the first parameter is always
+garbage here). Five stores per block freed, no formatting, no output,
+read with acid after the fault. `prev`'s own `next` is overwritten by
+then, so its *value* is gone and only its identity survives — which is
+why the raw words around it are dumped beside it.
+
+**A prediction, with its refutation condition, written before the run.**
+The heap here runs about `0x01c00000`–`0x03e00000`. The three bad values
+recorded across three builds are `0x3f4cd`, `0x3f4a9`, `0x3f4a1`, and
+each shifted left by eight lands at `0x03f4cd00`, `0x03f4a900`,
+`0x03f4a100` — just above the live blocks, where a freshly grown break
+would be. Little-endian, that is the same byte sequence **read one byte
+late**. So: the bad value is a heap pointer read one byte high, and
+`edg_dbg_prev` will sit near `edg_dbg_cur << 8`. Refuted if
+`cur << 8` is nowhere near the heap, if `prev` is far from it, or if
+`prev`'s raw words show an ordinary header with a plainly different
+value in its first slot. *It is guessed from arithmetic on the symptom,
+which is weaker than guessing from code, and is labelled so.*

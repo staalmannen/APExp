@@ -43,7 +43,19 @@
 # above is still true and none of it was ever about the right phase.
 #
 # What the ladder is for NOW is one question: **which entry of the
-# chain is bad.**  See the walk at the bottom.
+# chain is bad.**
+#
+# ***AND A POST-MORTEM WALK CANNOT ANSWER IT, WHICH TOOK A RUN TO
+# LEARN.***  `free_mem_block' pushes every visited block onto
+# `reusable_blocks_list', overwriting its `next'; the table head is
+# cleared only after the loop.  So walking from `mem_region_table[0]'
+# after the fault follows the reusable list, and the run that did so
+# printed **33 flawless entries** -- `start' exactly `hdr+0x30', each
+# `end' equal to the next entry's `hdr', `msize' 0 for a carved
+# sub-block and 0x10000 for its parent.  *A healthy chain, about the
+# wrong object.*  **The loop destroys its own evidence as it goes**,
+# which is why `free_memory_region' now records five globals and this
+# script reads them first.
 #
 # A note on the printing: acid's `\X' is 32-bit hex, so every value
 # here is displayed truncated to its low half.  That is harmless
@@ -184,6 +196,75 @@ echo
 # inside `{ }' acid terminates every statement with `;', the final one
 # included, and `n = n+1' without it answers
 # `syntax error, near symbol '1''.
+# ---- the recorder, which is the only thing that can name the entry ----
+# `free_memory_region' now stores five globals as it walks (the APExp
+# patch at `mem_manage.c:1191'), because **the walk overwrites every
+# link it has passed** -- see the note above the reusable-list dump.
+#
+#	edg_dbg_cur    the hdr it was about to dereference: the BAD VALUE
+#	edg_dbg_prev   the block whose `next' produced it
+#	edg_dbg_prev2  the one before that
+#	edg_dbg_n      how far down the chain the fault is
+#	edg_dbg_rn     which region, MEASURED -- `lstk()' cannot say,
+#	               since `region_number' is the first parameter and
+#	               the first parameter is always garbage here.
+#
+# `prev' is the finding: its size, its `msize' (0 means a sub-block
+# carved out of another by `trim_mem_block', non-zero a whole
+# allocation) and the bytes around it say what kind of block had a
+# corrupt link.  Its own `next' has been overwritten by then, so the
+# VALUE is gone and only the identity survives -- which is why the raw
+# bytes are dumped beside it.
+#
+# ***A PREDICTION, WRITTEN DOWN BEFORE THE RUN, WITH ITS REFUTATION.***
+# The heap in this process runs about 0x01c00000 to 0x03e00000 (the
+# table buffer is 0x01c5bb30, the live blocks 0x03d4xxxx-0x03dbxxxx).
+# `0x3f4a1' is `0x0003f4a1', and the three values recorded across three
+# builds are 0x3f4cd, 0x3f4a9, 0x3f4a1 -- each of which, SHIFTED LEFT BY
+# EIGHT, lands at 0x03f4cd00, 0x03f4a900, 0x03f4a100: just above the
+# live blocks, exactly where a freshly grown break would be.  Little-
+# endian, that is the same byte sequence read ONE BYTE LATE.
+#
+# So the prediction is: **the bad value is a heap pointer read one byte
+# high**, and `edg_dbg_prev' will sit near `edg_dbg_cur << 8'.
+#
+# *What refutes it*: `edg_dbg_cur << 8` nowhere near the heap, or
+# `edg_dbg_prev' far from it, or a `prev' whose raw words show an
+# ordinary header with a plainly different value in its first slot.
+# **It is a guess from three numbers and is labelled one** -- this
+# tree's recorded tally for mechanisms guessed from code alone is about
+# one in eight, and this is weaker than that, being guessed from
+# arithmetic on the symptom.
+#
+# ***IT NEEDS A REBUILD TO MEAN ANYTHING.***  Against a cpfe built
+# before the patch the names do not resolve and acid says so; against
+# one built after, `edg_dbg_n' is non-zero.  **A zero `edg_dbg_n' with
+# the names resolving is a cpfe that crashed somewhere else entirely**,
+# which is a different finding and not a failed read.
+echo
+echo 'cxx-vecacid: the recorder (needs an edg rebuild -- see the script)'
+echo
+{
+	echo 'print("edg_dbg_rn    = ", *edg_dbg_rn\D, "\n")'
+	echo 'print("edg_dbg_n     = ", *edg_dbg_n\D, "\n")'
+	echo 'print("edg_dbg_cur   = ", *edg_dbg_cur\X, "   (the bad value)\n")'
+	echo 'print("edg_dbg_prev  = ", *edg_dbg_prev\X, "   (its source)\n")'
+	echo 'print("edg_dbg_prev2 = ", *edg_dbg_prev2\X, "\n")'
+} | acid $crashpid
+
+echo
+echo 'cxx-vecacid: the two blocks before the fault, and the bytes at prev'
+echo
+{
+	echo 'p = *edg_dbg_prev'
+	echo 'q = *edg_dbg_prev2'
+	echo 'if p != 0 then { print("prev  ", p\X, " next=", *p\X, " start=", *(p+8)\X, " avail=", *(p+16)\X, " end=", *(p+24)\X, " msize=", *(p+32)\X, "\n"); }'
+	echo 'if q != 0 then { print("prev2 ", q\X, " next=", *q\X, " start=", *(q+8)\X, " avail=", *(q+16)\X, " end=", *(q+24)\X, " msize=", *(q+32)\X, "\n"); }'
+	echo 'print("\nraw words from prev-32 to prev+48:\n")'
+	echo 'i = 0-4'
+	echo 'if p != 0 then { while i < 6 do { print("  ", (p+i*8)\X, ": ", *(p+i*8)\X, "\n"); i = i+1; }; }'
+} | acid $crashpid
+
 echo
 echo 'cxx-vecacid: the region table itself'
 echo
@@ -195,8 +276,27 @@ echo
 	echo 'while i < 8 do { print("  table[", i\D, "] = ", *(t+i*8)\X, "\n"); i = i+1; }'
 } | acid $crashpid
 
+# ***THE WALK BELOW DOES NOT WALK THE REGION CHAIN, AND THE LAST RUN
+# PROVED IT BY ANSWERING.***  It printed 33 entries in perfect order --
+# `start' exactly `hdr+0x30', each entry's `end' equal to the NEXT
+# entry's `hdr', `msize' 0 for a block carved by `trim_mem_block' and
+# 0x10000 for its parent -- which is not what a chain containing
+# `0x3f4a1' looks like.
+#
+# **`free_mem_block' OVERWRITES `hdr->next'**: it pushes each visited
+# block onto `reusable_blocks_list' (`mem_manage.c:817'), and
+# `mem_region_table[rn]' is cleared only AFTER the loop.  So once the
+# loop has faulted, the table head still points at block 0 whose `next'
+# now points into the REUSABLE LIST.  *The loop destroys its own
+# evidence as it goes*, and every entry this prints is a block already
+# freed or one that was on the reusable list before the loop started.
+#
+# It is kept because it is a useful SANITY CHECK on the allocator -- 33
+# well-formed headers say the heap is not generally scribbled -- but it
+# cannot name the bad entry and is labelled so.  The globals read above
+# are what name it.
 echo
-echo 'cxx-vecacid: walking mem_region_table[0] -- which entry is bad?'
+echo 'cxx-vecacid: the reusable list (NOT the region chain -- see above)'
 echo
 {
 	echo 't = *_ZN3edg16mem_region_tableE'
@@ -204,7 +304,7 @@ echo
 	echo 'n = 0'
 	echo 'while h != 0 do {
 		if h < 0x100000 then {
-			print(n\D, " hdr=", h\X, "   <-- NOT A HEAP POINTER: THIS entry is the bad one\n");
+			print(n\D, " hdr=", h\X, "   <-- not a heap pointer\n");
 			h = 0;
 		};
 		if h != 0 then {
@@ -212,8 +312,8 @@ echo
 			h = *h;
 		};
 		n = n+1;
-		if n > 32 then {
-			print("stopping at 32 entries\n");
+		if n > 12 then {
+			print("stopping at 12 entries\n");
 			h = 0;
 		};
 	}'
@@ -235,10 +335,11 @@ echo 'cxx-vecacid:   acid '^$crashpid
 echo 'cxx-vecacid:   acid: regs()'
 echo 'cxx-vecacid:   acid: stk()'
 echo 'cxx-vecacid:   acid: src(*PC)'
-echo 'cxx-vecacid:   acid: t = *_ZN3edg16mem_region_tableE'
-echo 'cxx-vecacid:   acid: h = *t'
-echo 'cxx-vecacid:   acid: while h != 0 do { print(h\X, "\n"); h = *h; }'
-echo 'cxx-vecacid: note *table is the BUFFER and **table is entry 0, and'
-echo 'cxx-vecacid: remember lstk()''s first argument is garbage here.'
+echo 'cxx-vecacid:   acid: print(*edg_dbg_n\D, " ", *edg_dbg_cur\X, " ", *edg_dbg_prev\X)'
+echo 'cxx-vecacid:   acid: p = *edg_dbg_prev'
+echo 'cxx-vecacid:   acid: print(*p\X, " ", *(p+24)\X, " ", *(p+32)\X)'
+echo 'cxx-vecacid: note *table is the BUFFER and **table is entry 0; that'
+echo 'cxx-vecacid: chain is the REUSABLE list after a fault, not the region'
+echo 'cxx-vecacid: chain; and lstk()''s first argument is garbage here.'
 rm -rf $tmp
 echo 'cxx-vecacid: done'
