@@ -287,5 +287,57 @@ cp $tmp/p.cpp /tmp/cxx-vecmin.cpp
 echo
 echo 'cxx-vecsplit: saved as /tmp/cxx-vecmin.cpp'
 echo 'cxx-vecsplit: reproduce with:  c++ -F -I'^$CXXDIR^'/vector /tmp/cxx-vecmin.cpp'
+
+# ---- phase D: decompose the culprit --------------------------------
+# **PHASE C MINIMISES THE OTHERS AND LEAVES THE LAST ONE WHOLE.**  It
+# never tries to shrink the culprit itself, so the reproducer always
+# ends with a header that may be mostly irrelevant: `niter_base.h'
+# pulls in `move_iterator.h', `reverse_iterator.h', `wrap_iter.h' and
+# two metaprogramming headers before it declares anything of its own.
+#
+# This replaces the culprit with each of ITS includes in turn.  If one
+# of them reproduces, the real last member is that file and the
+# culprit was the envelope it arrived in -- which matters here,
+# because **`reverse_iterator.h' and `wrap_iter.h' are NOT among the
+# thirteen earlier includes**, so line 28 brings in three new things
+# at once and only one of them need be the one.
+#
+# `dirname' of the culprit, because a header's own includes are
+# relative to ITS directory and not to `vector/'.  The `..' segments
+# are left for the compiler to resolve rather than normalised here:
+# `../iterator/../metaprogramming/x.h' is a perfectly good path and
+# normalising it by hand is a second thing to get wrong.
+echo
+echo 'cxx-vecsplit: phase D -- can the culprit be REPLACED by one of its own includes?'
+cdir=`{dirname $culprit}
+subs=`{sed -n 's/^[ 	]*#[ 	]*include "\(.*\)"/\1/p' $CXXDIR/vector/$culprit}
+if(~ $#subs 0)
+	echo '  '^$culprit^' includes nothing; it is already atomic'
+others=()
+for(f in $keep){
+	if(! ~ $f $culprit)
+		others=($others $f)
+}
+hit=()
+for(s in $subs){
+	buildlist $others $cdir^'/'^$s
+	k=`{try}
+	echo '  '^$cdir^'/'^$s^' -> '^$k
+	if(~ $k CRASH)
+		hit=($hit $cdir^'/'^$s)
+}
+echo
+if(~ $#hit 0){
+	echo 'cxx-vecsplit: no single include of '^$culprit^' reproduces,'
+	echo 'cxx-vecsplit: so the last member is that file''s OWN content --'
+	echo 'cxx-vecsplit: its four niter_base overloads.'
+}
+if(! ~ $#hit 0){
+	echo 'cxx-vecsplit: ***'^$culprit^' IS AN ENVELOPE***: these of its'
+	echo 'cxx-vecsplit: own includes reproduce on their own:'
+	for(h in $hit)
+		echo 'cxx-vecsplit:   '^$h
+	echo 'cxx-vecsplit: re-run to bisect further, or read that file.'
+}
 rm -rf $tmp
 echo 'cxx-vecsplit: done'

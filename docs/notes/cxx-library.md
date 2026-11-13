@@ -600,3 +600,42 @@ lines and neither the C++ library nor EDG's corpus is implicated.
 translation unit does not either — it is one `#include` and an empty
 `main`. *A probe that needed an instantiation to crash would not be
 reproducing what was measured.*
+
+### The guess was wrong: `ok`
+
+`c++ -F cxx-niterbase-probe.cpp` translates cleanly and writes
+`cxx-niterbase-probe.eccp.c`. **A self-referential trailing return
+type is not what kills `<vector>`**, and the only unusual construct in
+`niter_base.h` is cleared.
+
+*That is a real result and the reason to have taken the shot*: one
+command ruled the shape out where the alternative was reasoning about
+it for a round. The file is kept as a regression ladder — if a later
+cpfe starts refusing it, the refusal is a finding, because g++ accepts
+it both as written and when instantiated. **One in eight is the
+recorded tally for mechanisms guessed from code alone, and this one
+went the usual way.**
+
+So the fault is in the INTERACTION, which is what phase C measures.
+
+### Phase D, because phase C leaves the last member whole
+
+Phase C shrinks the thirteen earlier includes and never touches the
+culprit — so the reproducer always ends with a header that may be
+mostly irrelevant. `niter_base.h` pulls in `move_iterator.h`,
+`reverse_iterator.h`, `wrap_iter.h` and two metaprogramming headers
+before it declares anything of its own, and **`reverse_iterator.h` and
+`wrap_iter.h` are NOT among the thirteen**. Line 28 therefore brings
+in three new things at once and only one of them need be the one.
+
+Phase D replaces the culprit with each of its own includes in turn. If
+one reproduces, the real last member is that file and the culprit was
+the envelope it arrived in; if none does, the last member is
+`niter_base.h`'s own content — now known not to be the trailing-return
+shape.
+
+It resolves a sub-include against `dirname` of the culprit, because a
+header's includes are relative to ITS directory and not to `vector/`,
+and leaves the `..` segments for the compiler rather than normalising
+them by hand — `../iterator/../metaprogramming/x.h` is a good path and
+normalising it is a second thing to get wrong.

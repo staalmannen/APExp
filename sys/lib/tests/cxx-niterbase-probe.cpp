@@ -4,6 +4,20 @@
  *
  *	c++ -F cxx-niterbase-probe.cpp
  *
+ * ***ANSWERED: ok.  THE GUESS IS REFUTED AND THE SHAPE IS CLEARED.***
+ * cpfe translates this cleanly and writes
+ * `cxx-niterbase-probe.eccp.c'.  So a self-referential trailing
+ * return type is NOT what kills `<vector>', and whatever does is in
+ * the INTERACTION between `niter_base.h' and the thirteen includes
+ * above it -- which is what `cxx-vecsplit' phase C measures.
+ *
+ * *That is a real result and the reason to have taken the shot*: one
+ * command ruled out the only unusual construct in the file, and the
+ * alternative was reasoning about it for a round.  Kept as a
+ * regression ladder: if a later cpfe starts refusing this, the
+ * refusal is a finding, because g++ accepts it written and
+ * instantiated.
+ *
  * ***A PROBE, NOT A TEST.***  It asserts nothing and prints nothing.
  * The result is whether cpfe SURVIVES it:
  *
@@ -36,11 +50,11 @@
  * accepts it -- but it is the shape a front end is most likely to
  * recurse on, and it is worth one command to find out.
  *
- * ***IT IS A GUESS AND IT IS LABELLED ONE.***  This tree's honest
- * tally for mechanisms guessed from code alone is about one in eight;
- * the automated minimiser is the measurement and this is the cheap
- * shot taken while it runs.  If it answers `ok' that is a real
- * result -- it rules the shape out.
+ * ***IT WAS A GUESS AND IT WAS LABELLED ONE, AND IT WAS WRONG.***
+ * This tree's honest tally for mechanisms guessed from code alone is
+ * about one in eight, and this one went the usual way.  The
+ * automated minimiser is the measurement; this was the cheap shot
+ * taken beside it, and `ok' is what it answered.
  *
  * Checked under g++ -std=c++14 -fsyntax-only before shipping.
  */
