@@ -341,6 +341,48 @@ reports one, this is a cpfe bug on deep instantiation and a different
 investigation -- and the host cannot help with it, since g++ compiles
 the same `<vector>` on both arms.
 
+***AND THAT IS EXACTLY WHAT THE NEXT RUN SAID: `34 ok, 0 error,
+1 CRASH`.*** The prediction is refuted and the error-recovery reading
+is dead. Every header compiles, `<vector>` alone crashes cpfe at
+`fault read addr=0x3f4a9 pc=0x9d98a6`, and the seven errors were
+HIDING this rather than causing it. *The seven other headers that hit
+the identical error and did not crash were the evidence for the wrong
+conclusion*: they showed the error was not sufficient, and were read
+as showing recovery depth was.
+
+**What the two sightings do say, and it is not nothing**: `addr` is
+`0x3f4cd` and then `0x3f4a9` -- thirty-six apart, across two
+different cpfe binaries and two different inputs -- while `pc` moved
+by nearly a megabyte. *An address that stable under that much change
+is computed from the input, not from a corrupted pointer*, and
+~0x3f4xx is far too small to be a heap address and too large for a
+tag. The shape that fits is a base of zero plus a real offset:
+something indexing off a null table.
+
+**The host-built cpfe is NOT the tool for this**, and nearly became
+one: `edgbaked-xcheck`'s recorded verdict is that it is sound for
+compile-time questions and VOID at run time, because its `long` is 8
+bytes where kencc's is 4 -- so every struct layout, every folded
+`sizeof` and every offset differs. *A crash is a run-time question.*
+Half an hour had gone into a `struct stat` shim for it before that
+sentence was re-read.
+
+**`sys/lib/tests/cxx-vecnarrow` is the instrument instead**, and it
+needs no debugger. `<vector>`'s include closure is 356 files; the 34
+headers that pass between them reach 337 of those, so the finding is
+already narrow and still unreadable. The ladder has three phases and
+**phase 0 is a control** -- `<vector>` must crash under the ladder
+itself, or every clean rung below is clean for the wrong reason.
+Phase 1 compiles each of `vector/vector.h`'s 56 includes alone;
+phase 2 compiles cumulative prefixes and stops at the first that
+crashes, which names the second party to an interaction. **If both
+are clean that is itself the answer**: the fault is in
+`vector/vector.h`'s own body, below its last `#include`, which is
+about 2000 lines rather than 356 files. The include list is DERIVED
+from the file at run time and the script gates if the derivation
+comes back empty, because a transcribed list goes stale silently and
+a ladder with no rungs still prints.
+
 ### And the bisect was printing half its own evidence
 
 `cxx-bisect` used `sed 1q` on cpfe's stderr. **A cpfe diagnostic is
