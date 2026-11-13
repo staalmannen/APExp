@@ -6550,6 +6550,7 @@ extern long long write(int, const void *, unsigned long long);
 
 long edg_dbg_padchecked;
 long edg_dbg_pad_dirty;
+long edg_dbg_pad_evicted;
 
 /*
  * ***THE RING WRAPS AND `dirty=0' THEN MEANS NOTHING.***  The bigger
@@ -6664,7 +6665,23 @@ void edg_dbg_padcheck(void)
   shown = 0;
 
   edg_dbg_bufn = 0;
-  edg_dbg_puts("edg-pad: carves=0x");
+  /*
+   * ***`edg-pad2' AND `evicted' ARE A VERSION MARKER, AND THIS TREE
+   * HAS A RULE ABOUT THEM THAT I SKIPPED.***  The eviction check was
+   * added so that a wrapped ring still reports every pad -- and the
+   * next run printed `dirty=0x0' in a format IDENTICAL to the one the
+   * old binary printed, with nothing to say which code produced it.
+   * cpfe reads the C++ headers at run time, so a header fix landing is
+   * no evidence that `mem_manage.c' was rebuilt.
+   *
+   * `edg-pad2' says the eviction check exists; `evicted' says how many
+   * times it ran. **`evicted=0' with `carves' over 4096 means the
+   * binary predates it** and the `dirty' count speaks only for the
+   * 4096 slots the ring still holds.
+   */
+  edg_dbg_puts("edg-pad2: evicted=0x");
+  edg_dbg_putx((unsigned long long)edg_dbg_pad_evicted);
+  edg_dbg_puts(" carves=0x");
   edg_dbg_putx((unsigned long long)edg_dbg_trim_n);
   edg_dbg_puts(" checked=0x");
   edg_dbg_putx((unsigned long long)lim);
@@ -7426,8 +7443,10 @@ _ZN34_INTERNAL_12_mem_manage_c_b0d968923edg20reusable_blocks_listE = __144744_26
  * ring still reports every pad.  `carves=0x1051 checked=0x1000' said
  * the last run could not.
  */
-if (edg_dbg_trim_n >= 4096)
+if (edg_dbg_trim_n >= 4096) {
+  edg_dbg_pad_evicted = edg_dbg_pad_evicted + 1;
   edg_dbg_padone(edg_dbg_trim_n & 4095);
+}
 memset((void *)__144745_27_alloc_addr, 0xA5, (size_t)EDG_DBG_CARVE_PAD);
 edg_dbg_trim_new[edg_dbg_trim_n & 4095] = (void *)__144744_26_new_hdr;
 edg_dbg_trim_par[edg_dbg_trim_n & 4095] = (void *)__144738_44_hdr;

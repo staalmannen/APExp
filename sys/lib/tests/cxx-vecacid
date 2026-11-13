@@ -75,14 +75,42 @@ CXXDIR=/sys/include/ape/c++
 VEC=$CXXDIR/vector/vector.h
 MIN=/tmp/cxx-vecmin.cpp
 
+# ***IT TAKES AN INPUT FILE NOW, AND THE REASON IS THAT THE CRASH
+# MOVED.***  The split_buffer rename fix got cpfe past the three
+# errors in `cxx-library-test.cpp', and the run that followed faulted
+# at `pc=0x90c3a1 addr=0x3f4cd' -- *a different code address* from
+# `free_memory_region's `0x9da331', with `chain-bad-at = -1'.  So the
+# twelve-line reproducer is no longer the only crashing input and a
+# ladder hardwired to it cannot reach the other one.
+#
+#	./cxx-vecacid				the minimised <vector> case
+#	./cxx-vecacid cxx-library-test.cpp	any other input
+#
+# With an argument the `-I' is NOT added: the minimum is a copy of
+# `vector.h' and needs its own directory on the path, an ordinary
+# program does not, and adding it anyway would put a header directory
+# ahead of itself.
+EXTRA=()
+if(! ~ $#* 0){
+	MIN=$1
+	if(! test -f $MIN){
+		echo 'cxx-vecacid: no such file: '^$MIN >[1=2]
+		exit usage
+	}
+	echo 'cxx-vecacid: using the input named on the command line'
+}
+if(~ $#* 0){
+	EXTRA=('-I'^$CXXDIR^/vector)
+}
+
 # Prefer the file `cxx-vecsplit' phase C left behind, because that one
 # is MEASURED to crash.  Regenerating is a fallback and says so: a
 # reproducer rebuilt from a recollection is the mistake phase C itself
 # made, one round ago.
-if(test -f $MIN){
+if(~ $#* 0 && test -f $MIN){
 	echo 'cxx-vecacid: using '^$MIN^' from cxx-vecsplit'
 }
-if(! test -f $MIN){
+if(~ $#* 0 && ! test -f $MIN){
 	echo 'cxx-vecacid: no '^$MIN^'; rebuilding the known minimum'
 	echo 'cxx-vecacid: (run cxx-vecsplit first if this does not crash)'
 	echo '#ifndef PSTL_VECTOR_H' > $MIN
@@ -104,7 +132,7 @@ tmp=/tmp/cxx-vecacid.$pid
 mkdir -p $tmp
 
 echo 'cxx-vecacid: running cpfe'
-c++ -F -I$CXXDIR/vector $MIN >$tmp/out >[2]$tmp/err
+c++ -F $EXTRA $MIN >$tmp/out >[2]$tmp/err
 echo
 cat $tmp/err
 
@@ -139,6 +167,17 @@ if(~ $#crashpid 0){
 	echo 'cxx-vecacid: dirty=0 with a nonzero carve count would REFUTE the'
 	echo 'cxx-vecacid: overrun reading and say the pad merely moved the'
 	echo 'cxx-vecacid: layout -- set EDG_DBG_CARVE_PAD to 0 for upstream.'
+	echo 'cxx-vecacid:'
+	echo 'cxx-vecacid: ***BUT READ `edg-pad2:` AND `evicted=` FIRST.***  A'
+	echo 'cxx-vecacid: ring of 4096 slots cannot report a pad it has already'
+	echo 'cxx-vecacid: overwritten, so `dirty=0` beside `carves` over 4096'
+	echo 'cxx-vecacid: was an unread window rather than a zero.  The check'
+	echo 'cxx-vecacid: now runs on EVICTION too -- and the line says'
+	echo 'cxx-vecacid: `edg-pad2:` with an `evicted=` count so that an older'
+	echo 'cxx-vecacid: binary cannot answer in the newer one''s format.  A'
+	echo 'cxx-vecacid: plain `edg-pad:` line means the edg build predates'
+	echo 'cxx-vecacid: the complete scan and its dirty count speaks only'
+	echo 'cxx-vecacid: for the last 4096 carves.'
 	rm -rf $tmp
 	exit nocrash
 }
@@ -501,6 +540,14 @@ echo
 	echo 'print("walked ", n\D, " entries\n")'
 } | acid $crashpid
 
+echo
+echo 'cxx-vecacid: ***THE WALK ABOVE IS ONLY MEANINGFUL IF `stk()` NAMED'
+echo 'cxx-vecacid: `free_memory_region`.***  Read the stack first.  A crash'
+echo 'cxx-vecacid: at any other pc is a different bug reached by a'
+echo 'cxx-vecacid: different route, and for it the region chain is just'
+echo 'cxx-vecacid: whatever the allocator happens to hold -- a healthy'
+echo 'cxx-vecacid: chain printed against the wrong question is exactly'
+echo 'cxx-vecacid: what the 33-entry run was.'
 echo
 echo 'cxx-vecacid: words around the table buffer (allocator bookkeeping?)'
 echo

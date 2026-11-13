@@ -1624,3 +1624,27 @@ code address** from `free_memory_region`'s `0x9da331`. `chain-bad-at` is
 `-1`, so the region chain never went bad this time. With the eviction check
 in, the next run's `dirty` count can be read; until then that `0` is only
 the unread window.
+
+***AND THE RUN AFTER THE FIX COULD NOT BE READ, FOR A REASON THAT IS THIS
+TREE'S OWN RULE.*** The next VM run printed the three `split_buffer` errors
+gone, `carves=0x1042 checked=0x1000 chain-bad-at=-1`, `dirty=0x0`, and the
+fault still at `pc=0x90c3a1`. The three errors vanishing is real — but it
+proves the **headers** were updated, and cpfe reads those at run time, so
+it says nothing about whether `mem_manage.c` was rebuilt with the eviction
+check. **The report's format was byte-identical either way**, so `dirty=0`
+had two explanations: a complete scan that found nothing, or an old binary
+scanning only the 4096 slots the ring still held.
+
+*A version marker is the standing answer to exactly this, and this file had
+already recorded it thirteen times for libap.* The line now reads
+**`edg-pad2:`** and carries **`evicted=`**, the number of slots checked as
+they were overwritten. An `edg-pad:` line, or `evicted=0` with `carves`
+over 4096, means the dirty count is partial. *The instrument was complete
+and unreadable, which is the same thing as incomplete.*
+
+`cxx-vecacid` takes an **input file** now, because the crash moved off the
+twelve-line reproducer onto `cxx-library-test.cpp` at a different `pc`, and
+a ladder hardwired to one input cannot reach the other. It also says, after
+the region walk, that the walk means nothing unless `stk()` named
+`free_memory_region` — *a healthy chain printed against the wrong question
+is exactly what the 33-entry run was.*
