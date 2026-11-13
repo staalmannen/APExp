@@ -1665,3 +1665,49 @@ data is intact and the fault is in per-translation-unit work; the same
 `pc=0x1` means it dies before any output. The companion free marker is
 whether `--gen_c_file_name` ever creates its file. *Both are one
 command and neither depends on a format letter.*
+
+### RUNG 1 PASSES: cpfe DIAGNOSES A BAD OPTION
+
+```
+bash-5.3$ cpfe --no_such_option
+Command-line error: invalid option: --no_such_option
+
+1 catastrophic error detected in this compilation.
+Compilation terminated.
+```
+
+***THAT IS A LOT OF FRONT END.*** `main` ran; the option table and the
+message catalogue are intact and correctly indexed; the diagnostic
+formatter works; the catastrophic-error counter works; and the exit
+path works. **So the fault is after command-line processing**, and the
+whole of startup and static data is cleared in one command with no
+debugger.
+
+**`sys/lib/tests/cpfe-ladder` codifies the rest**, and like `go-ladder`
+it **does NOT gate** -- the useful output is the HIGHEST RUNG REACHED,
+which a gate throws away at rung 1. Six rungs, each adding one thing:
+a bad option (1), `--version` (2), `-E` on an empty file with no other
+flags (3), `-E` with eccp's real option set (4), `-E` over an
+`#include` (5), and a full translation (6), which is the one known to
+die.
+
+**Rungs 3 and 4 are split deliberately.** `--target win64` and
+`--clear_flag=use_predefined_macro_file` are not cosmetic -- `eccp`'s
+header records that cpfe refuses its own configuration without the
+first -- so a bare run and a full-flag run can fail for unrelated
+reasons, and conflating them would report one number for two
+questions. **Rung 1 is also INVERTED and has its own arm**: a bad
+option *must* fail, and what is being tested is that it fails by
+PRINTING, so a pass condition of "non-zero status" would be the wrong
+test.
+
+The options are real, read out of `cmd_line.c:8817-8932` rather than
+recalled: `preprocess`/`-E`, `no_line_commands`/`-P`,
+`version`/`-v`.
+
+**It is rc and has not been parse-checked**, there being no rc on the
+build host -- so it was audited against the five recorded traps
+instead: `=` quoted or `^`-concatenated everywhere, `>[2]` and never
+`2>`, no backquote that can match nothing, no `} if not` on one line,
+and GNU `grep -qE`. *Every assignment is tight, matching `cxx-bisect`,
+because that file has actually run.*
