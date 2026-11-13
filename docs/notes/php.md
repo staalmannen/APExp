@@ -1780,6 +1780,69 @@ now, and **this is the round the mirror exists for**: a `config.h`
 edit that would have cost a full VM rebuild to discover cost 52
 seconds.
 
+### AND THE CRASH IS libap's `posix_spawn`, NOT php's RECURSION
+
+The rebuild carried `ZEND_CHECK_STACK_LIMIT`, the three commands pass
+(`php -v`, `php -m`, **`php-smoke.php` 0 failures** -- the zip block
+included, so `P_tmpdir` reached php), and Phoronix still ends the same
+way. ***BUT `acid` PUT BOTH PROCESSES INSIDE ONE libap FILE***, which
+is not where the previous round's reasoning was pointing:
+
+```
+php 870: general protection violation pc=0x1665dd9
+  src -> sys/src/ape/lib/ap/process/posix_spawn.c:461
+         fchdir(a->fd), in childsetup's switch, under `case FA_FCHDIR'
+php 839: stack exception              pc=0x16657fa
+  src -> sys/src/ape/lib/ap/process/posix_spawn.c:133
+         free(l->a[i].path), in posix_spawn_file_actions_destroy
+```
+
+**php's `ext/standard/proc_open.c` uses `posix_spawn` under
+`USE_POSIX_SPAWN`**, and Phoronix shells out constantly, so this is a
+hot path rather than an odd one.
+
+***THE SHARPEST FACT IS THE OP CODE.*** `FA_FCHDIR` is **4**, and
+`proc_open.c` adds only `addclose`, `adddup2` and `addchdir` -- it
+never calls `addfchdir`. So reaching that arm at all means `a->op` was
+read out of something that is not a `Faction`. *One enum value does
+more here than either trap line*, because it rules out "the actions
+were right and a call failed".
+
+**`ZEND_CHECK_STACK_LIMIT` is not refuted by this, and it is not
+confirmed either.** It guards recursion through the **PHP VM**; a C
+recursion -- libxml2 walking a document, a `zend_hash` destructor
+chain -- never reaches the check. And `posix_spawn.c:133` is a tiny
+frame doing `free`, so the stack was *already* at its limit when that
+call pushed: **the trap names where it tipped over, not what filled
+it.** *A stack exception's line is the least informative part of it.*
+
+**Reading the library did not find the corruption, and that is stated
+rather than papered over.** `addaction` checks NULL in the right
+places and its `realloc` result is stored before use; `childsetup`
+returns early for a NULL `fa` and a NULL list; `destroy` nulls the
+slot after freeing; `fork()` is `RFENVG|RFFDG|RFPROC` with **no
+`RFMEM`**, so the child's copy is private and the obvious
+parent-frees-while-child-walks race is refuted by reading the flags;
+and php `init`s a fresh stack object on every call, which `memset`s
+the pointer to 0. *Four candidates, four cheap refutations, no
+finding.*
+
+**So the round's product is an instrument.**
+`posix-spawn-test.c` grew `test_proc_open_loop`, which reproduces
+**the CALL php makes** rather than the outcome it wants:
+`close_parentends_of_pipes`'s exact shape -- two `adddup2` then two
+`addclose`, in php's order -- then `posix_spawnp`, then `destroy`, on
+a fresh stack object, **200 times**. *Every section that existed
+before it spawns ONCE*, and a single pass has passed for as long as
+the file has existed, so repetition is the only thing in the gap.
+0 failures and 200 of 200 on glibc, which is this tree's rule about
+checking a new test against a working implementation first.
+
+**What it can and cannot say is written into the file**: a clean run
+narrows the suspect to php's own heap rather than clearing libap,
+which is why it prints the iteration count it reached instead of only
+a verdict.
+
 ### What was cleared on the way, and how
 
 The cpp pp-number fix landed in the same window and was the obvious

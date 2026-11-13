@@ -322,6 +322,120 @@ test_many_actions(void)
 	      strcmp(buf, "grown\n") == 0, buf[0] ? buf : "read nothing");
 }
 
+/*
+ * ***php's proc_open SEQUENCE, REPEATED -- and the repetition is the
+ * whole point.***
+ *
+ * Every section above spawns ONCE.  `phoronix-test-suite system-info'
+ * shells out hundreds of times and ends with two php processes dead,
+ * and `acid' put both inside this file:
+ *
+ *	php 870: general protection violation pc=0x1665dd9
+ *	   -> posix_spawn.c:461   fchdir(a->fd), inside childsetup's
+ *	                          switch, under `case FA_FCHDIR'
+ *	php 839: stack exception  pc=0x16657fa
+ *	   -> posix_spawn.c:133   free(l->a[i].path), in
+ *	                          posix_spawn_file_actions_destroy
+ *
+ * **`FA_FCHDIR' is 4 and php never adds it** -- `proc_open.c' adds
+ * only CLOSE, DUP2 and CHDIR -- so reaching that arm at all says
+ * `a->op' was read out of a Faction that is not one.  *Reading the
+ * library did not find how*, which is why this is an instrument and
+ * not a fix: `addaction', `childsetup' and `destroy' each check for
+ * NULL in the right places, `fork()' is `RFENVG|RFFDG|RFPROC' with no
+ * `RFMEM' so the child's copy is private, and php `init's a fresh
+ * stack object every call.
+ *
+ * So this reproduces **the CALL php makes**, not the outcome it wants:
+ * `close_parentends_of_pipes' is `addclose'/`adddup2' per descriptor,
+ * then `posix_spawnp', then `destroy', on a `posix_spawn_file_actions_t'
+ * that is a FRESH STACK OBJECT each time -- and all of it in a loop,
+ * because a single pass has passed for as long as this file has
+ * existed.
+ *
+ * **What it can show that one spawn cannot**: a Falist that outlives
+ * its `destroy', an `addaction' realloc that moves the array while a
+ * caller holds the old pointer, a descriptor number reused after being
+ * closed, and anything that only appears once the allocator has been
+ * churned.  **What it canNOT show** is a failure that needs php's own
+ * heap next to it; *a clean run here narrows the suspect to php rather
+ * than clearing libap*, which is the honest reading and is why the
+ * section prints the iteration count it reached.
+ *
+ * ITERATIONS is deliberately modest: this forks a process per pass and
+ * Plan 9 has five spare segment slots, so a number that makes the test
+ * itself the problem would measure the wrong thing.
+ */
+#define ITERATIONS 200
+
+static void
+test_proc_open_loop(void)
+{
+	char buf[64];
+	char *argv[2];
+	posix_spawn_file_actions_t fa;
+	pid_t pid;
+	int p[2], q[2], i, err, n, bad, lastbad;
+
+	bad = 0;
+	lastbad = -1;
+	for (i = 0; i < ITERATIONS; i++) {
+		if (pipe(p) < 0 || pipe(q) < 0) {
+			bad++;
+			lastbad = i;
+			break;
+		}
+		if (posix_spawn_file_actions_init(&fa) != 0) {
+			bad++;
+			lastbad = i;
+			close(p[0]); close(p[1]);
+			close(q[0]); close(q[1]);
+			break;
+		}
+		/*
+		 * php's `close_parentends_of_pipes' shape: dup the child
+		 * ends onto 0 and 1, close the parent ends in the child.
+		 * The ORDER is php's too -- dup2 before the closes.
+		 */
+		posix_spawn_file_actions_adddup2(&fa, q[0], 0);
+		posix_spawn_file_actions_adddup2(&fa, p[1], 1);
+		posix_spawn_file_actions_addclose(&fa, q[1]);
+		posix_spawn_file_actions_addclose(&fa, p[0]);
+
+		argv[0] = "cat";
+		argv[1] = NULL;
+		err = posix_spawnp(&pid, "cat", &fa, NULL, argv, NULL);
+
+		/* php destroys immediately after the spawn, so do that. */
+		posix_spawn_file_actions_destroy(&fa);
+
+		close(q[0]);
+		close(p[1]);
+		if (err != 0) {
+			bad++;
+			lastbad = i;
+			close(q[1]);
+			close(p[0]);
+			break;
+		}
+		write(q[1], "x\n", 2);
+		close(q[1]);
+		memset(buf, 0, sizeof buf);
+		n = read(p[0], buf, sizeof buf - 1);
+		close(p[0]);
+		reap(pid);
+		if (n != 2 || buf[0] != 'x') {
+			bad++;
+			lastbad = i;
+			break;
+		}
+	}
+	printf("  INFO completed %d of %d iterations\n",
+	       bad ? lastbad : ITERATIONS, ITERATIONS);
+	snprintf(buf, sizeof buf, "failed at iteration %d", lastbad);
+	check("php's proc_open sequence survives repetition", bad == 0, buf);
+}
+
 int
 main(void)
 {
@@ -331,6 +445,7 @@ main(void)
 	test_many_actions();
 	test_enoent();
 	test_open_failure();
+	test_proc_open_loop();
 
 	if (failures)
 		printf("\n%d failure(s)\n", failures);
