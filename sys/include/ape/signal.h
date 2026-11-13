@@ -3,6 +3,55 @@
 #pragma lib "/$M/lib/ape/libap.a"
 
 #include <sys/types.h>
+/*
+ * `<features.h>' IS FOR `__restrict', AND IT IS LOAD-BEARING RATHER
+ * THAN TIDY.  The prototypes below are spelled with `__restrict'
+ * because `restrict' is a C keyword and not a C++ one, so in C++ a
+ * bare `restrict' reads as a PARAMETER NAME and two per prototype is
+ * `duplicate parameter name'.  That much was already recorded here.
+ *
+ * ***WHAT WAS NOT TRUE IS THAT `__restrict' NEEDS NO HELP.***  It is
+ * reserved to the implementation, so nothing outside one may define
+ * it -- but being reserved does not make it a KEYWORD, and a C++
+ * compiler only has it if it chooses to.  EDG's `cpfe' enters
+ * `__restrict' only under `gnu_restrict_keyword_enabled'
+ * (`fe_init.c:54193'), which g++ and Microsoft modes set and the
+ * default C++ mode does not -- so `<csignal>' answered
+ * `signal.h, line 176: error: duplicate parameter name', the very
+ * error the `__restrict' spelling was adopted to fix.
+ *
+ * `features.h' already holds the answer and is musl's own: with
+ * neither C99 nor `__GNUC__' in play -- which is exactly C++ here --
+ * it defines `__restrict' to nothing.  `<regex.h>', `<spawn.h>' and
+ * `<sys/stat.h>' already include it for the same reason.
+ *
+ * ***AND IT IS GUARDED BY `__cplusplus' WHERE THE OTHER THREE ARE
+ * NOT, WHICH IS A DELIBERATE ASYMMETRY AND THE REASON IS MEASURED.***
+ * `features.h' does three other things besides `__restrict': it
+ * defaults `_BSD_SOURCE' and `_XOPEN_SOURCE 700' when no source macro
+ * is set, and it defines `__inline' and `_Noreturn' UNGUARDED.  Under
+ * `sys/src/external', 12 packages define `__restrict' themselves, 20
+ * define `__inline' and **68 define `_Noreturn'** -- gnulib's
+ * `config.h', which is included before any system header, so
+ * `features.h' redefines what the package just defined.
+ *
+ * That is already true of every translation unit reaching
+ * `<sys/stat.h>', `<regex.h>', `<spawn.h>' or the seven others that
+ * include `features.h' unconditionally, so it is not a new hazard --
+ * but `<signal.h>' is reached by far more C than any of them, and the
+ * C side does not need this include at all: kencc lexes `__restrict'
+ * as a keyword already (`cc/lex.c:1678').  *Widening the C build's
+ * macro environment to fix a C++ bug would be paying on the side that
+ * has no fault.*
+ *
+ * To make it unconditional, the thing to measure first is a full
+ * `mk install' with it so: the failure would be a macro redefinition
+ * in one of those 68, and it would name the package rather than this
+ * header.
+ */
+#ifdef __cplusplus
+#include <features.h>
+#endif
 
 typedef int sig_atomic_t;
 
@@ -172,6 +221,16 @@ extern int sigsuspend(const sigset_t *);
  * outside an implementation may define it -- and where a package's
  * own `cdefs.h' does (twelve do), it expands to the qualifier or to
  * nothing, which is correct either way.
+ *
+ * ***AND THAT LAST SENTENCE WAS NOT THE WHOLE ANSWER.*** Reserving a
+ * name says who may DEFINE it; it does not say any compiler has it.
+ * EDG's default C++ mode does not, so this file needed <features.h>
+ * to define it away -- see the note at the top. `<glob.h>',
+ * `<search.h>' and `<regex.h>' use the same spelling and already
+ * included `features.h'; this header was the ONE that did not, which
+ * is why `<csignal>' was the only one of the fifty C++ headers to
+ * fail on it. *The spelling was right and the prerequisite was
+ * missing.*
  */
 extern int sigwait(const sigset_t *__restrict, int *__restrict);
 extern int sigwaitinfo(const sigset_t *__restrict, siginfo_t *__restrict);

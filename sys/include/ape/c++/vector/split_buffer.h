@@ -384,12 +384,26 @@ void split_buffer<t_type, t_allocator>::M_construct_at_end(size_type num, const_
   }
 }
 
+/*
+ * `t_type' AND NOT `typename split_buffer<t_type, t_allocator>::value_type'
+ * in these two SFINAE parameters, which is not cosmetic: an
+ * out-of-class definition matches its declaration only if the
+ * template-parameter types are EQUIVALENT, and the declarations at
+ * `:197' and `:207' write `value_type', the member alias, which is
+ * `t_type'.  Spelled the long way the definition's parameter is a
+ * DEPENDENT type the compiler cannot reduce while it is still looking
+ * for the declaration to match -- so both definitions answered
+ * `no declaration matches', and `<vector>' did not compile at all.
+ * `value_type' itself cannot be used here: the member template's own
+ * parameter list is written BEFORE the `split_buffer<...>::' qualifier,
+ * so the class scope is not open yet.
+ */
 template<class t_type, class t_allocator>
 template<class t_input_iterator,
          ::std::enable_if_bool_constant_t<
            ::std::conjunction<
              vector_helper::has_exactly_input_iterator_category<t_input_iterator>,
-             ::std::is_constructible<typename split_buffer<t_type, t_allocator>::value_type,
+             ::std::is_constructible<t_type,
                                               typename ::std::iterator_traits<t_input_iterator>::reference>>,
            void *>>
 void split_buffer<t_type, t_allocator>::M_construct_at_end(t_input_iterator first, t_input_iterator last) {
@@ -401,7 +415,7 @@ template<class t_forward_iterator,
          ::std::enable_if_bool_constant_t<
            ::std::conjunction<
              ::std::has_forward_iterator_category<t_forward_iterator>,
-             ::std::is_constructible<typename split_buffer<t_type, t_allocator>::value_type,
+             ::std::is_constructible<t_type,
                                               typename ::std::iterator_traits<t_forward_iterator>::reference>>,
            void *>>
 void split_buffer<t_type, t_allocator>::M_construct_at_end(t_forward_iterator first, t_forward_iterator last) {

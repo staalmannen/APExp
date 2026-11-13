@@ -196,7 +196,7 @@ namespace function_helper {
     virtual void          destroy() noexcept                                       = 0;
     virtual void          destroy_deallocate() noexcept                            = 0;
     virtual t_return_type operator()(t_arg_types &&...)                            = 0;
-    virtual void const   *target(::std::type_info const &) const noexcept = 0;
+    virtual void const   *target(::std::typeid_token) const noexcept = 0;
     // virtual ::std::type_info const &target_type() const noexcept                             = 0;
   };
 
@@ -227,7 +227,7 @@ namespace function_helper {
     void                                 destroy() noexcept override;
     void                                 destroy_deallocate() noexcept override;
     t_return_type                        operator()(t_arg_types &&...args) override;
-    void const                          *target(::std::type_info const &) const noexcept override;
+    void const                          *target(::std::typeid_token) const noexcept override;
     // virtual ::std::type_info const     &target_type() const noexcept;
   };
 
@@ -282,8 +282,15 @@ namespace function_helper {
 
   template<class t_func_type, class t_alloc, class t_return_type, class... t_arg_types>
   void const *func<t_func_type, t_alloc, t_return_type(t_arg_types...)>::target(
-    ::std::type_info const &type_inf) const noexcept {
-    if (type_inf == ::std::typeid_wrap<t_func_type>::value()) {
+    ::std::typeid_token type_inf) const noexcept {
+    /*
+     * `typeid_token' RATHER THAN `type_info const &', and the two
+     * `typeid_wrap.h' arms both define it -- see the no-RTTI one for
+     * why.  `typeid_token_equal' rather than `==' because under RTTI
+     * one type can have more than one `type_info' OBJECT, so the
+     * comparison has to be of the objects and not of their addresses.
+     */
+    if (::std::typeid_token_equal(type_inf, ::std::typeid_wrap<t_func_type>::value())) {
       return ::std::addressof(m_f.get_target());
     }
     return nullptr;

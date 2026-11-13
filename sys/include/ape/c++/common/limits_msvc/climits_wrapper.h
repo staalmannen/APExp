@@ -12,6 +12,25 @@
 #ifndef PSTL_CLIMITS_WRAPPER_H
 #define PSTL_CLIMITS_WRAPPER_H
 
+/*
+ * `<limits.h>' IS INCLUDED HERE and was not.  This arm reads the C
+ * library's own macros, so it is the one that needs them; the gcc arm
+ * beside it reads `__SCHAR_MAX__' and friends, which the compiler
+ * predefines, and so needed nothing.  Nobody noticed because the arm
+ * was only ever selected by `_MSC_VER', where the macros had already
+ * arrived by another route -- it is reached by every compiler with no
+ * gcc macros now, which is cpfe.
+ */
+#include <limits.h>
+/*
+ * AND `<stdint.h>' FOR `WCHAR_MAX' ALONE, which `<limits.h>' does not
+ * define: C99 7.18.3 puts `WCHAR_MIN'/`WCHAR_MAX' in `<stdint.h>' and
+ * `<wchar.h>', and APExp's `stdint_generic.h:302' is where this tree
+ * answers it.  `<stdint.h>' rather than `<wchar.h>' because it is the
+ * smaller of the two and this file wants one macro from it.
+ */
+#include <stdint.h>
+
 namespace std {
 namespace numeric_limits_helper {
 

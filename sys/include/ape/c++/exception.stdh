@@ -51,14 +51,30 @@ namespace std {
                                                           __EDG_DOES_NOT_THROW;
   extern terminate_handler get_terminate() __EDG_DOES_NOT_THROW;
 
-  /* Note that get_unexpected and set_unexpected were added in C++11 and
-     removed in C++17. */
-  typedef void (*unexpected_handler)();
-  extern unexpected_handler set_unexpected(unexpected_handler)
-                                                          __EDG_DOES_NOT_THROW;
-
   __EDG_NORETURN void terminate() __EDG_DOES_NOT_THROW;
-  __EDG_NORETURN void unexpected() __EDG_DOES_NOT_THROW;
+
+  /*
+   * THE C++98 `unexpected' FAMILY IS DELIBERATELY NOT DECLARED HERE,
+   * and this is an APExp change to an EDG file rather than an
+   * omission.  `std::unexpected()', `std::set_unexpected()' and
+   * `std::unexpected_handler' were deprecated in C++11 and REMOVED in
+   * C++17 -- and C++23 gave the name back to a class template,
+   * `std::unexpected<E>', which is the error half of `std::expected'
+   * and which this library implements in
+   * `utility/expected/unexpected.h'.
+   *
+   * The two cannot coexist: a function and a class template of the
+   * same name in the same namespace is
+   * `redeclared as different kind of entity', and every header that
+   * reaches `<expected>' reaches both.  `<vector>' is one, through
+   * `memory'.
+   *
+   * Nothing can call the removed ones: `rc/bin/ape/eccp' passes
+   * `--no_exceptions' by default, and an unexpected-handler is
+   * meaningless without exception specifications, which C++17 removed
+   * too.  *Keeping a name that was withdrawn twenty years ago, at the
+   * cost of the one that replaced it, is the wrong way round.*
+   */
 
   /* std::uncaught_exception is deprecated in C++17; use
      std::uncaught_exceptions. */

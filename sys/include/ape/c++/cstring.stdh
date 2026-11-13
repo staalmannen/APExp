@@ -4,15 +4,37 @@
 // C declarations are provided by APExp libc.
 #include <string.h>
 
+/*
+ * FIVE NAMES ARE DELIBERATELY NOT RE-EXPORTED FROM `::' HERE, and the
+ * reason is that this library DEFINES them in `std' itself:
+ * `memcpy', `memmove', `memcmp' and `memset' in `memory/', and
+ * `wmemcmp' beside them.  A `using ::memcpy;' then puts the C library's
+ * declaration into the same namespace as the library's own, with the
+ * same parameter list -- `conflicts with a previous declaration', or
+ * an ambiguous call where the return types differ (`memcmp' is `int'
+ * in C and `::std::int32_t' here).
+ *
+ * **Which of the two arrives first is a property of INCLUDE ORDER**,
+ * so `<cstring>' on its own compiled and `<cstring>' after anything
+ * reaching `memory/' did not.  That is why the right fix is to
+ * include the library's own definitions from here rather than to drop
+ * the using-declarations and hope: `std::memcpy' is then this
+ * library's, always, whichever header the program included first.
+ *
+ * `sys/lib/tests/hostkencc/cxxlib-host.sh' found all five; cpfe had
+ * reported two before its hundred-error limit stopped it.
+ */
+#include "memory/memcpy.h"
+#include "memory/memmove.h"
+#include "memory/memcmp.h"
+#include "memory/memset.h"
+
 namespace std {
-using ::memcpy;
 using ::memccpy;
-using ::memmove;
 using ::strcpy;
 using ::strncpy;
 using ::strcat;
 using ::strncat;
-using ::memcmp;
 using ::strcmp;
 using ::strcoll;
 using ::strncmp;
@@ -27,7 +49,6 @@ using ::strrchr;
 using ::strspn;
 using ::strstr;
 using ::strtok;
-using ::memset;
 using ::strerror;
 using ::strlen;
 using ::strnlen;

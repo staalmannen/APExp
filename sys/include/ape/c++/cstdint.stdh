@@ -28,7 +28,28 @@ using ::uint_least8_t;
 using ::uint_least16_t;
 using ::uint_least32_t;
 using ::uint_least64_t;
-using ::imaxdiv_t;
+
+/*
+ * `imaxdiv_t' WAS HERE AND IS NOT `<cstdint>'s.  It belongs to
+ * `<cinttypes>' ([cinttypes.syn]) and `<stdint.h>' does not declare
+ * it, so the using-declaration named something that did not exist in
+ * the global namespace and `<cstdint>' failed outright.  Both cpfe
+ * and g++ say so, at this line.  `cinttypes.stdh' has it.
+ *
+ * THE EXACT-WIDTH TYPES WERE MISSING, which is the larger half: the
+ * list carried `int8_t' and `uint8_t' and then jumped to the fast and
+ * least families, so `::std::int32_t' -- the spelling this library
+ * uses throughout, e.g. `memory/memcmp.h' -- was not declared by the
+ * header that owes it.  It happened to resolve because
+ * `common/int32_t.h' defines its own; *a name that is right by a
+ * second route is still missing from the first*.
+ */
+using ::int16_t;
+using ::int32_t;
+using ::int64_t;
+using ::uint16_t;
+using ::uint32_t;
+using ::uint64_t;
 } // namespace std
 
 #endif

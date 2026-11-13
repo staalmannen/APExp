@@ -14,10 +14,22 @@
 
 #include "../../common/size_t.h"
 
-#if (defined(__clang__) || defined(_MSC_VER))
+#include "../../common/compiler_builtins.h"
+
+/*
+ * BY CAPABILITY, NOT BY COMPILER NAME.  This was
+ * `#if (defined(__clang__) || defined(_MSC_VER))' ... `#else' --
+ * i.e. "gcc" for everything that is not clang or Microsoft -- so
+ * cpfe, which is neither, reached gcc's `__integer_pack' and did not
+ * have it.  The third arm is plain C++14 and is new; see
+ * `common/compiler_builtins.h' for the whole shape.
+ */
+#if PSTL_HAS_MAKE_INTEGER_SEQ
 #  include "make_integer_seq.h"
-#else
+#elif PSTL_HAS_INTEGER_PACK
 #  include "integer_pack.h"
+#else
+#  include "make_integer_seq_generic.h"
 #endif
 
 namespace std {
