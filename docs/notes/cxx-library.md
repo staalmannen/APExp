@@ -533,3 +533,70 @@ its own right.
 The crash is **at or before `vector.h:87`** — the include block plus
 `namespace std {`. That is where the next run will bisect, and the
 answer will be one `#include` line.
+
+## Bisected to one line: `vector.h:28`, `#include "../iterator/niter_base.h"`
+
+```
+rung A  shortest prefix (through line 15) -> ok
+rung B  the whole <vector>                -> CRASH
+  cut 69 (line 1488) -> CRASH      cut 13 (line 27) -> ok
+  cut 35 (line 49)   -> CRASH      cut 15 (line 29) -> CRASH
+  cut 18 (line 32)   -> CRASH      cut 14 (line 28) -> CRASH
+  cut 9  (line 23)   -> ok
+***THE CRASH IS IN vector/vector.h BETWEEN LINE 27 AND LINE 28***
+```
+
+Seven cpfe runs over 137 cut points. Line 27 is
+`#include "../iterator/next.h"` and is clean; line 28 is
+`#include "../iterator/niter_base.h"` and crashes.
+
+***A BOUNDARY IS NOT A REPRODUCER, AND THIS ONE PARTICULARLY IS NOT.***
+`cxx-vecnarrow` phase 1 compiled `niter_base.h` **alone** and it was
+fine, so what kills cpfe is a COMBINATION of which line 28 is only the
+last member. The header is self-contained — it includes
+`move_iterator.h`, `reverse_iterator.h` and `wrap_iter.h` itself — and
+`niter_base` is declared nowhere else in the library, so the
+interaction is with one or more of the thirteen includes above it.
+
+### `cxx-vecsplit` phase C minimises it
+
+Greedy removal: drop each earlier include, keep every drop that still
+CRASHES, and **keep an include whose removal makes the file merely
+ERROR** — that outcome says the prefix stopped compiling, not that it
+stopped crashing, and the two are different answers. What comes out is
+the smallest set that reproduces, printed and saved to
+`/tmp/cxx-vecmin.cpp`. *That is the thing to read, to attach to a bug
+report and to hand to `acid`* — a boundary line is not.
+
+### And one guess, labelled as one
+
+`sys/lib/tests/cxx-niterbase-probe.cpp` is twenty lines of pure C++14
+with **no library headers at all**, capturing the one unusual shape in
+`niter_base.h`: two of its four overloads are declared with a
+**trailing return type that calls `niter_base`**.
+
+```c
+template<typename t_iterator>
+constexpr auto niter_base(::std::reverse_iterator<t_iterator> it)
+  -> decltype(::std::make_reverse_iterator(niter_base(it.base())))
+```
+
+The name is in scope from its own declarator onwards, so the overload
+set the `decltype` resolves against **includes the function being
+declared**, whose return type is the thing being computed. It
+terminates, because `it.base()` is one level less wrapped, and g++
+accepts it both as written and when instantiated — *both checked
+before shipping*. It is the shape a front end is most likely to
+recurse on.
+
+**It is a guess and the file says so.** This tree's honest tally for
+mechanisms guessed from code alone is about one in eight; the
+minimiser is the measurement and this is the cheap shot taken beside
+it. If it answers `ok` that is still a result: it rules the shape out
+and leaves the interaction. If it CRASHES, the whole bug is twenty
+lines and neither the C++ library nor EDG's corpus is implicated.
+
+**Nothing in the probe instantiates anything**, because the crashing
+translation unit does not either — it is one `#include` and an empty
+`main`. *A probe that needed an instantiation to crash would not be
+reproducing what was measured.*

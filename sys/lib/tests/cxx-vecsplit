@@ -215,5 +215,77 @@ echo 'cxx-vecsplit: ***THE CRASH IS IN vector/vector.h BETWEEN LINE'
 echo 'cxx-vecsplit: '^$from^' AND LINE '^$to^'***'
 echo
 sed -n $from^','^$to^p $VEC | sed 25q
+
+# ---- phase C: minimise ---------------------------------------------
+# **A BOUNDARY IS NOT A REPRODUCER.**  Knowing that adding one
+# `#include' turns `ok' into `CRASH' names the last straw, not the
+# bug: `cxx-vecnarrow' phase 1 compiled that same header ALONE and it
+# was fine, so what crashes cpfe is a COMBINATION and the boundary
+# line is only its final member.
+#
+# This drops the earlier includes one at a time, greedily, keeping
+# every drop that still CRASHES.  What comes out is the smallest set
+# that reproduces -- which is the thing to read, to attach to a bug
+# report, and to hand to `acid'.  **An include whose removal makes
+# the file merely ERROR is KEPT**, because that outcome says the
+# prefix stopped compiling rather than stopped crashing, and the two
+# are not the same answer.
+echo
+echo 'cxx-vecsplit: phase C -- MINIMISING the reproducer'
+keep=`{sed -n '1,'^$to^'p' $VEC | sed -n 's/^[ 	]*#[ 	]*include "\(.*\)"/\1/p'}
+if(~ $#keep 0){
+	echo '  no #include lines up to line '^$to^'; nothing to minimise'
+	rm -rf $tmp
+	echo 'cxx-vecsplit: done'
+	exit 0
+}
+culprit=$keep($#keep)
+echo '  last include before the crash: '^$culprit
+echo '  starting from '^$#keep^' includes'
+
+fn buildlist {
+	rm -f $tmp/p.cpp
+	for(f in $*)
+		echo '#include "'^$CXXDIR^'/vector/'^$f^'"' >> $tmp/p.cpp
+	echo 'int main(void){ return 0; }' >> $tmp/p.cpp
+}
+
+buildlist $keep
+k=`{try}
+if(! ~ $k CRASH){
+	echo '  the includes ALONE answer '^$k^', not CRASH -- so the'
+	echo '  reproducer needs something else from the file as well'
+	echo '  (the guard, the comment block, or a later line).  Not'
+	echo '  minimising; the boundary above is the finding.'
+	rm -rf $tmp
+	echo 'cxx-vecsplit: done'
+	exit 0
+}
+cands=$keep
+for(drop in $cands){
+	if(! ~ $drop $culprit){
+		trial=()
+		for(f in $keep){
+			if(! ~ $f $drop)
+				trial=($trial $f)
+		}
+		buildlist $trial
+		k=`{try}
+		if(~ $k CRASH){
+			keep=$trial
+			echo '  dropped '^$drop
+		}
+	}
+}
+buildlist $keep
+k=`{try}
+echo
+echo 'cxx-vecsplit: ***MINIMAL REPRODUCER: '^$#keep^' include(s), '^$k^'***'
+echo
+cat $tmp/p.cpp
+cp $tmp/p.cpp /tmp/cxx-vecmin.cpp
+echo
+echo 'cxx-vecsplit: saved as /tmp/cxx-vecmin.cpp'
+echo 'cxx-vecsplit: reproduce with:  c++ -F -I'^$CXXDIR^'/vector /tmp/cxx-vecmin.cpp'
 rm -rf $tmp
 echo 'cxx-vecsplit: done'
