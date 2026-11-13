@@ -1828,8 +1828,90 @@ resting on it. It now requires a diagnostic that **names the missing
 file**, which is what distinguishes "the lexer reached its `fopen`"
 from "something else failed first".
 
-**Every crashing rung now also reports its byte count on stdout**, which
-is one more free split: cpfe emits a `#line` directive before any
-preprocessed token, so **0 bytes means it died between the open and the
-first emit, and non-zero means it died inside the output loop.** Two
-regions, one `wc`.
+**Every crashing rung now also reports its byte count on stdout.**
+***IT IS NOT A SPLIT AND THE FIRST VERSION OF THIS SENTENCE SAID IT
+WAS***: stdout there is a FILE, so it is fully buffered, and a
+preprocessed empty file is a few dozen bytes -- far under any buffer --
+so output that WAS produced dies in the buffer with the process and
+reads as 0. *This tree's own first rule about reading a log, met from
+the writing side.* It is reported because a LARGE count would still
+mean the loop ran and flushed; the question it cannot answer is the
+one it was added for. **The output FILE's existence is the version
+that works**, since `fopen` of the `--gen_c_file_name` target creates
+it whatever the buffer does, and rung 7 checks that now.
+
+## THE CRASH: EDG's OWN `struct stat` IS 88 BYTES AND libap WRITES 104
+
+***FOUND, AND MEASURED THREE WAYS.*** `cmd/edg/mkfile` passes **NO -I
+and NO -D** on purpose -- its own note is "each file declares
+everything it uses" -- so the generated corpus carries its own copy of
+the platform ABI:
+
+```c
+typedef unsigned short ino_t;
+typedef unsigned short dev_t;
+```
+
+and its own `struct stat` built from them, **member for member
+identical to `sys/include/ape/sys/stat.h`** (checked; the corpus was
+generated against APExp's own headers). **APExp widened both typedefs
+to `unsigned long long` THIS RELEASE** -- 64-bit qids, `struct stat`
+88 -> 104 -- and *a header change cannot reach a copy*.
+
+`host_envir.c:12783`'s `get_file_modification_time` is
+
+```c
+auto struct stat __150325_17_buf;
+...
+if ((stat(file_name, (&__150325_17_buf))) == 0) {
+```
+
+-- an 88-byte buffer **on the stack**, into which libap's `stat()`
+writes 104. **Sixteen bytes past the end, over the return address**,
+which is why the fault is `pc=0x1`: Plan 9 has no stack protector, so
+a smashed return address is returned to.
+
+**The numbers are from the host-built `6c`, not from arithmetic in my
+head**: EDG's struct with the old typedefs is **88**, with the new ones
+**104**, and APExp's real `<sys/stat.h>` is **104**.
+
+***AND IT ACCOUNTS FOR EVERY OBSERVATION THE LADDER HAD ALREADY
+MADE***, which is what distinguishes this from the four refuted
+readings:
+
+  - **rung 3 passes** -- a nonexistent file makes `stat()` FAIL, so
+    nothing is written and nothing is smashed, and the diagnostic
+    comes out cleanly. *The one rung that passes is the one where the
+    write does not happen.*
+  - the fault is after a successful `fopen` and before any output --
+    `get_file_modification_time` is called on the source once it is
+    found;
+  - content-independent, `-E` and full translation alike, 0 bytes out;
+  - **a full `mk install` did not move it**, because the corpus is
+    committed source and no rebuild regenerates it;
+  - it appeared in THIS release, which is when the typedefs widened.
+
+**Fixed in five files** -- `host_envir.c`, `ifc_modules_read.c`,
+`lexical.c`, `preproc.c` and `util/edg_prelink.c` -- each with the
+reason beside it. A regeneration would emit exactly those lines.
+
+**`sys/lib/tests/baketype-sweep.py` is the general form**, because this
+is a CLASS and not a one-off: any vendored package that declares an
+APExp `sys/` typedef itself has taken a copy of the ABI that no header
+change can reach. 50 such declarations disagree; **48 are inside `#if`
+arms this platform never takes** (gnulib, coreutils, diffutils) and 2
+were unguarded -- *and the sweep found the second pair*,
+`util/edg_prelink.c`, which I had missed by hand and which is not even
+built here. 0 unguarded now.
+
+***THE HOST BUILD CANNOT BE USED TO CONFIRM THIS, AND THAT IS A SECOND
+LIMIT ON IT.*** `sys/lib/tests/hostkencc/cpfe-host.sh` repairs the
+seven baked `sizeof`/`offsetof` constants and gets cpfe past
+`alloc_hash_table` -- and then dies in `get_file_modification_time`
+with glibc's stack protector, because **EDG's `struct stat` is
+APExp's, and the host's `stat()` is glibc's (144 bytes with reserved
+fields).** *A struct that is correct for the target is wrong for the
+host by construction*, so no amount of constant repair makes the host
+run past the first `stat`. The script is still worth having -- it got
+far enough to name this function, which is how the bug was found --
+but its ceiling is now known and written into it.

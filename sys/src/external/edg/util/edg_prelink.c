@@ -100,8 +100,16 @@ _ZN3edg6detail8ta_rightE};
 #line 10 "ape-arch/stddef_arch.h"
 typedef unsigned long long size_t;
 #line 16 "ape-sys/sys/types.h"
-typedef unsigned short ino_t;
-typedef unsigned short dev_t;
+/*
+ * APExp: widened with the four files under `edg/src' for the same
+ * reason -- this corpus declares its own copy of the platform ABI
+ * (`cmd/edg/mkfile' passes NO -I), so APExp's 64-bit `ino_t'/`dev_t'
+ * could not reach it and `struct stat' was 88 bytes where libap's
+ * `stat()' writes 104.  `edg_prelink' is NOT built here, but it is
+ * the same corpus and would carry the same smashed stack.
+ */
+typedef unsigned long long ino_t;
+typedef unsigned long long dev_t;
 typedef long long off_t;
 
 typedef unsigned short mode_t;
