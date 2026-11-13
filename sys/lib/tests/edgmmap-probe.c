@@ -93,13 +93,20 @@
 
 /*
  * Version marker: a test built from a fresh pull against a days-old
- * libap measures the old library and says nothing.  `_mmapmark' is
- * the existing one for this file; referencing it makes the link fail
- * against a libap predating the mmap work.
+ * libap measures the old library and says nothing.
+ *
+ * ***IT IS `_mmapoffmark' AND NOT `_mmapmark', AND THE DIFFERENCE IS
+ * THE WHOLE POINT.***  `_mmapmark' already existed, so referencing it
+ * would LINK against a libap predating the unconditional `lseek' this
+ * probe's section 3 measures -- and the probe would then report the
+ * OLD behaviour as this machine's answer.  **A version marker is only
+ * a marker for the fix it was added with.**  (The first draft also
+ * declared it `extern int' and took its address, where it is a
+ * FUNCTION; it linked, because the name is the same, and was simply
+ * the wrong declaration.)
  */
 #ifndef HOSTCHECK
-extern int _mmapmark;
-int *edgmmap_mark = &_mmapmark;
+extern int _mmapoffmark(void);	/* see the note at the top */
 #endif
 
 #define NREG   8
@@ -140,7 +147,11 @@ main(void)
 	int i, j, ok;
 
 	setvbuf(stdout, 0, _IOLBF, 0);
-	printf("edgmmap-probe: starting\n");
+#ifndef HOSTCHECK
+	printf("edgmmap-probe: starting, _mmapoffmark = %d\n", _mmapoffmark());
+#else
+	printf("edgmmap-probe: starting (HOSTCHECK)\n");
+#endif
 
 	f = tmpfile();
 	if (f == 0) {

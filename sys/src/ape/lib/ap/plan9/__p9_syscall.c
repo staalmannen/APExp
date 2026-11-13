@@ -235,11 +235,33 @@ p9_mmap_impl(void *addr, size_t len, int prot, int flags, int fd, off_t off,
 	}
 	memset(p, 0, len);
 
-	/* file-backed mapping: read file contents into buffer */
+	/*
+	 * File-backed mapping: read the file contents into the buffer.
+	 * libap does not MAP a file, it copies one, which is defensible
+	 * for MAP_PRIVATE -- writes are not meant to reach the file --
+	 * and is what EDG's memory manager runs on
+	 * (`mem_manage.c:524', every block of it).
+	 *
+	 * ***THE SEEK IS UNCONDITIONAL, AND `if(off != 0)' WAS A BUG.***
+	 * POSIX says the mapping starts at `off', and skipping the seek
+	 * for `off == 0' assumes the descriptor is ALREADY at 0 -- which
+	 * is true only of a freshly opened file.  EDG hands us
+	 * `fileno(tmpfile)' after `fseek'/`fputc'/`fflush' on the FILE,
+	 * so the position is past the end, and `read' returned 0 bytes
+	 * into a buffer the `memset' had zeroed: *a mapping at offset 0
+	 * that sees none of the file.*
+	 *
+	 * `edgmmap-probe' section 3 fails on the old line and passes on
+	 * this one; it is 0 failures on glibc either way, because glibc
+	 * maps rather than copies and has no position to get wrong.
+	 * **For EDG itself this is probably benign** -- its backing file
+	 * is extended with `fputc(0)' and holds nothing but zeros, which
+	 * is what the buffer already had -- so this is a POSIX fix found
+	 * while hunting something else, not the crash.
+	 */
 	if(!(flags & (MAP_ANONYMOUS|MAP_ANON)) && fd != -1){
 		ssize_t n;
-		if(off != 0)
-			lseek(fd, off, SEEK_SET);
+		lseek(fd, off, SEEK_SET);
 		n = read(fd, p, len);
 		if(n < 0){
 			if(is_seg) _SEGDETACH(base);

@@ -160,3 +160,18 @@ _mmapmark(void)
 {
 	return 1;
 }
+
+/*
+ * A SECOND marker, for `edgmmap-probe.c'.  `_mmapmark' above already
+ * exists, so a probe referencing only that one LINKS against a libap
+ * predating the unconditional `lseek' in `p9_mmap_impl' and then
+ * reports the OLD behaviour as this machine's answer -- the exact
+ * failure the idiom exists to stop, arriving through a marker that is
+ * merely too old rather than absent.  **A version marker is only a
+ * marker for the fix it was added with.**  Thirteenth use.
+ */
+int
+_mmapoffmark(void)
+{
+	return 1;
+}

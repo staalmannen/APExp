@@ -1463,6 +1463,26 @@ silent:
   skips the seek for offset 0, where the fd's position is whatever
   stdio left it. *0 failures on glibc with `-Wall -Wextra`*, so a
   failure on the VM is attributable.
+  ***AND IT REFUTES ITS OWN HYPOTHESIS: section 2 PASSES***, so a
+  `munmap` releasing more than asked is dead as a reading — that is
+  the one thing the probe existed for. **Section 3 FAILS and is
+  fixed**: `if(off != 0) lseek(...)` assumed the fd was already at 0,
+  which is true only of a freshly opened file, and EDG hands over
+  `fileno(tmpfile)` after `fseek`/`fputc`/`fflush` — so a mapping at
+  offset 0 saw none of the file. *Almost certainly not the crash*
+  (EDG's scratch file is all zeros and the buffer was already
+  zeroed) — a POSIX fix found while hunting something else.
+  **It needed a marker of its own**: `_mmapmark` already existed, so a
+  probe referencing only that links against a libap predating this fix
+  and reports the OLD behaviour — *a version marker is only a marker
+  for the fix it was added with*. `_mmapoffmark`, thirteenth use.
+  **The addresses are the other keeper**: mappings come back at
+  `0x410000` upward, so the heap starts near `0x400000` and
+  `hdr == 0x3f4a1` is BELOW it — never a heap pointer at all.
+  `fe_wrapup` does not unmap before walking either, so what remains is
+  exactly two places `hdr` can come from — `mem_region_table[0]` or a
+  previous `hdr->next` — **different bugs that end at the same
+  instruction**, which is why `cxx-vecacid` now WALKS the chain.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
