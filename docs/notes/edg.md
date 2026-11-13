@@ -1594,3 +1594,74 @@ If acid will not dereference it that way, `print(*SP)` and then
 turns "a table is wrong" into "THIS table is wrong"**, and nothing
 short of it distinguishes a function-number table from a vtable from
 a bad relocation.
+
+### THE TABLE EXISTS, AND IT IS NOT THE BUG
+
+`src(*SP)` answered **`no source for ?file?`**, and so did `src(0x1)`
+and `src(SP)`. ***THAT IS NOT THE RESULT IT LOOKS LIKE, AND THE
+MISSING PIECE IS A CONTROL.*** All three inputs are things `src()`
+*should* fail on -- a stack address, the number 1, and a word that may
+be either -- so the run cannot tell "acid resolved nothing because the
+value is not code" from "acid resolves nothing in this binary". *A
+negative result with two explanations is not a measurement*, and the
+one command that separates them was not run: **`src()` on an address
+that is certainly code in cpfe**, its entry point or any named
+function. `src()` worked on php's binary the same day, so it is not
+broken in general.
+
+**The mechanism the hypothesis predicted DOES exist, and reading it
+refutes the hypothesis.** `fe_init.c:53280` is
+
+```c
+a_function_pointer function_pointers[56] = {
+    (a_function_pointer)0,
+    (void (*)(void))(&hash_attribute_kind),
+    (void (*)(void))(&compare_for_attr_corresp_checking_map),
+    ...
+};
+```
+
+and every call through it is bounds-checked first --
+`symbol_tbl.c:40330` is `assert(idx < 55U), function_pointers[idx]`,
+and there are **7 such sites in 3 files, all the same shape**. A sweep
+for a `*_function_index` reaching a call WITHOUT the table finds
+nothing. So a function number cannot become a program counter by this
+route.
+
+***AND THE STATIC INITIALISER COMPILES CORRECTLY, MEASURED WITH THE
+HOST-BUILT `6c` RATHER THAN ASSUMED.*** This was the sharper form of
+the guess -- `cc/dcl.c`'s static-initialiser emitter was changed THIS
+RELEASE for `gbitagg`, and a 56-entry array of function pointers is
+exactly the shape that would expose a fault there. A six-entry
+reduction with the same casts gives
+
+```
+DATA	table+8(SB)/8,$f1<>+0(SB)
+DATA	table+16(SB)/8,$f2<>+0(SB)
+DATA	table+24(SB)/8,$f3<>+0(SB)
+DATA	table+32(SB)/8,$hash_attribute_kind+0(SB)
+GLOBL	table+0(SB),$48
+```
+
+-- real symbol references, eight bytes each, right offsets, the NULL
+entries skipped as `init1` always skips zeros. *Nothing to find.*
+
+**So three readings are now refuted and the position is still
+unknown**: the half-rebuilt corpus (the rebuild did not move it), the
+function-number table (bounds-checked, and its initialiser is right),
+and the static-init gap (which leaves zeros, not ones).
+
+**WHAT TO ASK NEXT IS POSITION, NOT MECHANISM**, and the cheapest
+question needs no acid at all: **does cpfe reach its own option
+processing?** The host build answers `invalid option: --help` correctly
+worded, so
+
+```
+cpfe --no-such-option
+```
+
+splits the search in half -- a diagnostic means `main` ran, the static
+data is intact and the fault is in per-translation-unit work; the same
+`pc=0x1` means it dies before any output. The companion free marker is
+whether `--gen_c_file_name` ever creates its file. *Both are one
+command and neither depends on a format letter.*

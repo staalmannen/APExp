@@ -1530,7 +1530,8 @@ exception at `:133`. **`FA_FCHDIR` is 4 and php never adds it**, so
 refuted four candidates and none found it*, including the obvious
 shared-memory race -- `fork()` is `RFENVG|RFFDG|RFPROC` with no
 `RFMEM`. `posix-spawn-test`'s `test_proc_open_loop` reproduces php's
-call sequence 200 times; 0 on glibc. **And `ZEND_CHECK_STACK_LIMIT` is
+call sequence 200 times; 0 on glibc **and 200 of 200 on the VM**, so
+the suspect moves to php's own heap -- *a narrowing, not a clearing*. **And `ZEND_CHECK_STACK_LIMIT` is
 neither confirmed nor refuted by this**: it guards the PHP VM, and a
 C recursion never reaches the check.
 
