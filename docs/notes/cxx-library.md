@@ -842,3 +842,90 @@ with `([0-9]+)`, which is ERE written into a BRE tool and matches a
 literal paren. *A fallback that cannot fire is not a fallback, it is
 a second thing to read wrongly when the first fails.* One extraction
 now, checked against the real message text.
+
+## ***`acid` NAMES IT, AND IT IS NOT THE FRONT END***
+
+```
+_ZN3edg18free_memory_regionEi(...)+0x21   mem_manage.c:1208
+_ZN3edg9fe_wrapupEv()+0x109
+cfe_main(...)+0xd1
+main+0x13
+```
+
+`mem_manage.c:1208` is `next_hdr = hdr->next` inside
+
+```c
+for (hdr = mem_region_table[rn]; hdr != 0; ) {
+    next_hdr = hdr->next;       /* <-- faults, hdr == 0x3f4a1 */
+    free_mem_block(hdr);
+    hdr = next_hdr;
+}
+```
+
+**So it is TEARDOWN, not parsing.** cpfe finishes the translation and
+dies freeing its memory regions, and `hdr` is a small garbage value
+rather than a heap address (`CX` holds it; `TYPE 0xe`, `ERROR 0x4` is
+a user-mode read of a not-present page). *Six rounds of narrowing had
+all been looking at the front end* — and the register dump was one
+command.
+
+### And the memory manager is `mmap`
+
+`mem_manage.c:524`'s `alloc_new_mem_block` has **no alternative
+path**: it opens a tmp file once and then, for every block,
+
+```c
+mmap(NULL, incremental_size, PROT_READ|PROT_WRITE,
+     MAP_PRIVATE, fileno(tmpfile), file_offset)
+```
+
+with `file_offset` accumulating — a growing file-backed store.
+`host_envir.c:4285`'s `map_memory_region_file` is where that call is,
+preceded by EDG's own `fseek`/`fputc`/`fflush` to extend the file.
+
+***THESE NOTES HAD RECORDED mmap AS CLEARED AND THAT WAS TOO STRONG.***
+What was checked is `open_mapped_input_file`, which serves PCH and IFC
+modules and never a source file — true, and written down as "*that
+also clears `mmap`*". **A verdict about one function was generalised
+to the whole mechanism**, and `map_memory_region_file` is a different
+function that every allocation goes through. Same shape as the clisp
+`~0UL` note: *a verdict about one use of a thing is not a verdict
+about the thing.*
+
+**libap does not map files.** `__p9_syscall.c:239` emulates: `malloc`
+(under `SEG_THRESHOLD`, 64MB) or `segattach`, then `memset` to zero,
+then `read(fd, p, len)`. For `MAP_PRIVATE` that is defensible — writes
+are not meant to reach the file — but it is a COPY, and **this release
+rewrote all of it**: the threshold moved 1MB → 64MB, the malloc arm
+began page-aligning by hand, and partial `munmap` was rebuilt twice.
+
+### `edgmmap-probe.c`
+
+Reproduces the call sequence rather than the outcome, which is this
+tree's own rule. Five sections; the one it exists for is **2**:
+unmap the regions one at a time, in EDG's own order, and after each
+unmap re-read every region still believed live. *That is
+`free_memory_region`'s loop*, and a `munmap` that releases more than
+it was asked for shows up there and nowhere else.
+
+Sections 0-1 report rather than assert (how many map, are the
+addresses distinct, do the regions overlap). **Distinct addresses are
+not enough** — two overlapping regions would both be writable and
+would corrupt each other, which is what a garbage `hdr` looks like
+from outside. Sections 3 and 4 assert, because they are POSIX rules
+rather than platform choices.
+
+**Section 3 is a bug read straight out of the source**:
+`__p9_syscall.c:241` is `if(off != 0) lseek(fd, off, SEEK_SET)`, and
+the fd comes from `fileno()` on a FILE that stdio has just written
+through — so its position is never 0 and the guard skips exactly the
+seek that would have fixed it. POSIX says the mapping starts at
+`off`.
+
+**0 failures on glibc with `-Wall -Wextra` and no diagnostics**, so a
+failure on the VM is attributable. *Its one warning was worth having*:
+gcc reported `off` set and not used, which was true — the array
+recorded the offsets and nothing read them. **An unused array in a
+probe is a check somebody meant to write**; section 2 prints the
+offset beside the address now, so if a later section disagrees about
+which region is which, the offset names it.
