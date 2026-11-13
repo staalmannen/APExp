@@ -779,3 +779,66 @@ later one droppable that was not before. It repeats until a whole
 pass removes nothing, skipping lines already dropped. **Six was the
 answer from one pass**; whether six is the floor is a question only
 the fixpoint answers.
+
+## `cxx-guardgen`: all four `ok`
+
+```
+flat-guarded  -> ok      flat-plain  -> ok
+chain-guarded -> ok      chain-plain -> ok
+```
+
+300 flat and 150 chained generated headers, with and without the
+guard, and cpfe survives every one. **So "a guard plus enough files"
+is ruled out on its own** — the guard is necessary and not
+sufficient, and the CONTENT of the real six matters too.
+
+*That the control arms also pass is what makes the result readable*:
+had `flat-plain` crashed, the probe would have been measuring file
+count and not the guard at all.
+
+### The state of the elimination
+
+Everything below was measured, each by one command:
+
+| ruled out | by |
+|---|---|
+| the C++ in `<vector>` | `g++ -E` over both forms: **byte-identical**, 6428 lines |
+| the include spelling | phase C2 CRASHES with every include absolute |
+| `niter_base.h` as an envelope | phase D: `ok` for all five of its own includes |
+| a self-referential trailing return type | `cxx-niterbase-probe`: `ok` |
+| a guard plus volume alone | `cxx-guardgen`: all four `ok` |
+| a circular include | closure of each of the fourteen: none reaches `vector.h` |
+| the guard being read | one grep: only its own three lines |
+
+**What is left is the guard AND the content together**, and at that
+point another guess is worth less than one stack.
+
+## `cxx-vecacid`
+
+The input is twelve lines now and the crash has a **real code
+address**, which is the difference from the one time `acid` was tried
+on this port and gave nothing: that crash was `pc=0x1`, and `src()`
+on an address that is not code cannot answer. `src(pc)` can name the
+line in EDG's generated C — which is how every other crash in this
+tree was finally read.
+
+The script compiles the reproducer, takes the pid out of cpfe's own
+`suicide:` line, and runs `regs()`, `stk()`, `lstk()`, `src(pc)` in
+that order — **`regs()` first so that an acid that dies later has
+already printed the thing most likely to be readable**. It prefers
+`/tmp/cxx-vecmin.cpp`, the file phase C left behind and *measured* to
+crash, and says so loudly when it falls back to rebuilding it: a
+reproducer rebuilt from a recollection is the exact mistake phase C
+made one round ago.
+
+It carries this tree's `acid` rule in its header, because the output
+is unreadable without it: ***`lstk()` misreads arguments in an APExp
+amd64 binary and the first one is always garbage***, since kencc's
+`REGARG` is `D_BP` and `acid` reads every parameter from the frame.
+Trust the call chain and `regs()`.
+
+**Its own first draft had a fallback that could not fire**: a `sed`
+with `([0-9]+)`, which is ERE written into a BRE tool and matches a
+literal paren. *A fallback that cannot fire is not a fallback, it is
+a second thing to read wrongly when the first fails.* One extraction
+now, checked against the real message text.

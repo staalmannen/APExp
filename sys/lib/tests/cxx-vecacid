@@ -1,0 +1,130 @@
+#!/bin/rc
+# cxx-vecacid -- crash cpfe on the twelve-line reproducer and ask
+# `acid' where.
+#
+#	./cxx-vecacid
+#
+# ***WHY NOW AND NOT BEFORE.***  `acid' was tried once on this port
+# and gave nothing, and that was correct: the crash then was
+# `pc=0x1', and `src()' on an address that is not code cannot answer.
+# **This crash has a real code address** (`pc=0x9d98a6'), so `src(pc)'
+# can name the line in EDG's generated C -- which is how every other
+# crash in this tree was finally read (`acid 6.out' and `src(pc)'
+# named `zend_string.h:401' outright).
+#
+# And the input is now twelve lines instead of 2.9M, so the crash is
+# reached in about a second and the stack is short.
+#
+# WHAT THE LADDER HAS ALREADY RULED OUT, so that the stack is read
+# against the right background:
+#
+#   * NOT the C++ in `<vector>': `g++ -E' over the crashing form and
+#     over an absolute-path rebuild gives byte-identical token
+#     streams, 6428 lines each.
+#   * NOT the include SPELLING: phase C2 CRASHES with every include
+#     rewritten absolute.
+#   * NOT `niter_base.h' as an envelope: phase D answers `ok' for all
+#     five of its own includes.
+#   * NOT a self-referential trailing return type:
+#     `cxx-niterbase-probe.cpp' answers `ok'.
+#   * NOT "a guard plus enough files": `cxx-guardgen' answers `ok' on
+#     all four arms -- 300 flat and 150 chained generated headers,
+#     with and without the guard.
+#
+# **What is left is the guard AND the content together**, which is
+# why guessing further is worth less than one stack.
+#
+# READING WHAT IT PRINTS.  This tree's own rule:
+# ***`acid's `lstk()' MISREADS ARGUMENTS in an APExp amd64 binary and
+# the first one is ALWAYS garbage***, because kencc's `REGARG' is
+# `D_BP' and `acid' reads every parameter from the frame.  So trust
+# the CALL CHAIN and `regs()`; treat argument values as a hint.  The
+# tell that you are looking at a misread is a 4-byte parameter coming
+# back as eight.
+
+CXXDIR=/sys/include/ape/c++
+VEC=$CXXDIR/vector/vector.h
+MIN=/tmp/cxx-vecmin.cpp
+
+# Prefer the file `cxx-vecsplit' phase C left behind, because that one
+# is MEASURED to crash.  Regenerating is a fallback and says so: a
+# reproducer rebuilt from a recollection is the mistake phase C itself
+# made, one round ago.
+if(test -f $MIN){
+	echo 'cxx-vecacid: using '^$MIN^' from cxx-vecsplit'
+}
+if(! test -f $MIN){
+	echo 'cxx-vecacid: no '^$MIN^'; rebuilding the known minimum'
+	echo 'cxx-vecacid: (run cxx-vecsplit first if this does not crash)'
+	echo '#ifndef PSTL_VECTOR_H' > $MIN
+	echo '#define PSTL_VECTOR_H' >> $MIN
+	echo '#include "../algorithm/equal.h"' >> $MIN
+	echo '#include "../algorithm/fill_n.h"' >> $MIN
+	echo '#include "../algorithm/lexicographical_compare.h"' >> $MIN
+	echo '#include "../algorithm/min.h"' >> $MIN
+	echo '#include "../algorithm/rotate.h"' >> $MIN
+	echo '#include "../iterator/niter_base.h"' >> $MIN
+	echo '#endif' >> $MIN
+	echo 'int main(void){ return 0; }' >> $MIN
+}
+echo
+cat $MIN
+echo
+
+tmp=/tmp/cxx-vecacid.$pid
+mkdir -p $tmp
+
+echo 'cxx-vecacid: running cpfe'
+c++ -F -I$CXXDIR/vector $MIN >$tmp/out >[2]$tmp/err
+echo
+cat $tmp/err
+
+# `cpfe NNNN: suicide: sys: trap: ...' -- the pid is the second word.
+# A faulted Plan 9 process stays BROKEN in /proc, which is what makes
+# this work at all.
+# **ONE extraction, not two.**  The first draft had a `sed' with
+# `([0-9]+)' as a fallback behind this -- which is ERE written into a
+# BRE tool, so it matches a literal paren and never fires.  A
+# fallback that cannot fire is not a fallback; it is a second thing
+# to read wrongly when the first fails.
+crashpid=`{grep -E 'suicide|trap:' $tmp/err | sed 1q | awk '{print $2}' | sed 's/://'}
+if(~ $#crashpid 0){
+	echo
+	echo 'cxx-vecacid: NO CRASH -- cpfe did not die on this input, so'
+	echo 'cxx-vecacid: there is nothing to attach to.  Re-run'
+	echo 'cxx-vecacid: cxx-vecsplit to regenerate a reproducer that'
+	echo 'cxx-vecacid: does.'
+	rm -rf $tmp
+	exit nocrash
+}
+
+echo
+echo 'cxx-vecacid: broken process is '^$crashpid
+if(! test -d /proc/$crashpid){
+	echo 'cxx-vecacid: but /proc/'^$crashpid^' is gone -- the process did'
+	echo 'cxx-vecacid: not stay broken.  Nothing to attach to.'
+	rm -rf $tmp
+	exit noproc
+}
+
+# `regs()' FIRST and `src(pc)' LAST, deliberately: if acid dies on one
+# of the later commands the earlier output is already printed.  Every
+# crash in this tree that was read at all was read from `regs()'.
+echo 'cxx-vecacid: attaching acid'
+echo
+{
+	echo 'regs()'
+	echo 'stk()'
+	echo 'lstk()'
+	echo 'src(pc)'
+} | acid $crashpid
+
+echo
+echo 'cxx-vecacid: if that printed nothing useful, do it by hand:'
+echo 'cxx-vecacid:   acid '^$crashpid
+echo 'cxx-vecacid:   acid: regs()'
+echo 'cxx-vecacid:   acid: stk()'
+echo 'cxx-vecacid:   acid: src(pc)'
+echo 'cxx-vecacid: and remember lstk()''s first argument is garbage here.'
+rm -rf $tmp
+echo 'cxx-vecacid: done'

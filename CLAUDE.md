@@ -1431,6 +1431,18 @@ silent:
   the no-guard arm is the control. *Its chain is capped at 150 because
   g++ refuses past 200 — a documented limit, so a 300-deep arm would
   have measured the limit and not the bug.*
+  ***ALL FOUR ANSWER `ok`***, so a guard plus volume is ruled out on
+  its own and the guard is necessary without being sufficient — *and
+  the control arms passing is what makes that readable*. **The
+  elimination is now: not the C++** (`g++ -E` byte-identical, 6428
+  lines), **not the spelling** (C2 crashes absolute), **not an
+  envelope** (D clears all five), **not the trailing-return shape**,
+  **not volume**, **not a circular include**, **not the guard being
+  read**. What is left is the guard AND the content together, at
+  which point another guess is worth less than one stack —
+  **`cxx-vecacid`**, which is possible now because the input is
+  twelve lines and the crash has a REAL CODE ADDRESS, unlike the
+  `pc=0x1` one `acid` was tried on and correctly gave nothing for.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
