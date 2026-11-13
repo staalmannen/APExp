@@ -6425,7 +6425,30 @@ long edg_dbg_link_n;
 
 void *edg_dbg_trim_new[4096];
 void *edg_dbg_trim_par[4096];
+long edg_dbg_trim_size[4096];
 long edg_dbg_trim_n;
+
+/*
+ * APExp: the sizes, because the arithmetic now points at one object.
+ *
+ * `alloc_in_region's DEDICATED arm (`true_size >= 2096') allocates a
+ * fresh block, advances `next_avail' by `size' ALONE and then trims --
+ * and `trim_mem_block' cuts at `next_avail' and sets the parent's
+ * `after_end_of_block' there.  **So a dedicated block's payload is
+ * EXACTLY its object, with no slack**: the `+ 8' in `true_size' only
+ * sized the request, and the surplus went into the carved remainder.
+ *
+ * The measured parent is `start=0x03cc0d30 end=0x03cc32f8', which is
+ * 0x25c8 = 9672 bytes = 1209 eight-byte words, and the carved header
+ * begins at the object's last byte plus one.  `prev->next' is therefore
+ * **the word at index 1209 of a 1209-word object** -- a plain off-by-one
+ * -- and `0x4d1b' at `prev-8' is the object's own last word rather than
+ * padding, which an earlier note here had it as.
+ *
+ * `link_size' is the `min_size' each block was asked for; `trim_size'
+ * is `alloc_addr - start_of_block', the object the carve cut behind.
+ */
+long edg_dbg_link_size[4096];
 
 /*
  * APExp: ***CATCH THE WRITE, since reading cannot find it.***
@@ -7069,6 +7092,7 @@ edg_dbg_check(2);
 edg_dbg_link_hdr[edg_dbg_link_n & 4095] = (void *)__144552_26_hdr;
 edg_dbg_link_next[edg_dbg_link_n & 4095] = (void *)(__144552_26_hdr->next);
 edg_dbg_link_rn[edg_dbg_link_n & 4095] = (long)__144539_63_region_number;
+edg_dbg_link_size[edg_dbg_link_n & 4095] = (long)__144540_63_min_size;
 edg_dbg_link_n = edg_dbg_link_n + 1;
 ;
 return __144552_26_hdr;
@@ -7134,16 +7158,44 @@ __144743_26_space_remaining_in_block = ((_ZN3edg8sizeof_tE)((__144738_44_hdr->af
 
 
 
-if (__144743_26_space_remaining_in_block >= 2096ULL) {
+/*
+ * APExp: ***AN EXPERIMENT, WITH ITS PREDICTION AND ITS REFUTATION.***
+ *
+ * A carved header begins at the parent's `next_avail', which in the
+ * dedicated arm is the byte after the parent's object -- so a write one
+ * word past that object lands exactly on the carved block's `next'.
+ * That is what the measurement says happened: the field was correct
+ * when linked, the parent is intact, and the first word past it holds
+ * `0x3f4a1'.
+ *
+ * `EDG_DBG_CARVE_PAD' moves the carved header up by that many bytes and
+ * leaves the gap owned by NOBODY: the parent still ends at
+ * `alloc_addr', and the new block starts above the pad, so the pad is
+ * dead space that absorbs a small overrun instead of a chain link.
+ *
+ *	PREDICTION: with the pad, cpfe completes -- the overrun is real
+ *	            and small, and lands in dead space.
+ *	REFUTED BY: the same fault at the same place, which would say the
+ *	            write is not an overrun of the parent's object but
+ *	            something that aims at the carved header itself.
+ *
+ * **It is an experiment and not a fix.** Padding every carve changes
+ * EDG's layout everywhere, which is exactly the kind of change that can
+ * move a bug rather than remove one; set it to 0 to get upstream's
+ * arrangement back. The `space_remaining' test is raised by the same
+ * amount so a carve still leaves a usable block behind.
+ */
+#define EDG_DBG_CARVE_PAD 64
+if (__144743_26_space_remaining_in_block >= (2096ULL + EDG_DBG_CARVE_PAD)) {
 
 
 
 
 __144745_27_alloc_addr = (__144738_44_hdr->next_avail_in_block);
-__144744_26_new_hdr = ((_ZN3edg22a_mem_block_header_ptrE)__144745_27_alloc_addr);
+__144744_26_new_hdr = ((_ZN3edg22a_mem_block_header_ptrE)(__144745_27_alloc_addr + EDG_DBG_CARVE_PAD));
 
 (__144744_26_new_hdr->malloc_size) = 0ULL;
-(__144744_26_new_hdr->next_avail_in_block) = ((__144744_26_new_hdr->start_of_block) = (__144745_27_alloc_addr + _ZN34_INTERNAL_12_mem_manage_c_b0d968923edg20adjusted_header_sizeE));
+(__144744_26_new_hdr->next_avail_in_block) = ((__144744_26_new_hdr->start_of_block) = (__144745_27_alloc_addr + EDG_DBG_CARVE_PAD + _ZN34_INTERNAL_12_mem_manage_c_b0d968923edg20adjusted_header_sizeE));
 
 (__144744_26_new_hdr->after_end_of_block) = (__144745_27_alloc_addr + __144743_26_space_remaining_in_block);
 (__144744_26_new_hdr->trimmed) = ((_ZN3edg14a_byte_booleanE)0);
@@ -7162,6 +7214,8 @@ _ZN34_INTERNAL_12_mem_manage_c_b0d968923edg20reusable_blocks_listE = __144744_26
  */
 edg_dbg_trim_new[edg_dbg_trim_n & 4095] = (void *)__144744_26_new_hdr;
 edg_dbg_trim_par[edg_dbg_trim_n & 4095] = (void *)__144738_44_hdr;
+edg_dbg_trim_size[edg_dbg_trim_n & 4095] =
+  (long)(__144745_27_alloc_addr - (__144738_44_hdr->start_of_block));
 edg_dbg_trim_n = edg_dbg_trim_n + 1;
 }
 (__144738_44_hdr->trimmed) = ((_ZN3edg14a_byte_booleanE)1);

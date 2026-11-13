@@ -1652,6 +1652,31 @@ silent:
   `int` return: this tree's own undeclared-function trap, inside an
   instrument written to hunt a memory bug. *Caught by reading the file
   order, not by a build.*
+  ***AND IT IS SITE 3, AND THE ARITHMETIC LANDS ON ONE OBJECT.***
+  `bad_at=1026`, `bad_pos=1`, site 3 (entry to `trim_mem_block`), 3132
+  clean walks. Link 1023 pushed `0x03d00d80` with `next` = `prev`, links
+  1024/1025 created regions 327/328 and checked clean at entry AND exit,
+  then link 1026's trim fired. ***AND `alloc_in_region` WAS NEVER
+  CALLED: 0 of 0*** — it is COMDAT and **41 TUs define their own copy**,
+  so instrumenting `mem_manage.c`'s measures the one nobody calls.
+  *A COMDAT function instrumented in one TU is not the function the
+  other forty call*, which is the instrument rule to keep.
+  **The arithmetic is the finding**: the dedicated arm advances
+  `next_avail` by `size` ALONE and `trim_mem_block` cuts there, so a
+  dedicated block's payload is EXACTLY its object with **no slack** —
+  the `+8` sized the REQUEST and the surplus went into the carved
+  remainder. The parent is `start=0x03cc0d30 end=0x03cc32f8` = `0x25c8`
+  = **9672 bytes = 1209 eight-byte words**, and the carved header begins
+  at the object's last byte plus one. ***So `prev->next` is the word at
+  INDEX 1209 of a 1209-word object*** — a plain off-by-one — and the
+  `0x4d1b` at `prev-8` is the object's own last word. *An earlier note
+  called that padding and was wrong.*
+  **`EDG_DBG_CARVE_PAD` is the experiment**: move the carved header up
+  64 bytes and leave the gap owned by nobody. *Prediction*: cpfe
+  completes. *Refuted by*: the same fault at the same place, which would
+  say the write aims at the carved header rather than running past the
+  object. **An experiment and not a fix** — padding every carve changes
+  EDG's layout everywhere, which can move a bug rather than remove one.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.

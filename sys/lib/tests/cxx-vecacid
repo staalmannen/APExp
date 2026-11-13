@@ -285,7 +285,7 @@ echo
 		if k < 0 then { k = 0; };
 		while k <= b do {
 			i = k & 4095;
-			print("  link ", k\D, " region=", *(edg_dbg_link_rn+i*4)\D, " hdr=", *(edg_dbg_link_hdr+i*8)\X, " next=", *(edg_dbg_link_next+i*8)\X, "\n");
+			print("  link ", k\D, " region=", *(edg_dbg_link_rn+i*4)\D, " size=", *(edg_dbg_link_size+i*4)\D, " hdr=", *(edg_dbg_link_hdr+i*8)\X, " next=", *(edg_dbg_link_next+i*8)\X, "\n");
 			k = k+1;
 		};
 	}'
@@ -295,7 +295,7 @@ echo
 		if k < 0 then { k = 0; };
 		while k <= t do {
 			i = k & 4095;
-			print("  carve ", k\D, " new=", *(edg_dbg_trim_new+i*8)\X, " parent=", *(edg_dbg_trim_par+i*8)\X, "\n");
+			print("  carve ", k\D, " objsize=", *(edg_dbg_trim_size+i*4)\D, " new=", *(edg_dbg_trim_new+i*8)\X, " parent=", *(edg_dbg_trim_par+i*8)\X, "\n");
 			k = k+1;
 		};
 	}'
@@ -374,14 +374,14 @@ echo
 	echo 'i = 0'
 	echo 'while i < 4096 do {
 		if *(edg_dbg_link_hdr+i*8) == p then {
-			print("  LINKED  slot ", i\D, " hdr=", p\X, " next-read-back=", *(edg_dbg_link_next+i*8)\X, " region=", *(edg_dbg_link_rn+i*4)\D, "\n");
+			print("  LINKED  slot ", i\D, " hdr=", p\X, " next-read-back=", *(edg_dbg_link_next+i*8)\X, " region=", *(edg_dbg_link_rn+i*4)\D, " size=", *(edg_dbg_link_size+i*4)\D, "\n");
 		};
 		i = i+1;
 	}'
 	echo 'i = 0'
 	echo 'while i < 4096 do {
 		if *(edg_dbg_trim_new+i*8) == p then {
-			print("  CARVED  slot ", i\D, " parent=", *(edg_dbg_trim_par+i*8)\X, "\n");
+			print("  CARVED  slot ", i\D, " parent=", *(edg_dbg_trim_par+i*8)\X, " parent objsize=", *(edg_dbg_trim_size+i*4)\D, "   <-- the object the write ran past\n");
 		};
 		i = i+1;
 	}'
