@@ -462,3 +462,74 @@ list: `while()` with an empty condition is not rc (the span is computed
 before the loop and again at the end of the body), and the nested
 backquote for the script's own directory was replaced with a plain
 `dirname $0`.
+
+## `cxx-vecsplit` refused, and the refusal convicted `cxx-vecnarrow`
+
+```
+cxx-vecsplit: 81 cut points, validated on the host
+cxx-vecsplit: rung A  shortest prefix (includes only) -> CRASH
+cxx-vecsplit: REFUSED -- the shortest prefix already crashes,
+cxx-vecsplit: which contradicts cxx-vecnarrow phase 2
+```
+
+**The guard did its job and the contradiction was real.** Two
+harnesses disagreed about the same question, and the one that was
+wrong is the one that had already given an answer.
+
+### `cxx-vecnarrow` was wrong in two independent ways
+
+**1. Its phase 2 tested `~ $k CRASH` and nothing else.** A prefix that
+ERRORED counted as clean. cpfe stops at the first error, so such a
+prefix never reaches the code that crashes — *"no prefix of the 56
+includes crashes" had two explanations and only one was reported.*
+This tree's own rule, in the harness rather than in the library: **a
+check whose negative result has two explanations is not a check.**
+
+**2. It derived the include list with `#include` anchored at column
+0, and `vector.h` has 58 include directives, not 56.** Two are written
+`#  include`, indented inside an `#if` at `:72-76`:
+
+```c
+#if defined(__cpp_exceptions) || defined(_CPPUNWIND)
+#  include "../language_support/exception/throw_on_true.h"
+#else
+#  include "../language_support/no_exception/throw_on_true.h"
+#endif
+```
+
+Neither was ever tested, and their absence is a live reason the
+cumulative prefixes errored — `split_buffer.h` already errors alone,
+per phase 1. *The two missing files are not themselves the culprit*:
+`no_exception/throw_on_true.h` is reached by `<array>`, `<functional>`,
+`<list>`, `<map>` and `<string>`, all of which pass `cxx-bisect`.
+
+Both are fixed. Phase 2 reports ERROR, stops on it, and the script
+gives **no verdict at all** when it stopped that way rather than
+claiming the body.
+
+### And `cxx-vecsplit`'s own fault was the same shape
+
+Its cut list covered only top-level `template<` boundaries, so its
+shortest prefix was the **entire include block in one step** — which
+is exactly the thing that crashes. *A ladder whose first rung already
+fails has no rungs.* The list spans the whole file now: `LINE DEPTH`
+pairs, `DEPTH` closing braces appended, **137 validated of 164
+candidates, 56 of them inside the include block**.
+
+**The generator's own guard fired too, and usefully**: a first attempt
+to require "no `#if` open at the cut" answered `0 candidates`, because
+**the include guard is itself an open `#if` for the whole file**. The
+baseline is the depth at the first `#include`, and the trailer's
+single `#endif` closes exactly the guard.
+
+**An ERROR rung now STOPS the bisect** instead of counting as clean,
+and says so: cpfe stops at the first error, so an errored prefix
+cannot say which side the crash is on. Since every cut was compiled by
+g++ first, an ERROR there is cpfe disagreeing with g++ — a finding in
+its own right.
+
+### What is known now, and it is narrower than before
+
+The crash is **at or before `vector.h:87`** — the include block plus
+`namespace std {`. That is where the next run will bisect, and the
+answer will be one `#include` line.

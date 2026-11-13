@@ -132,30 +132,52 @@ run_one() {	# $1 = source, $2 = label
 
 case "$mode" in
 --vecsplit)
-	# Regenerate `sys/lib/tests/cxx-vecsplit.cuts': the line numbers
-	# in vector/vector.h at which it can be TRUNCATED and still
-	# compile.  **The validation is the point.**  The rule that
-	# produces the candidates -- a `template<' at column 0 at brace
-	# depth 1 -- gives 108 and 27 of them do not compile, because a
-	# member template is two `template<...>' lines and a cut between
-	# them leaves a dangling header.  Teaching the rule about that
-	# case would be the wrong fix: the list is the set g++ PROVED
-	# compiles, so a rung that errors on the VM means cpfe disagrees
-	# with g++, which is a finding, instead of meaning the harness
-	# cut in the wrong place, which is noise.
+	# Regenerate `sys/lib/tests/cxx-vecsplit.cuts': the points in
+	# vector/vector.h at which it can be TRUNCATED and still
+	# compile, as `LINE DEPTH' -- DEPTH closing braces are appended,
+	# then `#endif' and a `main'.
+	#
+	# ***IT SPANS THE WHOLE FILE, INCLUDING THE INCLUDE BLOCK, AND
+	# THE FIRST VERSION DID NOT.***  That one cut only at top-level
+	# `template<' boundaries, so its shortest prefix was the ENTIRE
+	# include block in one step -- and when that prefix CRASHED on
+	# the VM there was nothing shorter to bisect against.  *A ladder
+	# whose first rung already fails has no rungs.*
+	#
+	# **The validation is the point.**  Every candidate is compiled
+	# by g++ before it is written down, so a rung that errors on the
+	# VM means cpfe disagrees with g++ -- a finding -- instead of
+	# meaning the harness cut in the wrong place, which is noise.
 	python3 - "$ROOT" "$SHIM" "$CXXDIR" <<'PYEOF'
 import pathlib, subprocess, sys
 root, shim, cxxdir = (pathlib.Path(a) for a in sys.argv[1:4])
 src = cxxdir / 'vector/vector.h'
 lines = src.read_text().split('\n')
-depth = 0; incomment = False; depths = []
+
+# Brace depth AND preprocessor-conditional depth, line by line,
+# ignoring comments, strings and char literals.
+depth = 0; ppdepth = 0; incomment = False
+bdepths = []; ppdepths = []; isinc = []
 for line in lines:
+    st = line.lstrip()
+    pp = st.startswith('#')
+    bdepths.append(depth); ppdepths.append(ppdepth)
+    # ***ANY INDENTATION.***  `vector.h' has two `#  include' lines
+    # inside an `#if', and the first derivation of this list matched
+    # `#include' at column 0 only -- so it reported 56 includes where
+    # the file has 58, and never tested either of the two.
+    isinc.append(bool(pp and st[1:].lstrip().startswith('include')))
+    if pp:
+        k = st[1:].lstrip().split(None, 1)[0] if st[1:].strip() else ''
+        if k in ('if', 'ifdef', 'ifndef'): ppdepth += 1
+        elif k == 'endif' and ppdepth: ppdepth -= 1
+        continue
     s = []; j = 0
     while j < len(line):
         if incomment:
-            k = line.find('*/', j)
-            if k < 0: j = len(line); break
-            incomment = False; j = k + 2; continue
+            x = line.find('*/', j)
+            if x < 0: j = len(line); break
+            incomment = False; j = x + 2; continue
         if line[j:j+2] == '/*': incomment = True; j += 2; continue
         if line[j:j+2] == '//': break
         if line[j] in '"\'':
@@ -164,10 +186,30 @@ for line in lines:
                 j += 2 if line[j] == '\\' else 1
             j += 1; continue
         s.append(line[j]); j += 1
-    depths.append(depth)
     depth += ''.join(s).count('{') - ''.join(s).count('}')
-cand = [i for i, l in enumerate(lines, 1)
-        if l.startswith('template<') and depths[i-1] == 1]
+
+# ***THE INCLUDE GUARD IS ITSELF AN OPEN `#if' FOR THE WHOLE FILE***,
+# so a rule of "cut only where no conditional is open" rejects every
+# line and the generator answers `0 candidates' -- a result-shaped
+# non-result.  The BASELINE is the depth at the first `#include', and
+# a cut must be at that depth: inside the guard and inside nothing
+# else.  The trailer's single `#endif' then closes exactly the guard.
+base = next((ppdepths[i] for i, y in enumerate(isinc) if y), 0)
+
+cand = []
+for i, l in enumerate(lines, 1):
+    # prefix = lines 1..i.  Never inside a real `#if', or the trailer
+    # would land in an unterminated conditional.
+    if ppdepths[i-1] != base:
+        continue
+    after_inc = isinc[i-1]
+    before_tmpl = (i < len(lines) and lines[i].startswith('template<')
+                   and bdepths[i] == 1)
+    if after_inc:
+        cand.append((i, bdepths[i-1]))
+    elif before_tmpl:
+        cand.append((i, bdepths[i]))
+
 tmp = pathlib.Path('/tmp/cxxlib-host'); tmp.mkdir(parents=True, exist_ok=True)
 CXX = ['g++', '-std=c++14', '-nostdinc++', '-fno-exceptions', '-fno-rtti',
        '-fsyntax-only', '-I' + str(shim), '-I' + str(cxxdir),
@@ -177,31 +219,37 @@ CXX = ['g++', '-std=c++14', '-nostdinc++', '-fno-exceptions', '-fno-rtti',
        '-D__EDG_SIZE_TYPE__=decltype(sizeof(0))',
        '-DPSTL_NO_COMPILER_BUILTINS=1']
 good = []
-for c in cand:
-    body = '\n'.join(lines[:c-1]) + '\n} // namespace std\n#endif\nint main(void){return 0;}\n'
+for ln, d in cand:
+    body = ('\n'.join(lines[:ln]) + '\n' + ('}\n' * d)
+            + '#endif\nint main(void){return 0;}\n')
     f = tmp / 'vs.cpp'; f.write_text(body)
     if subprocess.run(CXX + [str(f)], capture_output=True).returncode == 0:
-        good.append(c)
-hdr = ("""# cxx-vecsplit.cuts -- line numbers in sys/include/ape/c++/vector/vector.h
-# at which that file can be TRUNCATED and still compile.
+        good.append((ln, d))
+ninc = sum(1 for ln, d in good if d == 0)
+hdr = ("""# cxx-vecsplit.cuts -- points in sys/include/ape/c++/vector/vector.h
+# at which it can be TRUNCATED and still compile, as `LINE DEPTH'.
 #
 # GENERATED AND VALIDATED by `hostkencc/cxxlib-host.sh --vecsplit'.
-# A cut at line N means "lines 1..N-1, then `} // namespace std',
-# `#endif' and a `main'".  Do not edit by hand: regenerate.
+# A cut `L D' means "lines 1..L, then D closing braces, then `#endif'
+# and a `main'".  Do not edit by hand: regenerate.
 #
-# ***EVERY LINE HERE WAS COMPILED BY g++ BEFORE IT WAS WRITTEN DOWN.***
-# %d candidates, %d validated -- the %d that fail are member templates,
-# two `template<...>' lines where a cut between them leaves a dangling
-# header.  The list is the PROVEN set, so a rung that errors on the VM
-# is cpfe disagreeing with g++ rather than the harness cutting wrongly.
+# ***EVERY ONE WAS COMPILED BY g++ BEFORE IT WAS WRITTEN DOWN.***
+# %d candidates, %d validated, %d of them inside the include block.
+# The ones that fail are member templates -- two `template<...>'
+# lines where a cut between them leaves a dangling header.  The list
+# is the PROVEN set, so a rung that errors on the VM is cpfe
+# disagreeing with g++ rather than the harness cutting wrongly.
 #
-# `cxx-vecsplit' BISECTS these, so a run is about seven cpfe
-# invocations rather than %d.
-""" % (len(cand), len(good), len(cand) - len(good), len(good)))
+# ***IT SPANS THE INCLUDE BLOCK, AND THE FIRST VERSION DID NOT.***
+# That one cut only at top-level `template<' boundaries, so its
+# shortest prefix was the whole include block in one step -- and that
+# prefix CRASHED on the VM, leaving nothing shorter to bisect
+# against.  A ladder whose first rung already fails has no rungs.
+""" % (len(cand), len(good), ninc))
 out = root / 'sys/lib/tests/cxx-vecsplit.cuts'
-out.write_text(hdr + '\n'.join(map(str, good)) + '\n')
-print('cxxlib-host: %d candidates, %d validated -> %s'
-      % (len(cand), len(good), out))
+out.write_text(hdr + '\n'.join('%d %d' % g for g in good) + '\n')
+print('cxxlib-host: %d candidates, %d validated (%d in the include block) -> %s'
+      % (len(cand), len(good), ninc, out))
 PYEOF
 	exit $?
 	;;

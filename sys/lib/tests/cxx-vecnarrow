@@ -64,7 +64,12 @@ mkdir -p $tmp
 
 # The includes of vector.h, in file order, each made absolute by
 # prefixing the directory they are written relative to.
-incs=`{sed -n 's/^#include "\(.*\)"/\1/p' $VEC}
+# ***ANY INDENTATION.***  This matched `#include' at column 0 and so
+# derived 56 where the file has **58**: two are written `#  include'
+# inside an `#if' at :72-76.  Neither was ever tested, and their
+# absence is a live reason the cumulative prefixes below ERRORED --
+# see the note on phase 2.
+incs=`{sed -n 's/^[ 	]*#[ 	]*include "\(.*\)"/\1/p' $VEC}
 if(~ $#incs 0){
 	echo 'cxx-vecnarrow: derived NO includes from '^$VEC >/fd/2
 	echo 'cxx-vecnarrow: the sed no longer matches; fix it rather than' >/fd/2
@@ -125,6 +130,7 @@ echo
 echo 'cxx-vecnarrow: phase 2 -- CUMULATIVE prefixes'
 echo '/* cumulative prefix */' > $tmp/pre.h
 first=''
+errored=''
 # **Counting WITHOUT arithmetic**: rc has none, and `bc' is not
 # something to assume is reachable inside `apexp-sh' -- the union
 # resolves command names and Plan 9's own set is not GNU's.  A list
@@ -146,12 +152,40 @@ for(i in $incs){
 		# reprint this crash forty times.
 		break
 	}
+	# ***AN `ERROR' PREFIX IS NOT A CLEAN PREFIX, AND TREATING ONE
+	# AS CLEAN IS WHAT MADE THIS LADDER ANSWER WRONGLY.***  The
+	# first version tested `~ $k CRASH' and nothing else, so it
+	# reported "no prefix of the 56 includes crashes" when what it
+	# had measured was "no prefix got far enough to crash": cpfe
+	# stops at the first error, and these prefixes were missing the
+	# two `#  include' lines the derivation above had skipped.
+	# `cxx-vecsplit' then crashed on its SHORTEST prefix and the two
+	# harnesses contradicted each other.  *A check whose negative
+	# result has two explanations is not a check.*
+	if(~ $k ERROR){
+		echo '  ERROR at prefix '^$#count^', whose last include is '^$i
+		sed 3q $tmp/err
+		echo '  -- cpfe stops at an error, so nothing after this'
+		echo '  -- prefix was reached.  The remaining rungs would'
+		echo '  -- all be clean for the wrong reason; stopping.'
+		errored=$i
+		break
+	}
 }
-if(~ $first '')
+if(~ $first '' && ~ $errored '')
 	echo '  no prefix of the '^$#incs^' includes crashes'
 echo
 
 # ---- the reading -------------------------------------------------
+if(! ~ $errored ''){
+	echo 'cxx-vecnarrow: NO VERDICT -- phase 2 stopped on an ERROR, so'
+	echo 'cxx-vecnarrow: the includes after it were never exercised and'
+	echo 'cxx-vecnarrow: nothing here says where the crash is.  Use'
+	echo 'cxx-vecnarrow: cxx-vecsplit, which cuts the real file.'
+	rm -rf $tmp
+	echo 'cxx-vecnarrow: done'
+	exit errrung
+}
 if(~ $#alone 0 && ~ $first ''){
 	echo 'cxx-vecnarrow: ***THE CRASH IS IN vector/vector.h ITSELF***,'
 	echo 'cxx-vecnarrow: below its last #include -- not in anything it'

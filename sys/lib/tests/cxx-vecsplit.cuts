@@ -1,96 +1,156 @@
-# cxx-vecsplit.cuts -- line numbers in sys/include/ape/c++/vector/vector.h
-# at which that file can be TRUNCATED and still compile.
+# cxx-vecsplit.cuts -- points in sys/include/ape/c++/vector/vector.h
+# at which it can be TRUNCATED and still compile, as `LINE DEPTH'.
 #
 # GENERATED AND VALIDATED by `hostkencc/cxxlib-host.sh --vecsplit'.
-# A cut at line N means "lines 1..N-1, then `} // namespace std',
-# `#endif' and a `main'".  Do not edit by hand: regenerate.
+# A cut `L D' means "lines 1..L, then D closing braces, then `#endif'
+# and a `main'".  Do not edit by hand: regenerate.
 #
-# ***EVERY LINE HERE WAS COMPILED BY g++ BEFORE IT WAS WRITTEN DOWN.***
-# 108 candidates, 81 validated -- the 27 that fail are member templates,
-# two `template<...>' lines where a cut between them leaves a dangling
-# header.  The list is the PROVEN set, so a rung that errors on the VM
-# is cpfe disagreeing with g++ rather than the harness cutting wrongly.
+# ***EVERY ONE WAS COMPILED BY g++ BEFORE IT WAS WRITTEN DOWN.***
+# 164 candidates, 137 validated, 56 of them inside the include block.
+# The ones that fail are member templates -- two `template<...>'
+# lines where a cut between them leaves a dangling header.  The list
+# is the PROVEN set, so a rung that errors on the VM is cpfe
+# disagreeing with g++ rather than the harness cutting wrongly.
 #
-# `cxx-vecsplit' BISECTS these, so a run is about seven cpfe
-# invocations rather than 81.
-88
-1298
-1306
-1326
-1335
-1357
-1378
-1405
-1414
-1434
-1444
-1466
-1489
-1520
-1537
-1544
-1561
-1572
-1580
-1591
-1598
-1619
-1627
-1646
-1662
-1671
-1688
-1709
-1731
-1737
-1743
-1755
-1777
-1789
-1795
-1819
-1825
-1845
-1855
-1866
-1880
-1885
-1891
-1901
-1912
-1925
-1941
-1960
-1983
-2001
-2019
-2026
-2036
-2042
-2050
-2061
-2085
-2105
-2114
-2134
-2157
-2195
-2236
-2279
-2325
-2332
-2377
-2384
-2428
-2453
-2480
-2505
-2520
-2533
-2543
-2549
-2554
-2559
-2564
-2569
-2574
+# ***IT SPANS THE INCLUDE BLOCK, AND THE FIRST VERSION DID NOT.***
+# That one cut only at top-level `template<' boundaries, so its
+# shortest prefix was the whole include block in one step -- and that
+# prefix CRASHED on the VM, leaving nothing shorter to bisect
+# against.  A ladder whose first rung already fails has no rungs.
+15 0
+16 0
+17 0
+18 0
+19 0
+20 0
+21 0
+22 0
+23 0
+24 0
+25 0
+26 0
+27 0
+28 0
+29 0
+30 0
+31 0
+32 0
+33 0
+34 0
+35 0
+36 0
+37 0
+38 0
+39 0
+40 0
+41 0
+42 0
+43 0
+44 0
+45 0
+46 0
+47 0
+48 0
+49 0
+50 0
+51 0
+52 0
+53 0
+54 0
+55 0
+56 0
+57 0
+58 0
+59 0
+60 0
+61 0
+62 0
+63 0
+64 0
+65 0
+66 0
+67 0
+68 0
+69 0
+70 0
+87 1
+1297 1
+1305 1
+1325 1
+1334 1
+1356 1
+1377 1
+1404 1
+1413 1
+1433 1
+1443 1
+1465 1
+1488 1
+1519 1
+1536 1
+1543 1
+1560 1
+1571 1
+1579 1
+1590 1
+1597 1
+1618 1
+1626 1
+1645 1
+1661 1
+1670 1
+1687 1
+1708 1
+1730 1
+1736 1
+1742 1
+1754 1
+1776 1
+1788 1
+1794 1
+1818 1
+1824 1
+1844 1
+1854 1
+1865 1
+1879 1
+1884 1
+1890 1
+1900 1
+1911 1
+1924 1
+1940 1
+1959 1
+1982 1
+2000 1
+2018 1
+2025 1
+2035 1
+2041 1
+2049 1
+2060 1
+2084 1
+2104 1
+2113 1
+2133 1
+2156 1
+2194 1
+2235 1
+2278 1
+2324 1
+2331 1
+2376 1
+2383 1
+2427 1
+2452 1
+2479 1
+2504 1
+2519 1
+2532 1
+2542 1
+2548 1
+2553 1
+2558 1
+2563 1
+2568 1
+2573 1
