@@ -216,71 +216,163 @@ echo 'cxx-vecsplit: '^$from^' AND LINE '^$to^'***'
 echo
 sed -n $from^','^$to^p $VEC | sed 25q
 
-# ---- phase C: minimise ---------------------------------------------
-# **A BOUNDARY IS NOT A REPRODUCER.**  Knowing that adding one
-# `#include' turns `ok' into `CRASH' names the last straw, not the
-# bug: `cxx-vecnarrow' phase 1 compiled that same header ALONE and it
-# was fine, so what crashes cpfe is a COMBINATION and the boundary
-# line is only its final member.
+# ---- phase C: minimise, IN PLACE -----------------------------------
+# ***THE FIRST VERSION OF THIS PHASE REBUILT THE FILE AND SO TESTED
+# SOMETHING ELSE.***  It collected the include PATHS and wrote a fresh
+# `#include "<abs>/vector/<path>"' per line -- and that file answered
+# `ok', not CRASH.  The honest report ("the includes ALONE answer ok")
+# was right and the method was wrong: **a minimiser must SHRINK the
+# input, never reconstruct it**, because a reconstruction differs in
+# every way you did not think to copy.  Here it dropped the copyright
+# block, the `#ifndef'/`#define' guard and the relative include
+# spelling, and one of those three is load-bearing.
 #
-# This drops the earlier includes one at a time, greedily, keeping
-# every drop that still CRASHES.  What comes out is the smallest set
-# that reproduces -- which is the thing to read, to attach to a bug
-# report, and to hand to `acid'.  **An include whose removal makes
-# the file merely ERROR is KEPT**, because that outcome says the
-# prefix stopped compiling rather than stopped crashing, and the two
-# are not the same answer.
+# *Neither of the first two is load-bearing by MEANING*: nothing in
+# the library tests `PSTL_VECTOR_H', and lines 1-11 are a `//'
+# comment -- both checked.  So the gap is a finding in itself and
+# this phase is what attributes it, by deleting from the real file.
+#
+# Candidates, each deleted as a UNIT and kept deleted if the file
+# still CRASHES:
+#   * the comment block (everything before the guard)
+#   * the guard pair -- and then the trailing `#endif' goes too
+#   * each `#include' line
+#
+# **An include whose removal makes the file merely ERROR is KEPT**:
+# that says the prefix stopped compiling, not that it stopped
+# crashing, and the two are different answers.
 echo
-echo 'cxx-vecsplit: phase C -- MINIMISING the reproducer'
-keep=`{sed -n '1,'^$to^'p' $VEC | sed -n 's/^[ 	]*#[ 	]*include "\(.*\)"/\1/p'}
-if(~ $#keep 0){
-	echo '  no #include lines up to line '^$to^'; nothing to minimise'
-	rm -rf $tmp
-	echo 'cxx-vecsplit: done'
-	exit 0
-}
-culprit=$keep($#keep)
-echo '  last include before the crash: '^$culprit
-echo '  starting from '^$#keep^' includes'
+echo 'cxx-vecsplit: phase C -- MINIMISING in place (deleting real lines)'
 
-fn buildlist {
-	rm -f $tmp/p.cpp
-	for(f in $*)
-		echo '#include "'^$CXXDIR^'/vector/'^$f^'"' >> $tmp/p.cpp
+CUTLAST=$to
+CUTDEPTH=`{echo $cuts($hi) | sed 's/.*://'}
+GUARD=1
+DEL=()
+SUBLINE=''
+SUBTEXT=''
+SUBALL=''
+
+fn buildsel {
+	e=''
+	for(d in $DEL)
+		e=$e^$d^'d;'
+	if(! ~ $SUBLINE '')
+		e=$e^$SUBLINE^'s|.*|'^$SUBTEXT^'|;'
+	if(! ~ $SUBALL '')
+		e=$e^'s|^[ 	]*#[ 	]*include "|#include "'^$CXXDIR^'/vector/|;'
+	if(~ $e '')
+		sed -n '1,'^$CUTLAST^'p' $VEC > $tmp/p.cpp
+	if(! ~ $e '')
+		sed -n '1,'^$CUTLAST^'p' $VEC | sed $e > $tmp/p.cpp
+	i=0
+	while(! ~ $i $CUTDEPTH){
+		echo '}' >> $tmp/p.cpp
+		i=`{echo $i | awk '{print $1 + 1}'}
+	}
+	if(~ $GUARD 1)
+		echo '#endif' >> $tmp/p.cpp
 	echo 'int main(void){ return 0; }' >> $tmp/p.cpp
 }
 
-buildlist $keep
+# Re-establish the baseline through THIS builder, so that every rung
+# below differs from it by exactly one deletion.  A minimiser whose
+# baseline was produced by a different path is comparing two things.
+buildsel
 k=`{try}
+echo '  baseline (lines 1..'^$CUTLAST^') -> '^$k
 if(! ~ $k CRASH){
-	echo '  the includes ALONE answer '^$k^', not CRASH -- so the'
-	echo '  reproducer needs something else from the file as well'
-	echo '  (the guard, the comment block, or a later line).  Not'
-	echo '  minimising; the boundary above is the finding.'
+	echo '  the builder does not reproduce the crash, so nothing below'
+	echo '  would mean anything.  Stopping; the boundary is the finding.'
 	rm -rf $tmp
 	echo 'cxx-vecsplit: done'
-	exit 0
+	exit nobase
 }
-cands=$keep
-for(drop in $cands){
-	if(! ~ $drop $culprit){
-		trial=()
-		for(f in $keep){
-			if(! ~ $f $drop)
-				trial=($trial $f)
-		}
-		buildlist $trial
+
+gline=`{grep -n '^#ifndef' $VEC | sed 1q | sed 's/:.*//'}
+gnext=`{echo $gline | awk '{print $1 + 1}'}
+gprev=`{echo $gline | awk '{print $1 - 1}'}
+
+# the comment block, as one unit
+if(! ~ $gprev 0){
+	save=$DEL
+	i=1
+	while(! ~ $i $gline){
+		DEL=($DEL $i)
+		i=`{echo $i | awk '{print $1 + 1}'}
+	}
+	buildsel
+	k=`{try}
+	echo '  without the comment block (1..'^$gprev^') -> '^$k
+	if(! ~ $k CRASH)
+		DEL=$save
+}
+
+# the guard pair
+save=$DEL
+sg=$GUARD
+DEL=($DEL $gline $gnext)
+GUARD=0
+buildsel
+k=`{try}
+echo '  without the #ifndef/#define guard -> '^$k
+if(! ~ $k CRASH){
+	DEL=$save
+	GUARD=$sg
+}
+
+# each include line
+incl=`{sed -n '1,'^$CUTLAST^'p' $VEC | grep -n '^[ 	]*#[ 	]*include' | sed 's/:.*//'}
+last=$incl($#incl)
+for(n in $incl){
+	if(! ~ $n $last){
+		save=$DEL
+		DEL=($DEL $n)
+		buildsel
 		k=`{try}
-		if(~ $k CRASH){
-			keep=$trial
-			echo '  dropped '^$drop
-		}
+		if(~ $k CRASH)
+			echo '  dropped line '^$n
+		if(! ~ $k CRASH)
+			DEL=$save
 	}
 }
-buildlist $keep
+
+# ---- C2: does the include SPELLING matter? -------------------------
+# ***THE HOST SAYS THE TWO FORMS ARE THE SAME PROGRAM.***  `g++ -E'
+# over the crashing prefix and over the rebuilt absolute-path version
+# produces **byte-identical token streams**, 6428 lines each -- so
+# nothing about the C++ differs and the only things left are the file
+# NAMES and the search that found them.
+#
+# A relative `#include "../algorithm/equal.h"' from a file in /tmp
+# misses in the including file's own directory and is then found
+# through `-I'; an absolute one is found at once.  *This port's whole
+# crash history is about `stat' in `host_envir.c'*, so a failed
+# lookup preceding a successful one is not an idle difference.
+#
+# This rewrites every surviving include to the absolute form -- a
+# line-wise substitution on the same file, not a reconstruction -- and
+# reports.  CRASH means the spelling is innocent; `ok' means it is the
+# whole thing and the C++ is cleared.
+SUBALL=1
+buildsel
+k=`{try}
+SUBALL=''
+echo
+echo 'cxx-vecsplit: phase C2 -- same lines, ABSOLUTE include paths -> '^$k
+if(~ $k CRASH)
+	echo 'cxx-vecsplit:   so the spelling is innocent; the content is the cause'
+if(! ~ $k CRASH){
+	echo 'cxx-vecsplit:   ***SO IT IS THE SPELLING, NOT THE C++.***  The two'
+	echo 'cxx-vecsplit:   forms preprocess to identical tokens on the host, so'
+	echo 'cxx-vecsplit:   this is cpfe''s FILE LOOKUP -- a relative include'
+	echo 'cxx-vecsplit:   that misses once and is then found through -I.'
+	echo 'cxx-vecsplit:   Read host_envir.c, not the C++ library.'
+}
+
+buildsel
 k=`{try}
 echo
-echo 'cxx-vecsplit: ***MINIMAL REPRODUCER: '^$#keep^' include(s), '^$k^'***'
+echo 'cxx-vecsplit: ***MINIMAL REPRODUCER -- '^$k^'***'
 echo
 cat $tmp/p.cpp
 cp $tmp/p.cpp /tmp/cxx-vecmin.cpp
@@ -288,56 +380,43 @@ echo
 echo 'cxx-vecsplit: saved as /tmp/cxx-vecmin.cpp'
 echo 'cxx-vecsplit: reproduce with:  c++ -F -I'^$CXXDIR^'/vector /tmp/cxx-vecmin.cpp'
 
-# ---- phase D: decompose the culprit --------------------------------
-# **PHASE C MINIMISES THE OTHERS AND LEAVES THE LAST ONE WHOLE.**  It
-# never tries to shrink the culprit itself, so the reproducer always
-# ends with a header that may be mostly irrelevant: `niter_base.h'
-# pulls in `move_iterator.h', `reverse_iterator.h', `wrap_iter.h' and
-# two metaprogramming headers before it declares anything of its own.
-#
-# This replaces the culprit with each of ITS includes in turn.  If one
-# of them reproduces, the real last member is that file and the
-# culprit was the envelope it arrived in -- which matters here,
-# because **`reverse_iterator.h' and `wrap_iter.h' are NOT among the
-# thirteen earlier includes**, so line 28 brings in three new things
-# at once and only one of them need be the one.
-#
-# `dirname' of the culprit, because a header's own includes are
-# relative to ITS directory and not to `vector/'.  The `..' segments
-# are left for the compiler to resolve rather than normalised here:
-# `../iterator/../metaprogramming/x.h' is a perfectly good path and
-# normalising it by hand is a second thing to get wrong.
+# ---- phase D: decompose the last include ---------------------------
+# Phase C never shrinks the last include, so the reproducer ends with
+# a header that may be mostly envelope: `niter_base.h' pulls in
+# `move_iterator.h', `reverse_iterator.h', `wrap_iter.h' and two
+# metaprogramming headers before it declares anything of its own, and
+# **`reverse_iterator.h' and `wrap_iter.h' are not among the earlier
+# thirteen**.  This REPLACES that one line, in place, with each of the
+# culprit's own includes in turn -- one `sed' substitution keyed on
+# the same input line number the deletions use, so the two compose.
 echo
-echo 'cxx-vecsplit: phase D -- can the culprit be REPLACED by one of its own includes?'
+echo 'cxx-vecsplit: phase D -- replace the last include with each of ITS own'
+culprit=`{sed -n $last^p $VEC | sed 's/.*"\(.*\)".*/\1/'}
 cdir=`{dirname $culprit}
 subs=`{sed -n 's/^[ 	]*#[ 	]*include "\(.*\)"/\1/p' $CXXDIR/vector/$culprit}
 if(~ $#subs 0)
 	echo '  '^$culprit^' includes nothing; it is already atomic'
-others=()
-for(f in $keep){
-	if(! ~ $f $culprit)
-		others=($others $f)
-}
+SUBLINE=$last
 hit=()
 for(s in $subs){
-	buildlist $others $cdir^'/'^$s
+	SUBTEXT='#include "'^$cdir^'/'^$s^'"'
+	buildsel
 	k=`{try}
 	echo '  '^$cdir^'/'^$s^' -> '^$k
 	if(~ $k CRASH)
 		hit=($hit $cdir^'/'^$s)
 }
+SUBLINE=''
 echo
 if(~ $#hit 0){
-	echo 'cxx-vecsplit: no single include of '^$culprit^' reproduces,'
-	echo 'cxx-vecsplit: so the last member is that file''s OWN content --'
-	echo 'cxx-vecsplit: its four niter_base overloads.'
+	echo 'cxx-vecsplit: no single include of '^$culprit^' reproduces, so'
+	echo 'cxx-vecsplit: the last member is that file''s OWN content.'
 }
 if(! ~ $#hit 0){
-	echo 'cxx-vecsplit: ***'^$culprit^' IS AN ENVELOPE***: these of its'
-	echo 'cxx-vecsplit: own includes reproduce on their own:'
+	echo 'cxx-vecsplit: ***'^$culprit^' IS AN ENVELOPE*** -- these of its'
+	echo 'cxx-vecsplit: own includes reproduce in its place:'
 	for(h in $hit)
 		echo 'cxx-vecsplit:   '^$h
-	echo 'cxx-vecsplit: re-run to bisect further, or read that file.'
 }
 rm -rf $tmp
 echo 'cxx-vecsplit: done'
