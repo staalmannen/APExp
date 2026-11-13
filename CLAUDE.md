@@ -1443,6 +1443,26 @@ silent:
   **`cxx-vecacid`**, which is possible now because the input is
   twelve lines and the crash has a REAL CODE ADDRESS, unlike the
   `pc=0x1` one `acid` was tried on and correctly gave nothing for.
+  ***AND IT NAMES IT: `free_memory_region+0x21` under `fe_wrapup`,
+  `mem_manage.c:1208`, which is `next_hdr = hdr->next` with
+  `hdr == 0x3f4a1`.*** **So it is TEARDOWN and not parsing** — cpfe
+  finishes the translation and dies freeing its memory regions, and
+  *six rounds of narrowing had all been looking at the front end*.
+  **And the memory manager is `mmap`**: `alloc_new_mem_block` has no
+  alternative path, every block being
+  `mmap(NULL, n, RW, MAP_PRIVATE, fileno(tmpfile), off)` with `off`
+  accumulating. ***THESE NOTES HAD RECORDED mmap AS CLEARED AND THAT
+  WAS TOO STRONG*** — what was checked is `open_mapped_input_file`,
+  which serves PCH only, and *a verdict about one function was
+  generalised to the whole mechanism*, the clisp `~0UL` shape again.
+  libap does not map files: `__p9_syscall.c:239` is malloc-or-segattach
+  plus `memset` plus `read`, all of it rewritten this release.
+  **`edgmmap-probe.c` reproduces the CALL SEQUENCE**, its section 2
+  being EDG's own teardown loop — unmap one, re-read the survivors —
+  and **section 3 a bug read out of the source**: `if(off != 0) lseek`
+  skips the seek for offset 0, where the fd's position is whatever
+  stdio left it. *0 failures on glibc with `-Wall -Wextra`*, so a
+  failure on the VM is attributable.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
