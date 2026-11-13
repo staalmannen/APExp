@@ -1699,6 +1699,28 @@ silent:
   starts pointing at a shared idiom or the compiler; **`dirty=0` with a
   nonzero carve count REFUTES the overrun reading** and says the pad
   merely moved the layout.
+  ***AND THE CANARY FIRED: ONE PAD IN 1120, EIGHT BYTES, THE SAME
+  VALUE.*** `dirty=1` of `carves=0x460`, `off 0`, bytes
+  `a1 f4 03 00 00 00 00 00` — little-endian `0x0003f4a1`, the exact
+  value that had been landing on `prev->next` — with every later byte
+  still `0xA5`, and `chain-bad-at = -1`. **So the overrun is confirmed
+  POSITIVELY and not by an absence**, and `dirty=1` settles the
+  discriminator: **NOT systematic**, one object.
+  **`objsize` is not the object's size, which corrects the last
+  round**: it is `alloc_addr - start_of_block`, how FULL the block was
+  when trimmed (0x25c8 unpadded, 0x7590 here — different blocks, not
+  one object changing size). The report prints **`blockreq`** now, the
+  block's own `min_size`: the dedicated arm asks `size + 8` and bumps
+  by `size`, so `blockreq == objsize + 8` means ONE allocation of
+  `objsize` bytes, which is the number to match against EDG's source.
+  **The leading reading**: `alloc_in_region` reserves exactly one word
+  per allocation and never hands it out, and `trim_mem_block` cuts at
+  `next_avail`, REMOVING that reservation for the last allocation in a
+  trimmed block — upstream's slack absorbs a one-word write everywhere
+  except at a carve boundary. *And the count keeps it honest*: if
+  every allocation wrote its reserved word, 1120 carves would give many
+  dirty pads, and one does — so one EDG structure writes a terminator
+  past its end and the `+8` is otherwise unused.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
