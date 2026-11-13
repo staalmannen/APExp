@@ -203,6 +203,75 @@ echo
 	echo 'src(*PC)'
 } | acid $crashpid
 
+# ---- the TOKEN recorder, which is the live question ------------------
+# ***THE CRASH MOVED OUT OF THE MEMORY MANAGER.***  On
+# `cxx-library-test.cpp' it is
+# `get_token_from_reusable_cache_stack+0x241', `<noname>:4869' --
+# `token->base.extra_info_kind', the FIRST dereference of `token' --
+# with `CX = 0x3f4b1' and the fault at `0x3f4cd', which is CX+0x1c.
+# **Plan 9 amd64's text base is 0x200000**, so 0x3f4b1 is below the
+# executable itself and was never an address.  Same family as the
+# `0x3f4a1' that landed on a region link, and that is the connection
+# worth keeping: *one producer of bogus small values, showing up in
+# two places.*
+#
+# The chain back from the fault is short and fully read, and it
+# leaves exactly two possibilities -- an out-of-bounds index into a
+# flat unchecked array, or a corrupt stored element.  See the comment
+# above `edg_tok_note' in `lexical.c' for the whole derivation; what
+# matters here is how to READ the five fields:
+#
+#   off >= n      -> BOUNDS.  The index ran past `n_elems' of a flat
+#                    array with no check, and `cache != endcache'
+#                    beside it names the mechanism: the loop's exit
+#                    sentinel is built from a different cache than
+#                    the one being indexed, so it can never match.
+#   off <  n      -> the element is CORRUPT and the question moves to
+#                    whoever wrote it.  Then the ring matters: a
+#                    climbing `off' with healthy values before the
+#                    bad one says one element was clobbered.
+#   calls == 0    -> the names resolved but nothing ran; the crash is
+#                    not on this path and this whole section is void.
+#
+# **`edg_tok_calls` is load-bearing** for the same reason
+# `edg_dbg_checks` is: a recorder that never ran and a first call
+# that went bad print the same thing without a count.
+#
+# A note on width: `off', `n' and `alloc' are 64-bit and acid's `\D'
+# shows 32, which is harmless for counts and is the reason not to
+# read a huge `off' as a small one -- a NEGATIVE `int offset'
+# converted to `size_t' would show as something enormous, and the
+# low half alone could hide it.  `alloc' is printed for that case:
+# `n' above `alloc' is itself a finding.
+echo
+echo 'cxx-vecacid: the TOKEN recorder (needs an edg rebuild)'
+echo
+{
+	echo 'print("edg_tok_calls   = ", *edg_tok_calls\D, "   (0 = this path never ran; section void)\n")'
+	echo 'print("edg_tok_site    = ", *edg_tok_site\D, "   1=first lookup 2=pp-token flush loop\n")'
+	echo 'print("edg_tok_val     = ", *edg_tok_val\X, "   (the token pointer; compare with CX)\n")'
+	echo 'print("edg_tok_off     = ", *edg_tok_off\D, "   (index)\n")'
+	echo 'print("edg_tok_n       = ", *edg_tok_n\D, "   (n_elems -- off >= n is a BOUNDS bug)\n")'
+	echo 'print("edg_tok_alloc   = ", *edg_tok_alloc\D, "   (n_allocated)\n")'
+	echo 'print("edg_tok_elems   = ", *edg_tok_elems\X, "\n")'
+	echo 'print("edg_tok_cache   = ", *edg_tok_cache\X, "   (indexed through this)\n")'
+	echo 'print("edg_tok_endcache= ", *edg_tok_endcache\X, "   (sentinel built from this; differing is the mechanism)\n")'
+} | acid $crashpid
+
+echo
+echo 'cxx-vecacid: the last 24 token lookups, newest first'
+echo
+{
+	echo 'n = *edg_tok_calls'
+	echo 'k = n-1'
+	echo 'while k >= 0 && k > n-25 do {
+		i = k & 63;
+		print("  lookup ", k\D, " site=", *(edg_tok_ring_site+i*4)\D, " off=", *(edg_tok_ring_off+i*8)\D, " n=", *(edg_tok_ring_n+i*8)\D, " val=", *(edg_tok_ring_val+i*8)\X, "\n");
+		k = k-1;
+	}'
+	echo 'print("printed through lookup ", k\D+1, "; the ring holds 64\n")'
+} | acid $crashpid
+
 
 # ---- walk the list the crash was walking -----------------------------
 # ***THE STACK NAMES THE LINE AND NOT THE DEFECT.***  `free_memory_region'

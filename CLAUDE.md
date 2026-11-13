@@ -1753,9 +1753,34 @@ silent:
   label that did not match the loop's, so `No such file or directory`
   read as "the control fired". It demands `M_M_alloc` in the
   diagnostic now — *caught by reading the output, not the status.*
-  ***AND THE CRASH IS BACK ON THE BIGGER INPUT AT A DIFFERENT pc***:
-  `addr=0x3f4cd pc=0x90c3a1`, the same family of value at a different
-  code address, with `chain-bad-at = -1`.
+  ***AND THE CRASH IS BACK ON THE BIGGER INPUT AT A DIFFERENT pc, AND
+  IT IS NOT THE MEMORY MANAGER AT ALL.*** `evicted=0x42` plus 4096 live
+  is `carves=0x1042` exactly, so **the pad scan is complete and
+  `dirty=0` is a real zero** -- the carve overrun did not happen on
+  this input, and *a count that can only report what a ring still
+  holds was the whole reason the previous `0` meant nothing*. The
+  stack names `get_token_from_reusable_cache_stack+0x241`, which is
+  `token->base.extra_info_kind`, the FIRST dereference of `token`,
+  with `CX = 0x3f4b1` and the fault at CX+0x1c; **Plan 9 amd64's text
+  base is 0x200000**, so that was never an address. `0x3f4a1`,
+  `0x3f4a9`, `0x3f4b1`, `0x3f4cd` are ONE FAMILY eight apart and the
+  first is what had landed on a region link -- *one producer of bogus
+  small values in two places*, which is what "stale front-end data"
+  meant. The chain back is short and fully read: `object` is at
+  OFFSET 0 of the control block so `ptr()` returns it unchanged,
+  `Shared_obj` is one 8-byte pointer, and `Dyn_array::operator[]` is
+  `return elems + i` with **no bounds check at all** -- so the array
+  element holds the bad value, by an out-of-range index or a corrupt
+  store, **different bugs with one symptom**. `edg_tok_note` records
+  five fields and a 64-deep ring before the dereference; `endcache`
+  is among them because the loop's sentinel is built from a different
+  cache than the one indexed, and if they ever differ the walk cannot
+  stop. **Two plausible sentences cost one compile each and both said
+  no**: the `memcpy(..., 12ULL)` is EDG's own `__SO__` form, the
+  padding-excluding object representation, and the bit-field-then-
+  struct layout of `a_token_cache` agrees (host `6c -J -p -a`: 32,
+  128, 120, 16) while corpus member access is SYMBOLIC, so layout
+  only bites where a size is baked.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
