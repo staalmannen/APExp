@@ -6450,8 +6450,19 @@ typedef unsigned long long size_t;
 #line 20 "ape-sys/stddef.h"
 typedef _ptrdiff_t ptrdiff_t;
 #line 16 "ape-sys/sys/types.h"
-typedef unsigned short ino_t;
-typedef unsigned short dev_t;
+/*
+ * APExp: `ino_t' and `dev_t' were `unsigned short' here, which is what
+ * EDG's C back end baked from the headers it was generated against.
+ * APExp widened both to `unsigned long long' (64-bit qids; `struct
+ * stat' 88 -> 104 bytes), and **this corpus declares its own copies
+ * because `cmd/edg/mkfile' passes NO -I**: every generated file
+ * declares what it uses.  So the widening could not reach cpfe, and
+ * `get_file_modification_time' put an 88-byte `struct stat' on the
+ * stack for libap's `stat()' to write 104 bytes into.  A regeneration
+ * would emit these two lines exactly as they now read.
+ */
+typedef unsigned long long ino_t;
+typedef unsigned long long dev_t;
 #line 21 "ape-sys/stdio.h"
 typedef struct _IO_FILE FILE;
 #line 499 "src/basics.h"

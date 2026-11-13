@@ -566,6 +566,20 @@ is corroboration the class is real. **Control in two halves** --
 libwebp's pre-fix header out of git MUST classify X86-REACHABLE and
 the current one must NOT, since the first alone passes for a
 classifier that fires on everything),
+`baketype-sweep.py` (**does NOT gate**: a vendored package
+declaring an APExp `sys/` typedef ITSELF has taken a copy of the
+platform ABI that no header change can reach. **50 disagree, 48
+inside `#if` arms this platform never takes** (gnulib and friends),
+and the unguarded ones are the class that bites: EDG's
+`unsigned short ino_t/dev_t` made its `struct stat` 88 bytes where
+libap's `stat()` writes 104, smashing cpfe's return address on every
+input. *It found the second unguarded pair by itself.* **Limits are
+in the header**: it reads `#if` TEXT not arithmetic, it searches BOTH
+header roots because APExp has arch arms (`_ptrdiff_t` was a false
+positive on the first run against the generic arm alone), and it does
+not resolve alias chains. **Control in two halves** -- the pre-fix
+`host_envir.c` out of git MUST come back UNGUARDED+divergent and the
+current one must NOT),
 `truefalse-sweep.py` (**does NOT gate**: which vendored TUs use
 `true`/`false` as an IDENTIFIER without defining the names themselves —
 the shape kencc's C23 keywords break. **Its positive control is
@@ -1187,6 +1201,25 @@ silent:
   `check_target_config: must use SoftFloat library`, the DOCUMENTED
   refusal without `--target win64`, so it measured a missing flag
   rather than the preprocessor.
+  ***AND IT IS FOUND: EDG's OWN `struct stat` WAS 88 BYTES AND libap
+  WRITES 104.*** `cmd/edg/mkfile` passes **NO -I and NO -D** -- "each
+  file declares everything it uses" -- so the generated corpus carries
+  its own `typedef unsigned short ino_t/dev_t` and its own
+  `struct stat` built from them, member-identical to APExp's. **This
+  release widened both to `unsigned long long`** (64-bit qids,
+  `struct stat` 88 -> 104) and *a header change cannot reach a copy*.
+  `get_file_modification_time` puts that 88-byte struct ON THE STACK
+  and `stat()` writes 104 -- sixteen past the end, over the return
+  address, which is exactly why the fault is `pc=0x1`: Plan 9 has no
+  stack protector, so a smashed return address is returned to.
+  **Measured with the host `6c`: 88 old, 104 new, 104 for APExp's real
+  header.** Fixed in five files. *It accounts for every observation
+  the ladder made*, above all the one rung that PASSES -- a
+  nonexistent file makes `stat()` fail, so nothing is written and
+  nothing is smashed. **`baketype-sweep.py` is the general form**: 50
+  vendored declarations of an APExp `sys/` typedef disagree, 48 inside
+  `#if` arms nobody takes, and the sweep found the second unguarded
+  pair (`util/edg_prelink.c`) that I had missed by hand.
   ***AND RUNG 3, A NONEXISTENT INPUT FILE, PASSES*** -- so the 27
   `fe_translation_unit_init` calls (direct, no function-pointer
   dispatch), `fe_init_part_2` and the LEXER's own `fopen`
