@@ -1,6 +1,7 @@
 extern void edg_wat_note(void *, unsigned long long, long);
 extern void edg_wat_find(void *);
 extern long edg_wat_found;
+extern long edg_wat_site;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:08 2026 */
 extern int __EDGCPFE__7_0;
@@ -17954,7 +17955,7 @@ auto _ZN3edg9Dyn_arrayINS_25a_struct_stmt_stack_stateENS_12FE_allocatorEE13an_al
 (this->n_allocated) = 0ULL;
 (this->n_elems) = 0ULL;
 
-__35449_18_allocation = (((__35438_61_cap <= 1ULL) ? ((void)((__T804967608 = 32ULL) , (__T804967904 = (_ZN3edg8alloc_feEy(32ULL))))) : ((void)(__T804967904 = (_ZN3edg17alloc_fe_var_sizeEyPy((__35438_61_cap * 32ULL), (&__T804967608)))))) , ((((__T804967312.start) = ((
+__35449_18_allocation = (((__35438_61_cap <= 1ULL) ? ((void)((__T804967608 = 32ULL) , (__T804967904 = ((edg_wat_site = 41, _ZN3edg8alloc_feEy(32ULL)))))) : ((void)(__T804967904 = (_ZN3edg17alloc_fe_var_sizeEyPy((__35438_61_cap * 32ULL), (&__T804967608)))))) , ((((__T804967312.start) = ((
 #line 1728
 _ZN3edg12FE_allocatorINS_25a_struct_stmt_stack_stateEE7an_elemE *)__T804967904)) , ((__T804967312.n_bytes_allocated) = __T804967608)) , __T804967312));
 (this->elems) = (__35449_18_allocation.start);
@@ -17991,7 +17992,7 @@ __35945_18_old_cap = (this->n_allocated);
 __35946_18_new_cap = ((__35945_18_old_cap < 2ULL) ? 2ULL : ((__35945_18_old_cap + (__35945_18_old_cap / 2ULL)) + 1ULL));
 __35947_18_a = ((((__T803890416 = (((__T803760320.start) = (this->elems)) , (((__T803760320.n_bytes_allocated) = (__35945_18_old_cap * 32ULL)) , __T803760320))) , (__T803890712 = __35946_18_new_cap)) , (__T803891008 = (this->n_elems))) , ((((((__T804027672 = (((__T803890712 <= 1ULL) ? ((void)((
 #line 2226
-__T804025008 = 32ULL) , (__T804025304 = (_ZN3edg8alloc_feEy(32ULL))))) : ((void)(__T804025304 = (_ZN3edg17alloc_fe_var_sizeEyPy((__T803890712 * 32ULL), (&__T804025008)))))) , ((((__T803891304.start) = ((_ZN3edg12FE_allocatorINS_25a_struct_stmt_stack_stateEE7an_elemE *)__T804025304)) , ((__T803891304
+__T804025008 = 32ULL) , (__T804025304 = ((edg_wat_site = 42, _ZN3edg8alloc_feEy(32ULL)))))) : ((void)(__T804025304 = (_ZN3edg17alloc_fe_var_sizeEyPy((__T803890712 * 32ULL), (&__T804025008)))))) , ((((__T803891304.start) = ((_ZN3edg12FE_allocatorINS_25a_struct_stmt_stack_stateEE7an_elemE *)__T804025304)) , ((__T803891304
 #line 2226
 .n_bytes_allocated) = __T804025008)) , __T803891304))) , (__T804027968 = (__T803890416.start))) , (__T804028264 = (__T804027672.start))) , (((__T804025600 = (__T803891008 * 32ULL)) , ((__T804025600 > 9223372036854775807ULL) ? (_ZN3edg26insufficient_address_spaceEv()) : ((void)0))) , (memmove(((void 
 #line 2226
@@ -19366,7 +19367,7 @@ if ((((__156689_20_rp->is_inline) && (__156689_20_rp->definition_for_inlining_on
 {
 auto _ZN3edg35a_c99_inline_definition_locator_ptrE __156696_44_to_check;
 if (_ZN33_INTERNAL_11_scope_stk_c_5a7a406d3edg36avail_c99_inline_definition_locatorsE == ((_ZN3edg35a_c99_inline_definition_locator_ptrE)0)) {
-__156696_44_to_check = ((_ZN3edg31a_c99_inline_definition_locatorE *)(_ZN3edg8alloc_feEy(32ULL)));
+__156696_44_to_check = ((_ZN3edg31a_c99_inline_definition_locatorE *)((edg_wat_site = 43, _ZN3edg8alloc_feEy(32ULL))));
 
 
 
@@ -24591,7 +24592,7 @@ static _ZN3edg33a_name_hidden_by_old_for_init_ptrE _ZN33_INTERNAL_11_scope_stk_c
 auto _ZN3edg33a_name_hidden_by_old_for_init_ptrE __163060_38_nhp;
 
 if (_ZN33_INTERNAL_11_scope_stk_c_5a7a406d3edg34avail_names_hidden_by_old_for_initE == ((_ZN3edg33a_name_hidden_by_old_for_init_ptrE)0)) {
-__163060_38_nhp = ((_ZN3edg33a_name_hidden_by_old_for_init_ptrE)(_ZN3edg8alloc_feEy(32ULL)));
+__163060_38_nhp = ((_ZN3edg33a_name_hidden_by_old_for_init_ptrE)((edg_wat_site = 44, _ZN3edg8alloc_feEy(32ULL))));
 
 } else  {
 __163060_38_nhp = _ZN33_INTERNAL_11_scope_stk_c_5a7a406d3edg34avail_names_hidden_by_old_for_initE;

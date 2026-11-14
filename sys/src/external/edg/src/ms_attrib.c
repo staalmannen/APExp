@@ -1,6 +1,7 @@
 extern void edg_wat_note(void *, unsigned long long, long);
 extern void edg_wat_find(void *);
 extern long edg_wat_found;
+extern long edg_wat_site;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:07 2026 */
 extern int __EDGCPFE__7_0;
@@ -13402,7 +13403,7 @@ static _ZN3edg25an_ms_attribute_param_ptrE _ZN33_INTERNAL_11_ms_attrib_c_2c3a56a
 {
 auto _ZN3edg25an_ms_attribute_param_ptrE __147906_29_msapp;
 
-__147906_29_msapp = ((_ZN3edg21an_ms_attribute_paramE *)(_ZN3edg8alloc_feEy(32ULL)));
+__147906_29_msapp = ((_ZN3edg21an_ms_attribute_paramE *)((edg_wat_site = 38, _ZN3edg8alloc_feEy(32ULL))));
 
 
 
@@ -16189,7 +16190,7 @@ _ZN3edg16no_injected_textE = ((_ZN3edg9a_booleanE)0);
 
 
 { auto unsigned long long __T288447568; auto _ZZN3edg9constructIPNS_13a_token_cacheEJbEEEvT_DpOT0_E9an_object *__T288447864; auto _ZN3edg9a_booleanE __T288448160; auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE __T288448456;
-auto struct _ZN3edg13a_token_cacheE *__34873_15_p; __34873_15_p = ((struct _ZN3edg13a_token_cacheE *)(_ZN3edg8alloc_feEy(32ULL)));
+auto struct _ZN3edg13a_token_cacheE *__34873_15_p; __34873_15_p = ((struct _ZN3edg13a_token_cacheE *)((edg_wat_site = 39, _ZN3edg8alloc_feEy(32ULL))));
 
 { (_ZZN3edg9constructIPNS_13a_token_cacheEJbEEEvT_DpOT0_E9an_object *)((__T288447568 = 32ULL) , ((__T288447864 = ((_ZZN3edg9constructIPNS_13a_token_cacheEJbEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T288447568, ((void *)__34873_15_p))))) , (((__T288448160 = (*((_Bool *)((_Bool *)__1_34867_43_args)))) , ((
 #line 1154

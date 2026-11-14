@@ -66,6 +66,34 @@
 void *edg_wat_all_ptr[EDG_WAT_MAX];
 unsigned int edg_wat_all_size[EDG_WAT_MAX];
 unsigned char edg_wat_all_kind[EDG_WAT_MAX];	/* 1 alloc_fe, 2 var_size */
+unsigned short edg_wat_all_site[EDG_WAT_MAX];	/* tagged call site, 0 = untagged */
+
+/*
+ * ***THE CALL SITE, BECAUSE CONTENT CANNOT IDENTIFY THE OBJECT.***
+ * `kind' came back **1**, a fixed `alloc_fe(32)', so the neighbour is
+ * a struct and not a Dyn_array buffer -- which refuted the prediction
+ * and killed the `{pointer, number}' pair reading with it.
+ *
+ * And identifying it by its BYTES is not available: **the block was
+ * allocated twice** (idx 113624 and again at 114548, the second time
+ * *after* all five of the victim's allocations), so what it holds when
+ * the process dies need not be what it was allocated as.  A snapshot
+ * of a recycled block is not a type.
+ *
+ * Nor by LAYOUT: every aggregate the host `6c -a' emits for all 75
+ * TUs was searched -- 4812 distinct, 757 of them 32 bytes -- and
+ * **zero** have the observed `{ptr, num, ptr, num}' shape.  That is a
+ * real negative and it says the inference was the wrong instrument,
+ * not that the object is exotic.
+ *
+ * So each `alloc_fe(32ULL)' site is tagged with a number and the
+ * number is recorded beside the allocation.  58 sites, of which **24
+ * allocate `struct a_token_cache'** -- which is suggestive in a token
+ * cache bug and is exactly the kind of thing that should be measured
+ * rather than assumed.  A site of 0 means the 32 bytes came from a
+ * call whose size is not the literal, which is a finding of its own.
+ */
+long edg_wat_site;
 long edg_wat_all_n;
 long edg_wat_over;
 long edg_wat_calls;
@@ -97,10 +125,12 @@ long edg_wat_vic_cnt;
 void *edg_wat_nbr_ptr[EDG_WAT_HIST];
 unsigned long long edg_wat_nbr_size[EDG_WAT_HIST];
 long edg_wat_nbr_kind[EDG_WAT_HIST];
+long edg_wat_nbr_site[EDG_WAT_HIST];
 long edg_wat_nbr_idx[EDG_WAT_HIST];
 void *edg_wat_vic_ptr[EDG_WAT_HIST];
 unsigned long long edg_wat_vic_size[EDG_WAT_HIST];
 long edg_wat_vic_kind[EDG_WAT_HIST];
+long edg_wat_vic_site[EDG_WAT_HIST];
 long edg_wat_vic_idx[EDG_WAT_HIST];
 
 void
@@ -116,6 +146,8 @@ edg_wat_note(void *p, unsigned long long sz, long kind)
   edg_wat_all_ptr[edg_wat_all_n] = p;
   edg_wat_all_size[edg_wat_all_n] = (unsigned int)sz;
   edg_wat_all_kind[edg_wat_all_n] = (unsigned char)kind;
+  edg_wat_all_site[edg_wat_all_n] = (unsigned short)edg_wat_site;
+  edg_wat_site = 0;
   edg_wat_all_n = edg_wat_all_n + 1;
 }
 
@@ -144,6 +176,7 @@ edg_wat_find(void *target)
         edg_wat_nbr_ptr[edg_wat_nbr_cnt] = edg_wat_all_ptr[i];
         edg_wat_nbr_size[edg_wat_nbr_cnt] = s;
         edg_wat_nbr_kind[edg_wat_nbr_cnt] = (long)edg_wat_all_kind[i];
+        edg_wat_nbr_site[edg_wat_nbr_cnt] = (long)edg_wat_all_site[i];
         edg_wat_nbr_idx[edg_wat_nbr_cnt] = i;
       }
       edg_wat_nbr_cnt = edg_wat_nbr_cnt + 1;
@@ -153,6 +186,7 @@ edg_wat_find(void *target)
         edg_wat_vic_ptr[edg_wat_vic_cnt] = edg_wat_all_ptr[i];
         edg_wat_vic_size[edg_wat_vic_cnt] = s;
         edg_wat_vic_kind[edg_wat_vic_cnt] = (long)edg_wat_all_kind[i];
+        edg_wat_vic_site[edg_wat_vic_cnt] = (long)edg_wat_all_site[i];
         edg_wat_vic_idx[edg_wat_vic_cnt] = i;
       }
       edg_wat_vic_cnt = edg_wat_vic_cnt + 1;

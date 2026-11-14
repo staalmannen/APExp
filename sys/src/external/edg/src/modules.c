@@ -1,6 +1,7 @@
 extern void edg_wat_note(void *, unsigned long long, long);
 extern void edg_wat_find(void *);
 extern long edg_wat_found;
+extern long edg_wat_site;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:07 2026 */
 extern int __EDGCPFE__7_0;
@@ -12238,7 +12239,7 @@ _ZN3edg12a_const_charE *)0)))) , (__T124906312 = (((this->__T90000856).local))))
 #line 1448
 }
 } else  { {
-__T124914432 = ((((__T124916040 = (((__35161_75_n <= 1ULL) ? ((void)((__T124915152 = 32ULL) , (__T124915448 = (_ZN3edg8alloc_feEy(32ULL))))) : ((void)(__T124915448 = (_ZN3edg17alloc_fe_var_sizeEyPy((__35161_75_n * 32ULL), (&__T124915152)))))) , ((((__T124914856.start) = ((
+__T124914432 = ((((__T124916040 = (((__35161_75_n <= 1ULL) ? ((void)((__T124915152 = 32ULL) , (__T124915448 = ((edg_wat_site = 36, _ZN3edg8alloc_feEy(32ULL)))))) : ((void)(__T124915448 = (_ZN3edg17alloc_fe_var_sizeEyPy((__35161_75_n * 32ULL), (&__T124915152)))))) , ((((__T124914856.start) = ((
 #line 1450
 _ZN3edg12FE_allocatorINS_22a_module_entry_locatorEE7an_elemE *)__T124915448)) , ((__T124914856.n_bytes_allocated) = __T124915152)) , __T124914856))) , (__T124916336 = (__T124916040.start))) , (__T124916632 = (__T124916040.n_bytes_allocated))) , ((((__T124915744.start) = __T124916336) , ((
 #line 1450
@@ -12268,7 +12269,7 @@ if (((!(this->local_used)) || (__35194_12_old_start == (((this->__T90000856).loc
 __35192_12_new_start = (((this->__T90000856).local));
 __35193_11_new_num_allocated = (__35182_67_new_capacity * 32ULL);
 } else  { auto struct _ZN3edg10AllocationINS_22a_module_entry_locatorEEE __T125024032; auto _ZN3edg8sizeof_tE __T125024328; auto char *__T125024624;
-auto _ZN3edg18Buffered_allocatorILj1ENS_12FE_allocatorENS_22a_module_entry_locatorEE13an_allocationE __35204_19_alloced; __35204_19_alloced = (((__35182_67_new_capacity <= 1ULL) ? ((void)((__T125024328 = 32ULL) , (__T125024624 = (_ZN3edg8alloc_feEy(32ULL))))) : ((void)(__T125024624 = (
+auto _ZN3edg18Buffered_allocatorILj1ENS_12FE_allocatorENS_22a_module_entry_locatorEE13an_allocationE __35204_19_alloced; __35204_19_alloced = (((__35182_67_new_capacity <= 1ULL) ? ((void)((__T125024328 = 32ULL) , (__T125024624 = ((edg_wat_site = 37, _ZN3edg8alloc_feEy(32ULL)))))) : ((void)(__T125024624 = (
 #line 1483
 _ZN3edg17alloc_fe_var_sizeEyPy((__35182_67_new_capacity * 32ULL), (&__T125024328)))))) , ((((__T125024032.start) = ((_ZN3edg12FE_allocatorINS_22a_module_entry_locatorEE7an_elemE *)__T125024624)) , ((__T125024032.n_bytes_allocated) = __T125024328)) , __T125024032));
 
