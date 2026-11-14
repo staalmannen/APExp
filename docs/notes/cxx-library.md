@@ -1648,3 +1648,65 @@ a ladder hardwired to one input cannot reach the other. It also says, after
 the region walk, that the walk means nothing unless `stk()` named
 `free_memory_region` — *a healthy chain printed against the wrong question
 is exactly what the 33-entry run was.*
+
+### `evicted=0x42` — the carve overrun did not happen on this input
+
+`edg-pad2: evicted=0x42 carves=0x1042 checked=0x1000`. 66 evicted plus 4096
+live is 4162, which is `carves` exactly, so **the scan is complete and
+`dirty=0` is a real zero.** The carve-boundary overrun did not occur on
+`cxx-library-test.cpp`, `chain-bad-at` is `-1`, and the recorder shows
+`free_memory_region` at `n=1` with a healthy `cur`. *So this is a different
+bug from the one the pad experiment settled*, and the pad result on the
+twelve-line reproducer stands on its own.
+
+### And the stack names it: the token cache, not the memory manager
+
+`get_token_from_reusable_cache_stack+0x241`, `<noname>:4869` — which is
+`token->base.extra_info_kind`, the **first dereference of `token`** — with
+`CX = 0x000000000003f4b1` and the fault at `0x3f4cd`, i.e. CX + 0x1c.
+**Plan 9 amd64's text base is 0x200000**, so `0x3f4b1` is below the
+executable itself and was never an address. The earlier
+`addr=0x3f4cd pc=0x90c3a1` run was *this same fault*, not a second one.
+
+**The connection to the first crash is the value.** `0x3f4a1`, `0x3f4a9`,
+`0x3f4b1`, `0x3f4cd` are one family, eight apart, and `0x3f4a1` is what had
+been landing on a region link. So there is one producer of bogus small
+values showing up in two places — which is what "stale front-end data"
+meant, now with the front end's own structure named.
+
+The chain back from the fault is short and entirely read:
+
+* `Shared_obj_control_block<an_immutable_cached_token>` has `object` at
+  **offset 0**, so `ptr()` returns the control-block pointer unchanged.
+* `Shared_obj` is one 8-byte pointer — `n_allocated = n_bytes_allocated / 8`
+  says so from the corpus itself.
+* `Dyn_array::operator[]` is `return elems + i`, with **no bounds check at
+  all**.
+
+So the array element holds the bad value, and there are exactly two ways:
+`offset` past `n_elems` (a bounds bug), or a corrupt stored element.
+**Different bugs, one symptom** — the shape this hunt has already mistaken
+once — so `edg_tok_note` records five fields and a 64-deep ring before the
+dereference, and `cxx-vecacid` prints them first. `edg_tok_calls` is
+load-bearing: a recorder that never ran and a first call that went bad
+print the same thing without a count.
+
+**The loop's exit rule is why `endcache` is recorded.** `end_it` is built
+from the cache reached through the stack entry's `operator->`, while the
+element is indexed through `next_token.cache`. If those differ, `next_token`
+can never equal `end_it` and the walk runs off the end of a flat array —
+possibility one with a named mechanism.
+
+**Two things checked and cleared on the host, so they are not the lead.**
+The `memcpy(&next_token, &iterator(0,0), 12ULL)` is not a baked size error:
+EDG emits two forms of every struct, the padded one and a `__SO__` one
+without tail padding, and copies the object representation excluding
+padding — upstream's own correct idiom, and also exactly why `-J` matters.
+And `a_token_cache` being `{ unsigned is_reusable:1; Dyn_array tokens; }` —
+a bit-field followed by a struct member, with two new bit-field layout
+rules landed this release — does not bite here: the host `6c -J -p -a` gives
+`a_token_cache` 32, the control block 128, `a_cached_token_base` 120 and the
+iterator base 16, and member access in the corpus is **symbolic**, so a
+layout difference only matters where a size is *baked*, which
+`edgbaked-xcheck` already sweeps. *Both were plausible sentences; one
+compile each said no.*
