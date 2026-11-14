@@ -1739,3 +1739,45 @@ move / reuse), or all bad (`elems` is not what the cache thinks). The four
 words below `elems` go with it, since an FE allocation carries its block
 header there and a buffer sitting at a carve boundary is what would tie this
 to the first crash.
+
+### Only element 0, and the four words below it are the same tail
+
+`elems[1..22]` are all plausible control blocks (`0x03b84740`, `0x03c08520`,
+…); `elems[0]` is `0x0003f4b1`. And below `elems`:
+
+```
+0x03c15270: 0x03b59df8      pointer
+0x03c15278: 0x00000009      9
+0x03c15280: 0x03c486b8      pointer
+0x03c15288: 0x00004d1b      0x4d1b
+0x03c15290: 0x0003f4b1      elems[0]
+```
+
+**That is the four-word tail already recorded for `prev` in the first
+crash** — "a pointer, `9`, a pointer, `0x4d1b`" — with `0x4d1b` matching to
+the digit. So it is one write with two victims: a carved block header's
+`next` then, a `Dyn_array`'s element 0 now. *The two crashes are one bug,
+and that is now positive rather than inferred from the value alone.*
+
+**And `grow` says this buffer is recycled.** 23 slots of 8 bytes is 248, and
+`alloc_fe_var_size` takes anything under 2096 bytes off `reusable_fe_list` —
+which `grow` itself fills, pushing the old buffer there after
+`move_elements`. Three questions follow, and all three are free, because the
+data is already in the broken process and needs no edg rebuild:
+
+1. **Is `elems` on `reusable_fe_list` right now?** A live cache indexing a
+   block that has been handed back names the bug outright.
+2. **What is below `elems`,** far enough back to show the preceding object's
+   shape and a 48-byte `a_mem_block_header` if the block starts near —
+   `start`/`end`/`next`/`msize` are recognisable.
+3. **Which recorded block contains `elems`?** The link ring holds every
+   `hdr` and the trim ring every carve, so a scan for the one spanning
+   `elems` says whether this buffer sits in a carved sub-block, which is how
+   the other crash's victim was placed.
+
+*A negative on (1) is as useful as a positive*: it says the block is live and
+the word was overwritten in place, which is the overrun reading, and leaves
+the 34-copy allocation ring as the way to name the writer. **`alloc_fe` and
+`alloc_fe_var_size` are COMDAT in 34 TUs each**, the same trap that made
+`alloc_in_region` report `0 of 0`, so that instrument is a uniform sed over
+all 34 copies and is worth paying for only once these three have answered.
