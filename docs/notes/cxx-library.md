@@ -1991,3 +1991,32 @@ is suggestive in a token-cache bug, and exactly the kind of thing to measure
 rather than assume. `sys/lib/tests/edg-wat-sites.txt` is the tag → file:line →
 type map. A site of **0** means the 32 bytes came from a call whose size is not
 the literal, which is a finding of its own.
+
+### `found = 0`: the instrument was absent, not the bug
+
+The run came back `calls = 627353`, `recorded = 627353`, `overflowed = 0` —
+and `found = 0`, `target = 0`, both histories empty. **The cause was mine.**
+The corpus had been reverted and re-patched to add the call-site tags, and
+the arming of `edg_wat_find` inside `edg_tok_note` was a *separate* edit run
+by hand, which did not get re-run. Nothing ever called the search.
+
+*An instrument that is correct in three pieces is not an instrument.* All
+three edits are one committed, re-runnable script now —
+`sys/lib/tests/edg-wat-patch.py` — and each one gates:
+
+1. every definition of `alloc_fe` (**41**) and `alloc_fe_var_size` (**34**),
+   found by parameter spelling and by the first `return (char *)X;` after it,
+   **with no temp name in any anchor** — the assumption that missed 14 files;
+2. every `alloc_fe(32ULL)` call site (**58**), tagged, with the map written to
+   `edg-wat-sites.txt`;
+3. the arming in `edg_tok_note`.
+
+The gates are phrased against the temp-agnostic definition lists and against
+the files themselves, never against the anchors the patch used.
+
+**And `found = 0` was unreadable, which is the smaller lesson.** "The search
+is absent" and "no lookup ever saw a bad token" are opposite findings — one
+says the instrument is missing, the other says the crash moved — and they
+printed identically. `edg_wat_armed` is set on every `edg_tok_note` call now,
+exactly as `edg_wat_calls` already separates "not in the live copy" from "the
+address moved". *Three counters, three times the same ambiguity.*

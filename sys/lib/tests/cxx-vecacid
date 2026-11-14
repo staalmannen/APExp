@@ -322,7 +322,8 @@ echo
 {
 	echo 'print("edg_wat_calls = ", *edg_wat_calls\D, "   (0 = not in the LIVE copy; rest invalid)\n")'
 	echo 'print("recorded      = ", *edg_wat_all_n\D, "   overflowed = ", *edg_wat_over\D, "\n")'
-	echo 'print("edg_wat_found = ", *edg_wat_found\D, "   (0 = no lookup ever saw a bad token)\n")'
+	echo 'print("edg_wat_armed = ", *edg_wat_armed\D, "   (0 = edg_tok_note is NOT armed in this build)\n")'
+	echo 'print("edg_wat_found = ", *edg_wat_found\D, "   (0 with armed=1 = no lookup saw a bad token)\n")'
 	echo 'print("target        = ", *edg_wat_target\X, "\n")'
 	echo 'print("elems now     = ", *edg_tok_elems\X, "   (must equal target)\n")'
 	echo 'print("\n-- allocations ENDING at the victim: the overrunning object\n")'
