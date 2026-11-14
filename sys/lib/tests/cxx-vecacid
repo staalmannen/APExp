@@ -272,6 +272,57 @@ echo
 	echo 'print("printed through lookup ", k\D+1, "; the ring holds 64\n")'
 } | acid $crashpid
 
+# ---- the ARRAY itself ------------------------------------------------
+# ***THE PREDICTION WAS REFUTED BY ITS OWN STATED CONDITION.***  It was
+# `off >= n with cache != endcache'; the run gave **off=0, n=23,
+# cache == endcache == 0x03b8e278**.  So it is not a bounds bug and not
+# the sentinel mechanism, and **element 0 of a 23-element array holds
+# the bad value** while all 63 preceding lookups returned plausible
+# heap pointers.
+#
+# `n_allocated = 31' is NOT a second finding, checked rather than
+# assumed: `grow' is `new_cap = old_cap + old_cap/2 + 1' (2,4,7,11,17,
+# 26) and `alloc_fe_var_size' writes back the ACTUAL size, so a request
+# of 208 bytes rounded to 248 is 31 slots.
+#
+# What `grow' DOES show is the next question: after `move_elements' it
+# **frees the old buffer onto `reusable_fe_list'**.  So a stale cache
+# still pointing at a recycled buffer would read whatever its new owner
+# wrote -- which is the same family as the first crash.
+#
+# **This section needs NO rebuild**: `edg_tok_elems' and `edg_tok_n'
+# are already in the installed binary, so the whole array can be read
+# out of the broken process.  It separates three things:
+#
+#   only [0] bad     -> the first element specifically; a construction
+#                       or move-count bug, not the buffer.
+#   several bad      -> the BUFFER, which points at grow/move or at the
+#                       reuse above.
+#   all bad          -> `elems' itself is not what the cache thinks.
+#
+# The words BELOW `elems' are printed too, because an FE allocation
+# carries its block header there and a buffer sitting exactly at a
+# carve boundary is what ties this to the other crash.
+echo
+echo 'cxx-vecacid: the token array itself (no rebuild needed)'
+echo
+{
+	echo 'e = *edg_tok_elems'
+	echo 'c = *edg_tok_n'
+	echo 'print("elems = ", e\X, "   n_elems = ", c\D, "\n")'
+	echo 'i = 0'
+	echo 'while i < c && i < 40 do {
+		print("  elem ", i\D, " = ", *(e+i*8)\X, "\n");
+		i = i+1;
+	}'
+	echo 'print("---- the four words below elems ----\n")'
+	echo 'i = 0-4'
+	echo 'while i < 0 do {
+		print("  ", (e+i*8)\X, ": ", *(e+i*8)\X, "\n");
+		i = i+1;
+	}'
+} | acid $crashpid
+
 
 # ---- walk the list the crash was walking -----------------------------
 # ***THE STACK NAMES THE LINE AND NOT THE DEFECT.***  `free_memory_region'
