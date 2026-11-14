@@ -184,13 +184,13 @@ cxx-vecacid: running cpfe
 
 edg-pad2: evicted=0x42 carves=0x1042 checked=0x1000 chain-bad-at=0xffffffffffffffff
 edg-pad: dirty=0x0
-cpfe 1144: suicide: sys: trap: fault read addr=0x3f4cd pc=0x90c4bc
-eccp: FAILED at cpfe on cxx-library-test.cpp -- cpfe 1144: sys: trap: fault read addr=0x3f4cd pc=0x90c4bc
+cpfe 1773: suicide: sys: trap: fault read addr=0x3f4cd pc=0x90c4bc
+eccp: FAILED at cpfe on cxx-library-test.cpp -- cpfe 1773: sys: trap: fault read addr=0x3f4cd pc=0x90c4bc
 
-cxx-vecacid: broken process is 1144
+cxx-vecacid: broken process is 1773
 cxx-vecacid: attaching acid
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: AX    0x0000000000000000
@@ -860,11 +860,11 @@ _ZN3edg33f_is_generalized_identifier_startEjPNS_6a_typeE(__201524_30_options=0x8
 	__203285_35_parent=0x0
 _ZN3edg18typename_specifierEPPNS_6a_typeEPPNS_8a_symbolEbbPNS_18a_decl_parse_stateEPNS_16a_decl_pos_blockE(__180706_58_type_ptr=0x7ffffffd4918,__180707_55_type_sym=0x7ffffffd4680,__180708_57_within_using_decl=0x0,__180710_58_dps=0x7ffffffd4800,__180711_57_decl_pos_block=0x0,__180709_57_is_decl_specifier=0x1)+0x515 acid: no source for <noname>
 acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: the TOKEN recorder (needs an edg rebuild)
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: edg_tok_calls   = 742991   (0 = this path never ran; section void)
@@ -886,11 +886,11 @@ acid: edg_tok_cache   = 0x03b8e278   (indexed through this)
 acid: edg_tok_endcache= 0x03b8e278   (sentinel built from this; differing is the mechanism)
 
 acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: the last 24 token lookups, newest first
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: 				  lookup 742990 site=1 off=0 n=23 val=0x0003f4b1
@@ -944,11 +944,77 @@ acid: acid: acid: 				  lookup 742990 site=1 off=0 n=23 val=0x0003f4b1
 acid: acid: printed through lookup 742967; the ring holds 64
 
 acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
+
+cxx-vecacid: the token array itself (no rebuild needed)
+
+/proc/1773/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: acid: elems = 0x03c15290   n_elems = 23
+
+acid: acid: 			  elem 0 = 0x0003f4b1
+
+  elem 1 = 0x03b84740
+
+  elem 2 = 0x03b84640
+
+  elem 3 = 0x03c08520
+
+  elem 4 = 0x03c08420
+
+  elem 5 = 0x03c084a0
+
+  elem 6 = 0x03c08320
+
+  elem 7 = 0x03c082a0
+
+  elem 8 = 0x03c083a0
+
+  elem 9 = 0x03c081a0
+
+  elem 10 = 0x03c08120
+
+  elem 11 = 0x03c08220
+
+  elem 12 = 0x03c080a0
+
+  elem 13 = 0x03c08020
+
+  elem 14 = 0x03c07f20
+
+  elem 15 = 0x03c07ea0
+
+  elem 16 = 0x03c07fa0
+
+  elem 17 = 0x03c07da0
+
+  elem 18 = 0x03c07d20
+
+  elem 19 = 0x03c07e20
+
+  elem 20 = 0x03c07ca0
+
+  elem 21 = 0x03c07c20
+
+  elem 22 = 0x03c07aa0
+
+acid: acid: ---- the four words below elems ----
+
+acid: acid: 			  0x03c15270: 0x03b59df8
+
+  0x03c15278: 0x00000009
+
+  0x03c15280: 0x03c486b8
+
+  0x03c15288: 0x00004d1b
+
+acid: acid: 
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: WHEN the chain first went bad
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: edg_dbg_checks  = 22537 clean walks
@@ -970,11 +1036,11 @@ acid: edg_dbg_bad_allocs = 0 of 0 alloc_in_region calls
 acid: link total      = 7459   trim total = 4631
 
 acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: the links and carves around that instant
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: acid: 								  link -9 region=1 size=80 hdr=0x07e208b0 next=0x07e00870
@@ -998,11 +1064,11 @@ acid: acid: acid: acid: 								  link -9 region=1 size=80 hdr=0x07e208b0 next=0
 acid: acid: acid: 								  carve 0 objsize=1560 new=0x0a819cb8 parent=0x0a819630
 
 acid: acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: the recorder (needs an edg rebuild -- see the script)
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: edg_dbg_rn    = 2948
@@ -1016,22 +1082,22 @@ acid: edg_dbg_prev  = 0x00000000   (its source)
 acid: edg_dbg_prev2 = 0x00000000
 
 acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: the two blocks before the fault, and the bytes at prev
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: acid: acid: acid: acid: 
 raw words from prev-32 to prev+48:
 
 acid: acid: acid: acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: what was in prev->next when it was LINKED?
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: link ring: 7459 links recorded
@@ -1043,11 +1109,11 @@ acid: acid:
 
 
 acid: acid: 					acid: acid: acid: 					acid: acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: the last region-0 links, newest last
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: acid: acid: acid: acid: 									  link 7452 hdr=0x0ccb5fd0 next-read-back=0x0cc95f90
@@ -1101,21 +1167,21 @@ acid: acid: acid: acid: acid: acid: acid: 									  link 7452 hdr=0x0ccb5fd0 ne
 acid: acid: printed 24 region-0 links, newest first
 
 acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: and the parent that carved prev, if the ring named one
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: acid: acid: acid: prev is in no trim slot -- either it was never carved, or the ring wrapped
 
 acid: acid: acid: acid: acid: acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: the region table itself
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: mem_region_table buffer = 0x04700450
@@ -1139,11 +1205,11 @@ acid: acid:   table[0] = 0x0ccf6050
   table[7] = 0x01df6e70
 
 acid: acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: the reusable list (NOT the region chain -- see above)
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: acid: 														0 hdr=0x0ccf6050 next=0x0ccd6010 start=0x0ccf6080 end=0x0cd06050 msize=0x00010000
@@ -1177,7 +1243,7 @@ stopping at 12 entries
 acid: acid: walked 13 entries
 
 acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: ***THE WALK ABOVE IS ONLY MEANINGFUL IF `stk()` NAMED
 cxx-vecacid: `free_memory_region`.***  Read the stack first.  A crash
@@ -1189,7 +1255,7 @@ cxx-vecacid: what the 33-entry run was.
 
 cxx-vecacid: words around the table buffer (allocator bookkeeping?)
 
-/proc/1144/text:amd64 plan 9 executable
+/proc/1773/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid:   0x04700430: 0x00000000
@@ -1209,10 +1275,10 @@ acid: acid: acid:   0x04700430: 0x00000000
   0x04700468: 0x01d92cb8
 
 acid: acid: 
-echo kill > /proc/1144/ctl
+echo kill > /proc/1773/ctl
 
 cxx-vecacid: if that printed nothing useful, do it by hand:
-cxx-vecacid:   acid 1144
+cxx-vecacid:   acid 1773
 cxx-vecacid:   acid: regs()
 cxx-vecacid:   acid: stk()
 cxx-vecacid:   acid: src(*PC)
