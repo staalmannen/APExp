@@ -1710,3 +1710,32 @@ iterator base 16, and member access in the corpus is **symbolic**, so a
 layout difference only matters where a size is *baked*, which
 `edgbaked-xcheck` already sweeps. *Both were plausible sentences; one
 compile each said no.*
+
+### The prediction was refuted by its own stated condition
+
+The run gave **`off=0`, `n=23`, `cache == endcache == 0x03b8e278`** — so it is
+**not** a bounds bug and **not** the sentinel mechanism. `edg_tok_calls` is
+742991, so the path ran; `site=1`; and the 64-deep ring shows every one of
+the 63 preceding lookups returning a plausible heap pointer (`0x01cbXXXX`),
+with `off` climbing 0,1,2…12 through caches of `n=13` and `n=9`. **Element 0
+of a 23-element array holds `0x3f4b1`**, and it is the first lookup from that
+cache.
+
+`n_allocated = 31` is not a second finding, and that was checked rather than
+assumed: `grow` is `new_cap = old_cap + old_cap/2 + 1` (2, 4, 7, 11, 17, 26)
+and `alloc_fe_var_size` writes back the *actual* size, so a request of 208
+bytes rounded up to 248 is 31 slots.
+
+What `grow` does show is where to look next: after `move_elements` it
+**frees the old buffer onto `reusable_fe_list`** (`free_fe_normal` below
+2096 bytes, `free_fe_huge` above). A cache still pointing at a recycled
+buffer would read whatever its new owner wrote — the same family as the
+value that landed on a region link.
+
+**The array dump needs no rebuild**, because `edg_tok_elems` and `edg_tok_n`
+are already in the installed binary. It separates three things: only element
+0 bad (a construction or move-count bug), several bad (the buffer, so grow /
+move / reuse), or all bad (`elems` is not what the cache thinks). The four
+words below `elems` go with it, since an FE allocation carries its block
+header there and a buffer sitting at a carve boundary is what would tie this
+to the first crash.
