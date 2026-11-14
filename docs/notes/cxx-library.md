@@ -1861,3 +1861,26 @@ printed 64 empty rows at a count of 0, while the identical shape over a local
 stopped correctly at 24. A dereference in an acid loop condition does not
 control the loop; the bound is hoisted now. *A loop bound that cannot bound
 the loop prints a table of zeros that reads exactly like data.*
+
+### The 900MB log was mine, and it names an acid rule
+
+The watch section never ran — the run was killed inside the lookup loop — but
+the two runs together say why. In the earlier run `while i < *edg_wat_n && i
+< 64` printed **64 rows while `print` showed that same counter as 0**, so a
+dereference in an acid loop condition reads as something large and the only
+thing that stopped it was the literal `i < 64` beside it. I then "fixed" that
+by hoisting to `while i < m do` with **no literal at all** — and it ran until
+the disk did. *A bound read from memory is not a bound.*
+
+Two changes, and both are about never doing that again: **every loop bound in
+this script is a literal** (the watch prints all 32 slots and empty ones read
+as `ptr=0x0`), and **every acid pipe is capped with `sed 2000q`**. A runaway
+that cannot be read is bad; one that fills a disk before anyone sees it is
+worse. The watch section also moved to run **right after the token recorder**,
+so the data that matters is written first and a later kill costs nothing.
+
+One datum did survive: `edg_tok_elems = 0x03c157b0`, down **496 bytes** from
+`0x03c159a0` — and 496 is the difference between the old watch globals (1808
+bytes) and the new ones (1316). **Second confirmation that FE addresses track
+the heap base and the heap base tracks BSS**, which is exactly why the watch
+had to stop keying on an address.

@@ -201,7 +201,7 @@ echo
 	echo 'stk()'
 	echo 'lstk()'
 	echo 'src(*PC)'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 # ---- the TOKEN recorder, which is the live question ------------------
 # ***THE CRASH MOVED OUT OF THE MEMORY MANAGER.***  On
@@ -256,128 +256,18 @@ echo
 	echo 'print("edg_tok_elems   = ", *edg_tok_elems\X, "\n")'
 	echo 'print("edg_tok_cache   = ", *edg_tok_cache\X, "   (indexed through this)\n")'
 	echo 'print("edg_tok_endcache= ", *edg_tok_endcache\X, "   (sentinel built from this; differing is the mechanism)\n")'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
-echo
-echo 'cxx-vecacid: the last 24 token lookups, newest first'
-echo
-{
-	echo 'n = *edg_tok_calls'
-	echo 'k = n-1'
-	echo 'while k >= 0 && k > n-25 do {
-		i = k & 63;
-		print("  lookup ", k\D, " site=", *(edg_tok_ring_site+i*4)\D, " off=", *(edg_tok_ring_off+i*8)\D, " n=", *(edg_tok_ring_n+i*8)\D, " val=", *(edg_tok_ring_val+i*8)\X, "\n");
-		k = k-1;
-	}'
-	echo 'print("printed through lookup ", k\D+1, "; the ring holds 64\n")'
-} | acid $crashpid
-
-# ---- the ARRAY itself ------------------------------------------------
-# ***THE PREDICTION WAS REFUTED BY ITS OWN STATED CONDITION.***  It was
-# `off >= n with cache != endcache'; the run gave **off=0, n=23,
-# cache == endcache == 0x03b8e278**.  So it is not a bounds bug and not
-# the sentinel mechanism, and **element 0 of a 23-element array holds
-# the bad value** while all 63 preceding lookups returned plausible
-# heap pointers.
-#
-# `n_allocated = 31' is NOT a second finding, checked rather than
-# assumed: `grow' is `new_cap = old_cap + old_cap/2 + 1' (2,4,7,11,17,
-# 26) and `alloc_fe_var_size' writes back the ACTUAL size, so a request
-# of 208 bytes rounded to 248 is 31 slots.
-#
-# What `grow' DOES show is the next question: after `move_elements' it
-# **frees the old buffer onto `reusable_fe_list'**.  So a stale cache
-# still pointing at a recycled buffer would read whatever its new owner
-# wrote -- which is the same family as the first crash.
-#
-# **This section needs NO rebuild**: `edg_tok_elems' and `edg_tok_n'
-# are already in the installed binary, so the whole array can be read
-# out of the broken process.  It separates three things:
-#
-#   only [0] bad     -> the first element specifically; a construction
-#                       or move-count bug, not the buffer.
-#   several bad      -> the BUFFER, which points at grow/move or at the
-#                       reuse above.
-#   all bad          -> `elems' itself is not what the cache thinks.
-#
-# The words BELOW `elems' are printed too, because an FE allocation
-# carries its block header there and a buffer sitting exactly at a
-# carve boundary is what ties this to the other crash.
-echo
-echo 'cxx-vecacid: the token array itself (no rebuild needed)'
-echo
-{
-	echo 'e = *edg_tok_elems'
-	echo 'c = *edg_tok_n'
-	echo 'print("elems = ", e\X, "   n_elems = ", c\D, "\n")'
-	echo 'i = 0'
-	echo 'while i < c && i < 40 do {
-		print("  elem ", i\D, " = ", *(e+i*8)\X, "\n");
-		i = i+1;
-	}'
-	echo 'print("---- the four words below elems ----\n")'
-	echo 'i = 0-4'
-	echo 'while i < 0 do {
-		print("  ", (e+i*8)\X, ": ", *(e+i*8)\X, "\n");
-		i = i+1;
-	}'
-} | acid $crashpid
-
-# ---- three free questions, no rebuild --------------------------------
-# ***ONLY ELEMENT 0 IS BAD AND THE FOUR WORDS BELOW IT ARE THE FIND.***
-# elems[1..22] are all plausible control blocks; elems[0] is
-# `0x0003f4b1'.  And the words below `elems' are
-# `{0x03b59df8, 9, 0x03c486b8, 0x4d1b}' -- **the same four-word tail
-# recorded for `prev' in the first crash**, "a pointer, 9, a pointer,
-# 0x4d1b", `0x4d1b' to the digit.  *One write, two victims*: a carved
-# block header's `next' then, a Dyn_array's element 0 now.
-#
-# **And `grow' says this buffer is RECYCLED.** 23 elements of 8 bytes
-# is 248, and `alloc_fe_var_size' takes anything under 2096 bytes off
-# `reusable_fe_list' -- which `grow' itself fills, pushing the old
-# buffer there after `move_elements'.  So three things are worth
-# asking, and all three are free because the data is already in the
-# broken process:
-#
-#   (1) Is `elems' ON the reusable list right now?  A live cache
-#       indexing a block that has been handed back names the bug
-#       outright and needs nothing further.
-#   (2) What is BELOW `elems'?  Far enough back to see the preceding
-#       object's shape, and a 48-byte `a_mem_block_header' if the
-#       block starts near -- `start', `end', `next', `msize' are
-#       recognisable and would give the block this allocation sits in.
-#   (3) Which recorded block CONTAINS `elems'?  The link ring already
-#       holds every `hdr' and the trim ring every carve, so a scan for
-#       the one spanning `elems' costs nothing and says whether this
-#       buffer sits in a carved sub-block -- which is how the other
-#       crash's victim was placed.
-#
-# *A NEGATIVE on (1) is as useful as a positive*: it would say the
-# block is live and the word was overwritten in place, which is the
-# overrun reading, and leaves the 34-copy allocation ring as the way
-# to name the writer.
-echo
-echo 'cxx-vecacid: (1) is elems on the reusable free list?'
-echo
-{
-	echo 'e = *edg_tok_elems'
-	echo 'L = *_ZN3edg6detail16reusable_fe_listE'
-	echo 'print("reusable_fe_list = ", L\X, "\n")'
-	echo 'if L != 0 then {
-		b = *L;
-		c = *(L+16);
-		print("  entries = ", c\D, " buffer = ", b\X, "\n");
-		i = 0;
-		while i < c && i < 64 do {
-			if *(b+i*16) == e then {
-				print("  *** ENTRY ", i\D, " IS elems: ptr=", *(b+i*16)\X, " size=", *(b+i*16+8)\D, "\n");
-			};
-			print("  entry ", i\D, " ptr=", *(b+i*16)\X, " size=", *(b+i*16+8)\D, "\n");
-			i = i+1;
-		};
-	}'
-} | acid $crashpid
-
+# ***EVERY acid PIPE IS CAPPED WITH `sed 2000q' AND EVERY LOOP BOUND IS
+# A LITERAL, AND BOTH COST A RUN.***  A loop written
+# `while i < *edg_wat_n do' produced a **900MB log** that could not be
+# uploaded at all, and the run before it had printed **64 rows while
+# the same counter printed 0** -- so a dereference in a loop condition
+# here reads as something large, and the only reason that earlier loop
+# ever stopped was the `i < 64' beside it.  *A bound read from memory
+# is not a bound.*  The cap is the second half: a runaway that cannot
+# be read is bad, and one that fills a disk before anyone sees it is
+# worse.
 # ---- the WATCH: which object does the victim sit on top of? ---------
 # ***THE FIRST WATCH KEYED ON AN ADDRESS AND THE ADDRESS MOVED.***
 # `elems' was byte-identical in two runs (0x03c15290, different pids),
@@ -440,15 +330,134 @@ echo
 	echo 'print("edg_wat_watch = ", *edg_wat_watch\D, "   bytes (the victim buffer size)\n")'
 	echo 'print("edg_wat_hits  = ", *edg_wat_hits\D, "   allocations of that size\n")'
 	echo 'print("elems now     = ", *edg_tok_elems\X, "   match this against ptr below\n")'
-	echo 'm = *edg_wat_n'
-	echo 'print("recorded      = ", m\D, " of 32 slots\n")'
+	echo 'print("recorded      = ", *edg_wat_n\D, " of 32 slots\n")'
 	echo 'i = 0'
-	echo 'while i < m do {
+	echo 'while i < 32 do {
 		print("  row ", i\D, " ptr=", *(edg_wat_ptr+i*8)\X, " size=", *(edg_wat_size+i*8)\D, " prev=", *(edg_wat_pptr+i*8)\X, " prev_size=", *(edg_wat_psize+i*8)\D, " adj=", *(edg_wat_adj+i*4)\D, " kind=", *(edg_wat_kind+i*4)\D, "\n");
 		i = i+1;
 	}'
 	echo 'print("adj=1 means prev_ptr+prev_size == ptr; adj=0 means prev_size names nothing\n")'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
+
+echo
+echo 'cxx-vecacid: the last 24 token lookups, newest first'
+echo
+{
+	echo 'n = *edg_tok_calls'
+	echo 'k = n-1'
+	echo 'while k >= 0 && k > n-25 do {
+		i = k & 63;
+		print("  lookup ", k\D, " site=", *(edg_tok_ring_site+i*4)\D, " off=", *(edg_tok_ring_off+i*8)\D, " n=", *(edg_tok_ring_n+i*8)\D, " val=", *(edg_tok_ring_val+i*8)\X, "\n");
+		k = k-1;
+	}'
+	echo 'print("printed through lookup ", k\D+1, "; the ring holds 64\n")'
+} | acid $crashpid | sed 2000q
+
+# ---- the ARRAY itself ------------------------------------------------
+# ***THE PREDICTION WAS REFUTED BY ITS OWN STATED CONDITION.***  It was
+# `off >= n with cache != endcache'; the run gave **off=0, n=23,
+# cache == endcache == 0x03b8e278**.  So it is not a bounds bug and not
+# the sentinel mechanism, and **element 0 of a 23-element array holds
+# the bad value** while all 63 preceding lookups returned plausible
+# heap pointers.
+#
+# `n_allocated = 31' is NOT a second finding, checked rather than
+# assumed: `grow' is `new_cap = old_cap + old_cap/2 + 1' (2,4,7,11,17,
+# 26) and `alloc_fe_var_size' writes back the ACTUAL size, so a request
+# of 208 bytes rounded to 248 is 31 slots.
+#
+# What `grow' DOES show is the next question: after `move_elements' it
+# **frees the old buffer onto `reusable_fe_list'**.  So a stale cache
+# still pointing at a recycled buffer would read whatever its new owner
+# wrote -- which is the same family as the first crash.
+#
+# **This section needs NO rebuild**: `edg_tok_elems' and `edg_tok_n'
+# are already in the installed binary, so the whole array can be read
+# out of the broken process.  It separates three things:
+#
+#   only [0] bad     -> the first element specifically; a construction
+#                       or move-count bug, not the buffer.
+#   several bad      -> the BUFFER, which points at grow/move or at the
+#                       reuse above.
+#   all bad          -> `elems' itself is not what the cache thinks.
+#
+# The words BELOW `elems' are printed too, because an FE allocation
+# carries its block header there and a buffer sitting exactly at a
+# carve boundary is what ties this to the other crash.
+echo
+echo 'cxx-vecacid: the token array itself (no rebuild needed)'
+echo
+{
+	echo 'e = *edg_tok_elems'
+	echo 'c = *edg_tok_n'
+	echo 'print("elems = ", e\X, "   n_elems = ", c\D, "\n")'
+	echo 'i = 0'
+	echo 'while i < c && i < 40 do {
+		print("  elem ", i\D, " = ", *(e+i*8)\X, "\n");
+		i = i+1;
+	}'
+	echo 'print("---- the four words below elems ----\n")'
+	echo 'i = 0-4'
+	echo 'while i < 0 do {
+		print("  ", (e+i*8)\X, ": ", *(e+i*8)\X, "\n");
+		i = i+1;
+	}'
+} | acid $crashpid | sed 2000q
+
+# ---- three free questions, no rebuild --------------------------------
+# ***ONLY ELEMENT 0 IS BAD AND THE FOUR WORDS BELOW IT ARE THE FIND.***
+# elems[1..22] are all plausible control blocks; elems[0] is
+# `0x0003f4b1'.  And the words below `elems' are
+# `{0x03b59df8, 9, 0x03c486b8, 0x4d1b}' -- **the same four-word tail
+# recorded for `prev' in the first crash**, "a pointer, 9, a pointer,
+# 0x4d1b", `0x4d1b' to the digit.  *One write, two victims*: a carved
+# block header's `next' then, a Dyn_array's element 0 now.
+#
+# **And `grow' says this buffer is RECYCLED.** 23 elements of 8 bytes
+# is 248, and `alloc_fe_var_size' takes anything under 2096 bytes off
+# `reusable_fe_list' -- which `grow' itself fills, pushing the old
+# buffer there after `move_elements'.  So three things are worth
+# asking, and all three are free because the data is already in the
+# broken process:
+#
+#   (1) Is `elems' ON the reusable list right now?  A live cache
+#       indexing a block that has been handed back names the bug
+#       outright and needs nothing further.
+#   (2) What is BELOW `elems'?  Far enough back to see the preceding
+#       object's shape, and a 48-byte `a_mem_block_header' if the
+#       block starts near -- `start', `end', `next', `msize' are
+#       recognisable and would give the block this allocation sits in.
+#   (3) Which recorded block CONTAINS `elems'?  The link ring already
+#       holds every `hdr' and the trim ring every carve, so a scan for
+#       the one spanning `elems' costs nothing and says whether this
+#       buffer sits in a carved sub-block -- which is how the other
+#       crash's victim was placed.
+#
+# *A NEGATIVE on (1) is as useful as a positive*: it would say the
+# block is live and the word was overwritten in place, which is the
+# overrun reading, and leaves the 34-copy allocation ring as the way
+# to name the writer.
+echo
+echo 'cxx-vecacid: (1) is elems on the reusable free list?'
+echo
+{
+	echo 'e = *edg_tok_elems'
+	echo 'L = *_ZN3edg6detail16reusable_fe_listE'
+	echo 'print("reusable_fe_list = ", L\X, "\n")'
+	echo 'if L != 0 then {
+		b = *L;
+		c = *(L+16);
+		print("  entries = ", c\D, " buffer = ", b\X, "\n");
+		i = 0;
+		while i < c && i < 64 do {
+			if *(b+i*16) == e then {
+				print("  *** ENTRY ", i\D, " IS elems: ptr=", *(b+i*16)\X, " size=", *(b+i*16+8)\D, "\n");
+			};
+			print("  entry ", i\D, " ptr=", *(b+i*16)\X, " size=", *(b+i*16+8)\D, "\n");
+			i = i+1;
+		};
+	}'
+} | acid $crashpid | sed 2000q
 
 echo
 echo 'cxx-vecacid: (2) 48 words below elems'
@@ -460,7 +469,7 @@ echo
 		print("  ", (e+i*8)\X, ": ", *(e+i*8)\X, "\n");
 		i = i+1;
 	}'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 echo
 echo 'cxx-vecacid: (3) which recorded block contains elems'
@@ -499,7 +508,7 @@ echo
 		i = i+1;
 	}'
 	echo 'print("carves near elems: ", hits\D, "\n")'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 
 # ---- walk the list the crash was walking -----------------------------
@@ -625,7 +634,7 @@ echo
 	echo 'print("edg_dbg_bad_site= ", *edg_dbg_bad_site\D, "   1=alloc entry 2=alloc exit 3=trim 4=free_fe_huge 5=alloc_in_region\n")'
 	echo 'print("edg_dbg_bad_allocs = ", *edg_dbg_bad_allocs\D, " of ", *edg_dbg_allocs\D, " alloc_in_region calls\n")'
 	echo 'print("link total      = ", *edg_dbg_link_n\D, "   trim total = ", *edg_dbg_trim_n\D, "\n")'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 echo
 echo 'cxx-vecacid: the links and carves around that instant'
@@ -652,7 +661,7 @@ echo
 			k = k+1;
 		};
 	}'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 echo
 echo 'cxx-vecacid: the recorder (needs an edg rebuild -- see the script)'
@@ -663,7 +672,7 @@ echo
 	echo 'print("edg_dbg_cur   = ", *edg_dbg_cur\X, "   (the bad value)\n")'
 	echo 'print("edg_dbg_prev  = ", *edg_dbg_prev\X, "   (its source)\n")'
 	echo 'print("edg_dbg_prev2 = ", *edg_dbg_prev2\X, "\n")'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 echo
 echo 'cxx-vecacid: the two blocks before the fault, and the bytes at prev'
@@ -676,7 +685,7 @@ echo
 	echo 'print("\nraw words from prev-32 to prev+48:\n")'
 	echo 'i = 0-4'
 	echo 'if p != 0 then { while i < 6 do { print("  ", (p+i*8)\X, ": ", *(p+i*8)\X, "\n"); i = i+1; }; }'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 # ---- which of the two remaining explanations ------------------------
 # ***THE BYTE-SHIFT PREDICTION IS REFUTED, BY `edg_dbg_n' ALONE.***
@@ -738,7 +747,7 @@ echo
 		};
 		i = i+1;
 	}'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 # ***THE CHAIN AS BUILT, which is the thing the teardown walk destroys.***
 # Pushes go at the HEAD, so the Nth entry of the chain is the Nth most
@@ -768,7 +777,7 @@ echo
 		k = k-1;
 	}'
 	echo 'print("printed ", shown\D, " region-0 links, newest first\n")'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 echo
 echo 'cxx-vecacid: and the parent that carved prev, if the ring named one'
@@ -781,7 +790,7 @@ echo
 	echo 'if par == 0 then { print("prev is in no trim slot -- either it was never carved, or the ring wrapped\n"); }'
 	echo 'if par != 0 then { print("parent ", par\X, " next=", *par\X, " start=", *(par+8)\X, " avail=", *(par+16)\X, " end=", *(par+24)\X, " msize=", *(par+32)\X, "\n"); }'
 	echo 'if par != 0 then { print("prev header at ", p\X, ", parent after_end_of_block ", *(par+24)\X, " -- EQUAL means the carve is still intact\n"); }'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 echo
 echo 'cxx-vecacid: the region table itself'
@@ -792,7 +801,7 @@ echo
 	echo 'print("size_of_mem_region_table = ", *_ZN3edg24size_of_mem_region_tableE\D, "\n")'
 	echo 'i = 0'
 	echo 'while i < 8 do { print("  table[", i\D, "] = ", *(t+i*8)\X, "\n"); i = i+1; }'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 # ***THE WALK BELOW DOES NOT WALK THE REGION CHAIN, AND THE LAST RUN
 # PROVED IT BY ANSWERING.***  It printed 33 entries in perfect order --
@@ -836,7 +845,7 @@ echo
 		};
 	}'
 	echo 'print("walked ", n\D, " entries\n")'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 echo
 echo 'cxx-vecacid: ***THE WALK ABOVE IS ONLY MEANINGFUL IF `stk()` NAMED'
@@ -853,7 +862,7 @@ echo
 	echo 't = *_ZN3edg16mem_region_tableE'
 	echo 'i = 0-4'
 	echo 'while i < 4 do { print("  ", (t+i*8)\X, ": ", *(t+i*8)\X, "\n"); i = i+1; }'
-} | acid $crashpid
+} | acid $crashpid | sed 2000q
 
 echo
 echo 'cxx-vecacid: if that printed nothing useful, do it by hand:'
