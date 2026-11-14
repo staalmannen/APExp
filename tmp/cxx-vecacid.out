@@ -184,13 +184,13 @@ cxx-vecacid: running cpfe
 
 edg-pad2: evicted=0x42 carves=0x1042 checked=0x1000 chain-bad-at=0xffffffffffffffff
 edg-pad: dirty=0x0
-cpfe 1741: suicide: sys: trap: fault read addr=0x3f4cd pc=0x90c4fc
-eccp: FAILED at cpfe on cxx-library-test.cpp -- cpfe 1741: sys: trap: fault read addr=0x3f4cd pc=0x90c4fc
+cpfe 2756: suicide: sys: trap: fault read addr=0x3f4cd pc=0x90c4fc
+eccp: FAILED at cpfe on cxx-library-test.cpp -- cpfe 2756: sys: trap: fault read addr=0x3f4cd pc=0x90c4fc
 
-cxx-vecacid: broken process is 1741
+cxx-vecacid: broken process is 2756
 cxx-vecacid: attaching acid
 
-/proc/1741/text:amd64 plan 9 executable
+/proc/2756/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: AX    0x0000000000000000
@@ -860,11 +860,11 @@ _ZN3edg33f_is_generalized_identifier_startEjPNS_6a_typeE(__201524_30_options=0x8
 	__203285_35_parent=0x0
 _ZN3edg18typename_specifierEPPNS_6a_typeEPPNS_8a_symbolEbbPNS_18a_decl_parse_stateEPNS_16a_decl_pos_blockE(__180706_58_type_ptr=0x7ffffffd4918,__180707_55_type_sym=0x7ffffffd4680,__180708_57_within_using_decl=0x0,__180710_58_dps=0x7ffffffd4800,__180711_57_decl_pos_block=0x0,__180709_57_is_decl_specifier=0x1)+0x515 acid: no source for <noname>
 acid: 
-echo kill > /proc/1741/ctl
+echo kill > /proc/2756/ctl
 
 cxx-vecacid: the TOKEN recorder (needs an edg rebuild)
 
-/proc/1741/text:amd64 plan 9 executable
+/proc/2756/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: edg_tok_calls   = 742991   (0 = this path never ran; section void)
@@ -886,12 +886,666 @@ acid: edg_tok_cache   = 0x03b8e798   (indexed through this)
 acid: edg_tok_endcache= 0x03b8e798   (sentinel built from this; differing is the mechanism)
 
 acid: 
-echo kill > /proc/1741/ctl
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: the allocation WATCH (needs an edg rebuild)
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: edg_wat_calls = 627353   (0 = not in the LIVE copy; rest invalid)
+
+acid: edg_wat_watch = 248   bytes (the victim buffer size)
+
+acid: edg_wat_hits  = 1222   allocations of that size
+
+acid: elems now     = 0x03c157b0   match this against ptr below
+
+acid: recorded      = 32 of 32 slots
+
+acid: acid: 			  row 0 ptr=0x01d6e488 size=248 prev=0x01d6e460 prev_size=40 adj=1 kind=2
+
+  row 1 ptr=0x01eed0c8 size=248 prev=0x01dc1bb0 prev_size=160 adj=0 kind=2
+
+  row 2 ptr=0x01f5bd70 size=248 prev=0x01f398d8 prev_size=160 adj=0 kind=2
+
+  row 3 ptr=0x01f67b10 size=248 prev=0x01f672b0 prev_size=160 adj=0 kind=2
+
+  row 4 ptr=0x01fc2c78 size=248 prev=0x01fc16b8 prev_size=160 adj=0 kind=2
+
+  row 5 ptr=0x01fc7cd0 size=248 prev=0x01fc7220 prev_size=160 adj=0 kind=2
+
+  row 6 ptr=0x01fcd950 size=248 prev=0x01fcb898 prev_size=160 adj=0 kind=2
+
+  row 7 ptr=0x01fe1610 size=248 prev=0x01fdf408 prev_size=160 adj=0 kind=2
+
+  row 8 ptr=0x01fe9da0 size=248 prev=0x01e58820 prev_size=8 adj=0 kind=2
+
+  row 9 ptr=0x01fe9da0 size=248 prev=0x01fea1b0 prev_size=24 adj=0 kind=2
+
+  row 10 ptr=0x01fe9da0 size=248 prev=0x01e58820 prev_size=8 adj=0 kind=2
+
+  row 11 ptr=0x0202c340 size=248 prev=0x02028ca8 prev_size=160 adj=0 kind=2
+
+  row 12 ptr=0x020559a0 size=248 prev=0x020533c8 prev_size=160 adj=0 kind=2
+
+  row 13 ptr=0x0221d580 size=248 prev=0x02218bc0 prev_size=160 adj=0 kind=2
+
+  row 14 ptr=0x02230fd8 size=248 prev=0x0221d930 prev_size=160 adj=0 kind=2
+
+  row 15 ptr=0x02230fd8 size=248 prev=0x022315c0 prev_size=24 adj=0 kind=2
+
+  row 16 ptr=0x02230fd8 size=248 prev=0x02231ff0 prev_size=24 adj=0 kind=2
+
+  row 17 ptr=0x02230fd8 size=248 prev=0x02232508 prev_size=24 adj=0 kind=2
+
+  row 18 ptr=0x02230fd8 size=248 prev=0x02233a30 prev_size=24 adj=0 kind=2
+
+  row 19 ptr=0x02230fd8 size=248 prev=0x02233f48 prev_size=24 adj=0 kind=2
+
+  row 20 ptr=0x02230fd8 size=248 prev=0x02234a18 prev_size=24 adj=0 kind=2
+
+  row 21 ptr=0x02230fd8 size=248 prev=0x02235448 prev_size=24 adj=0 kind=2
+
+  row 22 ptr=0x02230fd8 size=248 prev=0x02235e78 prev_size=24 adj=0 kind=2
+
+  row 23 ptr=0x02230fd8 size=248 prev=0x02236390 prev_size=24 adj=0 kind=2
+
+  row 24 ptr=0x02230fd8 size=248 prev=0x02237b40 prev_size=24 adj=0 kind=2
+
+  row 25 ptr=0x02230fd8 size=248 prev=0x02237b40 prev_size=24 adj=0 kind=2
+
+  row 26 ptr=0x02230fd8 size=248 prev=0x02237b40 prev_size=24 adj=0 kind=2
+
+  row 27 ptr=0x02230fd8 size=248 prev=0x021da900 prev_size=8 adj=0 kind=2
+
+  row 28 ptr=0x02237fa0 size=248 prev=0x0221d930 prev_size=160 adj=0 kind=2
+
+  row 29 ptr=0x02237fa0 size=248 prev=0x02238290 prev_size=24 adj=0 kind=2
+
+  row 30 ptr=0x02230fd8 size=248 prev=0x0223c080 prev_size=24 adj=0 kind=2
+
+  row 31 ptr=0x02230fd8 size=248 prev=0x02237d60 prev_size=40 adj=0 kind=2
+
+acid: acid: adj=1 means prev_ptr+prev_size == ptr; adj=0 means prev_size names nothing
+
+acid: 
+echo kill > /proc/2756/ctl
 
 cxx-vecacid: the last 24 token lookups, newest first
 
-/proc/1741/text:amd64 plan 9 executable
+/proc/2756/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
-acid: acid: acid: acid: 				acid: acid: printed through lookup acid: 
-echo kill > /proc/1741/ctl
+acid: acid: acid: 				  lookup 742990 site=1 off=0 n=23 val=0x0003f4b1
+
+  lookup 742989 site=1 off=8 n=9 val=0x01cc0100
+
+  lookup 742988 site=1 off=7 n=9 val=0x01cc0300
+
+  lookup 742987 site=1 off=6 n=9 val=0x01cc0200
+
+  lookup 742986 site=1 off=5 n=9 val=0x01cc0280
+
+  lookup 742985 site=1 off=4 n=9 val=0x01cc0180
+
+  lookup 742984 site=1 off=3 n=9 val=0x01cc0080
+
+  lookup 742983 site=1 off=2 n=9 val=0x01cc0000
+
+  lookup 742982 site=1 off=1 n=9 val=0x01cbff80
+
+  lookup 742981 site=1 off=0 n=9 val=0x01cbfe00
+
+  lookup 742980 site=1 off=12 n=13 val=0x01cbd300
+
+  lookup 742979 site=1 off=11 n=13 val=0x01cbd280
+
+  lookup 742978 site=1 off=10 n=13 val=0x01cbd200
+
+  lookup 742977 site=1 off=9 n=13 val=0x01cbd180
+
+  lookup 742976 site=1 off=8 n=13 val=0x01cbd100
+
+  lookup 742975 site=1 off=7 n=13 val=0x01cbd080
+
+  lookup 742974 site=1 off=6 n=13 val=0x01cbd000
+
+  lookup 742973 site=1 off=5 n=13 val=0x01cbcf80
+
+  lookup 742972 site=1 off=4 n=13 val=0x01cbce80
+
+  lookup 742971 site=1 off=3 n=13 val=0x01cbcb80
+
+  lookup 742970 site=1 off=2 n=13 val=0x01cbcc80
+
+  lookup 742969 site=1 off=1 n=13 val=0x01cbcd80
+
+  lookup 742968 site=1 off=0 n=13 val=0x01cbcf00
+
+  lookup 742967 site=1 off=12 n=13 val=0x01cbd300
+
+acid: acid: printed through lookup 742967; the ring holds 64
+
+acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: the token array itself (no rebuild needed)
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: acid: elems = 0x03c157b0   n_elems = 23
+
+acid: acid: 			  elem 0 = 0x0003f4b1
+
+  elem 1 = 0x03b84c60
+
+  elem 2 = 0x03b84b60
+
+  elem 3 = 0x03c08a40
+
+  elem 4 = 0x03c08940
+
+  elem 5 = 0x03c089c0
+
+  elem 6 = 0x03c08840
+
+  elem 7 = 0x03c087c0
+
+  elem 8 = 0x03c088c0
+
+  elem 9 = 0x03c086c0
+
+  elem 10 = 0x03c08640
+
+  elem 11 = 0x03c08740
+
+  elem 12 = 0x03c085c0
+
+  elem 13 = 0x03c08540
+
+  elem 14 = 0x03c08440
+
+  elem 15 = 0x03c083c0
+
+  elem 16 = 0x03c084c0
+
+  elem 17 = 0x03c082c0
+
+  elem 18 = 0x03c08240
+
+  elem 19 = 0x03c08340
+
+  elem 20 = 0x03c081c0
+
+  elem 21 = 0x03c08140
+
+  elem 22 = 0x03c07fc0
+
+acid: acid: ---- the four words below elems ----
+
+acid: acid: 			  0x03c15790: 0x03b5a318
+
+  0x03c15798: 0x00000009
+
+  0x03c157a0: 0x03c48bd8
+
+  0x03c157a8: 0x00004d1b
+
+acid: acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: (1) is elems on the reusable free list?
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: acid: reusable_fe_list = 0x01cb1990
+
+acid: 												  entries = 24 buffer = 0x081223d0
+
+  entry 0 ptr=0x07f12550 size=136
+
+  entry 1 ptr=0x07f1ae30 size=136
+
+  entry 2 ptr=0x07f33948 size=136
+
+  entry 3 ptr=0x07e34778 size=112
+
+  entry 4 ptr=0x07dc17d8 size=80
+
+  entry 5 ptr=0x07da0038 size=80
+
+  entry 6 ptr=0x07d9ed78 size=88
+
+  entry 7 ptr=0x07d9e5b0 size=88
+
+  entry 8 ptr=0x07d9e1f8 size=88
+
+  entry 9 ptr=0x07d9ba08 size=64
+
+  entry 10 ptr=0x0c945000 size=152
+
+  entry 11 ptr=0x0cc73150 size=160
+
+  entry 12 ptr=0x0cc72ff0 size=160
+
+  entry 13 ptr=0x0cc72f38 size=160
+
+  entry 14 ptr=0x0cc6a3d8 size=160
+
+  entry 15 ptr=0x0cc67b10 size=160
+
+  entry 16 ptr=0x0cc677f8 size=160
+
+  entry 17 ptr=0x0cc06218 size=160
+
+  entry 18 ptr=0x0c7ece30 size=160
+
+  entry 19 ptr=0x0cc9f9f8 size=168
+
+  entry 20 ptr=0x0c7eb030 size=168
+
+  entry 21 ptr=0x0cce0008 size=264
+
+  entry 22 ptr=0x0c9b54e0 size=208
+
+  entry 23 ptr=0x0c9b3020 size=160
+
+acid: acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: (2) 48 words below elems
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: acid: 			  0x03c15630: 0x00000000
+
+  0x03c15638: 0x00000000
+
+  0x03c15640: 0x00000000
+
+  0x03c15648: 0x00000000
+
+  0x03c15650: 0x00000000
+
+  0x03c15658: 0x00000000
+
+  0x03c15660: 0x00000000
+
+  0x03c15668: 0x00000000
+
+  0x03c15670: 0x00000000
+
+  0x03c15678: 0x03c15688
+
+  0x03c15680: 0x02ba8872
+
+  0x03c15688: 0x01d697f8
+
+  0x03c15690: 0x03c15490
+
+  0x03c15698: 0x03c1c308
+
+  0x03c156a0: 0x03c1c050
+
+  0x03c156a8: 0x03c39b48
+
+  0x03c156b0: 0x03c39b48
+
+  0x03c156b8: 0x0000513b
+
+  0x03c156c0: 0x00000003
+
+  0x03c156c8: 0x00000000
+
+  0x03c156d0: 0x0000513b
+
+  0x03c156d8: 0x0000513b
+
+  0x03c156e0: 0x0000513b
+
+  0x03c156e8: 0x0000513b
+
+  0x03c156f0: 0x0000513b
+
+  0x03c156f8: 0x0000513b
+
+  0x03c15700: 0x00000000
+
+  0x03c15708: 0x00000001
+
+  0x03c15710: 0x032e7368
+
+  0x03c15718: 0x00000000
+
+  0x03c15720: 0x03c19f58
+
+  0x03c15728: 0x00000000
+
+  0x03c15730: 0x00000000
+
+  0x03c15738: 0x0000343c
+
+  0x03c15740: 0x00005108
+
+  0x03c15748: 0x00000000
+
+  0x03c15750: 0x00000000
+
+  0x03c15758: 0x00000000
+
+  0x03c15760: 0x00000000
+
+  0x03c15768: 0x00000000
+
+  0x03c15770: 0x00000b07
+
+  0x03c15778: 0x03c37a90
+
+  0x03c15780: 0x00000000
+
+  0x03c15788: 0x00000000
+
+  0x03c15790: 0x03b5a318
+
+  0x03c15798: 0x00000009
+
+  0x03c157a0: 0x03c48bd8
+
+  0x03c157a8: 0x00004d1b
+
+acid: acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: (3) which recorded block contains elems
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: acid: acid: acid: acid: acid: acid: 									acid: acid: blocks spanning elems: 0
+
+acid: acid: acid: acid: acid: acid: acid: 									acid: acid: carves near elems: 0
+
+acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: WHEN the chain first went bad
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: edg_dbg_checks  = 22537 clean walks
+
+acid: edg_dbg_bad_at  = -1   (-1 = never seen; with 0 clean walks the check never ran)
+
+acid: edg_dbg_bad_trim= 0
+
+acid: edg_dbg_bad_pos = 0   (how far down the chain)
+
+acid: edg_dbg_bad_hdr = 0x00000000
+
+acid: edg_dbg_bad_val = 0x00000000
+
+acid: edg_dbg_bad_site= 0   1=alloc entry 2=alloc exit 3=trim 4=free_fe_huge 5=alloc_in_region
+
+acid: edg_dbg_bad_allocs = 0 of 0 alloc_in_region calls
+
+acid: link total      = 7459   trim total = 4631
+
+acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: the links and carves around that instant
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: acid: acid: 								  link -9 region=1 size=80 hdr=0x07e20dd0 next=0x07e00d90
+
+  link -8 region=0 size=136 hdr=0x07e30df0 next=0x07df8ce8
+
+  link -7 region=0 size=65416 hdr=0x07e40e10 next=0x07e30df0
+
+  link -6 region=0 size=128 hdr=0x07e32a68 next=0x07e40e10
+
+  link -5 region=1 size=80 hdr=0x07e50e30 next=0x07e20dd0
+
+  link -4 region=0 size=408 hdr=0x07e60e50 next=0x07e32a68
+
+  link -3 region=1 size=352 hdr=0x07e70e70 next=0x07e50e30
+
+  link -2 region=0 size=65416 hdr=0x07e80e90 next=0x07e60e50
+
+  link -1 region=0 size=136 hdr=0x07e669c0 next=0x07e80e90
+
+acid: acid: acid: 								  carve 0 objsize=1560 new=0x0a81a1d8 parent=0x0a819b50
+
+acid: acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: the recorder (needs an edg rebuild -- see the script)
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: edg_dbg_rn    = 2948
+
+acid: edg_dbg_n     = 1
+
+acid: edg_dbg_cur   = 0x0c5a86e0   (the bad value)
+
+acid: edg_dbg_prev  = 0x00000000   (its source)
+
+acid: edg_dbg_prev2 = 0x00000000
+
+acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: the two blocks before the fault, and the bytes at prev
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: acid: acid: acid: acid: acid: 
+raw words from prev-32 to prev+48:
+
+acid: acid: acid: acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: what was in prev->next when it was LINKED?
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: link ring: 7459 links recorded
+acid:   (WRAPPED -- only the last 4096 are present)
+acid: acid: 
+trim ring: 4631 carves recorded
+acid:   (WRAPPED)
+acid: acid: 
+
+
+acid: acid: 					acid: acid: acid: 					acid: acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: the last region-0 links, newest last
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: acid: acid: acid: acid: acid: 									  link 7452 hdr=0x0ccb64f0 next-read-back=0x0cc964b0
+
+  link 7439 hdr=0x0cbd5478 next-read-back=0x0cbe6350
+
+  link 7438 hdr=0x0cbe6350 next-read-back=0x0cbc6310
+
+  link 7414 hdr=0x0ca86090 next-read-back=0x0ca66050
+
+  link 7320 hdr=0x0c975e70 next-read-back=0x0c965e50
+
+  link 7319 hdr=0x0c965e50 next-read-back=0x0c935df0
+
+  link 7312 hdr=0x0c8d1ef8 next-read-back=0x0c8f5d70
+
+  link 7311 hdr=0x0c8f5d70 next-read-back=0x0c8c5d10
+
+  link 7296 hdr=0x0a338150 next-read-back=0x0c7fb570
+
+  link 7293 hdr=0x0c7fb4e8 next-read-back=0x0c7fb468
+
+  link 7292 hdr=0x0c7fb468 next-read-back=0x0c7fb3e0
+
+  link 7291 hdr=0x0c7fb3e0 next-read-back=0x0c7fb1e0
+
+  link 7290 hdr=0x0c7fb1e0 next-read-back=0x0c7fb0f0
+
+  link 7289 hdr=0x0c7fb0f0 next-read-back=0x0c7fb068
+
+  link 7288 hdr=0x0c7fb068 next-read-back=0x0c7fafe8
+
+  link 7287 hdr=0x0c7fafe8 next-read-back=0x0c7faf60
+
+  link 7286 hdr=0x0c7faf60 next-read-back=0x0c7fae70
+
+  link 7285 hdr=0x0c7fae70 next-read-back=0x0c7fadf0
+
+  link 7284 hdr=0x0c7fadf0 next-read-back=0x0c7fad68
+
+  link 7283 hdr=0x0c7fad68 next-read-back=0x0c7fabb0
+
+  link 7282 hdr=0x0c7fabb0 next-read-back=0x0c7fab28
+
+  link 7281 hdr=0x0c7fab28 next-read-back=0x0c7faa38
+
+  link 7280 hdr=0x0c7faa38 next-read-back=0x0c7fa9b8
+
+  link 7279 hdr=0x0c7fa9b8 next-read-back=0x0c7fa930
+
+acid: acid: printed 24 region-0 links, newest first
+
+acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: and the parent that carved prev, if the ring named one
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: acid: acid: acid: acid: prev is in no trim slot -- either it was never carved, or the ring wrapped
+
+acid: acid: acid: acid: acid: acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: the region table itself
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: mem_region_table buffer = 0x04700970
+
+acid: size_of_mem_region_table = 4096
+
+acid: acid:   table[0] = 0x0ccf6570
+
+  table[1] = 0x0cd06590
+
+  table[2] = 0x01d91f70
+
+  table[3] = 0x01d931d8
+
+  table[4] = 0x01df5d70
+
+  table[5] = 0x01df62a0
+
+  table[6] = 0x01df6b18
+
+  table[7] = 0x01df7390
+
+acid: acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: the reusable list (NOT the region chain -- see above)
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: acid: acid: 														0 hdr=0x0ccf6570 next=0x0ccd6530 start=0x0ccf65a0 end=0x0cd06570 msize=0x00010000
+
+1 hdr=0x0ccd6530 next=0x0cc9e1e8 start=0x0ccd6560 end=0x0cce6530 msize=0x00010000
+
+2 hdr=0x0cc9e1e8 next=0x0ccb64f0 start=0x0cc9e218 end=0x0cca64b0 msize=0x00000000
+
+3 hdr=0x0ccb64f0 next=0x0cc964b0 start=0x0ccb6520 end=0x0ccc64a8 msize=0x0000ffb8
+
+4 hdr=0x0cc964b0 next=0x0cc66450 start=0x0cc964e0 end=0x0cc9e1a8 msize=0x00010000
+
+5 hdr=0x0cc66450 next=0x0cc363f0 start=0x0cc66480 end=0x0cc76450 msize=0x00010000
+
+6 hdr=0x0cc363f0 next=0x0cbf6370 start=0x0cc36420 end=0x0cc463f0 msize=0x00010000
+
+7 hdr=0x0cbf6370 next=0x0cbd5478 start=0x0cbf63a0 end=0x0cc06370 msize=0x00010000
+
+8 hdr=0x0cbd5478 next=0x0cbe6350 start=0x0cbd54a8 end=0x0cbd6310 msize=0x00000000
+
+9 hdr=0x0cbe6350 next=0x0cbc6310 start=0x0cbe6380 end=0x0cbf6308 msize=0x0000ffb8
+
+10 hdr=0x0cbc6310 next=0x0cb962b0 start=0x0cbc6340 end=0x0cbd5438 msize=0x00010000
+
+11 hdr=0x0cb962b0 next=0x0cb56230 start=0x0cb962e0 end=0x0cba62b0 msize=0x00010000
+
+12 hdr=0x0cb56230 next=0x0cb261d0 start=0x0cb56260 end=0x0cb66230 msize=0x00010000
+
+stopping at 12 entries
+
+acid: acid: walked 13 entries
+
+acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: ***THE WALK ABOVE IS ONLY MEANINGFUL IF `stk()` NAMED
+cxx-vecacid: `free_memory_region`.***  Read the stack first.  A crash
+cxx-vecacid: at any other pc is a different bug reached by a
+cxx-vecacid: different route, and for it the region chain is just
+cxx-vecacid: whatever the allocator happens to hold -- a healthy
+cxx-vecacid: chain printed against the wrong question is exactly
+cxx-vecacid: what the 33-entry run was.
+
+cxx-vecacid: words around the table buffer (allocator bookkeeping?)
+
+/proc/2756/text:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: acid: acid:   0x04700950: 0x00000000
+
+  0x04700958: 0x00000000
+
+  0x04700960: 0x0000000f
+
+  0x04700968: 0x00000000
+
+  0x04700970: 0x0ccf6570
+
+  0x04700978: 0x0cd06590
+
+  0x04700980: 0x01d91f70
+
+  0x04700988: 0x01d931d8
+
+acid: acid: 
+echo kill > /proc/2756/ctl
+
+cxx-vecacid: if that printed nothing useful, do it by hand:
+cxx-vecacid:   acid 2756
+cxx-vecacid:   acid: regs()
+cxx-vecacid:   acid: stk()
+cxx-vecacid:   acid: src(*PC)
+cxx-vecacid:   acid: print(*edg_dbg_n\D, " ", *edg_dbg_cur\X, " ", *edg_dbg_prev\X)
+cxx-vecacid:   acid: p = *edg_dbg_prev
+cxx-vecacid:   acid: print(*p\X, " ", *(p+24)\X, " ", *(p+32)\X)
+cxx-vecacid: note *table is the BUFFER and **table is entry 0; that
+cxx-vecacid: chain is the REUSABLE list after a fault, not the region
+cxx-vecacid: chain; and lstk()'s first argument is garbage here.
+cxx-vecacid: done
