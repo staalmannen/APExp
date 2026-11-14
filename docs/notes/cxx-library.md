@@ -2020,3 +2020,55 @@ says the instrument is missing, the other says the crash moved — and they
 printed identically. `edg_wat_armed` is set on every `edg_tok_note` call now,
 exactly as `edg_wat_calls` already separates "not in the live copy" from "the
 address moved". *Three counters, three times the same ambiguity.*
+
+## The crash is an EDG allocation baked for the OLD `ino_t`/`dev_t`
+
+`site = 34` is `lexical.c`'s `alloc_include_file_history`, allocating
+`an_include_file_history`. **The corpus bakes `alloc_fe(32)` and kencc lays
+that struct out at 48.**
+
+```
+'Y'  0 full_name                    observed: a pointer
+'U'  8 suppress_subsequent_include  observed: 9 = bits 0 and 3
+'U'  8 pragma_once / ifdef_guard / ifndef_guard / use_canonical_name
+'Y' 16 controlling_macro_name       observed: a pointer
+     24 unique_id, 16 bytes         observed: 0x4d1b …
+                                    …and its second half at +32, one word
+                                    PAST a 32-byte block
+```
+
+`a_unique_file_id` is `{dev_t st_dev; ino_t st_ino;}`, and **this release
+widened both from `unsigned short` to `unsigned long long`** — the same change
+that took `struct stat` from 88 to 104 and smashed cpfe's return address on
+every input. The typedefs were widened in EDG's five files; **the baked
+allocation sizes were not**, because nothing looks at them.
+
+Every observation falls out of that one number:
+
+* the stable `9` is the bit-field word, and `0x4d1b`/`0x3f4b1` are the two
+  halves of a **file id** — which is why they were identical across builds and
+  across a twelve-line input and a 2000-line one while every address around
+  them moved. *A value stable while addresses move is not an address*: it was
+  a device/inode pair all along.
+* exactly **one word** is written past the block, because the struct overruns
+  32 by 16 and the first 8 of those are still inside EDG's own slack.
+* the victim is **whatever was allocated next** — a carved block header's
+  `next` in the first crash, a token array's `elems[0]` in the second. *One
+  write, two victims, and they were one bug from the beginning.*
+
+**The fix is spelled `sizeof(struct an_include_file_history)`**, not `48`, so
+it cannot go stale again, and the corpus is restored to a pristine base first:
+every `edg_dbg_*`, `edg_tok_note` and above all `EDG_DBG_CARVE_PAD` — which
+padded every carve by 64 bytes — is gone, so what gets tested is the fix and
+not the fix plus a layout experiment.
+
+`sys/lib/tests/edgsize-sweep.py` is the general form and **gates**: for every
+`((T *)(alloc_fe(N)))`, is N smaller than kencc's `sizeof(T)`? **209 agree, 0
+short, 5 larger (arrays, reported not counted), 52 type unknown.** Its limits
+are in its header; the one worth repeating is that `X_ptr` is EDG's own
+typedef for `X *` and the mangled length prefix must be *recomputed*, not
+suffix-stripped — without that the one real finding sat inside the 52 unknowns.
+Its control puts the baked 32 back and requires the sweep to name the site.
+
+***And the root guard fired on its own first run, for the fifth time*** —
+`sys/lib/tests` is three levels below the root and the first draft said two.

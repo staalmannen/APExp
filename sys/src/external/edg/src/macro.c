@@ -1,8 +1,3 @@
-extern void edg_wat_note(void *, unsigned long long, long);
-extern void edg_wat_find(void *);
-extern long edg_wat_found;
-extern long edg_wat_site;
-extern long edg_wat_armed;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:07 2026 */
 extern int __EDGCPFE__7_0;
@@ -12475,7 +12470,7 @@ if (__67777_9_ptr == ((void *)0)) {
 
 __67777_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67764_36_size)));
 }
-return (char *)(edg_wat_note(__67777_9_ptr, (unsigned long long)(__67764_36_size), 1), __67777_9_ptr);
+return (char *)__67777_9_ptr;
 }
 #line 1356 "src/macro.c"
 _ZN3edg9a_booleanE _ZN3edg47adjust_curr_source_line_structure_after_reallocEPKcS1_S1_b(

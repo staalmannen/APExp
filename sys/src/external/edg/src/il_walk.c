@@ -1,8 +1,3 @@
-extern void edg_wat_note(void *, unsigned long long, long);
-extern void edg_wat_find(void *);
-extern long edg_wat_found;
-extern long edg_wat_site;
-extern long edg_wat_armed;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:05 2026 */
 extern int __EDGCPFE__7_0;
@@ -15778,7 +15773,7 @@ if (__67784_9_ptr == ((void *)0)) {
 
 __67784_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67771_36_size)));
 }
-return (char *)(edg_wat_note(__67784_9_ptr, (unsigned long long)(__67771_36_size), 1), __67784_9_ptr);
+return (char *)__67784_9_ptr;
 }
 
 
@@ -15818,7 +15813,7 @@ if (__67821_9_ptr == ((void *)0)) {
 __67821_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67806_41_size)));
 (*__67807_42_actual_size) = __67806_41_size;
 }
-return (char *)(edg_wat_note(__67821_9_ptr, (unsigned long long)(*__67807_42_actual_size), 2), __67821_9_ptr);
+return (char *)__67821_9_ptr;
 }
 #line 38 "src/types.h"
  /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE( _ZN3edg10a_type_ptrE __101054_44_type_ptr)

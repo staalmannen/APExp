@@ -1,8 +1,3 @@
-extern void edg_wat_note(void *, unsigned long long, long);
-extern void edg_wat_find(void *);
-extern long edg_wat_found;
-extern long edg_wat_site;
-extern long edg_wat_armed;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:11 2026 */
 extern int __EDGCPFE__7_0;
@@ -17904,7 +17899,7 @@ goto __T585314584;
 _ZN3edg7Ptr_mapINS_37a_corresponding_base_class_lookup_keyEPNS_12a_base_classENS_12FE_allocatorEEE *const this,  size_t __39563_66_n_slots)
 #line 5849
 { auto struct _ZN3edg10AllocationINS_13Ptr_map_entryINS_37a_corresponding_base_class_lookup_keyEPNS_12a_base_classEEEEE __T585612936; auto _ZN3edg8sizeof_tE __T585613232; auto char *__T585613528;
-auto _ZN3edg7Ptr_mapINS_37a_corresponding_base_class_lookup_keyEPNS_12a_base_classENS_12FE_allocatorEE13an_allocationE __39571_18_allocation; __39571_18_allocation = (((__39563_66_n_slots <= 1ULL) ? ((void)((__T585613232 = 32ULL) , (__T585613528 = ((edg_wat_site = 58, _ZN3edg8alloc_feEy(32ULL)))))) : ((void)(
+auto _ZN3edg7Ptr_mapINS_37a_corresponding_base_class_lookup_keyEPNS_12a_base_classENS_12FE_allocatorEE13an_allocationE __39571_18_allocation; __39571_18_allocation = (((__39563_66_n_slots <= 1ULL) ? ((void)((__T585613232 = 32ULL) , (__T585613528 = (_ZN3edg8alloc_feEy(32ULL))))) : ((void)(
 #line 5850
 __T585613528 = (_ZN3edg17alloc_fe_var_sizeEyPy((__39563_66_n_slots * 32ULL), (&__T585613232)))))) , ((((__T585612936.start) = ((_ZN3edg12FE_allocatorINS_13Ptr_map_entryINS_37a_corresponding_base_class_lookup_keyEPNS_12a_base_classEEEE7an_elemE *)__T585613528)) , ((__T585612936.n_bytes_allocated) = 
 #line 5850
@@ -18373,7 +18368,7 @@ if (__67776_9_ptr == ((void *)0)) {
 
 __67776_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67763_36_size)));
 }
-return (char *)(edg_wat_note(__67776_9_ptr, (unsigned long long)(__67763_36_size), 1), __67776_9_ptr);
+return (char *)__67776_9_ptr;
 }
 
 
@@ -18413,7 +18408,7 @@ if (__67813_9_ptr == ((void *)0)) {
 __67813_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67798_41_size)));
 (*__67799_42_actual_size) = __67798_41_size;
 }
-return (char *)(edg_wat_note(__67813_9_ptr, (unsigned long long)(*__67799_42_actual_size), 2), __67813_9_ptr);
+return (char *)__67813_9_ptr;
 }
 #line 5829 "src/symbol_tbl.h"
  /* COMDAT group: _ZN3edg29float_kind_to_cli_symbol_kindENS_12a_float_kindE */ unsigned char _ZN3edg29float_kind_to_cli_symbol_kindENS_12a_float_kindE( unsigned char __91446_70_fk)
