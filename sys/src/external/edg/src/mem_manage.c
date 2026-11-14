@@ -65,6 +65,7 @@
 
 void *edg_wat_all_ptr[EDG_WAT_MAX];
 unsigned int edg_wat_all_size[EDG_WAT_MAX];
+unsigned char edg_wat_all_kind[EDG_WAT_MAX];	/* 1 alloc_fe, 2 var_size */
 long edg_wat_all_n;
 long edg_wat_over;
 long edg_wat_calls;
@@ -72,14 +73,35 @@ long edg_wat_calls;
 /* filled in once, by edg_wat_find */
 long edg_wat_found;
 void *edg_wat_target;
-void *edg_wat_nbr_ptr;
-unsigned long long edg_wat_nbr_size;
 long edg_wat_nbr_cnt;
-long edg_wat_nbr_idx;
-void *edg_wat_vic_ptr;
-unsigned long long edg_wat_vic_size;
 long edg_wat_vic_cnt;
-long edg_wat_vic_idx;
+
+/*
+ * ***EVERY MATCH, NOT THE LAST ONE.***  `nbr_cnt' came back 2 and
+ * `vic_cnt' 5, so both ranges are handed out repeatedly -- these
+ * blocks live on `reusable_fe_list' and come back.  Reporting only the
+ * most recent match is reporting a guess about which allocation was
+ * live, and the whole history is eight slots and costs nothing.
+ *
+ * `kind' is the datum this round exists for.  **No 32-byte EDG struct
+ * has the shape the neighbour actually holds** -- `{ptr, 9, ptr,
+ * 19739}', with the two numbers identical across runs and across
+ * inputs while the pointers move -- which was checked against every
+ * aggregate the host `6c -a' emits for seven TUs, none matching.  So
+ * `kind == 1' (a fixed `alloc_fe(32)') would mean a struct outside
+ * that set, while `kind == 2' means an `alloc_fe_var_size' buffer,
+ * i.e. a Dyn_array of two 16-byte elements -- which is what two
+ * `{pointer, number}' pairs look like.
+ */
+#define EDG_WAT_HIST 8
+void *edg_wat_nbr_ptr[EDG_WAT_HIST];
+unsigned long long edg_wat_nbr_size[EDG_WAT_HIST];
+long edg_wat_nbr_kind[EDG_WAT_HIST];
+long edg_wat_nbr_idx[EDG_WAT_HIST];
+void *edg_wat_vic_ptr[EDG_WAT_HIST];
+unsigned long long edg_wat_vic_size[EDG_WAT_HIST];
+long edg_wat_vic_kind[EDG_WAT_HIST];
+long edg_wat_vic_idx[EDG_WAT_HIST];
 
 void
 edg_wat_note(void *p, unsigned long long sz, long kind)
@@ -93,6 +115,7 @@ edg_wat_note(void *p, unsigned long long sz, long kind)
   }
   edg_wat_all_ptr[edg_wat_all_n] = p;
   edg_wat_all_size[edg_wat_all_n] = (unsigned int)sz;
+  edg_wat_all_kind[edg_wat_all_n] = (unsigned char)kind;
   edg_wat_all_n = edg_wat_all_n + 1;
 }
 
@@ -117,15 +140,21 @@ edg_wat_find(void *target)
     a = (unsigned long long)edg_wat_all_ptr[i];
     s = (unsigned long long)edg_wat_all_size[i];
     if (a + s == t) {
-      edg_wat_nbr_ptr = edg_wat_all_ptr[i];
-      edg_wat_nbr_size = s;
-      edg_wat_nbr_idx = i;
+      if (edg_wat_nbr_cnt < EDG_WAT_HIST) {
+        edg_wat_nbr_ptr[edg_wat_nbr_cnt] = edg_wat_all_ptr[i];
+        edg_wat_nbr_size[edg_wat_nbr_cnt] = s;
+        edg_wat_nbr_kind[edg_wat_nbr_cnt] = (long)edg_wat_all_kind[i];
+        edg_wat_nbr_idx[edg_wat_nbr_cnt] = i;
+      }
       edg_wat_nbr_cnt = edg_wat_nbr_cnt + 1;
     }
     if (a == t) {
-      edg_wat_vic_ptr = edg_wat_all_ptr[i];
-      edg_wat_vic_size = s;
-      edg_wat_vic_idx = i;
+      if (edg_wat_vic_cnt < EDG_WAT_HIST) {
+        edg_wat_vic_ptr[edg_wat_vic_cnt] = edg_wat_all_ptr[i];
+        edg_wat_vic_size[edg_wat_vic_cnt] = s;
+        edg_wat_vic_kind[edg_wat_vic_cnt] = (long)edg_wat_all_kind[i];
+        edg_wat_vic_idx[edg_wat_vic_cnt] = i;
+      }
       edg_wat_vic_cnt = edg_wat_vic_cnt + 1;
     }
   }

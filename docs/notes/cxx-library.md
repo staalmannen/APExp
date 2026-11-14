@@ -1920,3 +1920,46 @@ wanted, which is the mistake the link ring already made when it held the last
 **The counts are reported, not just the last match.** These blocks are
 recycled, so a range is allocated many times; `nbr_cnt == 9` means the most
 recent match is a guess at which one was live, and that has to be visible.
+
+### The self-aiming record worked: a 32-byte object ends at the victim
+
+`recorded = 627353`, `overflowed = 0` — the table is complete. `found = 1`
+and `target == elems now == 0x048152e0`, so the search fired on the right
+address with nothing hardcoded. And:
+
+```
+nbr_ptr = 0x048152c0   nbr_size = 32    nbr_cnt = 2
+vic_ptr = 0x048152e0   vic_size = 248   vic_cnt = 5
+```
+
+**A 32-byte allocation ends exactly at the victim** — and 32 bytes is
+precisely the four words already dumped. This run shows them again:
+
+```
+0x048152c0: 0x04759e48      pointer
+0x048152c8: 0x00000009      9
+0x048152d0: 0x04848708      pointer
+0x048152d8: 0x00004d1b      19739
+```
+
+**The two numbers are identical across runs and across both inputs while the
+pointers move**, so 9 and 19739 are data, not addresses — two
+`{pointer, number}` pairs. And `elems[0]` is `0x0003f4b1` again, to the digit.
+
+*The address moved a third time* (`0x03c157b0` → `0x048152e0`, by the 12.5 MB
+the table added), which is exactly why the address key had to go.
+
+**No 32-byte EDG struct has that shape.** Checked against every aggregate the
+host `6c -a` emits for seven TUs: 32 distinct 32-byte structs, and **zero**
+with `{ptr@0, num@8, ptr@16, num@24}`. `a_text_buffer` is
+`{allocated_size, size, allocation_increment, buffer}`,
+`an_include_search_result` is four `char *`, `a_token_cache` is
+`{bitfield, Dyn_array}` — none fit.
+
+So `kind` is the next datum: **1** means a fixed `alloc_fe(32)`, i.e. a struct
+outside the set checked; **2** means an `alloc_fe_var_size` buffer, i.e. a
+`Dyn_array` of two 16-byte elements — which is what two `{pointer, number}`
+pairs look like. Both histories now print in full rather than the last match,
+because `nbr_cnt = 2` and `vic_cnt = 5`: these blocks live on
+`reusable_fe_list` and come back, so "the most recent match" is a guess about
+which allocation was live.
