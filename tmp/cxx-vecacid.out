@@ -184,13 +184,13 @@ cxx-vecacid: running cpfe
 
 edg-pad2: evicted=0x42 carves=0x1042 checked=0x1000 chain-bad-at=0xffffffffffffffff
 edg-pad: dirty=0x0
-cpfe 6210: suicide: sys: trap: fault read addr=0x3f4cd pc=0x90c5a1
-eccp: FAILED at cpfe on cxx-library-test.cpp -- cpfe 6210: sys: trap: fault read addr=0x3f4cd pc=0x90c5a1
+cpfe 7482: suicide: sys: trap: fault read addr=0x3f4cd pc=0x90c5ef
+eccp: FAILED at cpfe on cxx-library-test.cpp -- cpfe 7482: sys: trap: fault read addr=0x3f4cd pc=0x90c5ef
 
-cxx-vecacid: broken process is 6210
+cxx-vecacid: broken process is 7482
 cxx-vecacid: attaching acid
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: AX    0x0000000000000000
@@ -200,9 +200,9 @@ DX    0x0000000003d86910
 DI    0x0000000000000001
 SI    0x0000000000000017
 BP    0x0000000003d86910
-R8    0x0000000000000000
-R9    0x0000000000000001
-R10   0x000000000000292d
+R8    0x000000000d8a9650
+R9    0x0000000004b15470
+R10   0x0000000000099299
 R11   0x0000000000000000
 R12   0x0000000000000031
 R13   0x0000000004b1b8a0
@@ -211,7 +211,7 @@ R15   0x0000000000000000
 DS  0x0000  ES  0x0000  FS  0x0000  GS  0x0000
 TYPE  0x000000000000000e
 ERROR 0x0000000000000004
-PC    0x000000000090c5a1
+PC    0x000000000090c5ef
 CS    0x000000000000002b
 FLAGS 0x0000000000000246
 SP    0x00007ffffffd1360
@@ -264,9 +264,9 @@ _ZN3edg18typename_specifierEPPNS_6a_typeEPPNS_8a_symbolEbbPNS_18a_decl_parse_sta
 	__181229_31_saved_curr_token=0x0
 	__181234_31_ud_descr=0x7ffffffd1408
 	__T1095501000=0x4a8e458
-	__T1095502616=0xda9c00a54e8d
+	__T1095502616=0xda9c00a54edb
 _ZN3edg9get_tokenEv()+0x34ea <noname>:17514
-	__193734_17_ctoken=0xb645b60000
+	__193734_17_ctoken=0xb646040000
 	__193738_25_is_inert_macro=0xfffffd1567000000
 	__193739_17_is_temporarily_inert_macro=0xfffd156700000000
 	__193744_17_gotten_from_cache=0x1400
@@ -303,7 +303,7 @@ _ZN3edg9get_tokenEv()+0x34ea <noname>:17514
 	__195056_11_icclfmc_idx=0xa000000000
 	__T1102769216=0x7ffffffd15e0
 	__T1102779056=0xdbf8980
-	__T1102788768=0xb645b6
+	__T1102788768=0xb64604
 	__195200_19_after_string=0x0
 	__195211_17_create_ud_literal=0x0
 	__195215_18_suffix_len=0xd8a9650
@@ -326,22 +326,22 @@ _ZN33_INTERNAL_11_templates_c_ce2b1a853edg22make_template_functionEPNS0_8a_symbo
 	__176620_24_saved_pos_curr_token=0x5300002aa9
 	__176621_24_saved_error_position=0x1500002a87
 	__176623_33_saved_curr_construct_end_position=0x4100002a87
-	__176578_19_is_member_decl=0xb4f87e00
+	__176578_19_is_member_decl=0xb4f8cc00
 	__176626_31_locator_position=0x4b39e88
 	__176577_20_rout_type=0x4b39308
-	__176724_33_copy_error=0xb4cb1500
+	__176724_33_copy_error=0xb4cb6300
 	__176726_33_scope_pushed=0x309eb249800
 	__176725_33_ctws_state=0x309eb2498
-	__176723_33_tpl=0xb4cb15
-	__176779_26_func_info=0xb4f373
+	__176723_33_tpl=0xb4cb63
+	__176779_26_func_info=0xb4f3c1
 	__176781_26_decl_pos_block=0x9eb18f0
 	__176778_26_state=0x1217
 	__176780_26_locator=0x1000000000000
-	__176577_38_return_type=0xb4f87e
+	__176577_38_return_type=0xb4f8cc
 	__176822_20_underlying_rout_type=0x65f
-	__176823_37_rtsp=0xb4cb15
+	__176823_37_rtsp=0xb4cb63
 	__176572_37_sym=0x65f
-	__176961_31_decl_modifiers=0xb4cb15
+	__176961_31_decl_modifiers=0xb4cb63
 	__177019_22_locator=0x65f
 _ZN3edg22find_template_functionEPNS_8a_symbolEPPNS_14a_template_argEbPNS_17a_source_positionE(__178353_18_templ_sym=0x4b1c0c0,__178354_45_new_list=0x76c3400,__178356_44_source_pos=0x7ffffffd24d0,__178355_15_explicit_arg_list_present=0x0)+0x3ba src/builtin_defs.h:4373
 	__178373_37_tip=0x0
@@ -391,10 +391,10 @@ _ZN32_INTERNAL_10_overload_c_0a3c6faf3edg26select_overloaded_operatorENS0_14an_o
 	__170608_29_find_reversed_candidates=0xd1af228010000
 	__170610_29_eff_operand_1_type=0x9eb2b20
 	__170609_29_operand_1_is_class=0xd1af22801000001
-	__170654_21_matched_except_for_missing_selector=0xb509590000
-	__170655_21_matched_except_for_selector=0xb50959000000
+	__170654_21_matched_except_for_missing_selector=0xb509a70000
+	__170655_21_matched_except_for_selector=0xb509a7000000
 	__170649_21_orig_kind=0x5b000035d81e
-	__170652_21_saved_selector_is_object_pointer=0xb5095900
+	__170652_21_saved_selector_is_object_pointer=0xb509a700
 	__170605_46_arg_list2=0xd1af228
 	__170690_54_proj_function_symbol=0x2da7208
 	__170706_30_ovl_context=0x0
@@ -402,7 +402,7 @@ _ZN32_INTERNAL_10_overload_c_0a3c6faf3edg26select_overloaded_operatorENS0_14an_o
 	__T252173880=0x0
 	__170604_29_saved_candidate_functions=0x0
 	__170788_30_ovl_context=0x9eb2b2000000000
-	__170651_21_member_functions_symbol=0xb50959
+	__170651_21_member_functions_symbol=0xb509a7
 	__170787_30_selector=0x9eb2b20
 	__170863_18_eff_operand_2_type=0x9eb2b20
 	__170906_35_type_list=0x0
@@ -451,7 +451,7 @@ _ZN3edg32f_check_for_operator_overloadingENS_14an_opname_kindEbbbbPNS_10an_opera
 	__171277_28_arg_list=0x0
 	__171282_28_candidate_functions=0x2f000000000000
 	__T252757656=0xdbe7018
-	__T252757952=0xb50967
+	__T252757952=0xb509b5
 	__171474_30_temp_init_expr=0x22db81
 	__171472_30_operand_1_clone=0x3f36cb
 	__171473_30_temp_init_used=0x3f36cb00
@@ -464,19 +464,19 @@ _ZN3edg32f_check_for_operator_overloadingENS_14an_opname_kindEbbbbPNS_10an_opera
 	__171638_30_rp=0x0
 	__171283_28_arg_match=0x7fff00000000
 	__171659_23_op_2_inside_conditional=0xff000023f8000000
-	__171694_24_bitwise_assignment=0xb5095900
-	__171279_28_function_symbol=0xb3bcb7
-	__171695_24_routine_type=0xb51868
+	__171694_24_bitwise_assignment=0xb509a700
+	__171279_28_function_symbol=0xb3bd05
+	__171695_24_routine_type=0xb518b6
 	__T252777872=0xdbdeb88
 	__171286_28_nonstatic_member_is_best_match=0x0
 	__171630_24_overloaded_function_symbol=0x7fff000023f8
-	__171737_25_access_error_reported=0xb5186800
+	__171737_25_access_error_reported=0xb518b600
 	__171277_38_arg_list_elem=0x7ffffffd23b0
 	__171289_29_bound_function_selector=0x7ffffffd2430
-	__171694_52_have_selector=0xb509590000
+	__171694_52_have_selector=0xb509a70000
 	__171288_28_param=0x7ffffffd2318
 	__171797_32_result_type=0x605c6e0
-	__171816_28_source=0xb51351
+	__171816_28_source=0xb5139f
 	__171816_37_source_op=0x7ffffffd1f88
 	__171798_55_rhs_node=0x62e000001000000
 	__171278_43_end_arg_expr_list=0x2badc98
@@ -493,7 +493,7 @@ _ZN3edg32f_check_for_operator_overloadingENS_14an_opname_kindEbbbbPNS_10an_opera
 	__171961_34_rtp=0xe600000000
 	__171967_40_sev=0xe60000000000
 	__171979_32_reversed=0x3853b9000
-	__T252807936=0xa874b0
+	__T252807936=0xa874fe
 	__T252808232=0x101000000000000
 	__T252807112=0x2
 	__T252815312=0x3853b90
@@ -501,7 +501,7 @@ _ZN3edg32f_check_for_operator_overloadingENS_14an_opname_kindEbbbbPNS_10an_opera
 	__T252821208=0x0
 	__T252821504=0x0
 	__T252826984=0x605c6e0
-	__172039_19_notes=0xb51351
+	__172039_19_notes=0xb5139f
 	__T252829776=0x0
 _ZN27_INTERNAL_6_expr_c_3b3dca173edg19process_eq_operatorEPNS0_10an_operandES2_NS0_12a_token_kindEPNS0_17a_source_positionEjS2_(__210341_59_opnd1=0x7ffffffd2640,__210342_59_opnd2=0x7ffffffd24d8,__210343_58_op_token=0x7fff00000032,__210344_59_operator_pos=0x7ffffffd24d0,__210345_58_operator_tsn=0x7fff0000d816,__210346_59_result=0x7ffffffd31b8)+0x17b <noname>:32932
 	__210353_25_processed=0x3a2eab00
@@ -560,7 +560,7 @@ _ZN3edg22scan_decltype_operatorEPNS_22a_rescan_control_blockEb(__195694_59_rcblo
 	__195847_17_no_parens_matters=0x0
 	__195849_17_utp=0x52
 	__195873_25_cp=0x0
-	__195878_21_orig_operand=0xb51868
+	__195878_21_orig_operand=0xb518b6
 	__195851_17_prev_region=0x5200007fff
 	__195714_27_expr=0x7ffffffd34c8
 _ZN3edg34decltype_of_expr_with_substitutionEPNS_6a_typeEPNS_12an_expr_nodeEPNS_14a_template_argEPNS_16a_template_paramEiPbPNS_12a_ctws_stateE(__196342_60_type=0x38624d0,__196344_60_template_arg_list=0xdab57a8,__196345_60_template_param_list=0x3853348,__196346_60_options=0x10000000404,__196348_60_ctws_state=0x7ffffffd3c40,__196343_60_expr=0x3862470,__196347_61_copy_error=0x7ffffffd3c9f)+0x1ff <noname>:18954
@@ -576,7 +576,7 @@ _ZN3edg27copy_type_with_substitutionEPNS_6a_typeEPNS_14a_template_argEPNS_16a_te
 	__173062_16_new_type=0x0
 	__173078_16_adjusted_orig_type=0x0
 	__173077_16_orig_type=0x38624d0
-	__173080_15_is_overload_candidate=0xb3f78200
+	__173080_15_is_overload_candidate=0xb3f7d000
 	__173115_17_type_before_parent_subst=0x1000000003630
 	__173113_18_sym=0xdbf0280
 	__173114_17_parent_type=0xdbf0770
@@ -591,27 +591,27 @@ _ZN3edg27copy_type_with_substitutionEPNS_6a_typeEPNS_14a_template_argEPNS_16a_te
 	__T909303128=0xdbf01c0
 	__T909303776=0x200185
 	__T909304424=0x20018500
-	__173063_16_tp=0xa7a658
+	__173063_16_tp=0xa7a6a6
 	__173308_24_tracking_ref=0xdbf028000
 	__173330_27_new_tp=0xdbf0770
 	__173414_45_ttsp=0xdbf01c0
 	__173415_30_template_sym=0x200185
 	__173459_34_qualifiers=0xdbf01c0
 	__173460_26_type_without_typerefs=0x200185
-	__173064_16_tp2=0xa7a668
+	__173064_16_tp2=0xa7a6b6
 	__173075_29_saved_vpip=0x7ffffffd3728
 	__173076_29_saved_vpip_tail=0x202b04
-	__173073_15_is_partial_order_check=0xa90b3700
-	__173065_10_reusable_param_types=0xa7a66800000000
+	__173073_15_is_partial_order_check=0xa90b8500
+	__173065_10_reusable_param_types=0xa7a6b600000000
 	__173070_16_first_new_type_for_param_types_list=0x7ffffffd3728
 	__173079_33_rtsp=0xdbf01c0
 	__173067_16_new_return_type=0x88
-	__173068_16_this_class=0xa90b37
+	__173068_16_this_class=0xa90b85
 	__173069_16_new_this_class=0xf
 	__173612_29_ap=0xdbf0770
 	__173625_22_ptype=0xdbf0770
 	__173071_21_ptp=0x2c7a1d0
-	__173079_39_new_rtsp=0xb3f782
+	__173079_39_new_rtsp=0xb3f7d0
 	__173743_29_ap=0xdbf0770
 	__173744_29_new_ap=0x1000000003630
 	__173800_22_templ_param_for_type=0xdbf0770
@@ -624,14 +624,14 @@ _ZN33_INTERNAL_11_templates_c_ce2b1a853edg28substitute_template_argumentEPNS0_14
 	__170878_22_tap=0xdbec0c8
 	__170901_16_is_unnamed=0xbec0c80101000000
 	__170901_28_is_local=0xc0c80101000000b3
-	__170901_38_is_vla=0xc80101000000b327
-	__170901_46_is_generic=0x101000000b327cf
+	__170901_38_is_vla=0xc80101000000b328
+	__170901_46_is_generic=0x101000000b3281d
 	__170921_32_template_param_type=0x0
 	__170920_16_const_type=0xdbe4b40
-	__170921_16_new_const_type=0xb34058
+	__170921_16_new_const_type=0xb340a6
 	__170937_20_subst_outer_args=0x0
 	__171026_21_type_from_constant=0xdbe4b48
-	__171046_22_orig_templ=0xb34058
+	__171046_22_orig_templ=0xb340a6
 _ZN3edg40copy_template_arg_list_with_substitutionEPNS_8a_symbolEPNS_14a_template_argEPNS_16a_template_paramES5_S3_S5_PNS_17a_source_positionEiPbPNS_12a_ctws_stateE(__171161_18_template_sym=0x2e15220,__171163_25_param_list_for_copy=0x2e15168,__171168_23_options=0x400,__171162_23_arg_list_to_copy=0x3863b08,__171164_25_ttp_list_for_copy=0x0,__171169_16_copy_error=0x7ffffffd3c9f,__171170_21_ctws_state=0x7ffffffd3c40,__171166_25_templ_param_list=0x3853348,__171165_23_templ_arg_list=0xdab57a8,__171167_23_source_pos=0x385b148)+0x6e0 src/builtin_kinds.h:34878
 	__171203_14_added_placeholder=0x101
 	__171204_14_copy_arg_operands=0x10100
@@ -649,7 +649,7 @@ _ZN3edg40copy_template_arg_list_with_substitutionEPNS_8a_symbolEPNS_14a_template
 	__171286_18_err=0x0
 	__171195_22_tap=0x3863b50
 	__171197_22_new_tap=0xdbec0c8
-	__171427_59_dedup_pack_args=0xab9742
+	__171427_59_dedup_pack_args=0xab9790
 _ZN33_INTERNAL_11_templates_c_ce2b1a853edg47copy_template_alias_reference_with_substitutionEPNS0_8a_symbolEPNS0_6a_typeEPNS0_14a_template_argEPNS0_16a_template_paramEPNS0_17a_source_positionEiPbPNS0_12a_ctws_stateE(__171748_17_orig_type=0x38639a0,__171747_19_template_sym=0x2e15220,__171750_26_templ_param_list=0x3853348,__171749_24_templ_arg_list=0xdab57a8,__171751_24_source_pos=0x385b148,__171752_24_options=0x400,__171753_17_copy_error=0x7ffffffd3c9f,__171754_22_ctws_state=0x7ffffffd3c40)+0x1c5 src/builtin_kinds.h:35217
 	__171769_17_result_type=0x38639a0
 	__171765_24_tap=0x3863b08
@@ -674,7 +674,7 @@ _ZN3edg27copy_type_with_substitutionEPNS_6a_typeEPNS_14a_template_argEPNS_16a_te
 	__T909303128=0x3863a60
 	__T909303776=0x2e15220
 	__T909304424=0x2e1522000
-	__173063_16_tp=0xa4d745
+	__173063_16_tp=0xa4d793
 	__173308_24_tracking_ref=0x3812dc000
 	__173330_27_new_tp=0x3860c0c
 	__173414_45_ttsp=0x3863a60
@@ -684,7 +684,7 @@ _ZN3edg27copy_type_with_substitutionEPNS_6a_typeEPNS_14a_template_argEPNS_16a_te
 	__173064_16_tp2=0x5300002aa9
 	__173075_29_saved_vpip=0x0
 	__173076_29_saved_vpip_tail=0x9
-	__173073_15_is_partial_order_check=0x9e529900
+	__173073_15_is_partial_order_check=0x9e52e700
 	__173065_10_reusable_param_types=0x2aa900000000
 	__173070_16_first_new_type_for_param_types_list=0x7ffffffd3ae8
 	__173079_33_rtsp=0xb508d88
@@ -693,7 +693,7 @@ _ZN3edg27copy_type_with_substitutionEPNS_6a_typeEPNS_14a_template_argEPNS_16a_te
 	__173069_16_new_this_class=0x7ffffffd3ae0
 	__173612_29_ap=0x3860c0c
 	__173625_22_ptype=0x3860c0c
-	__173071_21_ptp=0xab5ec5
+	__173071_21_ptp=0xab5f13
 	__173079_39_new_rtsp=0x0
 	__173743_29_ap=0x3860c0c
 	__173744_29_new_ap=0x0
@@ -710,10 +710,10 @@ _ZN33_INTERNAL_11_templates_c_ce2b1a853edg28substitute_template_argumentEPNS0_14
 	__170901_38_is_vla=0x9001010000000000
 	__170901_46_is_generic=0x101000000000000
 	__170921_32_template_param_type=0x100dbeada8
-	__170920_16_const_type=0xb0ba6f
+	__170920_16_const_type=0xb0babd
 	__170921_16_new_const_type=0x200000000
 	__170937_20_subst_outer_args=0x100dbeada800
-	__171026_21_type_from_constant=0xb2dbba
+	__171026_21_type_from_constant=0xb2dc08
 	__171046_22_orig_templ=0x200000000
 _ZN3edg40copy_template_arg_list_with_substitutionEPNS_8a_symbolEPNS_14a_template_argEPNS_16a_template_paramES5_S3_S5_PNS_17a_source_positionEiPbPNS_12a_ctws_stateE(__171161_18_template_sym=0x385b118,__171163_25_param_list_for_copy=0x38527f0,__171168_23_options=0x400,__171162_23_arg_list_to_copy=0x3860e38,__171164_25_ttp_list_for_copy=0x0,__171169_16_copy_error=0x7ffffffd3c9f,__171170_21_ctws_state=0x7ffffffd3c40,__171166_25_templ_param_list=0x3853348,__171165_23_templ_arg_list=0xdab57a8,__171167_23_source_pos=0x385b148)+0x6e0 src/builtin_kinds.h:34878
 	__171203_14_added_placeholder=0x100
@@ -732,9 +732,9 @@ _ZN3edg40copy_template_arg_list_with_substitutionEPNS_8a_symbolEPNS_14a_template
 	__171286_18_err=0x0
 	__171195_22_tap=0x38648c0
 	__171197_22_new_tap=0xdbea790
-	__171427_59_dedup_pack_args=0xa4de8b
+	__171427_59_dedup_pack_args=0xa4ded9
 _ZN33_INTERNAL_11_templates_c_ce2b1a853edg30matches_partial_specializationEPNS0_8a_symbolES2_bPPNS0_14a_template_argE(__159315_19_template_sym=0x385b118,__159318_25_ps_arg_list=0x7ffffffd3d50,__159316_19_instance_sym=0xdbe4df8,__159317_16_for_ordering=0x0)+0x2f0 src/builtin_kinds.h:23981
-	__159328_16_result=0xaba49c00
+	__159328_16_result=0xaba4ea00
 	__159333_16_local_arg_list_used=0xdbf0c2800
 	__159337_36_primary_tssp=0x3852bb0
 	__159329_36_tssp=0x385b198
@@ -745,10 +745,10 @@ _ZN33_INTERNAL_11_templates_c_ce2b1a853edg30matches_partial_specializationEPNS0_
 	__159334_24_instance_tap=0xdb7fc88
 	__159335_24_prototype_tap=0x3860e38
 	__159384_24_saved_error_pos=0x5300002aa9
-	__159393_20_copy_error=0xb1b95500
+	__159393_20_copy_error=0xb1b9a300
 	__159395_38_eta_options=0x400
 	__159394_22_ctws_state=0x0
-	__159392_27_test_arg_list=0xb1b955
+	__159392_27_test_arg_list=0xb1b9a3
 _ZN33_INTERNAL_11_templates_c_ce2b1a853edg29check_partial_specializationsEPNS0_8a_symbolES2_Pb(__159736_19_instance_sym=0xdbe4df8,__159737_19_template_sym=0x3852b30,__159738_17_p_subst_error=0x0)+0xb2 src/builtin_kinds.h:24258
 	__159749_19_matching_sym=0x0
 	__159751_34_candidate_list=0x0
@@ -860,11 +860,11 @@ _ZN3edg33f_is_generalized_identifier_startEjPNS_6a_typeE(__201524_30_options=0x8
 	__203285_35_parent=0x0
 _ZN3edg18typename_specifierEPPNS_6a_typeEPPNS_8a_symbolEbbPNS_18a_decl_parse_stateEPNS_16a_decl_pos_blockE(__180706_58_type_ptr=0x7ffffffd4918,__180707_55_type_sym=0x7ffffffd4680,__180708_57_within_using_decl=0x0,__180710_58_dps=0x7ffffffd4800,__180711_57_decl_pos_block=0x0,__180709_57_is_decl_specifier=0x1)+0x515 acid: no source for <noname>
 acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: the TOKEN recorder (needs an edg rebuild)
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: edg_tok_calls   = 742991   (0 = this path never ran; section void)
@@ -886,31 +886,33 @@ acid: edg_tok_cache   = 0x04a8e458   (indexed through this)
 acid: edg_tok_endcache= 0x04a8e458   (sentinel built from this; differing is the mechanism)
 
 acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: the allocation record (needs an edg rebuild)
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: edg_wat_calls = 627353   (0 = not in the LIVE copy; rest invalid)
 
 acid: recorded      = 627353   overflowed = 0
 
-acid: edg_wat_found = 0   (0 = no lookup ever saw a bad token)
+acid: edg_wat_armed = 1   (0 = edg_tok_note is NOT armed in this build)
 
-acid: target        = 0x00000000
+acid: edg_wat_found = 1   (0 with armed=1 = no lookup saw a bad token)
+
+acid: target        = 0x04b15470
 
 acid: elems now     = 0x04b15470   (must equal target)
 
 acid: 
 -- allocations ENDING at the victim: the overrunning object
 
-acid:    count = 0   (>1: the range is recycled, so the live one is a guess)
+acid:    count = 2   (>1: the range is recycled, so the live one is a guess)
 
-acid: acid: 			   nbr 0 ptr=0x00000000 size=0 kind=0 site=0 idx=0
+acid: acid: 			   nbr 0 ptr=0x04b15450 size=32 kind=1 site=2 idx=113624
 
-   nbr 1 ptr=0x00000000 size=0 kind=0 site=0 idx=0
+   nbr 1 ptr=0x04b15450 size=32 kind=1 site=34 idx=114548
 
    nbr 2 ptr=0x00000000 size=0 kind=0 site=0 idx=0
 
@@ -927,17 +929,17 @@ acid: acid: 			   nbr 0 ptr=0x00000000 size=0 kind=0 site=0 idx=0
 acid: acid: 
 -- allocations STARTING at the victim: the buffer itself
 
-acid:    count = 0
+acid:    count = 5
 
-acid: acid: 			   vic 0 ptr=0x00000000 size=0 kind=0 site=0 idx=0
+acid: acid: 			   vic 0 ptr=0x04b15470 size=248 kind=2 site=0 idx=113627
 
-   vic 1 ptr=0x00000000 size=0 kind=0 site=0 idx=0
+   vic 1 ptr=0x04b15470 size=248 kind=2 site=0 idx=113632
 
-   vic 2 ptr=0x00000000 size=0 kind=0 site=0 idx=0
+   vic 2 ptr=0x04b15470 size=248 kind=2 site=0 idx=113963
 
-   vic 3 ptr=0x00000000 size=0 kind=0 site=0 idx=0
+   vic 3 ptr=0x04b15470 size=248 kind=2 site=0 idx=114030
 
-   vic 4 ptr=0x00000000 size=0 kind=0 site=0 idx=0
+   vic 4 ptr=0x04b15470 size=248 kind=2 site=0 idx=114085
 
    vic 5 ptr=0x00000000 size=0 kind=0 site=0 idx=0
 
@@ -951,11 +953,11 @@ kind 1 = alloc_fe (fixed struct), 2 = alloc_fe_var_size (Dyn_array buffer)
 acid: site = the tag in sys/lib/tests/edg-wat-sites.txt; 0 = a call whose size is not the literal 32
 
 acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: the last 24 token lookups, newest first
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: 				  lookup 742990 site=1 off=0 n=23 val=0x0003f4b1
@@ -1009,11 +1011,11 @@ acid: acid: acid: 				  lookup 742990 site=1 off=0 n=23 val=0x0003f4b1
 acid: acid: printed through lookup 742967; the ring holds 64
 
 acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: the token array itself (no rebuild needed)
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: elems = 0x04b15470   n_elems = 23
@@ -1075,11 +1077,11 @@ acid: acid: 			  0x04b15450: 0x04a59fd8
   0x04b15468: 0x00004d1b
 
 acid: acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: (1) is elems on the reusable free list?
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: reusable_fe_list = 0x02bb1650
@@ -1135,11 +1137,11 @@ acid: 												  entries = 24 buffer = 0x09022090
   entry 23 ptr=0x0d8b2ce0 size=160
 
 acid: acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: (2) 48 words below elems
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: 			  0x04b152f0: 0x00000000
@@ -1239,11 +1241,11 @@ acid: acid: acid: 			  0x04b152f0: 0x00000000
   0x04b15468: 0x00004d1b
 
 acid: acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: (3) which recorded block contains elems
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: acid: acid: acid: acid: acid: 									acid: acid: blocks spanning elems: 0
@@ -1251,11 +1253,11 @@ acid: acid: acid: acid: acid: acid: acid: acid: 									acid: acid: blocks span
 acid: acid: acid: acid: acid: acid: acid: 									acid: acid: carves near elems: 0
 
 acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: WHEN the chain first went bad
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: edg_dbg_checks  = 22537 clean walks
@@ -1277,11 +1279,11 @@ acid: edg_dbg_bad_allocs = 0 of 0 alloc_in_region calls
 acid: link total      = 7459   trim total = 4631
 
 acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: the links and carves around that instant
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: acid: 								  link -9 region=1 size=80 hdr=0x08d20a90 next=0x08d00a50
@@ -1305,11 +1307,11 @@ acid: acid: acid: acid: 								  link -9 region=1 size=80 hdr=0x08d20a90 next=0
 acid: acid: acid: 								  carve 0 objsize=1560 new=0x0b719e98 parent=0x0b719810
 
 acid: acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: the recorder (needs an edg rebuild -- see the script)
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: edg_dbg_rn    = 2948
@@ -1323,22 +1325,22 @@ acid: edg_dbg_prev  = 0x00000000   (its source)
 acid: edg_dbg_prev2 = 0x00000000
 
 acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: the two blocks before the fault, and the bytes at prev
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: acid: acid: acid: acid: 
 raw words from prev-32 to prev+48:
 
 acid: acid: acid: acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: what was in prev->next when it was LINKED?
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: link ring: 7459 links recorded
@@ -1350,11 +1352,11 @@ acid: acid:
 
 
 acid: acid: 					acid: acid: acid: 					acid: acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: the last region-0 links, newest last
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: acid: acid: acid: acid: 									  link 7452 hdr=0x0dbb61b0 next-read-back=0x0db96170
@@ -1408,21 +1410,21 @@ acid: acid: acid: acid: acid: acid: acid: 									  link 7452 hdr=0x0dbb61b0 ne
 acid: acid: printed 24 region-0 links, newest first
 
 acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: and the parent that carved prev, if the ring named one
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: acid: acid: acid: prev is in no trim slot -- either it was never carved, or the ring wrapped
 
 acid: acid: acid: acid: acid: acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: the region table itself
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: mem_region_table buffer = 0x05600630
@@ -1446,11 +1448,11 @@ acid: acid:   table[0] = 0x0dbf6230
   table[7] = 0x02cf7050
 
 acid: acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: the reusable list (NOT the region chain -- see above)
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid: acid: 														0 hdr=0x0dbf6230 next=0x0dbd61f0 start=0x0dbf6260 end=0x0dc06230 msize=0x00010000
@@ -1484,7 +1486,7 @@ stopping at 12 entries
 acid: acid: walked 13 entries
 
 acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: ***THE WALK ABOVE IS ONLY MEANINGFUL IF `stk()` NAMED
 cxx-vecacid: `free_memory_region`.***  Read the stack first.  A crash
@@ -1496,7 +1498,7 @@ cxx-vecacid: what the 33-entry run was.
 
 cxx-vecacid: words around the table buffer (allocator bookkeeping?)
 
-/proc/6210/text:amd64 plan 9 executable
+/proc/7482/text:amd64 plan 9 executable
 /sys/lib/acid/port
 /sys/lib/acid/amd64
 acid: acid: acid:   0x05600610: 0x00000000
@@ -1516,10 +1518,10 @@ acid: acid: acid:   0x05600610: 0x00000000
   0x05600648: 0x02c92e98
 
 acid: acid: 
-echo kill > /proc/6210/ctl
+echo kill > /proc/7482/ctl
 
 cxx-vecacid: if that printed nothing useful, do it by hand:
-cxx-vecacid:   acid 6210
+cxx-vecacid:   acid 7482
 cxx-vecacid:   acid: regs()
 cxx-vecacid:   acid: stk()
 cxx-vecacid:   acid: src(*PC)
