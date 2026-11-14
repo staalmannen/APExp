@@ -100,6 +100,18 @@ long edg_wat_calls;
 
 /* filled in once, by edg_wat_find */
 long edg_wat_found;
+
+/*
+ * ***`edg_wat_armed' IS A MARKER FOR THE INSTRUMENT, NOT FOR THE BUG.***
+ * A run came back `found = 0' with every other field healthy, and the
+ * cause was that the corpus had been reverted and re-patched while the
+ * arming of `edg_wat_find' -- a separate edit at the time -- was not
+ * re-run.  `found = 0' and "no lookup ever saw a bad token" print the
+ * same thing, and they are opposite findings: one says the instrument
+ * is absent, the other says the crash is somewhere else entirely.
+ * `edg_tok_note' sets this on every call now, so the two separate.
+ */
+long edg_wat_armed;
 void *edg_wat_target;
 long edg_wat_nbr_cnt;
 long edg_wat_vic_cnt;
