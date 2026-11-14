@@ -1,4 +1,6 @@
 extern void edg_wat_note(void *, unsigned long long, long);
+extern void edg_wat_find(void *);
+extern long edg_wat_found;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:06 2026 */
 extern int __EDGCPFE__7_0;
@@ -27807,6 +27809,18 @@ edg_tok_note(struct _ZN3edg13a_token_cacheE *c, unsigned long long off,
     edg_tok_n = ~0ULL;
     edg_tok_alloc = ~0ULL;
   }
+  /*
+   * ***THE SEARCH AIMS ITSELF HERE.***  This runs on every lookup, and
+   * the faulting one reaches it BEFORE the dereference that kills the
+   * process -- so the one moment at which the victim's address is
+   * known is also a moment at which code can still run.  A token below
+   * the text base (0x200000) was never an address; that is the whole
+   * test, and it needs no constant from any previous run.
+   */
+  if (!edg_wat_found && (unsigned long long)tok < 0x200000ULL
+      && edg_tok_elems != (void *)0)
+    edg_wat_find(edg_tok_elems);
+
   i = (edg_tok_calls - 1) & 63;
   edg_tok_ring_val[i] = tok;
   edg_tok_ring_off[i] = off;

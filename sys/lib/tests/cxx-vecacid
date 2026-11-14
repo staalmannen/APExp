@@ -259,84 +259,68 @@ echo
 } | acid $crashpid | sed 2000q
 
 # ***EVERY acid PIPE IS CAPPED WITH `sed 2000q' AND EVERY LOOP BOUND IS
-# A LITERAL, AND BOTH COST A RUN.***  A loop written
-# `while i < *edg_wat_n do' produced a **900MB log** that could not be
-# uploaded at all, and the run before it had printed **64 rows while
-# the same counter printed 0** -- so a dereference in a loop condition
-# here reads as something large, and the only reason that earlier loop
-# ever stopped was the `i < 64' beside it.  *A bound read from memory
-# is not a bound.*  The cap is the second half: a runaway that cannot
-# be read is bad, and one that fills a disk before anyone sees it is
-# worse.
-# ---- the WATCH: which object does the victim sit on top of? ---------
-# ***THE FIRST WATCH KEYED ON AN ADDRESS AND THE ADDRESS MOVED.***
-# `elems' was byte-identical in two runs (0x03c15290, different pids),
-# which read as a handle.  The next build answered `0x03c159a0' --
-# **0x710 = 1808 bytes higher, exactly the BSS that build added**.  The
-# FE layout is deterministic relative to the HEAP BASE and the heap
-# base sits above BSS, so an absolute-address watch moves the thing it
-# watches, by its own size.  *Apparatus inside the quantity measured.*
+# A LITERAL, AND BOTH COST A RUN.***  `while i < *edg_wat_n do'
+# produced a **900MB log** that could not be uploaded, and the run
+# before it printed **64 rows while the same counter printed 0** -- so
+# a dereference in a loop condition here reads as something large, and
+# the only reason that earlier loop stopped was the `i < 64' beside it.
+# *A bound read from memory is not a bound.*
 #
-# ***AND `edg_wat_calls = 0' WAS A SECOND, UNRELATED FAULT, WHICH IS
-# WHY THE COUNTER IS LOAD-BEARING.***  `alloc_fe' has **41**
-# definitions and `alloc_fe_var_size' **34**, and `cmd/edg/mkfile'
-# passes `-C' so `6l' keeps the FIRST and discards the rest -- so
-# patching a subset can patch a copy that is not the live one.  27 were
-# patched and the survivor was one of the other 14.  *Without the
-# counter that run reads as "the address moved", which was ALSO true
-# and was not the reason* -- two true statements, one irrelevant, and
-# only the count separates them.
+# ---- the allocation record, which AIMS ITSELF ------------------------
+# ***TWO WAYS OF ASKING THIS FAILED FIRST.***
 #
-# **And the miss was in the VERIFICATION as much as the patch**: the
-# patcher keyed on EDG's temp names, assuming COMDAT text is identical
-# across TUs, and the check counted files matching the same anchor --
-# so it agreed with the patch by construction and reported 27 of 27.
-# A check phrased against the thing under test instead of against
-# something independent of it.  The gate asks structurally now: every
-# file that DEFINES the function, found with no reference to any temp
-# name, must contain a call.  41 of 41 and 34 of 34.
+# An ADDRESS watch moves the thing it watches: FE addresses track the
+# heap base, the heap base sits above BSS, and each build shifted
+# `elems' by exactly the BSS that build added -- 1808 bytes one way,
+# then 496 back.  Confirmed twice.
 #
-# SO IT WATCHES A SIZE.  The victim is 248 bytes (31 slots of 8, from
-# `grow's `old + old/2 + 1' rounded up by `alloc_fe_var_size'), and a
-# size does not move with BSS.  `alloc_in_region' bumps sequentially,
-# so the allocation IMMEDIATELY BEFORE a 248-byte one is the object the
-# victim sits on top of -- and `prev_size' is the number to match
-# against EDG's structs.
+# A SIZE watch recording "the allocation before" answered **adj=0 on 31
+# of 32 rows**: consecutive CALLS, nowhere near each other in memory.
+# The reason was already in the source and I did not carry it over --
+# `alloc_fe_var_size' serves anything under 2096 bytes off
+# `reusable_fe_list', so bump order and address order barely relate.
+# The same `ptr' came back fifteen times in 32 rows, and there were
+# **1222** allocations of that size against a 32-slot table.
+#
+# So nothing is hardcoded now.  Every allocation is appended to a flat
+# table and the table is searched ONCE, from inside `edg_tok_note', at
+# the first lookup whose token is below the text base -- the faulting
+# lookup, reached *before* the dereference.  The one moment the
+# victim's address is known is also a moment code can still run.
 #
 # READING IT:
-#   calls == 0   -> still not in the live copy; nothing else is valid.
-#   hits == 0    -> no 248-byte allocation at all; the victim's size
-#                   moved and `edg_wat_watch' needs the new one.
-#   adj == 1     -> prev really is ADJACENT, `prev_ptr + prev_size'
-#                   lands exactly on `ptr'.  **`adj == 0' means the two
-#                   are consecutive CALLS and not neighbours in memory**
-#                   -- a different block, or something allocated between
-#                   them by a path these two functions do not cover --
-#                   and `prev_size' then names nothing.
-# Match the row whose `ptr' equals `elems now' and read its `prev_size'.
-#
-# **The bound is hoisted into `m' on purpose.**  The previous version
-# wrote `while i < *edg_wat_n && i < 64', and with the counter at 0 it
-# printed 64 empty rows -- while the identical shape over a LOCAL
-# (`while i < c && i < 64', section 1) stopped correctly at 24.  So a
-# dereference in a loop condition does not control the loop here.
-# *A loop bound that cannot bound the loop prints a table of zeros that
-# reads exactly like data.*
+#   calls == 0    -> not in the live copy; nothing else is valid.
+#   found == 0    -> the search never fired, so no lookup saw an
+#                    implausible token: the crash is somewhere else.
+#   target        -> must equal `elems now'.
+#   nbr_cnt == 0  -> **no allocation ends at the victim**, and with
+#                    `over' nonzero that means the table was too small
+#                    rather than that nothing is there.  With `over'
+#                    zero it is a real negative and refutes the
+#                    neighbour reading outright.
+#   nbr_size      -> the number to match against EDG's structs.
+# **The counts matter as much as the addresses**: these blocks are
+# recycled, so an address is handed out many times, and `nbr_cnt == 9'
+# means the most recent match is a guess at which one was live.
 echo
-echo 'cxx-vecacid: the allocation WATCH (needs an edg rebuild)'
+echo 'cxx-vecacid: the allocation record (needs an edg rebuild)'
 echo
 {
 	echo 'print("edg_wat_calls = ", *edg_wat_calls\D, "   (0 = not in the LIVE copy; rest invalid)\n")'
-	echo 'print("edg_wat_watch = ", *edg_wat_watch\D, "   bytes (the victim buffer size)\n")'
-	echo 'print("edg_wat_hits  = ", *edg_wat_hits\D, "   allocations of that size\n")'
-	echo 'print("elems now     = ", *edg_tok_elems\X, "   match this against ptr below\n")'
-	echo 'print("recorded      = ", *edg_wat_n\D, " of 32 slots\n")'
-	echo 'i = 0'
-	echo 'while i < 32 do {
-		print("  row ", i\D, " ptr=", *(edg_wat_ptr+i*8)\X, " size=", *(edg_wat_size+i*8)\D, " prev=", *(edg_wat_pptr+i*8)\X, " prev_size=", *(edg_wat_psize+i*8)\D, " adj=", *(edg_wat_adj+i*4)\D, " kind=", *(edg_wat_kind+i*4)\D, "\n");
-		i = i+1;
-	}'
-	echo 'print("adj=1 means prev_ptr+prev_size == ptr; adj=0 means prev_size names nothing\n")'
+	echo 'print("recorded      = ", *edg_wat_all_n\D, "   overflowed = ", *edg_wat_over\D, "\n")'
+	echo 'print("edg_wat_found = ", *edg_wat_found\D, "   (0 = no lookup ever saw a bad token)\n")'
+	echo 'print("target        = ", *edg_wat_target\X, "\n")'
+	echo 'print("elems now     = ", *edg_tok_elems\X, "   (must equal target)\n")'
+	echo 'print("\n-- which allocation ENDS at the victim (the overrunning object)\n")'
+	echo 'print("  nbr_ptr  = ", *edg_wat_nbr_ptr\X, "\n")'
+	echo 'print("  nbr_size = ", *edg_wat_nbr_size\D, "   <- match this against EDG structs\n")'
+	echo 'print("  nbr_cnt  = ", *edg_wat_nbr_cnt\D, "   times that range was allocated\n")'
+	echo 'print("  nbr_idx  = ", *edg_wat_nbr_idx\D, "\n")'
+	echo 'print("\n-- which allocation STARTS at the victim (the buffer itself)\n")'
+	echo 'print("  vic_ptr  = ", *edg_wat_vic_ptr\X, "\n")'
+	echo 'print("  vic_size = ", *edg_wat_vic_size\D, "\n")'
+	echo 'print("  vic_cnt  = ", *edg_wat_vic_cnt\D, "\n")'
+	echo 'print("  vic_idx  = ", *edg_wat_vic_idx\D, "\n")'
 } | acid $crashpid | sed 2000q
 
 echo

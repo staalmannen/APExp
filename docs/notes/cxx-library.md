@@ -1884,3 +1884,39 @@ One datum did survive: `edg_tok_elems = 0x03c157b0`, down **496 bytes** from
 bytes) and the new ones (1316). **Second confirmation that FE addresses track
 the heap base and the heap base tracks BSS**, which is exactly why the watch
 had to stop keying on an address.
+
+### `adj=0` on 31 of 32 rows: the free list, which the source already said
+
+The size watch ran — `calls = 627353`, `hits = 1222`, 248 bytes — and
+**refuted its own prediction**: `adj=0` on 31 of 32 rows, so the allocation
+immediately before a 248-byte one is a consecutive *call* and nowhere near it
+in memory. `elems = 0x03c157b0` is not in the table at all, because there were
+1222 hits and it records the first 32.
+
+**The reason was in the source and I failed to carry it over.** `grow` frees
+the old buffer onto `reusable_fe_list`, and `alloc_fe_var_size` serves
+anything under 2096 bytes *from* that list — so bump order and address order
+barely relate. The repeats say it plainly: `ptr=0x02230fd8` is handed out
+fifteen times in 32 rows. The one `adj=1` row is the single case where the
+free list missed and `alloc_in_region` bumped.
+
+So all three keys are dead: an **address** moves with BSS (twice confirmed), a
+**size** names 1222 allocations, and **bump order** is not address order.
+
+**The record aims itself now.** Every allocation is appended to a flat table
+(1<<20 entries, 12.5 MB; `edg_wat_all_n` reached 627353 for this input), and
+the table is searched **once**, from inside `edg_tok_note`, at the first
+lookup whose token is below the text base — which is the faulting lookup,
+reached *before* the dereference. The one moment the victim's address is known
+is also a moment at which code can still run. Nothing is hardcoded: no
+address, no size, no ring depth.
+
+**The table stops rather than wraps**, because the victim sits at `0x03c1…`
+in the low heap and was allocated early — a ring would evict exactly the entry
+wanted, which is the mistake the link ring already made when it held the last
+4096 of 7459 and every one was above the victim. `edg_wat_over` separates
+"the table was too small" from "nothing ends there".
+
+**The counts are reported, not just the last match.** These blocks are
+recycled, so a range is allocated many times; `nbr_cnt == 9` means the most
+recent match is a guess at which one was live, and that has to be visible.
