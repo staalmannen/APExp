@@ -299,6 +299,20 @@ echo
 #                    zero it is a real negative and refutes the
 #                    neighbour reading outright.
 #   nbr_size      -> the number to match against EDG's structs.
+#
+# ***AND THAT ANSWERED 32, WHICH IS WHY `kind' IS HERE.***  A 32-byte
+# allocation ends exactly at the victim, and 32 bytes is the four words
+# already dumped: `{ptr, 9, ptr, 19739}', **the two numbers identical
+# across runs and across inputs while the pointers move**, so they are
+# data and not addresses.  No 32-byte EDG struct has that shape --
+# checked against every aggregate the host `6c -a' emits for seven TUs.
+# So `kind == 2' (an `alloc_fe_var_size' buffer, i.e. a Dyn_array of
+# two 16-byte elements, which is what two `{pointer, number}' pairs
+# look like) and `kind == 1' (a fixed struct outside that set) are
+# different findings.  Both histories print in full because
+# `nbr_cnt = 2' and `vic_cnt = 5': these blocks live on
+# `reusable_fe_list' and come back, so the most recent match is a guess
+# at which allocation was live.
 # **The counts matter as much as the addresses**: these blocks are
 # recycled, so an address is handed out many times, and `nbr_cnt == 9'
 # means the most recent match is a guess at which one was live.
@@ -311,16 +325,21 @@ echo
 	echo 'print("edg_wat_found = ", *edg_wat_found\D, "   (0 = no lookup ever saw a bad token)\n")'
 	echo 'print("target        = ", *edg_wat_target\X, "\n")'
 	echo 'print("elems now     = ", *edg_tok_elems\X, "   (must equal target)\n")'
-	echo 'print("\n-- which allocation ENDS at the victim (the overrunning object)\n")'
-	echo 'print("  nbr_ptr  = ", *edg_wat_nbr_ptr\X, "\n")'
-	echo 'print("  nbr_size = ", *edg_wat_nbr_size\D, "   <- match this against EDG structs\n")'
-	echo 'print("  nbr_cnt  = ", *edg_wat_nbr_cnt\D, "   times that range was allocated\n")'
-	echo 'print("  nbr_idx  = ", *edg_wat_nbr_idx\D, "\n")'
-	echo 'print("\n-- which allocation STARTS at the victim (the buffer itself)\n")'
-	echo 'print("  vic_ptr  = ", *edg_wat_vic_ptr\X, "\n")'
-	echo 'print("  vic_size = ", *edg_wat_vic_size\D, "\n")'
-	echo 'print("  vic_cnt  = ", *edg_wat_vic_cnt\D, "\n")'
-	echo 'print("  vic_idx  = ", *edg_wat_vic_idx\D, "\n")'
+	echo 'print("\n-- allocations ENDING at the victim: the overrunning object\n")'
+	echo 'print("   count = ", *edg_wat_nbr_cnt\D, "   (>1: the range is recycled, so the live one is a guess)\n")'
+	echo 'i = 0'
+	echo 'while i < 8 do {
+		print("   nbr ", i\D, " ptr=", *(edg_wat_nbr_ptr+i*8)\X, " size=", *(edg_wat_nbr_size+i*8)\D, " kind=", *(edg_wat_nbr_kind+i*4)\D, " idx=", *(edg_wat_nbr_idx+i*4)\D, "\n");
+		i = i+1;
+	}'
+	echo 'print("\n-- allocations STARTING at the victim: the buffer itself\n")'
+	echo 'print("   count = ", *edg_wat_vic_cnt\D, "\n")'
+	echo 'i = 0'
+	echo 'while i < 8 do {
+		print("   vic ", i\D, " ptr=", *(edg_wat_vic_ptr+i*8)\X, " size=", *(edg_wat_vic_size+i*8)\D, " kind=", *(edg_wat_vic_kind+i*4)\D, " idx=", *(edg_wat_vic_idx+i*4)\D, "\n");
+		i = i+1;
+	}'
+	echo 'print("\nkind 1 = alloc_fe (a fixed-size struct), 2 = alloc_fe_var_size (a Dyn_array buffer)\n")'
 } | acid $crashpid | sed 2000q
 
 echo
