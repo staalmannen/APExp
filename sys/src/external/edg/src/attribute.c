@@ -1,3 +1,4 @@
+extern void edg_wat_note(void *, unsigned long long, long);
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:52:57 2026 */
 extern int __EDGCPFE__7_0;
@@ -18258,7 +18259,7 @@ if (__67833_9_ptr == ((void *)0)) {
 
 __67833_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67820_36_size)));
 }
-return (char *)__67833_9_ptr;
+return (char *)(edg_wat_note(__67833_9_ptr, (unsigned long long)(__67820_36_size), 1), __67833_9_ptr);
 }
 
 
@@ -18298,7 +18299,7 @@ if (__67870_9_ptr == ((void *)0)) {
 __67870_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67855_41_size)));
 (*__67856_42_actual_size) = __67855_41_size;
 }
-return (char *)__67870_9_ptr;
+return (char *)(edg_wat_note(__67870_9_ptr, (unsigned long long)(*__67856_42_actual_size), 2), __67870_9_ptr);
 }
 #line 38 "src/types.h"
  /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE( _ZN3edg10a_type_ptrE __101103_44_type_ptr)

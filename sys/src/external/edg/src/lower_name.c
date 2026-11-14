@@ -1,3 +1,4 @@
+extern void edg_wat_note(void *, unsigned long long, long);
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:07 2026 */
 extern int __EDGCPFE__7_0;
@@ -17095,7 +17096,7 @@ if (__67778_9_ptr == ((void *)0)) {
 
 __67778_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67765_36_size)));
 }
-return (char *)__67778_9_ptr;
+return (char *)(edg_wat_note(__67778_9_ptr, (unsigned long long)(__67765_36_size), 1), __67778_9_ptr);
 }
 
 
@@ -17135,7 +17136,7 @@ if (__67815_9_ptr == ((void *)0)) {
 __67815_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67800_41_size)));
 (*__67801_42_actual_size) = __67800_41_size;
 }
-return (char *)__67815_9_ptr;
+return (char *)(edg_wat_note(__67815_9_ptr, (unsigned long long)(*__67801_42_actual_size), 2), __67815_9_ptr);
 }
 #line 7442 "src/symbol_tbl.h"
  /* COMDAT group: _ZN3edg23get_inh_ctor_originatorEPNS_9a_routineEb */ _ZN3edg13a_routine_ptrE _ZN3edg23get_inh_ctor_originatorEPNS_9a_routineEb(

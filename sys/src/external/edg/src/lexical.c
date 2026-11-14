@@ -1,3 +1,4 @@
+extern void edg_wat_note(void *, unsigned long long, long);
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:06 2026 */
 extern int __EDGCPFE__7_0;
@@ -25406,7 +25407,7 @@ if (__67779_9_ptr == ((void *)0)) {
 
 __67779_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67766_36_size)));
 }
-return (char *)__67779_9_ptr;
+return (char *)(edg_wat_note(__67779_9_ptr, (unsigned long long)(__67766_36_size), 1), __67779_9_ptr);
 }
 
 
@@ -25446,7 +25447,7 @@ if (__67816_9_ptr == ((void *)0)) {
 __67816_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67801_41_size)));
 (*__67802_42_actual_size) = __67801_41_size;
 }
-return (char *)__67816_9_ptr;
+return (char *)(edg_wat_note(__67816_9_ptr, (unsigned long long)(*__67802_42_actual_size), 2), __67816_9_ptr);
 }
 #line 416
  /* COMDAT group: _ZN3edg7free_feEPvy */ void _ZN3edg7free_feEPvy( _ZN3edg10a_void_ptrE __67854_34_ptr, 

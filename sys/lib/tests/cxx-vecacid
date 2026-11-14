@@ -378,56 +378,76 @@ echo
 	}'
 } | acid $crashpid
 
-# ---- the WATCH: which allocation ends at the victim -------------------
-# All three questions above answered, and the third was the one that
-# told me what instrument to build:
+# ---- the WATCH: which object does the victim sit on top of? ---------
+# ***THE FIRST WATCH KEYED ON AN ADDRESS AND THE ADDRESS MOVED.***
+# `elems' was byte-identical in two runs (0x03c15290, different pids),
+# which read as a handle.  The next build answered `0x03c159a0' --
+# **0x710 = 1808 bytes higher, exactly the BSS that build added**.  The
+# FE layout is deterministic relative to the HEAP BASE and the heap
+# base sits above BSS, so an absolute-address watch moves the thing it
+# watches, by its own size.  *Apparatus inside the quantity measured.*
 #
-#   (1) `elems' is NOT on `reusable_fe_list' -- so the block is LIVE and
-#       the word was overwritten in place.  *A negative that is a
-#       result*: it settles the overrun reading against use-after-free.
-#   (2) The object below runs from `0x03c15158' (zeros beneath it, a
-#       self-pointer at its head) to `elems' -- 312 bytes -- and no
-#       EDG struct in `lexical.c's 327 is 312 bytes, so the boundary is
-#       a GUESS and reading further into it would be guessing twice.
-#   (3) **0 blocks and 0 carves** -- and that is not a miss.  The link
-#       ring holds the last 4096 of 7459 and every one is at
-#       0x07.../0x0c..., while the victim is at 0x03c1...: this block
-#       was allocated EARLY and is long-lived.
+# ***AND `edg_wat_calls = 0' WAS A SECOND, UNRELATED FAULT, WHICH IS
+# WHY THE COUNTER IS LOAD-BEARING.***  `alloc_fe' has **41**
+# definitions and `alloc_fe_var_size' **34**, and `cmd/edg/mkfile'
+# passes `-C' so `6l' keeps the FIRST and discards the rest -- so
+# patching a subset can patch a copy that is not the live one.  27 were
+# patched and the survivor was one of the other 14.  *Without the
+# counter that run reads as "the address moved", which was ALSO true
+# and was not the reason* -- two true statements, one irrelevant, and
+# only the count separates them.
 #
-# ***(3) IS WHY THIS IS A WATCH AND NOT A RING.***  Anything keyed on
-# recency had already evicted the answer, and a bigger ring only moves
-# the horizon.  The question is not "what happened lately" but "what
-# object occupies the bytes below this address" -- and `elems' is
-# byte-identical across two runs with different pids, so the address
-# is a handle.  `edg_wat_note' is in all **27** copies of `alloc_fe'
-# and `alloc_fe_var_size' (27, not the 34 first counted: that grep
-# matched the `extern' prototype too, and the patch's own count gate
-# caught it).
+# **And the miss was in the VERIFICATION as much as the patch**: the
+# patcher keyed on EDG's temp names, assuming COMDAT text is identical
+# across TUs, and the check counted files matching the same anchor --
+# so it agreed with the patch by construction and reported 27 of 27.
+# A check phrased against the thing under test instead of against
+# something independent of it.  The gate asks structurally now: every
+# file that DEFINES the function, found with no reference to any temp
+# name, must contain a call.  41 of 41 and 34 of 34.
 #
-# READING IT.  `rel' says which side of the boundary:
-#   1 ENDS at the watch   -> **the object that overran**, and `size'
-#                            names it against EDG's structs.
-#   2 STARTS at it        -> the victim buffer itself (expect one).
-#   3 SPANS it            -> neither: the word is INTERIOR to a live
-#                            object, which refutes the boundary
-#                            reading outright.
-# `calls > 0' with `n == 0' means the watch address MOVED, which is a
-# different answer from "never ran" and prints the same without the
-# count.
+# SO IT WATCHES A SIZE.  The victim is 248 bytes (31 slots of 8, from
+# `grow's `old + old/2 + 1' rounded up by `alloc_fe_var_size'), and a
+# size does not move with BSS.  `alloc_in_region' bumps sequentially,
+# so the allocation IMMEDIATELY BEFORE a 248-byte one is the object the
+# victim sits on top of -- and `prev_size' is the number to match
+# against EDG's structs.
+#
+# READING IT:
+#   calls == 0   -> still not in the live copy; nothing else is valid.
+#   hits == 0    -> no 248-byte allocation at all; the victim's size
+#                   moved and `edg_wat_watch' needs the new one.
+#   adj == 1     -> prev really is ADJACENT, `prev_ptr + prev_size'
+#                   lands exactly on `ptr'.  **`adj == 0' means the two
+#                   are consecutive CALLS and not neighbours in memory**
+#                   -- a different block, or something allocated between
+#                   them by a path these two functions do not cover --
+#                   and `prev_size' then names nothing.
+# Match the row whose `ptr' equals `elems now' and read its `prev_size'.
+#
+# **The bound is hoisted into `m' on purpose.**  The previous version
+# wrote `while i < *edg_wat_n && i < 64', and with the counter at 0 it
+# printed 64 empty rows -- while the identical shape over a LOCAL
+# (`while i < c && i < 64', section 1) stopped correctly at 24.  So a
+# dereference in a loop condition does not control the loop here.
+# *A loop bound that cannot bound the loop prints a table of zeros that
+# reads exactly like data.*
 echo
 echo 'cxx-vecacid: the allocation WATCH (needs an edg rebuild)'
 echo
 {
-	echo 'print("edg_wat_addr  = ", *edg_wat_addr\X, "   (elems from the previous run)\n")'
-	echo 'print("edg_wat_calls = ", *edg_wat_calls\D, "   (0 = not in this build)\n")'
-	echo 'print("edg_wat_n     = ", *edg_wat_n\D, "   hits; 0 with calls>0 means the address moved\n")'
-	echo 'print("elems now     = ", *edg_tok_elems\X, "   (must equal edg_wat_addr or the watch missed)\n")'
+	echo 'print("edg_wat_calls = ", *edg_wat_calls\D, "   (0 = not in the LIVE copy; rest invalid)\n")'
+	echo 'print("edg_wat_watch = ", *edg_wat_watch\D, "   bytes (the victim buffer size)\n")'
+	echo 'print("edg_wat_hits  = ", *edg_wat_hits\D, "   allocations of that size\n")'
+	echo 'print("elems now     = ", *edg_tok_elems\X, "   match this against ptr below\n")'
+	echo 'm = *edg_wat_n'
+	echo 'print("recorded      = ", m\D, " of 32 slots\n")'
 	echo 'i = 0'
-	echo 'while i < *edg_wat_n && i < 64 do {
-		print("  hit ", i\D, " rel=", *(edg_wat_rel+i*4)\D, " kind=", *(edg_wat_kind+i*4)\D, " ptr=", *(edg_wat_ptr+i*8)\X, " size=", *(edg_wat_size+i*8)\D, " seq=", *(edg_wat_seq+i*4)\D, "\n");
+	echo 'while i < m do {
+		print("  row ", i\D, " ptr=", *(edg_wat_ptr+i*8)\X, " size=", *(edg_wat_size+i*8)\D, " prev=", *(edg_wat_pptr+i*8)\X, " prev_size=", *(edg_wat_psize+i*8)\D, " adj=", *(edg_wat_adj+i*4)\D, " kind=", *(edg_wat_kind+i*4)\D, "\n");
 		i = i+1;
 	}'
-	echo 'print("rel: 1=ends at watch (the overrunning object) 2=starts at it (the victim) 3=spans it\n")'
+	echo 'print("adj=1 means prev_ptr+prev_size == ptr; adj=0 means prev_size names nothing\n")'
 } | acid $crashpid
 
 echo

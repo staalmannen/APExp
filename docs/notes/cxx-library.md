@@ -1818,3 +1818,46 @@ buffer; **3** spans it, which would refute the boundary reading outright and
 say the word is interior to a live object. `edg_wat_calls` separates "the
 watch address moved" from "the instrument never ran", which print the same
 without it.
+
+### The watch missed twice, in two independent ways
+
+**`edg_wat_calls = 0`.** Not "the address moved" — though that was also true,
+and is the reason the counter exists.
+
+1. **`alloc_fe` has 41 definitions and `alloc_fe_var_size` 34**, not the 27
+   the patch found. `cmd/edg/mkfile` passes `-C`, which marks every symbol
+   `dupok` so `6l` keeps the **first** definition and discards the rest — so
+   patching a subset can patch a copy that is not the live one, and the
+   survivor was one of the 14 missed. *Two true statements, one irrelevant,
+   and only `edg_wat_calls` separates them.*
+2. **`elems` moved by exactly `0x710` = 1808 bytes**, which is precisely the
+   BSS that build added (64 slots of 8+8+4+4+4, plus 16). The FE layout is
+   deterministic relative to the **heap base**, and the heap base sits above
+   BSS — so an absolute-address watch moves the thing it is watching, by its
+   own size. *Apparatus inside the quantity being measured.* "Byte-identical
+   across two runs" was true of two runs of **one binary**, and read as a
+   property of the program.
+
+**And the first miss was in the verification as much as the patch.** The
+patcher keyed on EDG's temp names, assuming COMDAT text is identical across
+TUs; 14 files number their `__T<n>` temps differently. The check counted
+files matching *the same anchor*, so it agreed with the patch by construction
+and reported 27 of 27 — **a check phrased against the thing under test
+instead of against something independent of it**. The gate asks structurally
+now: every file that *defines* the function, found with no reference to any
+temp name, must contain a call. **41 of 41 and 34 of 34**, and eight
+spot-checked files compile clean under the host `6c -J -p` and `gcc -std=c89`.
+
+**So the watch keys on a SIZE.** The victim is 248 bytes (31 slots of 8, from
+`grow`'s `old + old/2 + 1` rounded up by `alloc_fe_var_size`), and a size does
+not move with BSS. `alloc_in_region` bumps sequentially, so the allocation
+immediately before a 248-byte one is the object the victim sits on top of, and
+`prev_size` is the number to match against EDG's structs. `adj` is the honest
+part: `prev_ptr + prev_size == ptr` must hold, or the two are consecutive
+*calls* rather than neighbours in memory and `prev_size` names nothing.
+
+A third, smaller fault in the same run: `while i < *edg_wat_n && i < 64`
+printed 64 empty rows at a count of 0, while the identical shape over a local
+stopped correctly at 24. A dereference in an acid loop condition does not
+control the loop; the bound is hoisted now. *A loop bound that cannot bound
+the loop prints a table of zeros that reads exactly like data.*

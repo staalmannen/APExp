@@ -13169,7 +13169,7 @@ if (__67776_9_ptr == ((void *)0)) {
 
 __67776_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67763_36_size)));
 }
-return (char *)(edg_wat_note(__67776_9_ptr, (unsigned long long)__67763_36_size, 1), __67776_9_ptr);
+return (char *)(edg_wat_note(__67776_9_ptr, (unsigned long long)(__67763_36_size), 1), __67776_9_ptr);
 }
 
 
