@@ -323,6 +323,112 @@ echo
 	}'
 } | acid $crashpid
 
+# ---- three free questions, no rebuild --------------------------------
+# ***ONLY ELEMENT 0 IS BAD AND THE FOUR WORDS BELOW IT ARE THE FIND.***
+# elems[1..22] are all plausible control blocks; elems[0] is
+# `0x0003f4b1'.  And the words below `elems' are
+# `{0x03b59df8, 9, 0x03c486b8, 0x4d1b}' -- **the same four-word tail
+# recorded for `prev' in the first crash**, "a pointer, 9, a pointer,
+# 0x4d1b", `0x4d1b' to the digit.  *One write, two victims*: a carved
+# block header's `next' then, a Dyn_array's element 0 now.
+#
+# **And `grow' says this buffer is RECYCLED.** 23 elements of 8 bytes
+# is 248, and `alloc_fe_var_size' takes anything under 2096 bytes off
+# `reusable_fe_list' -- which `grow' itself fills, pushing the old
+# buffer there after `move_elements'.  So three things are worth
+# asking, and all three are free because the data is already in the
+# broken process:
+#
+#   (1) Is `elems' ON the reusable list right now?  A live cache
+#       indexing a block that has been handed back names the bug
+#       outright and needs nothing further.
+#   (2) What is BELOW `elems'?  Far enough back to see the preceding
+#       object's shape, and a 48-byte `a_mem_block_header' if the
+#       block starts near -- `start', `end', `next', `msize' are
+#       recognisable and would give the block this allocation sits in.
+#   (3) Which recorded block CONTAINS `elems'?  The link ring already
+#       holds every `hdr' and the trim ring every carve, so a scan for
+#       the one spanning `elems' costs nothing and says whether this
+#       buffer sits in a carved sub-block -- which is how the other
+#       crash's victim was placed.
+#
+# *A NEGATIVE on (1) is as useful as a positive*: it would say the
+# block is live and the word was overwritten in place, which is the
+# overrun reading, and leaves the 34-copy allocation ring as the way
+# to name the writer.
+echo
+echo 'cxx-vecacid: (1) is elems on the reusable free list?'
+echo
+{
+	echo 'e = *edg_tok_elems'
+	echo 'L = *_ZN3edg6detail16reusable_fe_listE'
+	echo 'print("reusable_fe_list = ", L\X, "\n")'
+	echo 'if L != 0 then {
+		b = *L;
+		c = *(L+16);
+		print("  entries = ", c\D, " buffer = ", b\X, "\n");
+		i = 0;
+		while i < c && i < 64 do {
+			if *(b+i*16) == e then {
+				print("  *** ENTRY ", i\D, " IS elems: ptr=", *(b+i*16)\X, " size=", *(b+i*16+8)\D, "\n");
+			};
+			print("  entry ", i\D, " ptr=", *(b+i*16)\X, " size=", *(b+i*16+8)\D, "\n");
+			i = i+1;
+		};
+	}'
+} | acid $crashpid
+
+echo
+echo 'cxx-vecacid: (2) 48 words below elems'
+echo
+{
+	echo 'e = *edg_tok_elems'
+	echo 'i = 0-48'
+	echo 'while i < 0 do {
+		print("  ", (e+i*8)\X, ": ", *(e+i*8)\X, "\n");
+		i = i+1;
+	}'
+} | acid $crashpid
+
+echo
+echo 'cxx-vecacid: (3) which recorded block contains elems'
+echo
+{
+	echo 'e = *edg_tok_elems'
+	echo 'n = *edg_dbg_link_n'
+	echo 'lim = n'
+	echo 'if lim > 4096 then { lim = 4096; }'
+	echo 'i = 0'
+	echo 'hits = 0'
+	echo 'while i < lim do {
+		h = *(edg_dbg_link_hdr+i*8);
+		if h != 0 then {
+			if e > h && e < h+0x10000 then {
+				print("  link slot ", i\D, " hdr=", h\X, " start=", *(h+8)\X, " end=", *(h+24)\X, " msize=", *(h+32)\X, " delta=", e-h\D, "\n");
+				hits = hits+1;
+			};
+		};
+		i = i+1;
+	}'
+	echo 'print("blocks spanning elems: ", hits\D, "\n")'
+	echo 'n = *edg_dbg_trim_n'
+	echo 'lim = n'
+	echo 'if lim > 4096 then { lim = 4096; }'
+	echo 'i = 0'
+	echo 'hits = 0'
+	echo 'while i < lim do {
+		t = *(edg_dbg_trim_new+i*8);
+		if t != 0 then {
+			if e > t-0x200 && e < t+0x200 then {
+				print("  carve slot ", i\D, " new=", t\X, " parent=", *(edg_dbg_trim_par+i*8)\X, " objsize=", *(edg_dbg_trim_size+i*4)\D, " delta=", e-t\D, "\n");
+				hits = hits+1;
+			};
+		};
+		i = i+1;
+	}'
+	echo 'print("carves near elems: ", hits\D, "\n")'
+} | acid $crashpid
+
 
 # ---- walk the list the crash was walking -----------------------------
 # ***THE STACK NAMES THE LINE AND NOT THE DEFECT.***  `free_memory_region'
