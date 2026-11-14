@@ -1,6 +1,7 @@
 extern void edg_wat_note(void *, unsigned long long, long);
 extern void edg_wat_find(void *);
 extern long edg_wat_found;
+extern long edg_wat_site;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:04 2026 */
 extern int __EDGCPFE__7_0;
@@ -22816,7 +22817,7 @@ const _ZN3edg7Ptr_mapIPNS_12an_expr_nodeENS_9Dyn_arrayINS_19a_subst_pairs_descrE
 _ZN3edg7Ptr_mapIPNS_12an_expr_nodeENS_9Dyn_arrayINS_19a_subst_pairs_descrENS_12FE_allocatorEEES5_EE *const this,  size_t __39563_66_n_slots)
 #line 5849
 { auto struct _ZN3edg10AllocationINS_13Ptr_map_entryIPNS_12an_expr_nodeENS_9Dyn_arrayINS_19a_subst_pairs_descrENS_12FE_allocatorEEEEEEE __T299087856; auto _ZN3edg8sizeof_tE __T299088152; auto char *__T299088448;
-auto _ZN3edg7Ptr_mapIPNS_12an_expr_nodeENS_9Dyn_arrayINS_19a_subst_pairs_descrENS_12FE_allocatorEEES5_E13an_allocationE __39571_18_allocation; __39571_18_allocation = (((__39563_66_n_slots <= 1ULL) ? ((void)((__T299088152 = 32ULL) , (__T299088448 = (_ZN3edg8alloc_feEy(32ULL))))) : ((void)(
+auto _ZN3edg7Ptr_mapIPNS_12an_expr_nodeENS_9Dyn_arrayINS_19a_subst_pairs_descrENS_12FE_allocatorEEES5_E13an_allocationE __39571_18_allocation; __39571_18_allocation = (((__39563_66_n_slots <= 1ULL) ? ((void)((__T299088152 = 32ULL) , (__T299088448 = ((edg_wat_site = 27, _ZN3edg8alloc_feEy(32ULL)))))) : ((void)(
 #line 5850
 __T299088448 = (_ZN3edg17alloc_fe_var_sizeEyPy((__39563_66_n_slots * 32ULL), (&__T299088152)))))) , ((((__T299087856.start) = ((_ZN3edg12FE_allocatorINS_13Ptr_map_entryIPNS_12an_expr_nodeENS_9Dyn_arrayINS_19a_subst_pairs_descrES0_EEEEE7an_elemE *)__T299088448)) , ((__T299087856.n_bytes_allocated) = 
 #line 5850

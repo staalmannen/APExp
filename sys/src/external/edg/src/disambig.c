@@ -1,6 +1,7 @@
 extern void edg_wat_note(void *, unsigned long long, long);
 extern void edg_wat_find(void *);
 extern long edg_wat_found;
+extern long edg_wat_site;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:00 2026 */
 extern int __EDGCPFE__7_0;
@@ -10075,7 +10076,7 @@ return (char *)(edg_wat_note(__67813_9_ptr, (unsigned long long)(*__67799_42_act
 { auto unsigned long long __T932989472; auto _ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *__T932989768; auto _ZN3edg9a_booleanE __T932990064; auto size_t __T932990360; auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE
 #line 1151
  __T932990656;
-auto struct _ZN3edg13a_token_cacheE *__34873_15_p; __34873_15_p = ((struct _ZN3edg13a_token_cacheE *)(_ZN3edg8alloc_feEy(32ULL)));
+auto struct _ZN3edg13a_token_cacheE *__34873_15_p; __34873_15_p = ((struct _ZN3edg13a_token_cacheE *)((edg_wat_site = 11, _ZN3edg8alloc_feEy(32ULL))));
 
 { (_ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *)((__T932989472 = 32ULL) , ((__T932989768 = ((_ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T932989472, ((void *)__34873_15_p))))) , ((((__T932990064 = (*((_ZN3edg9a_booleanE *)((
 #line 1154

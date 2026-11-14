@@ -329,17 +329,18 @@ echo
 	echo 'print("   count = ", *edg_wat_nbr_cnt\D, "   (>1: the range is recycled, so the live one is a guess)\n")'
 	echo 'i = 0'
 	echo 'while i < 8 do {
-		print("   nbr ", i\D, " ptr=", *(edg_wat_nbr_ptr+i*8)\X, " size=", *(edg_wat_nbr_size+i*8)\D, " kind=", *(edg_wat_nbr_kind+i*4)\D, " idx=", *(edg_wat_nbr_idx+i*4)\D, "\n");
+		print("   nbr ", i\D, " ptr=", *(edg_wat_nbr_ptr+i*8)\X, " size=", *(edg_wat_nbr_size+i*8)\D, " kind=", *(edg_wat_nbr_kind+i*4)\D, " site=", *(edg_wat_nbr_site+i*4)\D, " idx=", *(edg_wat_nbr_idx+i*4)\D, "\n");
 		i = i+1;
 	}'
 	echo 'print("\n-- allocations STARTING at the victim: the buffer itself\n")'
 	echo 'print("   count = ", *edg_wat_vic_cnt\D, "\n")'
 	echo 'i = 0'
 	echo 'while i < 8 do {
-		print("   vic ", i\D, " ptr=", *(edg_wat_vic_ptr+i*8)\X, " size=", *(edg_wat_vic_size+i*8)\D, " kind=", *(edg_wat_vic_kind+i*4)\D, " idx=", *(edg_wat_vic_idx+i*4)\D, "\n");
+		print("   vic ", i\D, " ptr=", *(edg_wat_vic_ptr+i*8)\X, " size=", *(edg_wat_vic_size+i*8)\D, " kind=", *(edg_wat_vic_kind+i*4)\D, " site=", *(edg_wat_vic_site+i*4)\D, " idx=", *(edg_wat_vic_idx+i*4)\D, "\n");
 		i = i+1;
 	}'
-	echo 'print("\nkind 1 = alloc_fe (a fixed-size struct), 2 = alloc_fe_var_size (a Dyn_array buffer)\n")'
+	echo 'print("\nkind 1 = alloc_fe (fixed struct), 2 = alloc_fe_var_size (Dyn_array buffer)\n")'
+	echo 'print("site = the tag in sys/lib/tests/edg-wat-sites.txt; 0 = a call whose size is not the literal 32\n")'
 } | acid $crashpid | sed 2000q
 
 echo

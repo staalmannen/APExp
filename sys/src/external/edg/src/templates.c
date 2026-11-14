@@ -1,6 +1,7 @@
 extern void edg_wat_note(void *, unsigned long long, long);
 extern void edg_wat_find(void *);
 extern long edg_wat_found;
+extern long edg_wat_site;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:09 2026 */
 extern int __EDGCPFE__7_0;
@@ -26447,7 +26448,7 @@ return (char *)(edg_wat_note(__67813_9_ptr, (unsigned long long)(*__67799_42_act
 { auto unsigned long long __T927631088; auto _ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *__T927631384; auto _ZN3edg9a_booleanE __T927631680; auto size_t __T927631976; auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE
 #line 1151
  __T927632272;
-auto struct _ZN3edg13a_token_cacheE *__34873_15_p; __34873_15_p = ((struct _ZN3edg13a_token_cacheE *)(_ZN3edg8alloc_feEy(32ULL)));
+auto struct _ZN3edg13a_token_cacheE *__34873_15_p; __34873_15_p = ((struct _ZN3edg13a_token_cacheE *)((edg_wat_site = 54, _ZN3edg8alloc_feEy(32ULL))));
 
 { (_ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *)((__T927631088 = 32ULL) , ((__T927631384 = ((_ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T927631088, ((void *)__34873_15_p))))) , ((((__T927631680 = (*((_ZN3edg9a_booleanE *)((
 #line 1154
@@ -26853,7 +26854,7 @@ __155824_29_vpip = _ZN33_INTERNAL_11_templates_c_ce2b1a853edg26avail_variadic_pa
 _ZN33_INTERNAL_11_templates_c_ce2b1a853edg26avail_variadic_param_infosE = (_ZN33_INTERNAL_11_templates_c_ce2b1a853edg26avail_variadic_param_infosE->next);
 } else  {
 
-__155824_29_vpip = ((_ZN3edg21a_variadic_param_infoE *)(_ZN3edg8alloc_feEy(32ULL)));
+__155824_29_vpip = ((_ZN3edg21a_variadic_param_infoE *)((edg_wat_site = 55, _ZN3edg8alloc_feEy(32ULL))));
 
 
 
@@ -58987,7 +58988,7 @@ __191051_35_dccp = _ZN33_INTERNAL_11_templates_c_ce2b1a853edg32avail_deferred_co
 _ZN33_INTERNAL_11_templates_c_ce2b1a853edg32avail_deferred_constraint_checksE = (_ZN33_INTERNAL_11_templates_c_ce2b1a853edg32avail_deferred_constraint_checksE->next);
 } else  {
 
-__191051_35_dccp = ((_ZN3edg27a_deferred_constraint_checkE *)(_ZN3edg8alloc_feEy(32ULL)));
+__191051_35_dccp = ((_ZN3edg27a_deferred_constraint_checkE *)((edg_wat_site = 56, _ZN3edg8alloc_feEy(32ULL))));
 
 
 
@@ -59403,7 +59404,7 @@ return __191398_28_result_list;
 
 
 { auto unsigned long long __T936017568; auto _ZZN3edg9constructIPNS_13a_token_cacheEJEEEvT_DpOT0_E9an_object *__T936017864; auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE __T936018160;
-auto struct _ZN3edg13a_token_cacheE *__34873_15_p; __34873_15_p = ((struct _ZN3edg13a_token_cacheE *)(_ZN3edg8alloc_feEy(32ULL)));
+auto struct _ZN3edg13a_token_cacheE *__34873_15_p; __34873_15_p = ((struct _ZN3edg13a_token_cacheE *)((edg_wat_site = 57, _ZN3edg8alloc_feEy(32ULL))));
 
 { (_ZZN3edg9constructIPNS_13a_token_cacheEJEEEvT_DpOT0_E9an_object *)((__T936017568 = 32ULL) , ((__T936017864 = ((_ZZN3edg9constructIPNS_13a_token_cacheEJEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T936017568, ((void *)__34873_15_p))))) , ((((__T936017864->is_reusable) = ((_ZN3edg11a_bit_fieldE)((
 #line 1154

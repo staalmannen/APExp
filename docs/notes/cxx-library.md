@@ -1963,3 +1963,31 @@ pairs look like. Both histories now print in full rather than the last match,
 because `nbr_cnt = 2` and `vic_cnt = 5`: these blocks live on
 `reusable_fe_list` and come back, so "the most recent match" is a guess about
 which allocation was live.
+
+### `kind = 1`, and content and layout both fail to identify it
+
+**Refuted.** The neighbour is a fixed `alloc_fe(32)` — a struct, not a
+`Dyn_array` buffer — which kills the `{pointer, number}` pair reading with it.
+
+**The indices are the other half, and they are the useful half.** The
+neighbour is allocated at **113624**, the victim's five allocations run
+113627 → 114085, and then the neighbour is allocated **again at 114548** —
+after the live victim buffer was handed out. So whoever receives that second
+32-byte block is writing into a buffer that is already live.
+
+**Two ways of naming the object both failed, and each failure is a result:**
+
+* *By content.* The block was allocated **twice**, so what it holds when the
+  process dies need not be what it was allocated as. A snapshot of a recycled
+  block is not a type.
+* *By layout.* Every aggregate the host `6c -a` emits for **all 75 TUs** —
+  4812 distinct, **757 of them 32 bytes** — was searched, and **zero** have
+  the observed `{ptr, num, ptr, num}` shape. A real negative, and it says the
+  inference was the wrong instrument rather than that the object is exotic.
+
+So each `alloc_fe(32ULL)` site is tagged with a number recorded beside the
+allocation. **58 sites, of which 24 allocate `struct a_token_cache`** — which
+is suggestive in a token-cache bug, and exactly the kind of thing to measure
+rather than assume. `sys/lib/tests/edg-wat-sites.txt` is the tag → file:line →
+type map. A site of **0** means the 32 bytes came from a call whose size is not
+the literal, which is a finding of its own.

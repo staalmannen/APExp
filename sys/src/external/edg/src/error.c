@@ -1,6 +1,7 @@
 extern void edg_wat_note(void *, unsigned long long, long);
 extern void edg_wat_find(void *);
 extern long edg_wat_found;
+extern long edg_wat_site;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:00 2026 */
 extern int __EDGCPFE__7_0;
@@ -23316,7 +23317,7 @@ auto int __159716_10_bucket;
 auto _ZN3edg25a_recorded_diagnostic_ptrE __159717_29_rdp;
 
 __159716_10_bucket = (_ZN28_INTERNAL_7_error_c_27e2eb9c3edg15bucket_for_diagENS0_13an_error_codeENS0_17an_error_severityEPNS0_17a_source_positionE(__159706_20_error_code, __159707_23_severity, __159708_24_error_pos));
-__159717_29_rdp = ((_ZN3edg25a_recorded_diagnostic_ptrE)(_ZN3edg8alloc_feEy(32ULL)));
+__159717_29_rdp = ((_ZN3edg25a_recorded_diagnostic_ptrE)((edg_wat_site = 12, _ZN3edg8alloc_feEy(32ULL))));
 (__159717_29_rdp->error_code) = __159706_20_error_code;
 (__159717_29_rdp->severity) = __159707_23_severity;
 (__159717_29_rdp->error_pos) = (*__159708_24_error_pos);

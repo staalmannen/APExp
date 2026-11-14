@@ -1,6 +1,7 @@
 extern void edg_wat_note(void *, unsigned long long, long);
 extern void edg_wat_find(void *);
 extern long edg_wat_found;
+extern long edg_wat_site;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:06 2026 */
 extern int __EDGCPFE__7_0;
@@ -25579,7 +25580,7 @@ return (_ZN3edg13Value_for_ptrIPNS_6detail19a_cached_token_baseEEE *)__34221_48_
 { auto unsigned long long __T1113016408; auto _ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *__T1113016704; auto _ZN3edg9a_booleanE __T1113017000; auto size_t __T1113017296; auto 
 #line 1151
 _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE __T1113017592;
-auto struct _ZN3edg13a_token_cacheE *__34876_15_p; __34876_15_p = ((struct _ZN3edg13a_token_cacheE *)(_ZN3edg8alloc_feEy(32ULL)));
+auto struct _ZN3edg13a_token_cacheE *__34876_15_p; __34876_15_p = ((struct _ZN3edg13a_token_cacheE *)((edg_wat_site = 30, _ZN3edg8alloc_feEy(32ULL))));
 
 { (_ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *)((__T1113016408 = 32ULL) , ((__T1113016704 = ((_ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T1113016408, ((void *)__34876_15_p))))) , ((((__T1113017000 = (*((_ZN3edg9a_booleanE *)((
 #line 1154
@@ -26122,7 +26123,7 @@ __T1117139384)), ((unsigned short *)__5_36431_58_args), ((const _ZN3edg17a_sourc
 { auto unsigned long long __T1117146600; auto _ZZN3edg9constructIPNS_13a_token_cacheEJbyEEEvT_DpOT0_E9an_object *__T1117146896; auto _ZN3edg9a_booleanE __T1117147192; auto size_t __T1117147488; auto 
 #line 1151
 _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE __T1117147784;
-auto struct _ZN3edg13a_token_cacheE *__34876_15_p; __34876_15_p = ((struct _ZN3edg13a_token_cacheE *)(_ZN3edg8alloc_feEy(32ULL)));
+auto struct _ZN3edg13a_token_cacheE *__34876_15_p; __34876_15_p = ((struct _ZN3edg13a_token_cacheE *)((edg_wat_site = 31, _ZN3edg8alloc_feEy(32ULL))));
 
 { (_ZZN3edg9constructIPNS_13a_token_cacheEJbyEEEvT_DpOT0_E9an_object *)((__T1117146600 = 32ULL) , ((__T1117146896 = ((_ZZN3edg9constructIPNS_13a_token_cacheEJbyEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T1117146600, ((void *)__34876_15_p))))) , ((((__T1117147192 = (*((_ZN3edg13Value_for_ptrIPbEE *)((
 #line 1154
@@ -26747,7 +26748,7 @@ return __180266_31_partial_body;
 
 
 { auto unsigned long long __T1117460296; auto _ZZN3edg9constructIPNS_13a_token_cacheEJEEEvT_DpOT0_E9an_object *__T1117460592; auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE __T1117460888;
-auto struct _ZN3edg13a_token_cacheE *__34876_15_p; __34876_15_p = ((struct _ZN3edg13a_token_cacheE *)(_ZN3edg8alloc_feEy(32ULL)));
+auto struct _ZN3edg13a_token_cacheE *__34876_15_p; __34876_15_p = ((struct _ZN3edg13a_token_cacheE *)((edg_wat_site = 32, _ZN3edg8alloc_feEy(32ULL))));
 
 { (_ZZN3edg9constructIPNS_13a_token_cacheEJEEEvT_DpOT0_E9an_object *)((__T1117460296 = 32ULL) , ((__T1117460592 = ((_ZZN3edg9constructIPNS_13a_token_cacheEJEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T1117460296, ((void *)__34876_15_p))))) , ((((__T1117460592->is_reusable) = ((_ZN3edg11a_bit_fieldE)((
 #line 1154
@@ -27809,18 +27810,6 @@ edg_tok_note(struct _ZN3edg13a_token_cacheE *c, unsigned long long off,
     edg_tok_n = ~0ULL;
     edg_tok_alloc = ~0ULL;
   }
-  /*
-   * ***THE SEARCH AIMS ITSELF HERE.***  This runs on every lookup, and
-   * the faulting one reaches it BEFORE the dereference that kills the
-   * process -- so the one moment at which the victim's address is
-   * known is also a moment at which code can still run.  A token below
-   * the text base (0x200000) was never an address; that is the whole
-   * test, and it needs no constant from any previous run.
-   */
-  if (!edg_wat_found && (unsigned long long)tok < 0x200000ULL
-      && edg_tok_elems != (void *)0)
-    edg_wat_find(edg_tok_elems);
-
   i = (edg_tok_calls - 1) & 63;
   edg_tok_ring_val[i] = tok;
   edg_tok_ring_off[i] = off;
@@ -28055,7 +28044,7 @@ __181297_26_olmp = _ZN3edg22avail_orig_line_modifsE;
 _ZN3edg22avail_orig_line_modifsE = (_ZN3edg22avail_orig_line_modifsE->next);
 } else  {
 
-__181297_26_olmp = ((_ZN3edg22an_orig_line_modif_ptrE)(_ZN3edg8alloc_feEy(32ULL)));
+__181297_26_olmp = ((_ZN3edg22an_orig_line_modif_ptrE)((edg_wat_site = 33, _ZN3edg8alloc_feEy(32ULL))));
 
 
 
@@ -29312,7 +29301,7 @@ static _ZN3edg27an_include_file_history_ptrE _ZN30_INTERNAL_9_lexical_c_3c2acd74
 
 {
 auto _ZN3edg27an_include_file_history_ptrE __183022_31_ifhp;
-__183022_31_ifhp = ((_ZN3edg27an_include_file_history_ptrE)(_ZN3edg8alloc_feEy(32ULL)));
+__183022_31_ifhp = ((_ZN3edg27an_include_file_history_ptrE)((edg_wat_site = 34, _ZN3edg8alloc_feEy(32ULL))));
 
 
 
@@ -37589,7 +37578,7 @@ static _ZN3edg29a_spelling_storage_buffer_ptrE _ZN30_INTERNAL_9_lexical_c_3c2acd
 _ZN3edg8sizeof_tE __193390_75_size)
 #line 17108
 {
-auto _ZN3edg29a_spelling_storage_buffer_ptrE __193397_33_new_ssbp; __193397_33_new_ssbp = ((struct _ZN3edg25a_spelling_storage_bufferE *)(_ZN3edg8alloc_feEy(32ULL)));
+auto _ZN3edg29a_spelling_storage_buffer_ptrE __193397_33_new_ssbp; __193397_33_new_ssbp = ((struct _ZN3edg25a_spelling_storage_bufferE *)((edg_wat_site = 35, _ZN3edg8alloc_feEy(32ULL))));
 
 
 (__193397_33_new_ssbp->next) = ((_ZN3edg29a_spelling_storage_buffer_ptrE)0);

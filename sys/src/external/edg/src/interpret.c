@@ -1,6 +1,7 @@
 extern void edg_wat_note(void *, unsigned long long, long);
 extern void edg_wat_find(void *);
 extern long edg_wat_found;
+extern long edg_wat_site;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:06 2026 */
 extern int __EDGCPFE__7_0;
@@ -61656,7 +61657,7 @@ __154259_28_vpep = _ZN33_INTERNAL_11_interpret_c_6f7afffe3edg25free_variant_path
 _ZN33_INTERNAL_11_interpret_c_6f7afffe3edg25free_variant_path_entriesE = (_ZN33_INTERNAL_11_interpret_c_6f7afffe3edg25free_variant_path_entriesE->next);
 _ZN33_INTERNAL_11_interpret_c_6f7afffe3edg27n_free_variant_path_entriesE -= 1UL;
 } else  {
-__154259_28_vpep = ((_ZN3edg20a_variant_path_entryE *)(_ZN3edg8alloc_feEy(32ULL)));
+__154259_28_vpep = ((_ZN3edg20a_variant_path_entryE *)((edg_wat_site = 28, _ZN3edg8alloc_feEy(32ULL))));
 (__154259_28_vpep->next_allocated) = _ZN33_INTERNAL_11_interpret_c_6f7afffe3edg20variant_path_entriesE;
 _ZN33_INTERNAL_11_interpret_c_6f7afffe3edg20variant_path_entriesE = __154259_28_vpep;
 _ZN33_INTERNAL_11_interpret_c_6f7afffe3edg22n_variant_path_entriesE += 1UL;
@@ -83913,7 +83914,7 @@ __T552166632 = __175251_23_result; _ZN3edg9Dyn_arrayIPNS_10a_constantENS_12FE_al
 
 
 { auto unsigned long long __T574926976; auto _ZZN3edg9constructIPNS_13a_token_cacheEJbEEEvT_DpOT0_E9an_object *__T574927272; auto _ZN3edg9a_booleanE __T574927568; auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE __T574927864;
-auto struct _ZN3edg13a_token_cacheE *__34873_15_p; __34873_15_p = ((struct _ZN3edg13a_token_cacheE *)(_ZN3edg8alloc_feEy(32ULL)));
+auto struct _ZN3edg13a_token_cacheE *__34873_15_p; __34873_15_p = ((struct _ZN3edg13a_token_cacheE *)((edg_wat_site = 29, _ZN3edg8alloc_feEy(32ULL))));
 
 { (_ZZN3edg9constructIPNS_13a_token_cacheEJbEEEvT_DpOT0_E9an_object *)((__T574926976 = 32ULL) , ((__T574927272 = ((_ZZN3edg9constructIPNS_13a_token_cacheEJbEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T574926976, ((void *)__34873_15_p))))) , (((__T574927568 = (*((_ZN3edg13Value_for_ptrIPbEE *)((
 #line 1154
