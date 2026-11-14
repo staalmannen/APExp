@@ -1781,6 +1781,31 @@ silent:
   struct layout of `a_token_cache` agrees (host `6c -J -p -a`: 32,
   128, 120, 16) while corpus member access is SYMBOLIC, so layout
   only bites where a size is baked.
+  ***AND IT IS FOUND, AND IT IS THE `ino_t`/`dev_t` WIDENING A SECOND
+  TIME.*** The tagged allocation record named `lexical.c`'s
+  `alloc_include_file_history`: **the corpus bakes `alloc_fe(32)` and
+  kencc lays `an_include_file_history` out at 48**, because its
+  `a_unique_file_id` is `{dev_t; ino_t}` and this release widened both
+  to `unsigned long long` — *the same change that took `struct stat`
+  from 88 to 104*. The typedefs were widened in EDG's five files and
+  **the baked allocation sizes were not, because nothing looks at
+  them**. Every observation falls out: the stable `9` is the bit-field
+  word and `0x4d1b`/`0x3f4b1` are the two halves of a FILE ID, which is
+  why they were identical across builds and across a twelve-line input
+  and a 2000-line one while every address moved — *a value stable while
+  addresses move is not an address*; exactly one word lands past the
+  block, the other 8 being inside EDG's own slack; and the victim is
+  whatever was allocated next, a carved header's `next` then and a
+  token array's `elems[0]` now. **One write, two victims, one bug from
+  the beginning.** Fixed as `sizeof(struct ...)` rather than `48`, on a
+  corpus restored to a pristine base so that `EDG_DBG_CARVE_PAD` — a
+  64-byte layout experiment — is not in what gets tested.
+  **`edgsize-sweep.py` is the general form and GATES**: 209 baked
+  `alloc_fe` sites agree, 0 short, 5 larger (arrays, reported not
+  counted), 52 unknown. *`X_ptr` is EDG's own typedef for `X *` and the
+  mangled length prefix must be RECOMPUTED* — without that the one real
+  finding sat inside the 52 unknowns. Its root guard fired on its own
+  first run, the fifth time in this tree.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.

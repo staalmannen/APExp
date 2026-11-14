@@ -317,7 +317,10 @@ echo
 # recycled, so an address is handed out many times, and `nbr_cnt == 9'
 # means the most recent match is a guess at which one was live.
 echo
-echo 'cxx-vecacid: the allocation record (needs an edg rebuild)'
+echo 'cxx-vecacid: the allocation record'
+echo 'cxx-vecacid: (needs sys/lib/tests/edg-wat-patch.py APPLIED to the corpus;'
+echo 'cxx-vecacid:  the tree ships clean, so these names do not resolve by default'
+echo 'cxx-vecacid:  -- acid saying so is the expected output, not a failure)'
 echo
 {
 	echo 'print("edg_wat_calls = ", *edg_wat_calls\D, "   (0 = not in the LIVE copy; rest invalid)\n")'

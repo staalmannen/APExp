@@ -1,8 +1,3 @@
-extern void edg_wat_note(void *, unsigned long long, long);
-extern void edg_wat_find(void *);
-extern long edg_wat_found;
-extern long edg_wat_site;
-extern long edg_wat_armed;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:02 2026 */
 extern int __EDGCPFE__7_0;
@@ -16673,7 +16668,7 @@ if (__67777_9_ptr == ((void *)0)) {
 
 __67777_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67764_36_size)));
 }
-return (char *)(edg_wat_note(__67777_9_ptr, (unsigned long long)(__67764_36_size), 1), __67777_9_ptr);
+return (char *)__67777_9_ptr;
 }
 
 
@@ -16713,7 +16708,7 @@ if (__67814_9_ptr == ((void *)0)) {
 __67814_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67799_41_size)));
 (*__67800_42_actual_size) = __67799_41_size;
 }
-return (char *)(edg_wat_note(__67814_9_ptr, (unsigned long long)(*__67800_42_actual_size), 2), __67814_9_ptr);
+return (char *)__67814_9_ptr;
 }
 #line 1160 "src/util.h"
  /* COMDAT group: _ZN3edg9delete_feINS_13a_token_cacheEEEvPPT_ */ void _ZN3edg9delete_feINS_13a_token_cacheEEEvPPT_( struct _ZN3edg13a_token_cacheE **__34882_35_p)

@@ -1,8 +1,3 @@
-extern void edg_wat_note(void *, unsigned long long, long);
-extern void edg_wat_find(void *);
-extern long edg_wat_found;
-extern long edg_wat_site;
-extern long edg_wat_armed;
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:09 2026 */
 extern int __EDGCPFE__7_0;
@@ -24655,7 +24650,7 @@ if (__67776_9_ptr == ((void *)0)) {
 
 __67776_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67763_36_size)));
 }
-return (char *)(edg_wat_note(__67776_9_ptr, (unsigned long long)(__67763_36_size), 1), __67776_9_ptr);
+return (char *)__67776_9_ptr;
 }
 
 
@@ -24695,7 +24690,7 @@ if (__67813_9_ptr == ((void *)0)) {
 __67813_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67798_41_size)));
 (*__67799_42_actual_size) = __67798_41_size;
 }
-return (char *)(edg_wat_note(__67813_9_ptr, (unsigned long long)(*__67799_42_actual_size), 2), __67813_9_ptr);
+return (char *)__67813_9_ptr;
 }
 #line 534 "src/util.h"
  /* COMDAT group: _ZN3edg7destroyIPNS_22a_reusable_token_cacheEEEvT_ */ void _ZN3edg7destroyIPNS_22a_reusable_token_cacheEEEvT_( struct _ZN3edg22a_reusable_token_cacheE *__34255_28_p_object)
@@ -25670,7 +25665,7 @@ _ZN3edg8sizeof_tE __155866_69_suffix_len)
 {
 auto _ZN3edg29a_literal_operator_header_ptrE __155876_33_ptr;
 
-__155876_33_ptr = ((_ZN3edg29a_literal_operator_header_ptrE)((edg_wat_site = 46, _ZN3edg8alloc_feEy(32ULL))));
+__155876_33_ptr = ((_ZN3edg29a_literal_operator_header_ptrE)(_ZN3edg8alloc_feEy(32ULL)));
 
 
 
@@ -25693,7 +25688,7 @@ _ZN3edg33a_substituted_type_list_entry_ptrE _ZN3edg33alloc_substituted_type_list
 {
 auto _ZN3edg33a_substituted_type_list_entry_ptrE __155899_37_ptr;
 
-__155899_37_ptr = ((_ZN3edg33a_substituted_type_list_entry_ptrE)((edg_wat_site = 47, _ZN3edg8alloc_feEy(32ULL))));
+__155899_37_ptr = ((_ZN3edg33a_substituted_type_list_entry_ptrE)(_ZN3edg8alloc_feEy(32ULL)));
 
 
 
@@ -25912,7 +25907,7 @@ __156183_32_hbslep = _ZN34_INTERNAL_12_symbol_tbl_c_f21399313edg30avail_hide_by_
 _ZN34_INTERNAL_12_symbol_tbl_c_f21399313edg30avail_hide_by_sig_list_entriesE = (_ZN34_INTERNAL_12_symbol_tbl_c_f21399313edg30avail_hide_by_sig_list_entriesE->next);
 } else  {
 
-__156183_32_hbslep = ((_ZN3edg24a_hide_by_sig_list_entryE *)((edg_wat_site = 48, _ZN3edg8alloc_feEy(32ULL))));
+__156183_32_hbslep = ((_ZN3edg24a_hide_by_sig_list_entryE *)(_ZN3edg8alloc_feEy(32ULL)));
 
 
 
@@ -27479,7 +27474,7 @@ case 8:
 (((__157756_37_sym_ptr->variant).field).ptr) = ((_ZN3edg11a_field_ptrE)0);
 (((__157756_37_sym_ptr->variant).field).anonymous_parent_object) = ((_ZN3edg12a_symbol_ptrE)0);
 { auto unsigned long long __T597914352; auto _ZN3edg20a_shared_token_cacheE *__T597915088; auto _ZN3edg25a_field_symbol_supplementE *__157962_37_fssp;
-__157962_37_fssp = ((_ZN3edg25a_field_symbol_supplementE *)((edg_wat_site = 49, _ZN3edg8alloc_feEy(32ULL))));
+__157962_37_fssp = ((_ZN3edg25a_field_symbol_supplementE *)(_ZN3edg8alloc_feEy(32ULL)));
 (__157962_37_fssp->token_sequence_number) = 0U;
 (_ZN3edg20a_shared_token_cacheE *)((__T597914352 = 8ULL) , ((__T597915088 = ((_ZN3edg20a_shared_token_cacheE *)(_ZnwyPv(__T597914352, ((void *)(&(__157962_37_fssp->token_cache))))))) , ((_ZN3edg10Shared_objINS_13a_token_cacheENS_12FE_allocatorEEC1Ev(__T597915088)) , __T597915088)));
 (__157962_37_fssp->prototype_field) = ((_ZN3edg29a_field_symbol_supplement_ptrE)0);
@@ -37267,7 +37262,7 @@ auto _ZN3edg16a_progenitor_ptrE __169076_21_pp;
 
 if (_ZN34_INTERNAL_12_symbol_tbl_c_f21399313edg17avail_progenitorsE == ((_ZN3edg16a_progenitor_ptrE)0)) {
 
-__169076_21_pp = ((_ZN3edg16a_progenitor_ptrE)((edg_wat_site = 50, _ZN3edg8alloc_feEy(32ULL))));
+__169076_21_pp = ((_ZN3edg16a_progenitor_ptrE)(_ZN3edg8alloc_feEy(32ULL)));
 
 
 
@@ -38476,7 +38471,7 @@ auto _ZN3edg24an_extern_type_fixup_ptrE __170375_28_ptr;
 
 ;
 
-__170375_28_ptr = ((_ZN3edg24an_extern_type_fixup_ptrE)((edg_wat_site = 51, _ZN3edg8alloc_feEy(32ULL))));
+__170375_28_ptr = ((_ZN3edg24an_extern_type_fixup_ptrE)(_ZN3edg8alloc_feEy(32ULL)));
 
 
 
@@ -38708,7 +38703,7 @@ _ZN3edg6a_typeE *__170623_53_assoc_type)
 auto _ZN3edg33an_exception_spec_error_descr_ptrE __170635_38_esedp; auto _ZN3edg33an_exception_spec_error_descr_ptrE __170635_45_end_of_list;
 
 ;
-__170635_38_esedp = ((_ZN3edg33an_exception_spec_error_descr_ptrE)((edg_wat_site = 52, _ZN3edg8alloc_feEy(32ULL))));
+__170635_38_esedp = ((_ZN3edg33an_exception_spec_error_descr_ptrE)(_ZN3edg8alloc_feEy(32ULL)));
 
 
 
@@ -39362,7 +39357,7 @@ _ZN3edg21a_master_instance_ptrE _ZN3edg21alloc_master_instanceEv(void)
 {
 auto _ZN3edg21a_master_instance_ptrE __171291_26_mip;
 
-__171291_26_mip = ((_ZN3edg21a_master_instance_ptrE)((edg_wat_site = 53, _ZN3edg8alloc_feEy(32ULL))));
+__171291_26_mip = ((_ZN3edg21a_master_instance_ptrE)(_ZN3edg8alloc_feEy(32ULL)));
 
 
 
