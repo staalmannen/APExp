@@ -1,3 +1,80 @@
+/*
+ * ---- edg_wat_note: WHICH ALLOCATION ENDS AT THE VICTIM ---------------
+ *
+ * The token array's buffer sits at a byte-identical address in two
+ * separate runs (`elems = 0x03c15290', different pids), so the FE
+ * layout is deterministic for one input and the ADDRESS is a usable
+ * handle.  That is what makes this a WATCH and not a ring.
+ *
+ * ***A TIME RING WOULD HAVE ANSWERED NOTHING HERE.***  The link ring
+ * holds the last 4096 of 7459 links and every one is at 0x07.../0x0c...,
+ * while the victim is at 0x03c1... -- this block was allocated early
+ * and is long-lived, so anything keyed on recency had already evicted
+ * it.  The question is not "what happened lately" but "what object
+ * occupies the bytes below this address", and only an address-keyed
+ * record can answer it.
+ *
+ * `alloc_fe' and `alloc_fe_var_size' are COMDAT with a per-TU copy --
+ * 34 definitions each, the trap that made `alloc_in_region' report
+ * `0 of 0' -- so the call is inserted in EVERY copy by a patch over
+ * identical text, and the patch GATES on the replacement count.
+ *
+ * WHAT IT RECORDS.  Any allocation that
+ *
+ *	ENDS   at the watch address	-> the object that overran
+ *	STARTS at it			-> the victim buffer itself
+ *	SPANS  it			-> neither, and that is a finding
+ *					   too: the word would be interior
+ *					   to a live object, not a boundary
+ *
+ * **`edg_wat_calls' is load-bearing.**  The watch address is a
+ * measurement from a previous run, not a constant of the program, so
+ * `calls > 0' with `hits == 0' says the address MOVED -- a different
+ * answer from "the instrument never ran", and the two print the same
+ * without the count.
+ *
+ * Only builtin types here, which is why the whole block sits at the
+ * top of the file: it needs none of EDG's typedefs, and a declaration
+ * at file scope ahead of everything cannot be caught by a `#line'.
+ */
+unsigned long long edg_wat_addr = 0x03c15290ULL;
+void *edg_wat_ptr[64];
+unsigned long long edg_wat_size[64];
+long edg_wat_kind[64];
+long edg_wat_rel[64];
+long edg_wat_seq[64];
+long edg_wat_n;
+long edg_wat_calls;
+
+void
+edg_wat_note(void *p, unsigned long long sz, long kind)
+{
+  unsigned long long a;
+  long rel;
+
+  edg_wat_calls = edg_wat_calls + 1;
+  if (p == (void *)0)
+    return;
+  a = (unsigned long long)p;
+  rel = 0;
+  if (a + sz == edg_wat_addr)
+    rel = 1;
+  else if (a == edg_wat_addr)
+    rel = 2;
+  else if (a < edg_wat_addr && edg_wat_addr < a + sz)
+    rel = 3;
+  if (rel == 0)
+    return;
+  if (edg_wat_n < 64) {
+    edg_wat_ptr[edg_wat_n] = p;
+    edg_wat_size[edg_wat_n] = sz;
+    edg_wat_kind[edg_wat_n] = kind;
+    edg_wat_rel[edg_wat_n] = rel;
+    edg_wat_seq[edg_wat_n] = edg_wat_calls;
+    edg_wat_n = edg_wat_n + 1;
+  }
+}
+
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:07 2026 */
 extern int __EDGCPFE__7_0;
@@ -6982,7 +7059,7 @@ if (__67776_9_ptr == ((void *)0)) {
 
 __67776_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67763_36_size)));
 }
-return (char *)__67776_9_ptr;
+return (char *)(edg_wat_note(__67776_9_ptr, (unsigned long long)__67763_36_size, 1), __67776_9_ptr);
 }
 
 
@@ -7022,7 +7099,7 @@ if (__67813_9_ptr == ((void *)0)) {
 __67813_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67798_41_size)));
 (*__67799_42_actual_size) = __67798_41_size;
 }
-return (char *)__67813_9_ptr;
+return (char *)(edg_wat_note(__67813_9_ptr, (unsigned long long)(*__67799_42_actual_size), 2), __67813_9_ptr);
 }
 #line 216 "src/mem_manage.c"
 static char *_ZN34_INTERNAL_12_mem_manage_c_b0d968923edg17malloc_with_checkEy( _ZN3edg8sizeof_tE __144120_41_size)

@@ -378,6 +378,58 @@ echo
 	}'
 } | acid $crashpid
 
+# ---- the WATCH: which allocation ends at the victim -------------------
+# All three questions above answered, and the third was the one that
+# told me what instrument to build:
+#
+#   (1) `elems' is NOT on `reusable_fe_list' -- so the block is LIVE and
+#       the word was overwritten in place.  *A negative that is a
+#       result*: it settles the overrun reading against use-after-free.
+#   (2) The object below runs from `0x03c15158' (zeros beneath it, a
+#       self-pointer at its head) to `elems' -- 312 bytes -- and no
+#       EDG struct in `lexical.c's 327 is 312 bytes, so the boundary is
+#       a GUESS and reading further into it would be guessing twice.
+#   (3) **0 blocks and 0 carves** -- and that is not a miss.  The link
+#       ring holds the last 4096 of 7459 and every one is at
+#       0x07.../0x0c..., while the victim is at 0x03c1...: this block
+#       was allocated EARLY and is long-lived.
+#
+# ***(3) IS WHY THIS IS A WATCH AND NOT A RING.***  Anything keyed on
+# recency had already evicted the answer, and a bigger ring only moves
+# the horizon.  The question is not "what happened lately" but "what
+# object occupies the bytes below this address" -- and `elems' is
+# byte-identical across two runs with different pids, so the address
+# is a handle.  `edg_wat_note' is in all **27** copies of `alloc_fe'
+# and `alloc_fe_var_size' (27, not the 34 first counted: that grep
+# matched the `extern' prototype too, and the patch's own count gate
+# caught it).
+#
+# READING IT.  `rel' says which side of the boundary:
+#   1 ENDS at the watch   -> **the object that overran**, and `size'
+#                            names it against EDG's structs.
+#   2 STARTS at it        -> the victim buffer itself (expect one).
+#   3 SPANS it            -> neither: the word is INTERIOR to a live
+#                            object, which refutes the boundary
+#                            reading outright.
+# `calls > 0' with `n == 0' means the watch address MOVED, which is a
+# different answer from "never ran" and prints the same without the
+# count.
+echo
+echo 'cxx-vecacid: the allocation WATCH (needs an edg rebuild)'
+echo
+{
+	echo 'print("edg_wat_addr  = ", *edg_wat_addr\X, "   (elems from the previous run)\n")'
+	echo 'print("edg_wat_calls = ", *edg_wat_calls\D, "   (0 = not in this build)\n")'
+	echo 'print("edg_wat_n     = ", *edg_wat_n\D, "   hits; 0 with calls>0 means the address moved\n")'
+	echo 'print("elems now     = ", *edg_tok_elems\X, "   (must equal edg_wat_addr or the watch missed)\n")'
+	echo 'i = 0'
+	echo 'while i < *edg_wat_n && i < 64 do {
+		print("  hit ", i\D, " rel=", *(edg_wat_rel+i*4)\D, " kind=", *(edg_wat_kind+i*4)\D, " ptr=", *(edg_wat_ptr+i*8)\X, " size=", *(edg_wat_size+i*8)\D, " seq=", *(edg_wat_seq+i*4)\D, "\n");
+		i = i+1;
+	}'
+	echo 'print("rel: 1=ends at watch (the overrunning object) 2=starts at it (the victim) 3=spans it\n")'
+} | acid $crashpid
+
 echo
 echo 'cxx-vecacid: (2) 48 words below elems'
 echo

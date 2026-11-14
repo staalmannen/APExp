@@ -1,3 +1,4 @@
+extern void edg_wat_note(void *, unsigned long long, long);
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
 /* Thu Oct  8 07:53:06 2026 */
 extern int __EDGCPFE__7_0;
@@ -8868,7 +8869,7 @@ if (__67776_9_ptr == ((void *)0)) {
 
 __67776_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67763_36_size)));
 }
-return (char *)__67776_9_ptr;
+return (char *)(edg_wat_note(__67776_9_ptr, (unsigned long long)__67763_36_size, 1), __67776_9_ptr);
 }
 
 
@@ -8908,7 +8909,7 @@ if (__67813_9_ptr == ((void *)0)) {
 __67813_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67798_41_size)));
 (*__67799_42_actual_size) = __67798_41_size;
 }
-return (char *)__67813_9_ptr;
+return (char *)(edg_wat_note(__67813_9_ptr, (unsigned long long)(*__67799_42_actual_size), 2), __67813_9_ptr);
 }
 #line 497 "src/util.h"
  /* COMDAT group: _ZN3edg9move_fromIPKNS_9Dyn_arrayINS_10Shared_objINS_16a_pending_pragmaENS_12FE_allocatorEEES4_EEEEONS_17Remove_ref_helperIDTdecl9dummy_valIT_EEEE9an_objectESA_ */ _ZN3edg13Value_for_ptrIPKNS_9Dyn_arrayINS_10Shared_objINS_16a_pending_pragmaENS_12FE_allocatorEEES4_EEEE *

@@ -1781,3 +1781,40 @@ the 34-copy allocation ring as the way to name the writer. **`alloc_fe` and
 `alloc_fe_var_size` are COMDAT in 34 TUs each**, the same trap that made
 `alloc_in_region` report `0 of 0`, so that instrument is a uniform sed over
 all 34 copies and is worth paying for only once these three have answered.
+
+### All three answered, and the third dictated the next instrument
+
+1. **`elems` is not on `reusable_fe_list`.** The block is live and the word
+   was overwritten in place — the overrun reading, against use-after-free.
+   *A negative that is a result.*
+2. The object below `elems` runs from `0x03c15158` — zeros beneath it, a
+   self-pointer at its head — to `elems`: **312 bytes**. But no EDG struct
+   among `lexical.c`'s 327 is 312 bytes, so **the boundary is a guess** and
+   reading further into the object would be guessing twice.
+3. **0 blocks and 0 carves span `elems`**, and that is not a miss. The link
+   ring holds the last 4096 of 7459 links and every one is at `0x07…`/`0x0c…`
+   while the victim is at `0x03c1…`: this block was allocated early and is
+   long-lived.
+
+**(3) is why the next instrument is a watch and not a ring.** Anything keyed
+on recency had already evicted the answer, and a bigger ring only moves the
+horizon. The question is not "what happened lately" but "what object occupies
+the bytes below this address" — and `elems` is **byte-identical across two
+runs with different pids**, so the address is a usable handle.
+
+`edg_wat_note` records any allocation that ends at, starts at, or spans the
+watch address, and is inserted in every copy of `alloc_fe` and
+`alloc_fe_var_size`. **27 copies, not the 34 first counted**: that grep
+matched the `extern` prototype as well as the definition, because the
+prototype line contains the definition anchor as a substring. *The patch's own
+count gate caught it*, and the real number was then confirmed by an
+independent anchor — the parameter's temp name, which the prototype does not
+carry. All six spot-checked files compile clean under the host `6c -J -p` and
+under `gcc -std=c89`.
+
+`rel` is the whole reading: **1** ends at the watch, so `size` names the
+overrunning object against EDG's structs; **2** starts at it, the victim
+buffer; **3** spans it, which would refute the boundary reading outright and
+say the word is interior to a live object. `edg_wat_calls` separates "the
+watch address moved" from "the instrument never ran", which print the same
+without it.
