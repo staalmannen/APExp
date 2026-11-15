@@ -2072,3 +2072,53 @@ Its control puts the baked 32 back and requires the sweep to name the site.
 
 ***And the root guard fired on its own first run, for the fifth time*** —
 `sys/lib/tests` is three levels below the root and the first draft said two.
+
+## The crash is gone, and the next thing on that path is cpp
+
+`cxx-vecacid cxx-library-test.cpp` answers **NO CRASH**. cpfe completes, and
+`cc -c` reaches cpfe's **output** for the first time — where it answers
+`Syntax error in #line`, dozens of times, once per header switch. *A fix that
+makes a process reach code it never reached before can expose anything on
+that path*, and this was the next thing on it.
+
+**It is a GNU linemarker.** `c_gen_be.c:782` builds the directive from the
+literal `"#line "`, sets `buf[1]` to a **space** when the target is
+gcc-or-clang so it becomes `# N`, and appends gcc's system-header flag after
+the file name. kencc's `cpp` rejected any token after the name:
+
+```c
+tp+3<trp->lp || (tp+3==trp->lp && (tp+1)->type!=STRING) || *(tp+1)->t=='L'
+```
+
+Measured with `cpp-xcheck/`, which builds this cpp with gcc on the host:
+**the four plain forms were accepted and every flagged one refused.** After
+the fix, all eight. The flags — 1 enter, 2 return, 3 system header, 4
+`extern "C"` — are **skipped rather than acted on**, which is what a compiler
+that is not gcc should do with them.
+
+**The `L` test is kept and is not the precedence slip it looks like.** The old
+condition was `(A && B) || C` with `C` evaluated whatever `A` said; it reads
+like a misplaced paren and the *effect* was right, since `L"f.h"` is not a
+file name in any form of the directive. It is explicit now rather than left to
+be re-read as a bug.
+
+`sys/lib/tests/cpp-linemarker.sh` is the instrument: 8 forms that must be
+accepted, **4 that must still be refused** — a one-line "accept anything after
+the number" passes section 1 and is wrong — and a third section asserting the
+position is still *recorded*, since a fix that skipped the whole tail would
+leave the file name unset and pass the first two. **0 failures**, and its
+control removes the flag-skipping loop and fires on **exactly** the 6 flagged
+cases, leaving the other 10 passing.
+
+***It is NOT a `cpp-xcheck.sh` case file, and that was tried first.*** That
+harness diffs against `gcc -E -P`, and `-P` is precisely the flag that
+suppresses line markers, while kencc's cpp has no `-P` and writes its own — so
+a case file made of line directives differs **by construction, in every
+line**, however correct both preprocessors are. *A comparison whose two sides
+are asked different questions cannot be read*; the tell was that the diff was
+100% noise rather than one line of signal. gcc also rejects `# N "f" 1 2 3 4`
+("invalid flag 2"), which kencc now accepts — deliberate, since skipping is
+cheaper than ordering rules for flags nothing reads.
+
+No regression: `hideset-cases` and `ppnum-cases` still PASS, and
+`--regress` over **400 real libap files** reports `same` for every one.
