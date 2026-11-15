@@ -39,6 +39,23 @@
 #define MICROSOFT_DIALECT_IS_GENERATED_CODE_TARGET 0
 #define C_GEN_BE_GENERATES_ANSI_C      1
 
+/*
+ * USE_EMPTY_STRUCT_IN_GENERATED_C -- 0, and it was baked 1.
+ *
+ * With it on, the C back end writes `struct X { };' for any class
+ * whose size is <= 1 -- every captureless lambda's closure type, and
+ * every empty C++ class.  C89 has no empty struct and kencc refuses
+ * one: `syntax error, last name: _Z24mainEUliE_'.  **EDG's own
+ * portable arm writes `char __dummy;'**, which is what this corpus's
+ * own generated structs contain on nearly every page of it.
+ *
+ * Changed in `src/target.c', because nothing reads this header at run
+ * time -- it documents what a REGENERATION would be told.  See
+ * `sys/lib/tests/edgtarg-sweep.py', which gates on the two files
+ * disagreeing and exists because they already had, twice.
+ */
+#define USE_EMPTY_STRUCT_IN_GENERATED_C 0
+
 /* ---- no COMDAT ---------------------------------------------------- *
  * Clearing GCC_IS_GENERATED_CODE_TARGET above stops __weak__ being
  * EMITTED, but by itself that only turns a kencc-unsupported attribute

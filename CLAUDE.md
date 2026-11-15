@@ -1829,6 +1829,28 @@ silent:
   that was 100% noise rather than one line of signal. No regression:
   `hideset-cases` and `ppnum-cases` still PASS and `--regress` over 400
   real libap files reports `same` for every one.
+  ***AND PAST `#line` THE NEXT ONE IS AN EMPTY STRUCT, FROM THE SAME
+  CLASS AS THE LINEMARKERS.*** `6c` reaches the generated C and stops at
+  `syntax error, last name: _Z24mainEUliE_`, `main`'s `(int)` lambda —
+  and the host `6c` reproduces it in one line, message and identifier
+  verbatim: `struct X { };` fails, `struct X { char __dummy; };` passes.
+  EDG writes an empty struct for any class of size <= 1 (every
+  captureless lambda's closure type, every empty C++ class), and **it
+  is a target SETTING** — `use_empty_struct_in_generated_c`, whose
+  other arm writes `char __dummy;`, which is what this corpus's own
+  structs contain on nearly every page. ***And the target description
+  is not what runs***: `kencc_targ.h` already said
+  `GCC_IS_GENERATED_CODE_TARGET 0` while the baked `src/target.c` says
+  **1**, which is exactly where the linemarker flags came from.
+  **`edgtarg-sweep.py` GATES** on the two files disagreeing: 5 agree, 3
+  disagree (all KNOWN, each with a reason not taken this round), 10 not
+  comparable, 18 absent. ***Its first version reported two ABI
+  disagreements that do not exist*** — `TARG_ALIGNOF_POINTER` and
+  `TARG_ALIGNOF_LONG_DOUBLE`, each the regex taking the FIRST of eight
+  assignments, since those are set once per DATA MODEL in arms chosen
+  at run time. *A name assigned more than once is NOT COMPARABLE and
+  never counted; the finding it refuses to make is the one that would
+  have been believed.*
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
