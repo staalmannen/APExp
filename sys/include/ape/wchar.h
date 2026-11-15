@@ -85,6 +85,10 @@ typedef struct {
  * btowc.c expanded to "wint_t ((Rune)(int c))", reported as
  *   btowc.c:29 external redeclaration of: Rune
  */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern Rune btowc(int);
 extern int wctob(Rune);
 
@@ -184,4 +188,8 @@ wchar_t *wcpncpy(wchar_t *d, const wchar_t *s, size_t n);
 
 
 
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* _WCHAR_H */

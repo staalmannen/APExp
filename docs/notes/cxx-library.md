@@ -2169,3 +2169,51 @@ handled in cpp instead), and `INSTANTIATE_EXTERN_INLINE` /
 `INSTANTIATE_INLINE_VARIABLES` (link-model changes, and `eccp` already passes
 `--instantiate local`). Its control flips a value that currently agrees and
 requires exactly one new finding.
+
+## Past the compiler, and the link wants mangled C names
+
+```
+main: undefined: _Z6wcslenPKw
+main: undefined: _Z8iswalphaj
+```
+
+`wcslen(const wchar_t*)` and `iswalpha(unsigned)` — **C++-mangled**, because
+`<wchar.h>` and `<wctype.h>` have **no `extern "C"` guard at all**, while
+`<stdio.h>`, `<string.h>` and `<ctype.h>` do. A header without the guard is a
+link error in C++ and nothing else: it compiles, it preprocesses, every C
+program is unaffected, and a C++ call asks the linker for a name no C library
+defines.
+
+**Measured on the host by an A/B over one staged copy of the tree**, which is
+sound here because the question is a *name* and names are what the two
+compilers must agree on:
+
+```
+without guards : _Z6wcslenPKw  _Z7imaxabsx      ← the VM's error, to the digit
+with guards    : wcslen        imaxabs
+```
+
+Guarded: `wchar.h`, `wctype.h`, `inttypes.h`.
+
+***`stddef.h` was guarded too and should not have been.*** Its one declaration
+sits inside `#ifndef __cplusplus` — C++ has `std::unreachable` and no
+`_Noreturn`, and the header's own comment says so — so C++ never sees it, and
+the guard put `extern "C" {` inside a conditional arm whose `}` was outside
+it. **An unbalanced brace in the arm nobody compiles**, which is the worst
+version of this to ship. Reverted, and the exemption is in the sweep.
+
+`sys/lib/tests/apexternc-sweep.py` gates on it. **165 headers, 31 declare
+functions with no guard**, and the gate is the set the C++ library actually
+includes — every `c++/*.stdh` names its C headers — while the other **30** are
+reported: `lua.h`, `libsec.h`, `mp.h`, `auth.h`, `f2c.h`, `termios.h`,
+`uchar.h`, the `unistring` family. Whether C++ should see those at all is a
+decision nobody has taken, and *a sweep that gates on a decision nobody has
+taken is a sweep that gets switched off*.
+
+***Its first run reported `stddef.h`*** — the one header the edit had just
+proved needs no guard — because the not-C++ pattern was anchored at `^ndef`
+and the keyword is `ifndef`, so it matched neither spelling. *A sweep whose
+first run names a file you have just decided about is the cheapest possible
+chance to catch it.* Its control strips the guard from a guarded,
+C++-reachable header and requires exactly one new finding; it fires on
+`ctype.h`.
