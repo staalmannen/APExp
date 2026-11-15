@@ -10856,7 +10856,7 @@ _ZN3edg29msvc_is_generated_code_targetE = ((_ZN3edg9a_booleanE)0);
 _ZN3edg26msvc_target_version_numberE = 1926UL;
 _ZN3edg42microsoft_dialect_is_generated_code_targetE = ((_ZN3edg9a_booleanE)0);
 #line 1024
-_ZN3edg31use_empty_struct_in_generated_cE = ((_ZN3edg9a_booleanE)1);
+_ZN3edg31use_empty_struct_in_generated_cE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg21exc_spec_in_func_typeE = ((_ZN3edg9a_booleanE)0);
 _ZN3edg27targ_minimum_pack_alignmentE = ((_ZN3edg16a_targ_alignmentE)1U);

@@ -2122,3 +2122,50 @@ cheaper than ordering rules for flags nothing reads.
 
 No regression: `hideset-cases` and `ppnum-cases` still PASS, and
 `--regress` over **400 real libap files** reports `same` for every one.
+
+## Past `#line`, and the next one is an empty struct
+
+`6c` now reaches the generated C and stops at
+`syntax error, last name: _Z24mainEUliE_` — `main`'s `(int)` lambda. The
+host `6c` reproduces it in one line, **message and identifier verbatim**:
+
+```c
+struct _Z24mainEUliE_ { };      /* syntax error, last name: _Z24mainEUliE_ */
+struct _Z24mainEUliE_ { char __dummy; };   /* OK */
+```
+
+An **empty struct**, which C89 has not and kencc refuses. EDG writes one for
+any class whose size is ≤ 1 — every captureless lambda's closure type and
+every empty C++ class — and it is a target setting, not a compiler
+limitation: `use_empty_struct_in_generated_c`. **Its other arm writes
+`char __dummy;`**, which is what this corpus's own generated structs contain
+on nearly every page. So the fix is upstream's own portable arm, one
+assignment in `src/target.c`.
+
+***And the target description is not what runs.*** `kencc_targ.h` already
+said `GCC_IS_GENERATED_CODE_TARGET 0` while the baked `target.c` says **1** —
+which is exactly where the gcc linemarker flags came from. Nothing reads that
+header at run time; it documents what a *regeneration* would be told, and the
+corpus was generated once with somebody else's answers. **Two rounds, two
+places, one class.**
+
+`sys/lib/tests/edgtarg-sweep.py` gates on it: 5 agree, **3 disagree (all
+known, each with a reason)**, 10 not comparable, 18 not in `target.c`.
+
+***Its first version reported two ABI disagreements that do not exist.*** It
+said `TARG_ALIGNOF_POINTER` was 8 in the header and 4 in the baked target, and
+the same for `TARG_ALIGNOF_LONG_DOUBLE` — either of which would mean every
+struct EDG lays out is wrong. **Both were the regex taking the first of eight
+assignments**: those variables are set once per *data model*, in arms chosen
+at run time, and the first in file order belongs to a 32-bit one. *A rule
+written from the examples in front of you fires on the next shape.* A name
+assigned more than once is reported as **not comparable** and never counted —
+**the finding it refuses to make is the one that would have been believed.**
+
+The three real disagreements are not taken this round and say why:
+`GCC_IS_GENERATED_CODE_TARGET` (clearing it moves attributes, builtin varargs
+and the line-directive form at once, and the one consequence that bit is
+handled in cpp instead), and `INSTANTIATE_EXTERN_INLINE` /
+`INSTANTIATE_INLINE_VARIABLES` (link-model changes, and `eccp` already passes
+`--instantiate local`). Its control flips a value that currently agrees and
+requires exactly one new finding.
