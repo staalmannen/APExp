@@ -42,10 +42,18 @@
 
 /*from musl*/
 typedef struct { intmax_t quot, rem; } imaxdiv_t;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern intmax_t strtoimax(const char *, char **, int);
 extern uintmax_t strtoumax(const char *, char **, int);
 extern intmax_t imaxabs(intmax_t);
 extern imaxdiv_t imaxdiv(intmax_t, intmax_t);
 
 
+
+#ifdef __cplusplus
+}
+#endif
 #endif

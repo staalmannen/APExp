@@ -1851,6 +1851,27 @@ silent:
   at run time. *A name assigned more than once is NOT COMPARABLE and
   never counted; the finding it refuses to make is the one that would
   have been believed.*
+  ***AND PAST THE COMPILER THE LINK WANTS MANGLED C NAMES***:
+  `main: undefined: _Z6wcslenPKw` and `_Z8iswalphaj`, because
+  **`<wchar.h>` and `<wctype.h>` have NO `extern "C"` guard at all**
+  while `<stdio.h>`, `<string.h>` and `<ctype.h>` do. *A header
+  without the guard is a link error in C++ and nothing else*: it
+  compiles, it preprocesses, every C program is unaffected.
+  **Measured on the host by an A/B over a staged copy** -- without the
+  guards g++ asks for `_Z6wcslenPKw`/`_Z7imaxabsx`, with them `wcslen`/
+  `imaxabs`, and the first is the VM's error to the digit; the host is
+  sound here because the question is a NAME. Guarded: `wchar.h`,
+  `wctype.h`, `inttypes.h`. ***`stddef.h` was guarded too and should
+  not have been*** -- its one declaration is inside
+  `#ifndef __cplusplus`, so the guard put `extern "C" {` in a
+  conditional arm whose `}` was outside it, **an unbalanced brace in
+  the arm nobody compiles**. **`apexternc-sweep.py` GATES**: 31 of 165
+  headers declare functions with no guard, the gate is the set the C++
+  library includes (0 now) and the other 30 are REPORTED, since
+  *a sweep that gates on a decision nobody has taken gets switched
+  off*. ***Its first run reported `stddef.h`***, the one header just
+  decided about, because the not-C++ pattern was anchored at `^ndef`
+  and the keyword is `ifndef`.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.

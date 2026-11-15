@@ -18,6 +18,10 @@ typedef const short* const* wctrans_t;
  * ##############################################
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern int iswalnum(Rune);
 extern int iswalpha(Rune);
 extern int iswblank(Rune);
@@ -62,4 +66,8 @@ extern wctrans_t wctrans(const char*);
 extern wctype_t wctype(const char*);
 extern int iswctype(Rune, unsigned long);
 
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* _WCTYPE_H */
