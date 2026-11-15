@@ -285,10 +285,57 @@ control(Tokenrow *trp)
 		expandrow(trp, "<line>");
 		tp = trp->bp+2;
 	kline:
-		if (tp+1>=trp->lp || tp->type!=NUMBER || tp+3<trp->lp
-		 || (tp+3==trp->lp && ((tp+1)->type!=STRING)||*(tp+1)->t=='L')){
+		/*
+		 * ***TRAILING FLAGS ARE GNU LINEMARKERS AND THEY ARE
+		 * ACCEPTED NOW.***  The old test was
+		 *
+		 *	tp+3<trp->lp || (tp+3==trp->lp && (tp+1)->type!=STRING)
+		 *
+		 * which rejects ANY token after the file name -- so
+		 * `# 123 "f.h" 3', what gcc writes when it enters a system
+		 * header, was a hard error.  **EDG's C back end writes
+		 * exactly that**: `c_gen_be.c:782' starts from the literal
+		 * `"#line "', sets `buf[1]' to a SPACE for a gcc-or-clang
+		 * target so the directive becomes `# N', and then appends
+		 * the system-header flag after the name.  cpfe's output
+		 * could not be preprocessed at all, every header switch
+		 * costing one error.
+		 *
+		 * *The flags carry nothing this preprocessor needs* -- 1
+		 * enter, 2 return, 3 system header, 4 extern "C" -- so they
+		 * are skipped rather than acted on, which is what a
+		 * compiler that is not gcc should do with them.
+		 *
+		 * **The `L' test is kept and is not the precedence slip it
+		 * looks like.**  Written out, the old condition was
+		 * `(A && B) || C' where C is `*(tp+1)->t=='L'', evaluated
+		 * whatever A said; it reads like a misplaced paren and the
+		 * EFFECT was right, since a wide string `L"f.h"' is not a
+		 * file name in any form of this directive.  It is explicit
+		 * below rather than left to be re-read as a bug.
+		 *
+		 * Measured with `cpp-xcheck/', which builds this cpp with
+		 * gcc on the host: before, the four plain forms were
+		 * accepted and every flagged one refused; after, all eight.
+		 */
+		if (tp+1>=trp->lp || tp->type!=NUMBER){
 			error(ERROR, "Syntax error in #line");
 			return;
+		}
+		if (tp+2<trp->lp){		/* a file name follows */
+			Token *ftp = tp+1;
+
+			if (ftp->type!=STRING || *ftp->t=='L'){
+				error(ERROR, "Syntax error in #line");
+				return;
+			}
+			ftp++;
+			while (ftp+1<trp->lp && ftp->type==NUMBER)
+				ftp++;		/* GNU linemarker flags */
+			if (ftp+1<trp->lp){
+				error(ERROR, "Syntax error in #line");
+				return;
+			}
 		}
 		cursource->line = atol((char*)tp->t)-1;
 		/*

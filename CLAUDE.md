@@ -1806,6 +1806,29 @@ silent:
   mangled length prefix must be RECOMPUTED* — without that the one real
   finding sat inside the 52 unknowns. Its root guard fired on its own
   first run, the fifth time in this tree.
+  ***AND THE CRASH IS GONE: `cxx-vecacid cxx-library-test.cpp` ANSWERS
+  NO CRASH.*** cpfe completes, and `cc -c` reaches cpfe's OUTPUT for
+  the first time — where it answers `Syntax error in #line`, once per
+  header switch. **It is a GNU linemarker**: `c_gen_be.c:782` builds
+  the directive from `"#line "`, sets `buf[1]` to a SPACE for a
+  gcc-or-clang target so it becomes `# N`, and appends gcc's
+  system-header flag after the name, and kencc's cpp rejected any token
+  after the name. The flags (1 enter, 2 return, 3 system header, 4
+  `extern "C"`) are **skipped rather than acted on**, which is what a
+  compiler that is not gcc should do. **`cpp-linemarker.sh` is the
+  instrument**: 8 forms that must be accepted, **4 that must still be
+  refused** (a one-line "accept anything after the number" passes the
+  first section and is wrong), and a third section asserting the
+  position is still RECORDED — 0 failures, and its control removes the
+  skip loop and fires on exactly the 6 flagged cases. ***It is NOT a
+  `cpp-xcheck.sh` case file, and that was tried first***: that harness
+  diffs against `gcc -E -P`, and `-P` is the flag that SUPPRESSES line
+  markers while kencc's cpp writes its own, so such a case file differs
+  by construction in every line — *a comparison whose two sides are
+  asked different questions cannot be read*, and the tell was a diff
+  that was 100% noise rather than one line of signal. No regression:
+  `hideset-cases` and `ppnum-cases` still PASS and `--regress` over 400
+  real libap files reports `same` for every one.
   **The host build is NOT the tool here and nearly became one** —
   `edgbaked-xcheck`'s verdict is sound-for-compile-time,
   VOID-at-run-time, and a crash is a run-time question.
