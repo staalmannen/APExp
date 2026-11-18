@@ -396,7 +396,7 @@ public:
  * @return Reference to the requested element.
  */
 template<class t_type, size_t t_size> inline auto array<t_type, t_size>::at(size_type const position) -> reference {
-  ::std::throw_on_true<::std::out_of_range<>>((position > t_size));
+  ::std::throw_on_true<::std::out_of_range>((position > t_size));
   return m_elements[position];
 }
 
@@ -411,7 +411,7 @@ template<class t_type, size_t t_size> inline auto array<t_type, t_size>::at(size
  */
 template<class t_type, size_t t_size>
 constexpr inline auto array<t_type, t_size>::at(size_type const position) const -> const_reference {
-  ::std::throw_on_true<::std::out_of_range<>>((position > t_size));
+  ::std::throw_on_true<::std::out_of_range>((position > t_size));
   return m_elements[position];
 }
 

@@ -1004,7 +1004,7 @@ public:
    * @return reference Reference to the requested character.
    */
   reference at(size_type pos) {
-    ::std::throw_on_true<::std::out_of_range<>>(pos > size());
+    ::std::throw_on_true<::std::out_of_range>(pos > size());
     return *(begin() + static_cast<difference_type>(pos));
   }
 
@@ -1017,7 +1017,7 @@ public:
    * @return const_reference Reference to the requested character.
    */
   const_reference at(size_type pos) const {
-    ::std::throw_on_true<::std::out_of_range<>>(pos > size());
+    ::std::throw_on_true<::std::out_of_range>(pos > size());
     return *(cbegin() + static_cast<difference_type>(pos));
   }
 

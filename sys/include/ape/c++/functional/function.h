@@ -454,7 +454,7 @@ namespace function_helper {
     }
 
     t_return_type operator()(t_arg_types &&...args) const {
-      ::std::throw_on_true<::std::bad_function_call<>>(nullptr == m_f);
+      ::std::throw_on_true<::std::bad_function_call>(nullptr == m_f);
       return (*m_f)(::std::forward<t_arg_types>(args)...);
     }
 

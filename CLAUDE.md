@@ -1953,11 +1953,39 @@ silent:
   **`to_wstring` has SIX overloads and no float, deliberately**: the
   generic converter works but answers `"100"` where `%f` gives
   `"100.000000"`, and a different string from the one the standard
-  promises is worse than a compile error. What is left in unrar is the
-  iterator-pair `basic_string(InputIt,InputIt)` over `unsigned char *`
-  and **the exception hierarchy being TEMPLATES**, so
-  `catch (std::length_error &)` does not compile; both in 0.6's
-  inventory with the mechanism, along with re2c's ten missing headers.
+  promises is worse than a compile error.
+  ***AND THE NEXT ONE WAS `<stdexcept>`, WHERE TWO FAULTS SAT IN ONE
+  PLACE AND THE FIRST HID THE SECOND.*** **EDG ships `<stdexcept>`
+  EMPTY** — `namespace std { }`, the runtime having only `exception`,
+  `bad_alloc` and `type_info` — so unrar's `os.hpp:16`, literally
+  `#include <stdexcept> // For std::length_error.`, declared NOTHING
+  and compiled anyway because `<vector>` drags the header in by
+  another route. *A header that answers an include and declares
+  nothing is the stub-that-says-nothing family, one layer up from a
+  function, and what kept it invisible is that the name arrived by
+  accident.* Underneath, portable_stl's four were
+  `template<class = void> class length_error`, so
+  `catch (std::length_error &)` is *invalid use of template-name
+  without an argument list* (g++ offers C++17 CTAD, which is the wrong
+  lead). **Upstream's reason is good and is KEPT** — a template member
+  `what()` needs no `.cpp` and no COMDAT, which is what makes the
+  library header-only — so the fix is a RENAME AND AN ALIAS,
+  `using length_error = length_error_impl<>`, and not a real class,
+  which would be a LINK-MODEL change. **Six of the nine did not exist
+  in any form.** `cxx-stdexcept-test.cpp`: subject 0, reference 0,
+  and **its control is a COMPILE FAILURE** (42 errors), so a run that
+  prints nothing is the expected result. ***Its section 2 is the half
+  that constrains the design***: one template plus nine aliases gives
+  nine SIBLINGS, passes every line of section 1 and fails every line
+  of section 2, because `catch (std::logic_error &)` must catch a
+  thrown `length_error`. **unrar is 43 of 44.**
+  What is left is `basic_string`'s iterator-pair overloads, which
+  `to_address` the first element and copy a BLOCK — so they reject an
+  iterator whose `value_type` merely converts (unrar's
+  `unsigned char *`) and ***would be silently wrong for a
+  NON-CONTIGUOUS one***, which the `input_iterator_tag` guard admits.
+  In 0.6's inventory with the mechanism, along with the missing
+  `(char const *)` constructors and re2c's ten missing headers.
   ***AND `cxxapp-host.sh --control` IS STRUCTURAL NOW***: its first
   version required the harness to still report `to_wstring` missing,
   `to_wstring` was added, the control failed, and **what it was

@@ -1470,3 +1470,43 @@ width. That is also the one that was never a bug, so the sweep's blind spot
 and its false-positive risk happen to coincide; a standing sweep was not
 added, because after the fix the shape occurs nowhere and it would have no
 positive control.
+
+## `cxx-stdexcept-test.cpp` — whose control is a COMPILE FAILURE
+
+**Came from**: unrar's `rar.cpp:95`, `catch (std::length_error &)`.
+
+**What it covers**: the nine `<stdexcept>` classes by their standard names,
+the derivations [stdexcept.syn] fixes, and that `what()` answers.
+
+**Three things about it are worth copying.**
+
+***(1) THE FILE INCLUDES ONLY `<stdexcept>`, AND THAT IS A REGRESSION TEST
+THAT CANNOT BE WRITTEN AS AN ASSERTION.*** EDG ships that header empty, so
+the names used to arrive only because `<vector>` drags
+`language_support/length_error.h` in by another route. If `<stdexcept>`
+alone does not declare them, the file does not compile. Hence `strcmp`
+rather than `std::string` in section 3 — *pulling in `<string>` would
+reintroduce the very route that hid the bug.*
+
+***(2) SECTION 2 CONSTRAINS THE DESIGN RATHER THAN CHECKING IT.*** The
+cheap way to write ten exception classes is one template and ten aliases,
+which gives ten **siblings**: it passes every line of section 1 and fails
+every line of section 2, because `catch (std::logic_error &)` must catch a
+thrown `std::length_error`. *A test section whose job is to rule out the
+implementation you would otherwise have written.*
+
+***(3) ITS CONTROL IS A COMPILE FAILURE AND THE FILE SAYS SO.*** Against
+the pre-fix headers out of git it does not build — 42 errors, the first
+`'logic_error' is not a member of 'std'`. So the control is not a failure
+count, and **a run that prints nothing is the expected result rather than a
+lost measurement**, which is the opposite of this tree's usual rule and has
+to be written down where the next reader will see it.
+
+**And its `MK` macro is a recorded deviation, not a convenience.** The
+standard gives these a `(char const *)` constructor and **no** default
+constructor; portable_stl's have only a default one. So the reference arm
+says `T("message")` where the subject says `T()` — the two arms ask the
+same question about the **names and the hierarchy** and deliberately not
+about construction. *A macro that papers over a difference is a bug; one
+that names the difference and keeps the rest of the comparison honest is
+the point.*

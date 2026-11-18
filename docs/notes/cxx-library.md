@@ -2483,3 +2483,114 @@ cleanly, so that mode is not asking what it claims. **This was already true
 before any change here**, measured by stashing the whole diff and re-running:
 same message. Recorded in 0.6's inventory; not fixed in the same round as a
 change to the same library.
+
+## `<stdexcept>`: two faults, and the first one hid the second
+
+unrar's last-but-one failure was `rar.cpp:95`,
+`catch (std::length_error &)`, and what it turned out to be is two
+independent things in the same place.
+
+**(1) EDG ships `<stdexcept>` empty.** `stdexcept.stdh` is
+`namespace std { }` with nothing between the braces; EDG's runtime
+(`lib_src/`) supplies `exception`, `bad_alloc` and `type_info` and
+nothing else. unrar's `os.hpp:16` is literally
+
+    #include <stdexcept> // For std::length_error.
+
+and it compiled — because `<vector>` drags `language_support/length_error.h`
+in by another route. ***A HEADER THAT ANSWERS AN INCLUDE AND DECLARES
+NOTHING IS THE STUB-THAT-SAYS-NOTHING FAMILY, ONE LAYER UP FROM A
+FUNCTION*** — and the reason it survived a whole port is that the name
+arrived anyway, by accident, from a header nobody asked.
+
+**(2) portable_stl's four were templates.**
+`template<class = void> class length_error : public logic_error<>`, and
+`logic_error`, `out_of_range` and `bad_function_call` the same, so
+`catch (std::length_error &)` is *invalid use of template-name without an
+argument list* — with g++ offering C++17 CTAD as the explanation, which is
+the wrong lead.
+
+### The fix is a rename and an alias, and upstream's reason is kept
+
+A template member `what()` can be defined in a header with no `.cpp` and
+no COMDAT question, which is exactly what lets this library stay
+header-only. **That is a good reason and the whole point of the shape**, so
+it stays: each class becomes `length_error_impl<>` with
+`using length_error = length_error_impl<>` beside it. Making them ordinary
+classes with inline virtuals would put the vtable and the typeinfo in
+COMDAT — a question about the **link model**, where `cmd/edg/mkfile`
+already passes `-C` and `--instantiate local` does not touch typeinfo —
+and that deserves its own round rather than a ride on this one.
+
+The derivations are preserved by deriving each `_impl` from the **alias**
+of its parent, so `length_error_impl<>` has base `logic_error`, which is
+`logic_error_impl<>`.
+
+**Six of the nine did not exist in any form**: `runtime_error`,
+`domain_error`, `invalid_argument`, `range_error`, `overflow_error`,
+`underflow_error`. `stdexcept.stdh` now includes all nine;
+`bad_function_call` got the same rename and stays out of it, being
+`<functional>`'s.
+
+The cost is that `::std::length_error<>` is no longer valid. The library
+spelled it that way at 30-odd sites and they were updated with it; the
+pristine vendor copy under `sys/src/external/paragon_portable_stl/` is
+untouched.
+
+### `cxx-stdexcept-test.cpp`, and the section that constrains the design
+
+***SECTION 2 IS THE HALF THAT WOULD HAVE CAUGHT THE OBVIOUS
+SHORTCUT.*** The cheap way to write ten exception classes is one template
+and ten aliases of it — which gives ten **siblings**, passes every line of
+section 1, and fails every line of section 2, because
+`catch (std::logic_error &)` then does not catch a thrown
+`std::length_error`. [stdexcept.syn] fixes those derivations and real code
+leans on them.
+
+**The file includes only `<stdexcept>`, and that is fault (1)'s regression
+test.** It cannot be written as an assertion: if `<stdexcept>` alone does
+not declare these names, the file does not compile. Hence `strcmp` rather
+than `std::string` in section 3 — *pulling in `<string>` would reintroduce
+exactly the second route that hid the bug.*
+
+Three arms:
+
+* **Subject** — 0 failures.
+* **Reference** — libstdc++, 0 failures. ***The `MK` macro is a recorded
+  deviation and not a convenience***: the standard gives these a
+  `(char const *)` constructor and **no** default constructor, and
+  portable_stl's have only a default one, so the reference arm says
+  `T("message")` where the subject says `T()`. The two arms therefore ask
+  the same question about the **names and the hierarchy**, which is what
+  the file is for, and not about construction.
+* **Control** — the pre-fix headers staged out of git: **it does not
+  compile**, 42 errors, the first `'logic_error' is not a member of
+  'std'`. So the control is a compile failure rather than a failure count,
+  and *a run that prints nothing is the expected result rather than a lost
+  measurement.*
+
+**Also built without `--no_exceptions`**, which `eccp` passes by default:
+the file is `throw` and `catch` and nothing else, so a build that drops
+exceptions measures the driver. If `eccp` refuses, that refusal is the
+result.
+
+### unrar: 42 of 44 → 43 of 44
+
+The one left is `extinfo.cpp`, and reading it turned up a third class
+rather than a one-line fix. `basic_string`'s iterator-pair constructor
+is
+
+    : basic_string(::std::to_address(first),
+                   static_cast<size_type>(::std::distance(first, last)), allocator)
+
+— it takes the **address** of the first element and copies a block. So it
+compiles only for an iterator whose `value_type` is exactly `value_type`
+(unrar's is `unsigned char *` into a `basic_string<char>`, a perfectly
+legal conversion that this cannot express), and ***for a NON-CONTIGUOUS
+iterator it would be silently wrong rather than rejected***: `to_address`
+on a `list` iterator answers the address inside one node, and the copy
+then reads whatever follows it. The guard admits `input_iterator_tag`, so
+the implementation promises more than it can do. `append(first, last)`,
+`insert(pos, first, last)` and the `make_string` form are the same
+expression. *Not fixed in this round*; it wants a real loop and a test
+over a non-contiguous iterator, which is its own piece of work.

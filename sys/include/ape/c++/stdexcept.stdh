@@ -11,6 +11,34 @@ stdexcept -- Include file for exception handling (see 19.1.1)
 #ifndef _STDEXCEPT_STDH
 #define _STDEXCEPT_STDH
 
+/*
+ * ***THIS HEADER WAS EMPTY, AND THAT IS WHY THE GAP WAS INVISIBLE.***
+ * EDG ships `<stdexcept>' as `namespace std { }' with nothing between
+ * the braces -- the runtime supplies `exception', `bad_alloc' and
+ * `type_info' and nothing else -- so `#include <stdexcept>' declared
+ * NOTHING.  unrar's `os.hpp:16' is literally
+ *
+ *     #include <stdexcept> // For std::length_error.
+ *
+ * and it compiled only because `<vector>' happens to drag
+ * `length_error.h' in by another route.  *A header that answers an
+ * include and declares nothing is the stub-that-says-nothing family,
+ * one layer up from a function.*
+ *
+ * The nine [stdexcept.syn] classes are portable_stl's, and six of
+ * them did not exist at all before this.  `bad_function_call' is
+ * deliberately NOT here: it belongs to `<functional>'.
+ */
+#include "language_support/domain_error.h"
+#include "language_support/invalid_argument.h"
+#include "language_support/length_error.h"
+#include "language_support/logic_error.h"
+#include "language_support/out_of_range.h"
+#include "language_support/overflow_error.h"
+#include "language_support/range_error.h"
+#include "language_support/runtime_error.h"
+#include "language_support/underflow_error.h"
+
 /* This lets users disable the EDG supplied exception classes. */
 #ifndef __NO_EDG_EXCEPTION_CLASSES
 
