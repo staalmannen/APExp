@@ -2,13 +2,24 @@
 
 APEXPROOT=.
 
+#
+# ORDER IS LOAD-BEARING AT THE END OF THIS LIST.  `sys/src/ape/c++'
+# holds what needs a C++ compiler, so it must come after
+# `sys/src/ape/lib' (which builds libedg.a) and after
+# `sys/src/ape/cmd' (which builds cpfe).  Nothing in it is enabled
+# yet -- its own `DIRS' is empty and says why -- so it is in the list
+# before its first port rather than with it: *a dispatcher added in
+# the same round as the thing it dispatches leaves neither
+# attributable.*
+#
 DIRS= \
 		sys/src/cmd\
 		sys/src/lib\
 		sys/src/cmd2\
 		sys/src/ape/9src\
 		sys/src/ape/lib\
-		sys/src/ape/cmd
+		sys/src/ape/cmd\
+		sys/src/ape/c++
 
 _ARCHS=	386\
 		68020\

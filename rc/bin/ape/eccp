@@ -6,10 +6,16 @@
 #
 # Usage:
 #   eccp [flags] file.cpp ...        compile and link
-#   eccp -c [flags] file.cpp ...     compile to .o, do not link
+#   eccp -c [flags] file.cpp ...     compile to ./<base>.o, do not link
+#   eccp -c -o dir/x.o file.cpp      compile that one source to that path
 #   eccp -F [flags] file.cpp         cpfe only: write the generated C
 #   eccp -K [flags] file.cpp ...     keep the generated .eccp.c intermediates
 #   eccp -o out [flags] file.cpp ... compile, link, write to out
+#
+# `-c' and `-F' write into the CURRENT directory, named from the
+# source's basename, as gcc does -- not beside the source, which is
+# what they used to do.  See the stage-1 comment for the two faults
+# that cost and why only a separate compile could show them.
 #
 # `c++' IS THIS, AND `eccp' IS WHERE IT LIVES.  `rc/bin/ape/c++' is now a
 # one-line forwarder to this script, so `CXX=c++' works for autoconf, for
@@ -272,6 +278,51 @@ fn run {
 	$*
 }
 
+# ---- where the object and the generated C go ----
+# ***THIS WAS WRONG IN BOTH PLACES AND ONLY A SEPARATE COMPILE COULD
+# SHOW IT***, which is why it survived until unrar wanted an mkfile.
+# `eccp -o prog x.cpp' is internally consistent however the
+# intermediates are named, because the same script computes the object
+# names it then links; `eccp -c' hands them to someone else.
+#
+# Two faults, and the first is the one that makes a pattern rule
+# impossible:
+#
+# 1. THE OBJECT WAS NAMED AFTER THE GENERATED C.  `objs' was
+#    `basename $gen .c'^`.o', and `$gen' is `<stem>.eccp.c', so
+#    `eccp -c foo.cpp' produced **`foo.eccp.o'**.  No mkfile can write
+#    `%.o: %.cpp' against that, and `-o' was accepted and then IGNORED
+#    whenever `-c' was given.
+# 2. THE GENERATED C WAS WRITTEN BESIDE THE SOURCE.  `stem' keeps the
+#    directory, so `eccp -c ../../external/c++/unrar/rar.cpp' dropped
+#    `rar.eccp.c' into the external tree -- which a build must not
+#    write to, and which no `clean' rule here would ever remove.
+#    `cc -c' then put the object there too, since `pcc.c:457' derives
+#    it with `changeext' from the input path.
+#
+# gcc's rule is the one to follow and is what this does: `-c' writes
+# the object into the CURRENT directory, named from the source's
+# BASENAME with the extension replaced, and `-c -o path' names it
+# exactly.  The generated C goes beside the OBJECT for the same reason.
+# `-o' with `-c' and several sources is refused rather than silently
+# writing them all to one name, which is what `pcc' itself would do
+# (one `oname' reused for every source, `pcc.c:454').
+objdir = .
+if(! ~ $cflag '' && ! ~ $outfile '') {
+	# Both lists, not just `$sources': `-c -o x.o a.cpp b.c' is two
+	# inputs for one output name however they are spelled.  Written as
+	# two `~' tests rather than as arithmetic on purpose -- the sum
+	# would want `hoc' or `expr', and *a driver that cannot run
+	# without another command in the union is one more thing to be
+	# missing*, which is this tree's recorded `basename -d' lesson.
+	if(! ~ $#sources^' '^$#cfiles '1 0' '0 1') {
+		echo 'eccp: -c -o with' $#sources 'C++ and' $#cfiles \
+		     'C inputs: which one does -o name?' >/fd/2
+		exit usage
+	}
+	objdir = `{dirname $outfile}
+}
+
 # ---- stage 1: cpfe, C++ -> C ----
 # `--gen_c_file_name' rather than a redirection, for the OTHER half of the
 # c++lib bug: a shell redirection CREATES the target whatever the command
@@ -279,18 +330,20 @@ fn run {
 # writes the file itself and leaves none behind on a failure.
 objs = ()
 for(s in $sources) {
-	stem = `{echo $s | sed 's/\.\(cpp\|cxx\|cc\|C\)$//'}
-	gen = $stem^'.eccp.c'
+	base = `{basename $s | sed 's/\.\(cpp\|cxx\|cc\|C\)$//'}
+	gen = $objdir^'/'^$base^'.eccp.c'
+	obj = $objdir^'/'^$base^'.o'
+	if(! ~ $cflag '' && ! ~ $outfile '') obj = $outfile
 	if(! ~ $fflag '' && ! ~ $outfile '') gen = $outfile
 	run $CPFE $cpfeopts '--gen_c_file_name='^$gen $s
 	st = $status
 	generated = ($generated $gen)
 	if(! ~ $st '') die cpfe $s
 	if(~ $fflag '') {
-		run $CC -c $ccopts $iflags $gen
+		run $CC -c -o $obj $ccopts $iflags $gen
 		st = $status
 		if(! ~ $st '') die $CC $gen
-		objs = ($objs `{basename $gen .c}^'.o')
+		objs = ($objs $obj)
 	}
 }
 
@@ -299,11 +352,17 @@ for(s in $sources) {
 if(! ~ $fflag '') exit 0
 
 # ---- stage 2: any plain .c the caller handed us ----
+# `-o' here for the same reason as stage 1: `pcc' derives the object
+# from the INPUT PATH, so a `.c' given with a directory left its object
+# in that directory while the name this loop recorded had none.  *The
+# list and the files agreed only when the path was bare.*
 for(c in $cfiles) {
-	run $CC -c $ccopts $iflags $c
+	cobj = $objdir^'/'^`{basename $c .c}^'.o'
+	if(! ~ $cflag '' && ! ~ $outfile '' && ~ $#sources 0) cobj = $outfile
+	run $CC -c -o $cobj $ccopts $iflags $c
 	st = $status
 	if(! ~ $st '') die $CC $c
-	objs = ($objs `{basename $c .c}^'.o')
+	objs = ($objs $cobj)
 }
 
 if(~ $kflag '' && ! ~ $#generated 0) rm -f $generated

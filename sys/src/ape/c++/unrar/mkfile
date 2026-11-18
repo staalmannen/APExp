@@ -1,0 +1,207 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+RARSRC=$APEXPROOT/sys/src/external/c++/unrar
+
+TARG=unrar
+BIN=$APEXPROOT/$objtype/bin/ape
+
+#
+# unrar 7.x -- C++, and the first real application built through
+# `eccp' (cpfe + libedg.a + sys/include/ape/c++).
+#
+# It REPLACES `sys/src/ape/cmd/unrar', which is one C file from a
+# pre-2.71 source -- the last version before unrar became C++.  That
+# directory and `sys/src/external/unrar' go when this one works.
+#
+# ---- WHAT THE FLAGS ARE AND WHY ------------------------------------
+#
+# `-DUNRAR' is upstream's own, from the `.cpp.o' rule in its makefile
+# (`-D$(WHAT)', with `WHAT=UNRAR'), and ***IT IS NOT IN THAT
+# MAKEFILE'S `DEFINES' LINE***, which is where a reader looks for it.
+# `sys/lib/tests/hostkencc/cxxapp-host.sh' read `DEFINES=' and so
+# compiled 44 files without it; the other two `WHAT' values are
+# `SFX_MODULE' and `RARDLL', neither of which this builds.
+#
+# NO `-D_UNIX', though the whole unix arm of `os.hpp' is
+# `#ifdef _UNIX'.  `raros.hpp:23' is
+# `#if !defined(_WIN_ALL) && !defined(_UNIX)' -> `#define _UNIX', so it
+# falls out for any target that is not Windows.  *The old C unrar's
+# mkfile passes `-D_UNIX' and that is residue from a different
+# source*; adding it here would be harmless and would also be a claim
+# about this version that nothing checks.
+#
+# NO `-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE' either, and the
+# reason is measured rather than assumed: those are glibc's switch for
+# the `*64' redirections, and the host build of these 49 files shows
+# exactly that -- `fopen64', `stat64', `lseek64', `open64',
+# `readdir64', `fstat64', `lstat64', `ftruncate64', `statvfs64' in its
+# undefined set.  **APExp's `off_t' is already 64-bit**, so there are
+# no such names here and the defines would switch on nothing.
+#
+# NO `RAR_SMP', which upstream's unix makefile does pass, and this is
+# the one flag left out as a CHOICE rather than because it is
+# inapplicable.  It turns on `threadpool.cpp' and so libap's
+# pthreads -- which this release fixed and `pthread-test' passes
+# against, but a first build of a 49-file C++ program is not the place
+# to measure a second thing.  `threadpool.cpp' compiles either way
+# (measured, 49 of 49 both with and without) and without the flag its
+# body is inert, so turning it on is one word here and nothing else.
+# *One change to attribute rather than two.*
+#
+# **So `cxxapp-host.sh' and this mkfile do not pass the same defines**,
+# and that is deliberate on both sides: the harness takes upstream's
+# own set, because its question is "does the library have what the
+# package asks for", while this builds the subset that is one thing at
+# a time.  The FILE lists are required to agree -- the harness gates
+# its control on `OFILES' against the link rule -- and the DEFINE sets
+# are not.  *Saying which of the two is authoritative for what is the
+# point; a harness and a build that quietly differ are two results
+# wearing one number.*
+#
+# ---- `-fexceptions' IS THE LOAD-BEARING ONE ------------------------
+#
+# ***unrar IS THE FIRST THING IN THIS TREE TO NEED C++ EXCEPTIONS, AND
+# EDG's SETJMP-BASED EH HAS NEVER BEEN RUN HERE.***  `eccp' passes
+# `--no_exceptions' by DEFAULT and says why in its own header: EDG
+# itself is built `-fno-exceptions -fno-rtti', so that is the only
+# configuration this port has ever exercised.
+#
+# unrar is not optional about it.  `unpack.cpp', `model.cpp' and
+# `unpack50frag.cpp' each `throw std::bad_alloc()', and `rar.cpp:90`
+# and `:95' catch `std::bad_alloc &' and `std::length_error &' --
+# those two catches ARE the out-of-memory path, so a build with
+# exceptions off would compile and then terminate instead of
+# reporting a corrupt archive.
+#
+# **So a failure here is a RESULT and not a blocked build**, and the
+# instrument for it already exists: `sys/lib/tests/cxx-stdexcept-test.cpp'
+# is `throw' and `catch' and nothing else, and its section 2 asserts
+# the thing unrar actually depends on -- that
+# `catch (std::logic_error &)' catches a thrown `std::length_error'.
+# Run that first; it was written one round before this mkfile and for
+# a different reason, and it answers this question in isolation.
+#
+# RTTI stays OFF.  EDG's `--no_rtti' disables `typeid' and
+# `dynamic_cast', which unrar uses nowhere; catching by base class is
+# the EH machinery's own type matching and not `typeid'. *If section 2
+# of that test passes and unrar's catches still miss, `-frtti' is the
+# next thing to try and that would be a finding about cpfe.*
+#
+# ---- WHY NOT `mkone' ----------------------------------------------
+#
+# `mkone' and `mkmany' drive `$CC'/`$LD' over `%.$O' -- `.6' on amd64,
+# `.8' on 386 -- and `eccp' produces `.o' on every architecture,
+# because `sys/src/ape/9src/cc.c' is one line including `pcc.c' and
+# `pcc.c:75' picks the extension from the name it was invoked under.
+# So the object suffix here is architecture-INDEPENDENT and `$O' is
+# the wrong variable; the rules below are five lines and say so.
+#
+# ***AND `eccp -c' COULD NOT BE USED IN A PATTERN RULE AT ALL UNTIL
+# THIS ROUND.***  It named the object after the GENERATED C --
+# `eccp -c foo.cpp' wrote `foo.eccp.o' -- and it put both the
+# generated C and the object BESIDE THE SOURCE, i.e. in
+# `sys/src/external', which a build must not write to.  `-o' was
+# accepted and ignored whenever `-c' was given.  Fixed in
+# `rc/bin/ape/eccp'; *the fault was invisible to `eccp -o prog x.cpp'
+# because that computes the object names it then links itself.*
+#
+
+CXX=eccp
+CXXFLAGS=-c -fexceptions -I$RARSRC -DUNRAR
+
+OFILES=\
+	rar.o\
+	strlist.o\
+	strfn.o\
+	pathfn.o\
+	smallfn.o\
+	global.o\
+	file.o\
+	filefn.o\
+	filcreat.o\
+	archive.o\
+	arcread.o\
+	unicode.o\
+	system.o\
+	crypt.o\
+	crc.o\
+	rawread.o\
+	encname.o\
+	resource.o\
+	match.o\
+	timefn.o\
+	rdwrfn.o\
+	consio.o\
+	options.o\
+	errhnd.o\
+	rarvm.o\
+	secpassword.o\
+	rijndael.o\
+	getbits.o\
+	sha1.o\
+	sha256.o\
+	blake2s.o\
+	hash.o\
+	extinfo.o\
+	extract.o\
+	volume.o\
+	list.o\
+	find.o\
+	unpack.o\
+	headers.o\
+	threadpool.o\
+	rs16.o\
+	cmddata.o\
+	ui.o\
+	largepage.o\
+	filestr.o\
+	recvol.o\
+	rs.o\
+	scantree.o\
+	qopen.o\
+
+# `OFILES' IS UPSTREAM'S `OBJECTS' *PLUS* `UNRAR_OBJ', AND THE SECOND
+# HALF IS EASY TO MISS.  The makefile's link rule is
+# `unrar: $(OBJECTS) $(UNRAR_OBJ)', and `UNRAR_OBJ' is the last five
+# above -- `filestr recvol rs scantree qopen'.  A reader who takes
+# `OBJECTS=' alone gets 44 of 49, which is what `cxxapp-host.sh' did:
+# *the object list is in the LINK RULE and not in the variable that
+# looks like it.*  `LIB_OBJ' is the shared-library build's and is not
+# used here.
+
+all:V:	$TARG
+
+$TARG:	$OFILES
+	$CXX -fexceptions -o $TARG $OFILES
+
+%.o:	$RARSRC/%.cpp
+	$CXX $CXXFLAGS -o $stem.o $RARSRC/$stem.cpp
+
+install:V:	$BIN/$TARG
+
+$BIN/$TARG:	$TARG
+	cp $prereq $BIN/$TARG
+
+# `$CPUS' and not a list of our own: it comes from `/$objtype/mkfile'
+# through `$APE/config', and is the same variable `mkone''s own
+# `installall' loops over.  *A hand-written rule that invents its own
+# architecture list is one more thing to keep in step*, and the
+# top-level mkfile's `$_ARCHS' is not in scope here, so a `for' over
+# it would have been a silent no-op.
+installall:V:
+	for(objtype in $CPUS)
+		mk install
+
+# `*.eccp.c' is `eccp''s intermediate.  It removes its own on success
+# and on a cpfe failure, so this is for the case nothing covers: a
+# `cc' failure after a successful translation, where the generated C is
+# deliberately left behind for someone to read.
+clean:V:
+	rm -f *.o *.eccp.c $TARG
+
+nuke:V:	clean
+
+test:VQ:
+	# nothing

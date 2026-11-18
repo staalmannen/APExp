@@ -52,7 +52,7 @@
 #
 # ---- WHAT IT FOUND -------------------------------------------------
 #
-# ***unrar BUILDS CLEAN: 44 objects, 0 failures, no stubbed header.***
+# ***unrar BUILDS CLEAN: 49 objects, 0 failures, no stubbed header.***
 # It was **39 of 44** on the first run, then 42, then 43, then 44 --
 # four rounds, each one library gap, and the walk is worth more than
 # the number:
@@ -64,6 +64,16 @@
 #
 # *Every one of the four was the library's and not unrar's*, which is
 # the result this harness existed to get.
+#
+# ***AND THEN 44 TURNED OUT TO BE 49.***  The fifth harness fault, and
+# the same shape as the other four: it read `OBJECTS=' while the
+# makefile's link rule is `unrar: $(OBJECTS) $(UNRAR_OBJ)'.  Five
+# files -- `filestr recvol rs scantree qopen' -- had never been
+# compiled, and `-DUNRAR' had never been passed either, because that
+# arrives as `-D$(WHAT)' in the compile rule and not through
+# `DEFINES='.  All five compile and the define changes nothing here,
+# so the finding is about the harness; *but a clean 44 was being read
+# as "the package builds", and it was not the package.*
 #
 # ***AND THE GAP IT NAMED WAS NOT THE BUG IT FOUND.***  `to_wstring'
 # looked like six wrappers over the generic `to_string2<t_string>'
@@ -170,17 +180,87 @@ compile_pkg() {			# $1 = package name; echoes "ok fail"
 	[ -d "$d" ] || { echo "cxxapp-host: no package $1" >&2; exit 2; }
 	# The object list and the defines come from the package's OWN
 	# makefile -- see note 3 and note 4 above.
-	# The LOGICAL line, continuations and all.  A first version used a
-	# plain `sed -n s/^OBJECTS=//p' and took only the first physical
+	#
+	# ***THE OBJECT LIST IS IN THE LINK RULE, NOT IN THE VARIABLE THAT
+	# LOOKS LIKE IT.***  This read `OBJECTS=' and reported 44 of
+	# unrar's files for four rounds; the makefile's rule is
+	#
+	#	unrar:	$(OBJECTS) $(UNRAR_OBJ)
+	#
+	# and `UNRAR_OBJ' is five more -- `filestr recvol rs scantree
+	# qopen'.  *A variable named OBJECTS in a makefile with a second
+	# object variable is a trap the name itself sets*, and the only
+	# place that cannot lie is the rule that builds the program.  So
+	# the rule is found by the package's own NAME (the directory's),
+	# every `$(VAR)' in its prerequisites is expanded, and `OBJECTS'
+	# alone is the FALLBACK -- announced when taken, because a silent
+	# fallback to the old behaviour is the bug coming back.
+	#
+	# A logical line, continuations and all: an earlier version used a
+	# plain `sed -n s/^OBJECTS=//p' and took only the first PHYSICAL
 	# line -- 9 objects of 44, reported as a clean "9 failed".
-	objs=$(awk '/^OBJECTS=/{o=1} o{print; if ($0 !~ /\\$/) exit}' "$d/makefile" 2>/dev/null \
-		| tr -d '\\' | sed 's/^OBJECTS=//' | tr ' \t' '\n' \
-		| grep '\.o$' | sed 's/\.o$/.cpp/' | sort -u)
-	defs=$(sed -n 's/^DEFINES=//p' "$d/makefile" 2>/dev/null)
+	expand_var() {		# $1 = makefile, $2 = variable name
+		awk -v v="$2" '
+			$0 ~ "^"v"=" {o=1}
+			o {print; if ($0 !~ /\\$/) exit}
+		' "$1" 2>/dev/null | tr -d '\\' | sed "s/^$2=//"
+	}
+	lrule=$(awk -v t="$1" '$0 ~ "^"t":" {print; exit}' "$d/makefile" 2>/dev/null)
+	lvars=$(printf '%s\n' "$lrule" | grep -o '\$([A-Za-z_][A-Za-z_0-9]*)' \
+		| tr -d '$()' | sort -u)
+	if [ -z "$lvars" ]; then
+		echo "  no '$1:' link rule in $1/makefile -- falling back to OBJECTS=" >&2
+		lvars=OBJECTS
+	fi
+	objs=$(for v in $lvars; do expand_var "$d/makefile" "$v"; done \
+		| tr ' \t' '\n' | grep '\.o$' | sed 's/\.o$/.cpp/' | sort -u)
+	# ***AND `-DUNRAR' IS NOT IN `DEFINES'.***  unrar's compile rule is
+	# `$(COMPILE) -D$(WHAT) -c $<' with `WHAT=UNRAR', so the define
+	# that selects the whole program arrives through a SECOND variable
+	# and a reader looking at `DEFINES=' never sees it.  Every `-D$(V)'
+	# anywhere in the makefile is expanded here for that reason.
+	defs=$(expand_var "$d/makefile" DEFINES)
+	for v in $(grep -o '\-D\$([A-Za-z_][A-Za-z_0-9]*)' "$d/makefile" 2>/dev/null \
+			| sed 's/^-D//' | tr -d '$()' | sort -u); do
+		dv=$(expand_var "$d/makefile" "$v" | tr -d ' \t')
+		[ -n "$dv" ] && defs="$defs -D$dv"
+	done
 	if [ -z "$objs" ]; then
-		echo "cxxapp-host: no OBJECTS in $1/makefile -- cannot tell which" >&2
-		echo "cxxapp-host: .cpp files are translation units (note 3)." >&2
+		echo "cxxapp-host: no object list for $1 -- neither a '$1:' rule" >&2
+		echo "cxxapp-host: nor OBJECTS=, so which .cpp files are" >&2
+		echo "cxxapp-host: translation units is unknown (note 3)." >&2
 		exit 2
+	fi
+	# ***AND IF THIS TREE HAS AN mkfile FOR THE PACKAGE, THE TWO LISTS
+	# MUST AGREE.***  `sys/src/ape/c++/<pkg>/mkfile' writes its
+	# `OFILES' out by hand, so it and the list derived here are two
+	# readings of the same makefile -- and the whole reason this
+	# function changed is that one such reading was wrong for four
+	# rounds.  `gd-xcheck.sh' already gates on exactly this shape
+	# (`Makefile.am' against `lib/gd/mkfile'), for the same reason:
+	# *two derivations of one list that disagree means one of them is
+	# wrong, and neither says which.*  Reported here and required by
+	# `--control'.
+	# A MARKER FILE and not a variable: `compile_pkg' runs inside
+	# `$(...)' so every assignment it makes dies with the subshell,
+	# which is the same boundary that already cost this harness an
+	# `exit 2' nobody saw (see `report').  `$OUT' is shared, so a file
+	# crosses it.
+	rm -f "$OUT/objdrift"
+	mkf=$ROOT/sys/src/ape/c++/$1/mkfile
+	if [ -f "$mkf" ]; then
+		awk '/^OFILES=/{o=1;next} o{if($0 !~ /\\$/) exit; print}' "$mkf" \
+			| tr -d '\\\t ' | grep '\.o$' | sed 's/\.o$/.cpp/' \
+			| sort -u > "$OUT/mkobjs"
+		printf '%s\n' "$objs" | sort -u > "$OUT/upobjs"
+		if ! cmp -s "$OUT/mkobjs" "$OUT/upobjs"; then
+			: > "$OUT/objdrift"
+			echo "  *** OFILES DRIFT: $mkf and the makefile's link rule" >&2
+			echo "  *** disagree.  mkfile only:" \
+			     "$(comm -23 "$OUT/mkobjs" "$OUT/upobjs" | tr '\n' ' ')" >&2
+			echo "  *** makefile only:" \
+			     "$(comm -13 "$OUT/mkobjs" "$OUT/upobjs" | tr '\n' ' ')" >&2
+		fi
 	fi
 	# ***MISSING HEADERS ARE STUBBED, AND THE STUB IS ANNOUNCED.***
 	# Without this the first absent header stops every file and the
@@ -255,9 +335,15 @@ if [ "${1:-}" = "--control" ]; then
 	#
 	# **So it asserts the MEASURED STATE now, which is the strongest
 	# form available and the one a clean package allows.**  unrar
-	# builds clean: 44 objects, 0 failures, no stubbed header.  A
+	# builds clean: 49 objects, 0 failures, no stubbed header.  A
 	# regression in the library fails this; a new unrar object does
 	# not, since the floor is `>=' and not `=='.
+	#
+	# ***THE NUMBER WAS 44 AND THAT WAS THE HARNESS, NOT THE
+	# PACKAGE.***  It read `OBJECTS=' while the link rule is
+	# `unrar: $(OBJECTS) $(UNRAR_OBJ)', so five files were never
+	# compiled -- and the control had been asserting the wrong total
+	# as a clean result.  *A floor is only as good as what it counts.*
 	#
 	# *The lesson is the one the first version already carried and the
 	# second only half took*: a control made of a FINDING expires when
@@ -265,7 +351,7 @@ if [ "${1:-}" = "--control" ]; then
 	# re-point it at what is now true rather than to loosen it.  What
 	# changes here is that the thing now true is a RESULT, so the
 	# control has become a regression gate on it.
-	MINOK=44
+	MINOK=49
 	set -- $(compile_pkg unrar 2>"$OUT/ctl.err")
 	if [ $# -ne 2 ]; then
 		echo "cxxapp-host: ***THE CONTROL DID NOT RUN.***  compile_pkg gave" >&2
@@ -288,6 +374,14 @@ if [ "${1:-}" = "--control" ]; then
 		echo "cxxapp-host: and unrar needed none when this was written.  A" >&2
 		echo "cxxapp-host: stub makes every later count optimistic, so the" >&2
 		echo "cxxapp-host: 0 failures above cannot be read." >&2
+		exit 1
+	fi
+	if [ -f "$OUT/objdrift" ]; then
+		echo "cxxapp-host: ***THE CONTROL FIRED.***  This tree's own" >&2
+		echo "cxxapp-host: sys/src/ape/c++/unrar/mkfile and upstream's link" >&2
+		echo "cxxapp-host: rule name different object sets; the lines above" >&2
+		echo "cxxapp-host: say which.  One of the two readings is wrong and" >&2
+		echo "cxxapp-host: neither says which, so the count means nothing." >&2
 		exit 1
 	fi
 	echo "control: unrar still builds clean, $ok objects and no stubbed header"

@@ -2729,3 +2729,160 @@ part of the ten and is a decision rather than a patch*: de novo headers,
 or a copy from LLVM libc++ the way musl was copied into libap — and copied
 `.cpp` files would need a `libc++` mkfile after `edg`, plus probably a
 `sys/src/ape/c++` for things that need C++ built first.
+
+## `sys/src/ape/c++`: unrar gets an mkfile, and there is no `libc++`
+
+The direction: *"Create an mkfile for c++ unrar in sys/src/ape/c++/unrar
+and if we need .cpp files and a libc++, create those files and mkfile in
+sys/src/ape/c++/libc++."* So the first question is whether a `libc++` is
+needed at all.
+
+### It is not, and that is measured rather than read
+
+All 49 of unrar's translation units were compiled to **real objects** on
+the build host and `nm -u` taken over them, minus what they define
+themselves — the `php-mirror.sh --undefined` idiom. **125 external names,
+16 of them C++-mangled:**
+
+    _ZNSt9bad_allocC1Ev  C1ERKS_  D1Ev     std::bad_alloc
+    _ZNSt9exceptionC2Ev  D2Ev              std::exception
+    _ZTISt9bad_alloc  _ZTISt9exception     their typeinfo
+    _Znwm _Znam _ZdlPv _ZdaPv (+sized)     operator new / delete
+    _ZTVN10__cxxabiv1{16__enum,17__class,20__si_class}_type_infoE
+
+The first four groups are **`libedg.a`**, which `sys/src/ape/lib/edg`
+already builds from EDG's own lowered runtime. The three `__cxxabiv1`
+vtables are **gcc's ABI and not cpfe's**, so they are a host artefact.
+And `sys/include/ape/c++` is header-only by construction — upstream's
+`CMakeLists.txt` has no `install()` rule because the headers *are* the
+product.
+
+***So nothing in the C++ library needs compiling, and the place for a
+`libc++` is named in `sys/src/ape/c++/mkfile` against the day the LIBRARY
+grows a `.cpp` — not because an application asked for one.***
+
+The other 109 are plain C, and `apfunc-sweep.py` answers them: **29
+defined, 2 declared-only, 1 absent** over the interesting subset, and
+***all three of the non-`defined` answers are the sweep being right about
+a function and wrong about availability***:
+
+* `lchown` — `<unistd.h>:147` is `#define lchown chown`. Plan 9 has no
+  POSIX symlink ownership, so that is the honest answer, and it is a
+  MACRO, which the sweep cannot see.
+* `towlower`/`towupper` — `<wctype.h>` declares them at `:38-39` **and
+  `#define`s them at `:54-55`** to libutf's `tolowerrune`/`toupperrune`.
+  A plain call gets the macro.
+
+*That is a fourth state the sweep's three cannot express: a header that
+declares a function and then `#define`s the name over it.* Its
+`declared-only` is meant to be the alarming one — the state that costs a
+link — so a false alarm there is worth recording. The host's own
+`towupper` undefined symbol is glibc declaring it as a function; under
+APExp there is no such reference at all.
+
+### What the mkfile is waiting on is exceptions
+
+***unrar IS THE FIRST THING IN THIS TREE TO NEED C++ EXCEPTIONS.***
+`unpack.cpp`, `model.cpp` and `unpack50frag.cpp` each
+`throw std::bad_alloc()`, and `rar.cpp:90`/`:95` catch `std::bad_alloc &`
+and `std::length_error &` — **those two catches are the out-of-memory
+path**, so a build with exceptions off would compile and then terminate
+where it should report a corrupt archive.
+
+`eccp` passes `--no_exceptions` by DEFAULT and says why: EDG itself is
+built `-fno-exceptions -fno-rtti`, so that is the only configuration this
+port has exercised, and `lib_src`'s setjmp-based EH **has never been
+run**. The mkfile passes `-fexceptions`, so a failure there is a result
+and not a blocked build — and the instrument already exists:
+`cxx-stdexcept-test.cpp` is `throw` and `catch` and nothing else, and its
+section 2 asserts exactly what unrar depends on, that
+`catch (std::logic_error &)` catches a thrown `std::length_error`. *It was
+written one round earlier for a different reason and answers this question
+in isolation.* RTTI stays off; `--no_rtti` disables `typeid` and
+`dynamic_cast`, which unrar uses nowhere, and catching by base is the EH
+machinery's own type matching.
+
+### `eccp -c` could not be used in a pattern rule at all
+
+Two faults, and ***only a SEPARATE COMPILE could show either***:
+`eccp -o prog x.cpp` is internally consistent however the intermediates
+are named, because the same script computes the object names it then
+links. `eccp -c` hands them to someone else.
+
+1. **The object was named after the generated C.** `objs` was
+   `basename $gen .c`^`.o` with `$gen` = `<stem>.eccp.c`, so
+   `eccp -c foo.cpp` produced **`foo.eccp.o`**. No mkfile can write
+   `%.o: %.cpp` against that — and `-o` was accepted and then **ignored**
+   whenever `-c` was given.
+2. **The generated C was written beside the source.** `stem` keeps the
+   directory, so `eccp -c ../../external/c++/unrar/rar.cpp` dropped
+   `rar.eccp.c` into `sys/src/external`, which a build must not write to
+   and which no `clean` rule here would remove. `cc -c` then put the
+   object there too, since `pcc.c:457` derives it with `changeext` from
+   the input path.
+
+gcc's rule is the one to follow and is what it does now: `-c` writes the
+object into the **current** directory named from the source's basename,
+`-c -o path` names it exactly, and the generated C goes beside the object.
+`-c -o` with more than one input is **refused** rather than writing them
+all to one name, which is what `pcc` itself would do (one `oname` reused
+for every source, `pcc.c:454`). *`pcc` does support `-c -o`*
+(`pcc.c:453-457`), which is what makes this possible at all.
+
+### Why not `mkone`, and why its own directory
+
+`mkone`/`mkmany` drive `$CC`/`$LD` over `%.$O` — `.6` on amd64, `.8` on
+386 — and `eccp` produces `.o` on **every** architecture, because
+`sys/src/ape/9src/cc.c` is one line including `pcc.c` and `pcc.c:75` picks
+the extension from the name it was invoked under. So the object suffix
+here is architecture-independent and `$O` is the wrong variable; five
+hand-written rules say so.
+
+`sys/src/ape/c++` is its own directory rather than a few more entries in
+`cmd/mkfile` because a C++ program needs cpfe **and** `libedg.a` **and**
+the header set: putting one in `cmd/mkfile` would make the order of that
+file's app list load-bearing, and that list is a list — the tree's own
+note says it is read rather than recalled, which is the opposite of what
+you want an ordering invariant hiding in. It sits last in the top-level
+`DIRS`, and ***its own `DIRS` is EMPTY***: one failing entry aborts the
+whole tree's `mk`, and a port built only by hand has not been measured in
+that position. *The dispatcher goes in before its first port rather than
+with it, so neither is unattributable.*
+
+### And 44 was the harness, not the package
+
+***THE FIFTH HARNESS FAULT, AND THE SAME SHAPE AS THE OTHER FOUR.***
+`cxxapp-host.sh` read `OBJECTS=` while the makefile's link rule is
+
+    unrar:	$(OBJECTS) $(UNRAR_OBJ)
+
+so five files — `filestr recvol rs scantree qopen` — had **never been
+compiled**, and `-DUNRAR` had never been passed either, because that
+arrives as `-D$(WHAT)` in the compile rule and not through `DEFINES=`.
+All five compile and the define changes nothing, so the finding is about
+the harness — *but a clean 44 was being read as "the package builds", and
+it was not the package.* **49 of 49 now**, and the control's floor with
+it.
+
+*A variable named `OBJECTS` in a makefile that has a second object
+variable is a trap the name itself sets*, and the only place that cannot
+lie is the rule that builds the program. The rule is found by the
+package's own name, every `$(VAR)` in its prerequisites is expanded, and
+`OBJECTS` alone is the **fallback, announced when taken** — a silent
+fallback to the old behaviour is the bug coming back. Measured: with the
+`unrar:` rule renamed, it prints the fallback line and reports 44.
+
+**And the two readings of that list are now required to agree.** The
+mkfile writes `OFILES` out by hand, so it and the harness are two
+derivations of one thing; `--control` fails if they differ, which is the
+shape `gd-xcheck.sh` already gates on. Controlled by planting one extra
+entry: it fires, naming the difference in both directions.
+
+### What is NOT measured
+
+The link, the C side (these compile against the host's own C headers),
+cpfe's own acceptance, and anything at run time. **Nothing here has been
+through `mk` or `eccp`** — there is no rc and no mk on the build host, so
+the two mkfiles and the `eccp` change are checked by `rceq-sweep.py`,
+`mkcont-sweep.py` and reading. The old C `sys/src/ape/cmd/unrar` (one
+file, pre-2.71) and `sys/src/external/unrar` stay until this one runs.

@@ -118,6 +118,7 @@ sys/src/
 │   │   ├── pcre2/    # PCRE2 regex
 │   │   ├── bz2/, z/, lzma/, xml2/  # Compression/XML libraries
 │   │   └── [auth, bio, draw, l, plumb, sec]  # Core Plan9 libs
+│   ├── c++/          # apps and libs needing C++ (after lib/edg + cmd/edg)
 │   └── cmd/          # APE utilities
 │       ├── make/     # GNU make 4.4.1
 │       ├── sed/      # GNU sed 4.2.1
@@ -2002,16 +2003,65 @@ silent:
   sections needing the fix and the remaining one reports 3 failures
   with the garbage printed — *a control that can only say "it did not
   build" cannot tell this bug's silent half from its loud one.*
-  ***unrar IS 44 OF 44 NOW***, four rounds and four library gaps
+  ***unrar IS 49 OF 49 NOW***, four rounds and four library gaps
   (`to_wstring`, `<stdexcept>`, the iterator pair, `<deque>`), **and
   two of the four were silent, which a compile-only harness cannot
   see**: it named the loud half and the tests found the rest. `<deque>`
   is fixed in UNRAR rather than the library, the include being unused
   there — shipping one that declares nothing is what EDG's empty
-  `<stdexcept>` already did to this port. **Not measured**: the link,
-  the C side, cpfe's acceptance, run time; there is no unrar mkfile
-  yet. **re2c has not moved** — ten missing headers and no `makefile`
-  to read an object list from, both in 0.6's inventory with the missing
+  `<stdexcept>` already did to this port.
+  ***AND THE TOTAL WAS 44 BECAUSE OF THE HARNESS, THE FIFTH FAULT OF
+  THAT FAMILY***: it read `OBJECTS=` while the link rule is
+  `unrar: $(OBJECTS) $(UNRAR_OBJ)`, so five files had never been
+  compiled, and `-DUNRAR` had never been passed either, arriving as
+  `-D$(WHAT)` in the compile rule rather than through `DEFINES=`. All
+  five compile and the define changes nothing — *but a clean 44 was
+  being read as "the package builds", and it was not the package.* **A
+  variable named `OBJECTS` in a makefile with a second object variable
+  is a trap the name itself sets**; the only place that cannot lie is
+  the rule that builds the program, and `OBJECTS` alone is the
+  FALLBACK, announced when taken.
+  **`sys/src/ape/c++` EXISTS NOW** — apps and libraries needing a C++
+  compiler, last in the top-level `DIRS` so the dependency on
+  `lib/edg` + `cmd/edg` is said once rather than hidden in the ORDER
+  of `cmd/mkfile`'s app list, with its own `DIRS` **empty** (a port
+  built only by hand has not been measured in that position).
+  ***AND THERE IS NO `libc++`, MEASURED RATHER THAN ASSUMED***: all 49
+  unrar objects built on the host, `nm -u` minus their own definitions
+  gives **16 mangled externals**, every one `libedg.a`'s but three
+  `__cxxabiv1` RTTI vtables, which are gcc's ABI and not cpfe's — and
+  `sys/include/ape/c++` is header-only by construction. *A `libc++`
+  will be wanted when the LIBRARY grows a `.cpp`, not because an
+  application asked.* Of the 109 plain-C externals,
+  `apfunc-sweep.py`'s three non-`defined` answers are all it being
+  right about a FUNCTION and wrong about availability — `lchown` is
+  `#define lchown chown` and `towlower`/`towupper` are `#define`d over
+  their own declarations in `<wctype.h>`: **a fourth state the sweep's
+  three cannot express**, and a false alarm in the one state that is
+  supposed to be alarming.
+  **`sys/src/ape/c++/unrar/mkfile` builds it with `eccp -fexceptions`,
+  and THAT is what it is waiting on rather than a compile**: unrar
+  throws `std::bad_alloc` in three files and catches it and
+  `std::length_error` in `rar.cpp` — those catches ARE the
+  out-of-memory path — while `eccp` passes `--no_exceptions` by
+  default because EDG itself is built that way, so **EDG's
+  setjmp-based EH has never been run here**. `cxx-stdexcept-test.cpp`
+  answers it in isolation and its section 2 is exactly the
+  catch-by-base unrar needs; *written a round earlier for another
+  reason*. RTTI stays off. **`RAR_SMP` is left out as a CHOICE** (one
+  thing at a time; 49 of 49 compile either way), so the harness and
+  the mkfile pass different DEFINES on purpose while their FILE lists
+  are gated to agree.
+  ***AND `eccp -c` COULD NOT BE USED IN A PATTERN RULE AT ALL***: it
+  named the object after the generated C (`foo.eccp.o`) and wrote both
+  that C and the object BESIDE THE SOURCE, i.e. into
+  `sys/src/external`, with `-o` accepted and ignored under `-c`. gcc's
+  rule now — object into the CURRENT directory from the source's
+  basename, `-c -o` exact, several inputs refused. *Invisible to
+  `eccp -o prog x.cpp`, which computes the object names it then links
+  itself*, which is why it survived until something wanted an mkfile.
+  **re2c has not moved** — ten missing headers and no `makefile` to
+  read an object list from, both in 0.6's inventory with the missing
   `(char const *)` constructors.
   ***AND `--control` EXPIRED A SECOND TIME, EXACTLY AS ITS OWN COMMENT
   SAID***: with no gap left to require it printed its "this may be good
