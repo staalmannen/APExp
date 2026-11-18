@@ -1420,3 +1420,93 @@ sources, since `lib/gd/mkfile` derives its object list the same way
 and the two disagreeing means one of them is wrong. *`ls *.c` gives
 70: the other 23 are upstream's own demo programs, each with its own
 `main`.*
+
+## `cxx-wstring-test.cpp` — the first instrument in this tree whose subject is a *coincidence*
+
+**Came from**: the user's "do `to_wstring` first", which looked like six
+wrappers over machinery the library already had, and was.
+
+**What it cost**: the wrappers were half an hour. What they *uncovered* was
+six sites in `basic_string` and its storage that pass an element count where
+`memcpy`/`memmove`/`memset` want bytes — **all six correct for `char` and
+wrong for every wider character type**. `docs/notes/cxx-library.md` has the
+table and the mechanism.
+
+**Why nothing had found it.** `sizeof(char)` is 1, so the bug is unreachable
+through `std::string`, and `std::string` is what every existing instrument
+touches: `cxx-library-test` has one string section, `cxxlib-host.sh
+--headers` compiles declarations, and `--instantiate` instantiates
+`basic_string<char>`. *A library can be green over a whole class of bug
+because the only type anybody tests makes the arithmetic come out right.*
+
+**Three arms, and each answers a question the others cannot:**
+
+* **Subject** — APExp's library under `g++ -nostdinc++`: 0 failures.
+* **Reference** — `-DREFERENCE`, i.e. libstdc++: 0 failures. Every assertion
+  is a standard-library rule, so a reference implementation answers the same
+  questions and the whole control costs **one flag**. *This is the cheapest
+  form the cross-check idiom has taken here.*
+* **Control** — the pre-fix headers staged out of git: **21 failures**, with
+  all ten `char` cases passing.
+
+**The sizing rule is the half worth copying.** The SSO buffer is 23 **bytes**,
+so it holds 23 `char` and **5** `wchar_t`, and only a case that crosses that
+boundary reaches the reallocating path. A case sized to look reasonable for
+`char` never reallocates — the first draft's `append` case passed against the
+broken library for that reason while `+=` on the same data failed. Both are
+kept: *the case that passes is what made the rule visible.*
+
+**And its header first counted eight bugs, not six.** Two of the eight are in
+`short_object_optimization.h`'s `sizeof(value_type) == 1` **specialisation**,
+where a scaled index and an unscaled width are both right. They were changed
+to match the primary template and are **not findings**. *A fact about the
+code was read as a conclusion about it; the specialisation condition is one
+line above the class.*
+
+**What a mechanical sweep can and cannot see here.** "A `mem*` call with no
+`sizeof` in its statement" finds seven of the eight sites in one `awk` and
+**cannot see the eighth**, which says `sizeof` — on the index rather than the
+width. That is also the one that was never a bug, so the sweep's blind spot
+and its false-positive risk happen to coincide; a standing sweep was not
+added, because after the fix the shape occurs nowhere and it would have no
+positive control.
+
+## `cxx-stdexcept-test.cpp` — whose control is a COMPILE FAILURE
+
+**Came from**: unrar's `rar.cpp:95`, `catch (std::length_error &)`.
+
+**What it covers**: the nine `<stdexcept>` classes by their standard names,
+the derivations [stdexcept.syn] fixes, and that `what()` answers.
+
+**Three things about it are worth copying.**
+
+***(1) THE FILE INCLUDES ONLY `<stdexcept>`, AND THAT IS A REGRESSION TEST
+THAT CANNOT BE WRITTEN AS AN ASSERTION.*** EDG ships that header empty, so
+the names used to arrive only because `<vector>` drags
+`language_support/length_error.h` in by another route. If `<stdexcept>`
+alone does not declare them, the file does not compile. Hence `strcmp`
+rather than `std::string` in section 3 — *pulling in `<string>` would
+reintroduce the very route that hid the bug.*
+
+***(2) SECTION 2 CONSTRAINS THE DESIGN RATHER THAN CHECKING IT.*** The
+cheap way to write ten exception classes is one template and ten aliases,
+which gives ten **siblings**: it passes every line of section 1 and fails
+every line of section 2, because `catch (std::logic_error &)` must catch a
+thrown `std::length_error`. *A test section whose job is to rule out the
+implementation you would otherwise have written.*
+
+***(3) ITS CONTROL IS A COMPILE FAILURE AND THE FILE SAYS SO.*** Against
+the pre-fix headers out of git it does not build — 42 errors, the first
+`'logic_error' is not a member of 'std'`. So the control is not a failure
+count, and **a run that prints nothing is the expected result rather than a
+lost measurement**, which is the opposite of this tree's usual rule and has
+to be written down where the next reader will see it.
+
+**And its `MK` macro is a recorded deviation, not a convenience.** The
+standard gives these a `(char const *)` constructor and **no** default
+constructor; portable_stl's have only a default one. So the reference arm
+says `T("message")` where the subject says `T()` — the two arms ask the
+same question about the **names and the hierarchy** and deliberately not
+about construction. *A macro that papers over a difference is a bug; one
+that names the difference and keeps the rest of the comparison honest is
+the point.*

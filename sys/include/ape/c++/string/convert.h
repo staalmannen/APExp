@@ -14,6 +14,17 @@
 
 #include "../common/char8_t.h"
 #include "../common/char_t.h"
+/*
+ * `uint32_t' IS USED UNQUALIFIED AT :122, :178 AND :230 AND WAS
+ * DECLARED BY NOTHING THIS HEADER INCLUDES.  These lines are inside
+ * `namespace std', so the unqualified name finds `::std::uint32_t' as
+ * soon as something declares it -- and nothing did, so `convert.h'
+ * did not compile at all.  It had never been compiled: nothing in the
+ * library included it until `to_wstring' reached it through
+ * `to_string2.h'.  *This tree's own rule about a change that makes
+ * code reach code nothing reached before.*
+ */
+#include "../common/uint32_t.h"
 #include "../error/portable_stl_error.h"
 #include "../iterator/distance.h"
 #include "../utility/expected/expected.h"

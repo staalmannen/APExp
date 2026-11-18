@@ -1674,7 +1674,7 @@ template<class t_key, class t_type, class t_compare, class t_allocator>
 t_type &map<t_key, t_type, t_compare, t_allocator>::at(key_type const &key) {
   t_parent_pointer     parent;
   t_node_base_pointer &child = m_tree.find_equal(parent, key);
-  ::std::throw_on_true<::std::out_of_range<>>(nullptr == child); // "map::at:  key not found"
+  ::std::throw_on_true<::std::out_of_range>(nullptr == child); // "map::at:  key not found"
   return ::std::get<1>(static_cast<t_node_pointer>(child)->m_value.get_value());
 }
 
@@ -1693,7 +1693,7 @@ template<class t_key, class t_type, class t_compare, class t_allocator>
 t_type const &map<t_key, t_type, t_compare, t_allocator>::at(key_type const &key) const {
   t_parent_pointer    parent;
   t_node_base_pointer child = m_tree.find_equal(parent, key);
-  ::std::throw_on_true<::std::out_of_range<>>(nullptr == child); // "map::at:  key not found"
+  ::std::throw_on_true<::std::out_of_range>(nullptr == child); // "map::at:  key not found"
   return ::std::get<1>(static_cast<t_node_pointer>(child)->m_value.get_value());
 }
 

@@ -1307,7 +1307,7 @@ template<class t_type, class t_allocator> vector<t_type, t_allocator>::vector(si
   auto guard = ::std::make_exception_guard(M_destroy_vector(*this));
   if (num > 0) {
     bool const has_length_error{num > max_size()};
-    ::std::throw_on_true<::std::length_error<>>(has_length_error);
+    ::std::throw_on_true<::std::length_error>(has_length_error);
     if (has_length_error) {
       return;
     }
@@ -1359,7 +1359,7 @@ vector<t_type, t_allocator>::vector(size_type num, allocator_type const &alloc) 
   auto guard = ::std::make_exception_guard(M_destroy_vector(*this));
   if (num > 0) {
     bool const has_length_error{num > max_size()};
-    ::std::throw_on_true<::std::length_error<>>(has_length_error);
+    ::std::throw_on_true<::std::length_error>(has_length_error);
     if (has_length_error) {
       return;
     }
@@ -1415,7 +1415,7 @@ template<class t_type, class t_allocator> vector<t_type, t_allocator>::vector(si
   auto guard = ::std::make_exception_guard(M_destroy_vector(*this));
   if (num > 0) {
     bool const has_length_error{num > max_size()};
-    ::std::throw_on_true<::std::length_error<>>(has_length_error);
+    ::std::throw_on_true<::std::length_error>(has_length_error);
     if (has_length_error) {
       return;
     }
@@ -1470,7 +1470,7 @@ vector<t_type, t_allocator>::vector(size_type num, value_type const &value, allo
   auto guard = ::std::make_exception_guard(M_destroy_vector(*this));
   if (num > 0) {
     bool const has_length_error{num > max_size()};
-    ::std::throw_on_true<::std::length_error<>>(has_length_error);
+    ::std::throw_on_true<::std::length_error>(has_length_error);
     if (has_length_error) {
       return;
     }
@@ -1600,7 +1600,7 @@ template<class t_input_iterator, class t_sentinel>
 void vector<t_type, t_allocator>::M_init_with_size(t_input_iterator first, t_sentinel last, size_type num) {
   if (num > 0) {
     bool const has_length_error{num >= max_size()};
-    ::std::throw_on_true<::std::length_error<>>(has_length_error);
+    ::std::throw_on_true<::std::length_error>(has_length_error);
     if (has_length_error) {
       return;
     }
@@ -1691,7 +1691,7 @@ inline vector<t_type, t_allocator>::vector(std::initializer_list<value_type> ini
   size_type num{init_list.size()};
   if (num > 0) {
     bool const has_length_error{num > max_size()};
-    ::std::throw_on_true<::std::length_error<>>(has_length_error);
+    ::std::throw_on_true<::std::length_error>(has_length_error);
     if (has_length_error) {
       return;
     }
@@ -1713,7 +1713,7 @@ inline vector<t_type, t_allocator>::vector(std::initializer_list<value_type> ini
   size_type num{init_list.size()};
   if (num > 0) {
     bool const has_length_error{num > max_size()};
-    ::std::throw_on_true<::std::length_error<>>(has_length_error);
+    ::std::throw_on_true<::std::length_error>(has_length_error);
     if (has_length_error) {
       return;
     }

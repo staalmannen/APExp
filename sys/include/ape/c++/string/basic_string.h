@@ -1004,7 +1004,7 @@ public:
    * @return reference Reference to the requested character.
    */
   reference at(size_type pos) {
-    ::std::throw_on_true<::std::out_of_range<>>(pos > size());
+    ::std::throw_on_true<::std::out_of_range>(pos > size());
     return *(begin() + static_cast<difference_type>(pos));
   }
 
@@ -1017,7 +1017,7 @@ public:
    * @return const_reference Reference to the requested character.
    */
   const_reference at(size_type pos) const {
-    ::std::throw_on_true<::std::out_of_range<>>(pos > size());
+    ::std::throw_on_true<::std::out_of_range>(pos > size());
     return *(cbegin() + static_cast<difference_type>(pos));
   }
 
@@ -1380,7 +1380,21 @@ public:
     }
     view_type sv = sv_like;
     if (m_storage.insert(index, sv.size())) {
-      ::std::memcpy((begin() + static_cast<difference_type>(index)).operator->(), sv.begin(), sv.size());
+      /*
+       * ***AN ELEMENT COUNT WHERE `memcpy' WANTS BYTES.***  Five in
+       * this file and one in `short_object_optimization.h', and every
+       * one is CORRECT FOR `char' and wrong for every other character
+       * type: `sizeof(char)' is 1, so the bug cannot be reached
+       * through `std::string'.
+       * `std::wstring(L" -md=") + std::to_wstring(3)' answered
+       * `" -\0\0\0" "3"' -- five elements asked for, five BYTES
+       * copied, which is one element and a quarter.
+       * `sys/lib/tests/cxx-wstring-test.cpp' is the test and its
+       * control against the pre-fix headers gives 21 failures, all of
+       * them on a character type wider than a byte.
+       */
+      ::std::memcpy((begin() + static_cast<difference_type>(index)).operator->(), sv.begin(),
+                    sv.size() * sizeof(value_type));
     } else {
       return ::std::unexpected<::std::std_error>{
         ::std::std_error::allocate_error};
@@ -1558,7 +1572,7 @@ public:
       if (storage_size != erase_size) {
         ::std::memmove((begin() + static_cast<difference_type>(index)).operator->(),
                                 (cbegin() + static_cast<difference_type>(index + erase_size)).operator->(),
-                                storage_size - index - erase_size + 1);
+                                (storage_size - index - erase_size + 1) * sizeof(value_type));
       } else {
         // null-terminated character '\0'
         traits_type::assign(data()[index], value_type());
@@ -1676,7 +1690,8 @@ public:
     if (m_storage.reserve(index + count + 1)) {
       m_storage.set_size(index + count);
       if (!sv.empty()) {
-        ::std::memcpy((begin() + static_cast<difference_type>(index)).operator->(), sv.begin(), count);
+        ::std::memcpy((begin() + static_cast<difference_type>(index)).operator->(), sv.begin(),
+                      count * sizeof(value_type));
         traits_type::assign(data()[index + count], value_type());
       }
     } else {
@@ -1886,7 +1901,8 @@ public:
     }
     view_type sv = sv_like;
     if (m_storage.replace(pos, ::std::min(count, size() - pos), sv.size())) {
-      ::std::memcpy((begin() + static_cast<difference_type>(pos)).operator->(), sv.begin(), sv.size());
+      ::std::memcpy((begin() + static_cast<difference_type>(pos)).operator->(), sv.begin(),
+                    sv.size() * sizeof(value_type));
     } else {
       return ::std::unexpected<::std::std_error>{
         ::std::std_error::allocate_error};
@@ -1912,7 +1928,17 @@ public:
         ::std::std_error::out_of_range};
     }
     if (m_storage.replace(pos, ::std::min(count, size() - pos), count2)) {
-      ::std::memset((begin() + static_cast<difference_type>(pos)).operator->(), ch, count2);
+      /*
+       * ***`memset' CANNOT DO THIS AT ALL, AND SCALING THE COUNT
+       * WOULD NOT FIX IT.***  It writes one BYTE per unit, so filling
+       * a `wstring' with `L'Q'' set the low three bytes of the first
+       * element to 0x51 and gave `0x515151' -- the arithmetic bug and
+       * a type bug at the same site, where the other seven are only
+       * the arithmetic.  `traits_type::assign(ptr, count, ch)' is the
+       * per-element fill every char_traits specialisation here
+       * already provides.
+       */
+      traits_type::assign((begin() + static_cast<difference_type>(pos)).operator->(), count2, ch);
     } else {
       return ::std::unexpected<::std::std_error>{
         ::std::std_error::allocate_error};

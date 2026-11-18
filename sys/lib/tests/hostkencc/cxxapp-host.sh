@@ -52,21 +52,41 @@
 #
 # ---- WHAT IT FOUND -------------------------------------------------
 #
-# unrar, 44 objects: **39 compile, 5 fail, and the failures are two
-# library gaps rather than anything of unrar's.**
+# unrar, 44 objects: **42 compile, 2 fail**, and the failures are
+# library gaps rather than anything of unrar's.  It was 39 of 44 on
+# the first run; the three that moved were `std::to_wstring'.
 #
-#   * `std::to_wstring' -- 10 sites.  **The implementation is already
-#     there**: `string/to_string2.h' has a generic
-#     `to_string2<t_string>', so this is six inline wrappers over
-#     upstream's own machinery and not new code.
+# ***AND THE GAP IT NAMED WAS NOT THE BUG IT FOUND.***  `to_wstring'
+# looked like six wrappers over the generic `to_string2<t_string>'
+# already in `string/to_string2.h', and it is -- but that file had
+# never been included by anything, so compiling it for the first time
+# found `convert.h' using `uint32_t' with nothing declaring it, and
+# then running it found **six places in `basic_string' and its storage
+# that pass an ELEMENT count where `memcpy' wants BYTES**.  Every one
+# is correct for `char' and wrong for `wchar_t', `char16_t' and
+# `char32_t', so the whole library was green over it.
+# `sys/lib/tests/cxx-wstring-test.cpp' is the test; its control
+# against the pre-fix headers gives 21 failures.
+#
+# *The harness was built to name missing NAMES and what it was worth
+# was a silent miscompile two layers underneath one.*
+#
+# What is left:
+#
 #   * `basic_string(InputIt, InputIt)' -- `win32stm.cpp:240' is
 #     `std::string Src(v.begin(), v.end())' with `unsigned char*'
 #     iterators, and the iterator-pair constructor does not take it
 #     (`enable_if_bool_constant<false>', then a cascade onto the
 #     `(const char *, size_type, allocator)' overload).
-#
-# `<deque>' is a third gap and a smaller one than it looks: unrar
-# includes it in `os.hpp' and **never names `std::deque' anywhere**.
+#   * **The exception hierarchy is TEMPLATES**:
+#     `template<class = void> class length_error', so
+#     `catch (std::length_error&)' -- `rar.cpp:95', and what every
+#     real program writes -- does not compile.  Upstream's reason is
+#     visible: a template member `what()' needs no .cpp.  They also
+#     have none of the standard's `(char const *)' constructors.
+#   * `<deque>' is a third gap and a smaller one than it looks: unrar
+#     includes it in `os.hpp' and **never names `std::deque'
+#     anywhere**.
 
 set -u
 
@@ -200,23 +220,53 @@ report() {			# $1 = package name
 }
 
 if [ "${1:-}" = "--control" ]; then
-	# ***AN EXTERNAL CONTROL, AND IT WILL NEED RE-POINTING.***  There
-	# is no oracle for "which names is the library missing", so the
-	# control is that the harness must still see a gap we KNOW is
-	# there.  `to_wstring' is that gap today.  **When it is added, this
-	# control starts failing and must be aimed at the next known gap**
-	# -- which is the honest cost of a control made of a real finding
-	# rather than a planted one, and is why it says so here.
-	compile_pkg unrar > /dev/null
-	if grep -q "'to_wstring' is not a member of 'std'" "$OUT/err"; then
-		echo "control: the harness still reports the known to_wstring gap"
-		exit 0
+	# ***THE FIRST VERSION OF THIS CONTROL NAMED ONE GAP AND SO HAD TO
+	# BE RE-POINTED EVERY TIME ONE WAS FIXED.***  It required the
+	# harness to still report `std::to_wstring' as missing; `to_wstring'
+	# was then added, the control failed, and what it was reporting was
+	# a success.  *A control made of a single real finding expires the
+	# moment the finding is fixed* -- and the next reader cannot tell
+	# "fixed" from "harness broke", which is exactly what a control is
+	# for.
+	#
+	# So it asks STRUCTURALLY instead, which is this tree's rule
+	# elsewhere.  Two things, and each covers a failure the other
+	# cannot see:
+	#
+	#   1. The harness really compiled this package.  Not "it ran" --
+	#      a run that compiles nothing reports a tidy `0 failed'.  The
+	#      floor is well under the current count so that fixing gaps
+	#      never trips it.
+	#   2. It still produced a report with the gaps named.  If every
+	#      gap is one day fixed this half stops firing, and the right
+	#      answer then is to say so here rather than to loosen it.
+	MINOK=35
+	set -- $(compile_pkg unrar 2>"$OUT/ctl.err")
+	if [ $# -ne 2 ]; then
+		echo "cxxapp-host: ***THE CONTROL DID NOT RUN.***  compile_pkg gave" >&2
+		echo "cxxapp-host: no counts; see the message above." >&2
+		exit 1
 	fi
-	echo "cxxapp-host: ***THE CONTROL DID NOT FIRE.***  Either to_wstring" >&2
-	echo "cxxapp-host: was added -- in which case re-point this control at" >&2
-	echo "cxxapp-host: the next known gap -- or the harness stopped" >&2
-	echo "cxxapp-host: compiling anything, which looks identical here." >&2
-	exit 1
+	ok=$1; bad=$2
+	echo "control: unrar $ok compiled, $bad failed"
+	if [ "$ok" -lt "$MINOK" ]; then
+		echo "cxxapp-host: ***THE CONTROL FIRED.***  Only $ok of unrar's" >&2
+		echo "cxxapp-host: objects compiled, under the floor of $MINOK.  The" >&2
+		echo "cxxapp-host: harness, the staged shim or the predefines broke --" >&2
+		echo "cxxapp-host: this is NOT a library regression report." >&2
+		exit 1
+	fi
+	if [ "$bad" -eq 0 ] && ! grep -q 'STUBBED' "$OUT/ctl.err"; then
+		echo "cxxapp-host: ***THE CONTROL DID NOT FIRE AND THAT MAY BE GOOD" >&2
+		echo "cxxapp-host: NEWS.***  Every object compiled and no header was" >&2
+		echo "cxxapp-host: stubbed, so there is no known gap left for the" >&2
+		echo "cxxapp-host: control to require.  Check it by hand, then write" >&2
+		echo "cxxapp-host: down here that unrar builds clean -- do not just" >&2
+		echo "cxxapp-host: relax the condition." >&2
+		exit 1
+	fi
+	echo "control: the harness compiled $ok objects and still names its gaps"
+	exit 0
 fi
 
 if [ $# -gt 0 ]; then

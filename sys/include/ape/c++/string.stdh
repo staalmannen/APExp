@@ -5,5 +5,6 @@
 #include "string/basic_string.h"
 #include "string/char_traits.h"
 #include "string/to_string.h"
+#include "string/to_wstring.h"
 
 #endif

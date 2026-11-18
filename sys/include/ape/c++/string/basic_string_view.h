@@ -504,7 +504,7 @@ public:
    * @return View of the substring [pos, pos + rcount) or ::out_of_range if pos >= size()
    */
   basic_string_view substr(size_type pos = 0UL, size_type count = npos) const {
-    ::std::throw_on_true<::std::out_of_range<>>(pos > size());
+    ::std::throw_on_true<::std::out_of_range>(pos > size());
     auto work_size = ::std::min(count, (size() - pos));
     return {(0U == work_size ? nullptr : (begin() + pos)), work_size};
   }

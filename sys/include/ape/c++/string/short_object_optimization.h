@@ -291,9 +291,24 @@ public:
       no_error = reserve(old_size + what_size - replacement_size + 1);
     }
     if (no_error) {
+      /*
+       * ***THE ONE REACHABLE BUG IN THIS FILE: AN ELEMENT COUNT
+       * WHERE `memmove' WANTS BYTES.***  The `+ 1' is the NUL, so
+       * the whole expression counts ELEMENTS and was handed to
+       * `memmove' unscaled, while `insert' nine lines above and
+       * `reserve' below both scale theirs.  This is the PRIMARY
+       * template, which serves every character type wider than a
+       * byte; the `sizeof(value_type) == 1' specialisation below has
+       * the same line and was never wrong.
+       *
+       * `std::wstring(L"abcdefgh").replace(1, 2, L"XYZ")' answered
+       * `aXYZ' followed by the wrong five elements.  Test and
+       * control: `sys/lib/tests/cxx-wstring-test.cpp'.
+       */
       static_cast<void>(::std::memmove(::std::to_address(data() + index + what_size),
                                                 ::std::to_address(data() + index + replacement_size),
-                                                old_size - (index + replacement_size) + 1));
+                                                (old_size - (index + replacement_size) + 1)
+                                                  * sizeof(value_type)));
 
       if (replacement_size > what_size) {
         // always change size down: may move data to short string but not reallocate!
@@ -482,7 +497,25 @@ public:
         ::std::memcpy(
           ::std::to_address(temp.get()), ::std::to_address(data()), size() * sizeof(value_type));
         // do not miss '\0' terminator
-        ::std::memset(::std::to_address(&temp.get()[size() * sizeof(value_type)]), 0, 1);
+        /*
+         * This was `memset(&temp.get()[size() * sizeof(value_type)],
+         * 0, 1)', whose index is scaled and whose width is not --
+         * and ***IT WAS NOT A BUG, WHICH IS WORTH SAYING RATHER THAN
+         * QUIETLY FIXING.***  THIS class is the
+         * `sizeof(value_type) == 1' specialisation, so the scale
+         * factor is 1 and one byte IS one element.  The sibling
+         * primary template above, which serves every wider type,
+         * already wrote `temp.get()[size()] = value_type{};'.
+         *
+         * It is changed to match only so that the two classes read
+         * the same and so that nothing here depends on the
+         * specialisation condition staying what it is.  *A sweep for
+         * "a mem* call with no sizeof in it" cannot see this line at
+         * all* -- it says sizeof, in the wrong place -- so it was
+         * found by hand and is recorded here for the next reader who
+         * wonders why the two classes differed.
+         */
+        temp.get()[size()] = value_type{};
         m_storage.get_first().m_long.m_data = temp.release();
       } else {
         ::std::throw_on_true<::std::bad_alloc>(true);
@@ -594,9 +627,14 @@ public:
       no_error = reserve(old_size + what_size - replacement_size + 1);
     }
     if (no_error) {
+      /* The same line as the primary template's.  Scaling it is a
+       * no-op here -- this is the `sizeof(value_type) == 1'
+       * specialisation -- and the two are kept identical so that
+       * nothing depends on which class a type lands in. */
       static_cast<void>(::std::memmove(::std::to_address(data() + index + what_size),
                                                 ::std::to_address(data() + index + replacement_size),
-                                                old_size - (index + replacement_size) + 1));
+                                                (old_size - (index + replacement_size) + 1)
+                                                  * sizeof(value_type)));
 
       if (replacement_size > what_size) {
         // always change size down: may move data to short string but not reallocate!

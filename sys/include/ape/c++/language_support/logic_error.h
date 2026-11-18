@@ -2,50 +2,50 @@
 // * Copyright (c) 2024-2025 Paragon Software Group
 // *
 // * Project="Paragon Portable STL" File="logic_error.h"
-// * 
+// *
 // * This program and the accompanying materials are made available under the
 // * terms of the MIT License which is available at
 // * https://opensource.org/licenses/MIT.
-// * 
+// *
 // * SPDX-License-Identifier: MIT
 // ***************************************************************************
+
 #ifndef PSTL_LOGIC_ERROR_H
 #define PSTL_LOGIC_ERROR_H
 
 #include "exception.h"
 
 namespace std {
+
 /**
- * @brief Defines a type of object to be thrown as exception.
- * It reports errors that are a consequence of faulty logic within the program such as violating logical preconditions
- * or class invariants and may be preventable.
+ * @brief Defines a type of object to be thrown as exception.  It reports errors that are a consequence of faulty logic within the program such as violating logical preconditions or class invariants and may be preventable.
  */
-template<class = void> class logic_error : public ::std::exception {
+template<class = void> class logic_error_impl : public ::std::exception {
 public:
   /**
    * @brief Default destructor.
    */
-  ~logic_error() noexcept override                                                = default;
+  ~logic_error_impl() noexcept override = default;
   /**
    * @brief Default constructor.
    */
-  logic_error() noexcept                                                          = default;
+  logic_error_impl() noexcept = default;
   /**
    * @brief Default copy constructor.
    */
-  logic_error(logic_error const &) noexcept                                       = default;
+  logic_error_impl(logic_error_impl const &) noexcept = default;
   /**
    * @brief Default move constructor.
    */
-  logic_error(logic_error &&) noexcept                                            = default;
+  logic_error_impl(logic_error_impl &&) noexcept = default;
   /**
    * @brief Default copy assignment.
    */
-  logic_error                            &operator=(logic_error const &) noexcept = default;
+  logic_error_impl &operator=(logic_error_impl const &) noexcept = default;
   /**
    * @brief Default move assignment.
    */
-  logic_error                            &operator=(logic_error &&) noexcept      = default;
+  logic_error_impl &operator=(logic_error_impl &&) noexcept = default;
   /**
    * @brief Get exception message.
    *
@@ -59,10 +59,51 @@ public:
  *
  * @return const char pointer to ntbs message.
  */
-template<class t_object>
-inline char const * logic_error<t_object>::what() const noexcept {
+template<class t_object> inline char const * logic_error_impl<t_object>::what() const noexcept {
   return "logical error from portable_stl.";
 }
+
+/*
+ * ***THE CLASS IS A TEMPLATE AND THE NAME IS AN ALIAS, WHICH IS NOT
+ * HOW UPSTREAM LEFT IT.***  Upstream wrote
+ * `template<class = void> class logic_error', and every one of
+ * `<stdexcept>'s classes the same way, so
+ *
+ *     catch (::std::logic_error &)
+ *
+ * -- what every real program writes -- answered `invalid use of
+ * template-name without an argument list', with g++ helpfully
+ * offering C++17 class template argument deduction as the
+ * explanation.  unrar's `rar.cpp:95' and `dll.cpp:174' are that line.
+ *
+ * **Upstream's reason is good and is kept.**  A template member
+ * `what()' can be defined in a header with no `.cpp' and no COMDAT
+ * question, which is what lets this library stay header-only -- and
+ * it is why the fix is a RENAME AND AN ALIAS rather than a real
+ * class.  Making these ordinary classes with inline virtuals would
+ * put the vtable and the typeinfo in COMDAT, which is a question
+ * about the LINK MODEL (`cmd/edg/mkfile' already passes `-C', and
+ * `--instantiate local' does not touch typeinfo) and deserves its own
+ * round.  *An alias costs nothing and answers the whole complaint.*
+ *
+ * The cost is that `::std::logic_error<>' is no longer valid; the
+ * library's own call sites spelled it that way and were updated with
+ * it.
+ *
+ * **What is still missing is the standard's CONSTRUCTORS.**  There is
+ * no `logic_error(char const *)' and no
+ * `logic_error(string const &)', so `throw ::std::logic_error("...")'
+ * does not compile and `what()' returns a fixed string.  Not added
+ * here, for two reasons worth writing down: a `string' overload in
+ * this header would be a circular include (`basic_string' throws
+ * `length_error'), and storing a `char const *' is only safe for an
+ * argument with static storage duration -- *a silent dangle for
+ * anything else, which is worse than the compile error a caller gets
+ * now.*
+ */
+
+using logic_error = logic_error_impl<>;
+
 } // namespace std
 
 #endif // PSTL_LOGIC_ERROR_H

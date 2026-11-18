@@ -595,7 +595,7 @@ void vector<bool, t_allocator>::M_construct_at_end(t_input_iterator first, t_sen
 template<class t_allocator> inline vector<bool, t_allocator>::vector(size_type num) : m_begin(nullptr), m_size(0U) {
   if (num > 0U) {
     if (num > max_size()) {
-      throw ::std::length_error<>{};
+      throw ::std::length_error{};
     }
     if (M_vallocate(num)) {
       M_construct_at_end(num, false);
@@ -630,7 +630,7 @@ vector<bool, t_allocator>::vector(size_type num, allocator_type const &alloc)
     : m_begin(nullptr), m_size(0U), m_cap_alloc(0U, static_cast<t_storage_allocator>(alloc)) {
   if (num > 0U) {
     if (num > max_size()) {
-      throw ::std::length_error<>{};
+      throw ::std::length_error{};
     }
     if (M_vallocate(num)) {
       M_construct_at_end(num, false);
@@ -664,7 +664,7 @@ template<class t_allocator>
 vector<bool, t_allocator>::vector(size_type num, value_type const &value) : m_begin(nullptr), m_size(0U) {
   if (num > 0U) {
     if (num > max_size()) {
-      throw ::std::length_error<>{};
+      throw ::std::length_error{};
     }
     if (M_vallocate(num)) {
       M_construct_at_end(num, value);
@@ -699,7 +699,7 @@ vector<bool, t_allocator>::vector(size_type num, value_type const &value, alloca
     : m_begin(nullptr), m_size(0U), m_cap_alloc(0U, static_cast<t_storage_allocator>(alloc)) {
   if (num > 0U) {
     if (num > max_size()) {
-      throw ::std::length_error<>{};
+      throw ::std::length_error{};
     }
     if (M_vallocate(num)) {
       M_construct_at_end(num, value);
@@ -737,7 +737,7 @@ vector<bool, t_allocator>::vector(t_input_iterator first, t_input_iterator last)
     if (::std::std_error::allocate_error == result.error()) {
       throw ::std::bad_alloc{};
     } else {
-      throw ::std::length_error<>{};
+      throw ::std::length_error{};
     }
   }
 }
@@ -762,7 +762,7 @@ vector<bool, t_allocator>::vector(t_input_iterator first, t_input_iterator last,
     if (::std::std_error::allocate_error == result.error()) {
       throw ::std::bad_alloc{};
     } else {
-      throw ::std::length_error<>{};
+      throw ::std::length_error{};
     }
   }
 }
@@ -783,7 +783,7 @@ template<class t_forward_iterator, vector_helper::enable_for_forward_iter_bool<t
 vector<bool, t_allocator>::vector(t_forward_iterator first, t_forward_iterator last) : m_begin(nullptr), m_size(0U) {
   auto num = static_cast<size_type>(::std::distance(first, last));
   if (num > max_size()) {
-    throw ::std::length_error<>{};
+    throw ::std::length_error{};
   }
   M_init_with_size(first, last, num);
 }
@@ -810,7 +810,7 @@ vector<bool, t_allocator>::vector(t_forward_iterator first, t_forward_iterator l
     : m_begin(nullptr), m_size(0U), m_cap_alloc(0U, static_cast<t_storage_allocator>(alloc)) {
   auto num = static_cast<size_type>(::std::distance(first, last));
   if (num > max_size()) {
-    throw ::std::length_error<>{};
+    throw ::std::length_error{};
   }
   M_init_with_size(first, last, num);
 }
@@ -837,7 +837,7 @@ vector<bool, t_allocator>::vector(std::initializer_list<value_type> init_list) :
   size_type num = static_cast<size_type>(init_list.size());
   if (num > 0U) {
     if (num > max_size()) {
-      throw ::std::length_error<>{};
+      throw ::std::length_error{};
     }
     if (M_vallocate(num)) {
       M_construct_at_end(init_list.begin(), init_list.end(), num);
@@ -874,7 +874,7 @@ vector<bool, t_allocator>::vector(std::initializer_list<value_type> init_list, a
   size_type num = static_cast<size_type>(init_list.size());
   if (num > 0U) {
     if (num > max_size()) {
-      throw ::std::length_error<>{};
+      throw ::std::length_error{};
     }
     if (M_vallocate(num)) {
       M_construct_at_end(init_list.begin(), init_list.end(), num);
