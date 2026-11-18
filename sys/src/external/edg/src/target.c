@@ -7237,7 +7237,7 @@ _ZN3edg24targ_var_handle_int_kindE = _ZN3edg17ik_unsigned_shortE;
 _ZN3edg36targ_virtual_function_index_int_kindE = _ZN3edg8ik_shortE;
 
 
-_ZN3edg21targ_wchar_t_int_kindE = _ZN3edg17ik_unsigned_shortE;
+_ZN3edg21targ_wchar_t_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg20targ_wint_t_int_kindE = _ZN3edg17ik_unsigned_shortE;
 
 _ZN3edg14targ_word_modeE = _ZN3edg6tmk_SIE;
