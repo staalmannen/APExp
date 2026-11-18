@@ -66,8 +66,42 @@ if not os.path.isfile(os.path.join(ROOT, 'CLAUDE.md')):
 EDG = os.path.join(ROOT, 'sys', 'src', 'external', 'edg')
 HDR = os.path.join(EDG, 'kencc_targ.h')
 TARG = os.path.join(EDG, 'src', 'target.c')
+ECCP = os.path.join(ROOT, 'rc', 'bin', 'ape', 'eccp')
+
+
+def active_target():
+    """***THE PER-MODEL SETTINGS ARE A FUNCTION, NOT AN ARM.***  The
+    first version of this sweep called ten names NOT COMPARABLE because
+    each is assigned eight times -- and that was right about the regex
+    and wrong about the file.  The eight are
+    `set_target_config_win64', `..._linux_i686', `..._linux_aarch64'
+    and five more: **one function per target, and exactly one runs.**
+
+    Which one is not a guess either: `rc/bin/ape/eccp' passes
+    `--target win64' and says in its own header that the flag is not
+    optional.  So the name is READ FROM THE DRIVER rather than written
+    here -- a sweep that hardcoded `win64' would go quietly wrong the
+    day the driver changed, which is this tree's whole complaint about
+    `kencc_targ.h' in the first place.
+
+    **And it is what let `wchar_t' through.**  win64's `wchar_t' is
+    `unsigned short'; APE's is `unsigned int'.  cpfe built `L"ape"'
+    out of 2-byte elements and libap's `wcslen' walked it 4 bytes at a
+    time, so `std::wcslen(L"ape") == 3' was false -- *the one failure
+    left in `cxx-library-test'*, and invisible to a sweep that had
+    declared the name unreadable."""
+    if not os.path.isfile(ECCP):
+        return None
+    m = re.search(r'--target\s+([a-z0-9_]+)', open(ECCP, errors='replace').read())
+    return m.group(1) if m else None
 
 DEFINE = re.compile(r'^#define\s+([A-Z][A-Z0-9_]*)\s+(\d+)\s*(?:/\*|$)', re.M)
+# ***AND THE ONE THAT BIT IS NOT A NUMBER.***  `TARG_WCHAR_T_INT_KIND'
+# is `((an_integer_kind)ik_unsigned_int)', and win64's config baked
+# `ik_unsigned_short'.  A sweep that reads only integers is a sweep
+# that could not see the setting that produced the bug it was extended
+# for, so kinds are compared by SYMBOL beside them.
+KIND = re.compile(r'^#define\s+([A-Z][A-Z0-9_]*)\s+\(\([a-z_]+\)(ik_[a-z_]+)\)', re.M)
 
 # Accepted disagreements.  Each entry is a REASON, not a shrug: a name
 # here is one somebody has read and decided about.
@@ -87,12 +121,32 @@ KNOWN = {
 }
 
 
+def config_body(text, target):
+    """The body of `set_target_config_<target>', plus
+    `target_early_init' -- the two places a setting is decided."""
+    out = []
+    for name in ('set_target_config_%sEv(void)' % target, 'target_early_initEv(void)'):
+        i = text.find(name)
+        while i >= 0:
+            j = text.find('\nstatic void ', i + 1)
+            k = text.find('\nvoid ', i + 1)
+            end = min(x for x in (j, k, len(text)) if x > 0)
+            body = text[i:end]
+            if '=' in body:
+                out.append(body)
+            i = text.find(name, i + 1)
+    return '\n'.join(out)
+
+
 def baked(text):
-    """name -> (value, count).  count > 1 means the variable is set per
-    data model in arms chosen at run time, so it has no single value."""
+    """name -> (value, count).  count > 1 is still reported as not
+    comparable, but within ONE config body it should not happen."""
     out = {}
-    for m in re.finditer(r'_ZN3edg(\d+)([a-z0-9_]+)E = \(\([^()]*\)([0-9]+)[UL]*\)\s*;', text):
-        n, name, val = int(m.group(1)), m.group(2), m.group(3)
+    pat = (r'_ZN3edg(\d+)([a-z0-9_]+)E = (?:\(\([^()]*\)([0-9]+)[UL]*\)'
+           r'|_ZN3edg\d+(ik_[a-z_]+)E)\s*;')
+    for m in re.finditer(pat, text):
+        n, name = int(m.group(1)), m.group(2)
+        val = m.group(3) if m.group(3) is not None else m.group(4)
         if len(name) != n:
             continue
         v, c = out.get(name, (val, 0))
@@ -103,7 +157,7 @@ def baked(text):
 def sweep(hdr_text, targ_text, quiet=False):
     bake = baked(targ_text)
     agree, disagree, absent, ambiguous = [], [], [], []
-    for name, want in DEFINE.findall(hdr_text):
+    for name, want in DEFINE.findall(hdr_text) + KIND.findall(hdr_text):
         low = name.lower()
         if low not in bake:
             absent.append(name)
@@ -138,7 +192,17 @@ def main():
     for f in (HDR, TARG):
         if not os.path.isfile(f):
             sys.exit('edgtarg-sweep: no %s' % f)
-    hdr_text, targ_text = open(HDR).read(), open(TARG, errors='replace').read()
+    hdr_text, whole = open(HDR).read(), open(TARG, errors='replace').read()
+    target = active_target()
+    if target is None:
+        sys.exit('edgtarg-sweep: cannot read --target from %s, so which of '
+                 'the eight target configs runs is unknown' % ECCP)
+    body = config_body(whole, target)
+    if not body:
+        sys.exit('edgtarg-sweep: no set_target_config_%s in target.c -- the '
+                 'driver names a target the corpus does not define' % target)
+    print('active target, from %s: %s' % (os.path.basename(ECCP), target))
+    targ_text = body
 
     if '--control' in sys.argv[1:]:
         # ***A DELIBERATE BREAK, BECAUSE THERE IS NO ORACLE.***  Flip one

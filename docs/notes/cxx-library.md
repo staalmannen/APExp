@@ -2217,3 +2217,46 @@ first run names a file you have just decided about is the cheapest possible
 chance to catch it.* Its control strips the guard from a guarded,
 C++-reachable header and requires exactly one new finding; it fires on
 `ctype.h`.
+
+## It works: 23 PASS, 1 FAIL, 1 GAP — and the FAIL is win64's `wchar_t`
+
+`cxx-library-test` builds, links and runs. The one failure is
+`std::wcslen(L"ape") == 3`, with `std::iswalpha` passing on the next line —
+so it is not linkage but **width**.
+
+***EDG's active target is win64, and win64's `wchar_t` is 2 bytes.***
+`eccp:250` passes `--target win64` and its own header says the flag is not
+optional; `target.c` has **one function per target**, and
+`set_target_config_win64` bakes `targ_wchar_t_int_kind = ik_unsigned_short`
+while `kencc_targ.h:195` says `ik_unsigned_int` and APE's `stddef.h:50` is
+`unsigned int`. So cpfe built `L"ape"` out of 2-byte elements and libap's
+`wcslen` walked it 4 bytes at a time. Every other size in that function
+already matches APE — int 4, long 4, long long 8, pointer 8, short 2, long
+double 8 — `wchar_t` alone did not.
+
+**This is the third finding from one class** (after the gcc linemarker flags
+and the empty struct): the baked target disagreeing with the committed target
+description.
+
+***And the sweep could not see it, for a reason that was my own mistake.***
+It called ten names "not comparable" because each is assigned eight times —
+right about the regex, **wrong about the file**. The eight are not arms of a
+switch: they are `set_target_config_win64`, `..._linux_i686`,
+`..._linux_aarch64` and five more — *one function per target, and exactly one
+runs*. The sweep now reads the active target **from the driver** rather than
+hardcoding it, because a sweep that hardcoded `win64` would go quietly wrong
+the day `eccp` changed, which is this tree's whole complaint about
+`kencc_targ.h` in the first place.
+
+It also compares **integer kinds** now, not only numbers — the setting that
+bit is `((an_integer_kind)ik_unsigned_int)`, and *a sweep that reads only
+integers could not see the setting it was extended for*.
+
+**15 agree → 19 agree, and 10 not comparable → 0.** Its external control is
+the bug itself: putting `ik_unsigned_short` back makes the sweep report
+`TARG_WCHAR_T_INT_KIND ... *** NEW ***` and exit 1. The deliberate-break
+control still fires on `CLANG_IS_GENERATED_CODE_TARGET` with nothing else
+moving.
+
+The remaining `GAP` is `std::variant`, which is a name and not an
+implementation — an empty class body upstream, nothing to test.
