@@ -2260,3 +2260,56 @@ moving.
 
 The remaining `GAP` is `std::variant`, which is a name and not an
 implementation — an empty class body upstream, nothing to test.
+
+## Real applications: the gap list, measured on the host
+
+`sys/src/external/c++` holds **unrar** and **re2c**, to replace the old C
+versions. `hostkencc/cxxapp-host.sh` compiles a package's objects against
+`sys/include/ape/c++` with `g++ -nostdinc++`, the same trick `cxxlib-host.sh`
+uses, and **reports rather than gates** — these are ports in progress and a
+gate would fail every run.
+
+**unrar: 44 objects, 39 compile, 5 fail, and all five are library gaps.**
+
+| gap | where | size of the job |
+|---|---|---|
+| `std::to_wstring` | 10 sites in `filefn`, `arcread`, `list`, `rar` | **small** — `string/to_string2.h` already has a generic `to_string2<t_string>`, so this is six inline wrappers over upstream's own machinery |
+| `basic_string(InputIt, InputIt)` | `win32stm.cpp:240`, `std::string Src(v.begin(), v.end())` with `unsigned char*` iterators | the iterator-pair ctor SFINAEs out (`enable_if_bool_constant<false>`) and cascades onto the `(const char*, size_type, allocator)` overload |
+| `<deque>` | `os.hpp` | **smaller than it looks**: unrar never names `std::deque` anywhere, so the header only has to exist — but shipping an empty one is the stub-that-answers-nothing family this tree calls its most common bug, so it is a decision rather than a patch |
+
+**re2c wants 24 standard headers and ten are missing**: `cassert fstream
+iomanip iostream ostream sstream` — the whole streams library, of which the
+tree has **none** — plus `queue stack unordered_set valarray`. `queue` and
+`stack` are adaptors and fall out once `deque` exists; streams are a project.
+re2c also has no `OBJECTS` makefile (autotools, 3572 files), so the harness
+says `NOT MEASURED` rather than guessing.
+
+### Four things that made earlier runs of this read like results
+
+Each is now in the harness so the next run cannot repeat it:
+
+1. **The four cpfe predefines.** Without them every file dies on
+   `__EDG_SIZE_TYPE__ does not name a type` and the run measures the harness.
+   `cxxlib-host.sh` already knew them; my ad-hoc command did not.
+2. **The include scan missed `.hpp`.** A first survey globbed
+   `*.cpp -o *.h -o *.cc` and concluded *"unrar needs nothing we do not
+   have"* — while every unrar header is `.hpp`. *A file-type list written
+   from the examples in front of you misses the next extension.*
+3. **Not every `.cpp` is a translation unit.** unrar `#include`s `arccmt.cpp`
+   and `win32stm.cpp` into others, so compiling `*.cpp` reported **38
+   failures that were all `wchar does not name a type` at line 1**. The
+   object list comes from the package's own makefile — and the first parse of
+   that took only the first physical line, 9 objects of 44, reported as a
+   tidy "9 failed".
+4. **The package's own `-D` set**, without which the platform arms are wrong
+   and the errors are about Windows code.
+
+And **missing headers are stubbed with the stub announced on stderr**: without
+a stub the first absent header stops every file and the run says nothing about
+what else is missing, which is the whole question; without the announcement it
+would be exactly the silent-stub shape this tree keeps paying for.
+
+Its control is external and will need re-pointing: the harness must still see
+the known `to_wstring` gap, and **when that is fixed the control must be aimed
+at the next one** — the honest cost of a control made of a real finding rather
+than a planted one.
