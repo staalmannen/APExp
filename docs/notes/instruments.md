@@ -1510,3 +1510,45 @@ same question about the **names and the hierarchy** and deliberately not
 about construction. *A macro that papers over a difference is a bug; one
 that names the difference and keeps the rest of the comparison honest is
 the point.*
+
+## `cxx-striter-test.cpp` — the one whose control had to be SPLIT
+
+**Came from**: unrar's last failing object, `std::string Src(v.begin(),
+v.end())` over a `vector<unsigned char>`.
+
+**What it covers**: `basic_string`'s iterator-pair constructor,
+`make_string`, `append`, `assign` and `insert`, over three kinds of range.
+
+**Three sections, three questions, and the third one is load-bearing.** A
+converting `value_type`; a non-contiguous `list` range; and a hand-written
+**single-pass** iterator with no `operator->` and no `operator-`, so
+`to_address` cannot be applied to it and a two-pass implementation cannot
+compile against it at all. *Without the third section the fix's tag
+dispatch on `has_forward_iterator_category` would be dead code nothing
+ever took* — the obvious implementation measures the range to reserve and
+then loops, which reads it twice, and an input iterator cannot be read
+twice.
+
+***ITS CONTROL IS SPLIT AND THAT IS THE POINT.*** Against the pre-fix
+headers the whole file **does not compile** — 19 errors — because sections
+1 and 3 need the fix in order to build. A control that can only say "it
+did not build" cannot tell the loud half of this bug from the silent half,
+and the silent half is the one that matters: `to_address` on a `list`
+iterator answers an address inside one node, and the copy then read 66
+bytes of the wrong memory at the right length. So the file takes
+`-DCONTROL_SECTION2_ONLY`, which drops the two sections that cannot
+compile and leaves the non-contiguous one — and that **compiles and
+reports 3 failures**, with the garbage printed beside the expected string.
+*The finding is the output, not the count.*
+
+**Subject 0, reference (libstdc++) 0.** Every assertion is a
+standard-library rule — [string.cons], [string.append], [string.assign]
+and [string.insert] all take an InputIterator pair — so the reference arm
+asks the same questions for one flag.
+
+**It is the second test in a row whose subject was invisible to every
+existing instrument**, after `cxx-wstring-test`: nothing in this tree had
+ever handed a string a non-contiguous range, so there was no symptom, and
+`cxxapp-host.sh` could only ever have seen fault (a), the one that
+produces a diagnostic. *A package that compiles has not been shown to
+run.*

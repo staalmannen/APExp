@@ -2594,3 +2594,138 @@ the implementation promises more than it can do. `append(first, last)`,
 `insert(pos, first, last)` and the `make_string` form are the same
 expression. *Not fixed in this round*; it wants a real loop and a test
 over a non-contiguous iterator, which is its own piece of work.
+
+## The iterator-pair overloads copied a block, and unrar builds clean
+
+unrar's last failing object was `extinfo.cpp`, and the line is
+`win32stm.cpp:240` (included into it):
+
+    std::string Src(v.begin(), v.end());   // v is vector<unsigned char>
+
+`basic_string`'s iterator-pair constructor was
+
+    : basic_string(::std::to_address(first),
+                   static_cast<size_type>(::std::distance(first, last)),
+                   allocator)
+
+and `make_string` and `append(first, last)` said the same thing — it takes
+the **address** of the first element and copies a block. Two faults, and
+***THE ONE THAT PRODUCED A DIAGNOSTIC IS THE LUCKY ONE.***
+
+**(a) It compiles only for an iterator whose `value_type` IS the string's
+`value_type`.** `unsigned char` converts to `char` perfectly well;
+`to_address(first)` hands over an `unsigned char *`, which does not. The
+overload SFINAE'd out and the diagnostic then named
+`(const char *, size_type, allocator)` — *not the constructor anybody
+wrote*, which is why it read like a missing overload rather than a broken
+body.
+
+**(b) For a non-contiguous iterator it was silently wrong.** `to_address`
+on a `list` iterator answers the address of the element inside one node,
+and the copy then read `distance` elements of whatever followed that node.
+The guard admits `input_iterator_tag`, so **the implementation promised
+far more than it could do** — and nothing in this tree had ever handed a
+string a non-contiguous range, so there was no symptom.
+
+### The fix, and the one thing that constrains it
+
+A per-element loop, with the reserve **tag-dispatched** on
+`has_forward_iterator_category`. That dispatch is the whole design
+constraint: the obvious implementation calls `distance(first, last)` to
+reserve and then loops, which reads the range **twice**, and a single-pass
+input iterator cannot be read twice. `M_reserve_for_range` therefore has a
+`true_type` arm that measures and a `false_type` arm that does not.
+
+**The block-copy fast path is deliberately not kept beside the loop.** It
+would need a trait for "contiguous AND the same character type", and *a
+wrong fast path here is silent* — which is the half of this bug that cost
+nothing to find only because nobody had triggered it. `append(1, ch)`
+re-enters `reserve`, which returns early once the capacity is there, so
+the loop is a byte-at-a-time copy and not a quadratic one.
+
+### `cxx-striter-test.cpp`, and why its control had to be split
+
+Three sections, three different questions: a converting `value_type`
+(fault (a), unrar's own line); a `list` range (fault (b), **the only
+section that could ever give a wrong ANSWER rather than a wrong
+diagnostic**); and a hand-written single-pass iterator with no
+`operator->` and no `operator-`, so `to_address` could not even be applied
+to it and a two-pass implementation cannot compile against it. *Without
+that third section the tag dispatch would be dead code nothing ever took.*
+
+* **Subject** — 0 failures. **Reference** (libstdc++, `-DREFERENCE`) — 0.
+* ***The control is split and it has to be.*** Against the pre-fix headers
+  the whole file **does not compile** — 19 errors — so a failure count is
+  not available that way. Built with `-DCONTROL_SECTION2_ONLY`, which
+  drops the two sections that need the fix in order to compile, it
+  compiles and reports **3 failures**, and the output is the finding:
+
+      want "a list is not a block, and this payload is well past ..."
+      got  "a.......!.......\373";]\360U...#;]\360U.. ......."
+
+  the first element, then 66 bytes of whatever followed that list node, at
+  the right length. *A control that could only say "it did not build"
+  would have left the silent half of this bug resting on a reading.*
+
+### unrar: 44 of 44, and the fourth gap is fixed in unrar
+
+`<deque>` was the last one, and it is **smaller than it looks**: `deque`
+appears nowhere else in the package — not one `std::deque`, not one
+mention outside the single `#include` in `os.hpp`. So the include is
+dropped, with the reason in a comment beside it, rather than shipping a
+`<deque>` that declares nothing — ***which is precisely what EDG's empty
+`<stdexcept>` did to this port, and it cost a whole campaign before
+anybody noticed.*** A real `deque` is a library decision and is in 0.6's
+inventory.
+
+**The walk is worth more than the number:**
+
+| | gap | whose |
+|---|---|---|
+| 39 → 42 | `std::to_wstring`, and six silent miscompiles under it | library |
+| 42 → 43 | `<stdexcept>` empty, and its classes templates | library |
+| 43 → 44 | the iterator-pair overloads copying a block | library |
+| 44 | `<deque>`, unused in unrar | unrar |
+
+***Every one of the four was the library's*** (the fourth being an unused
+include rather than a gap at all), which is the result the harness existed
+to get. **And two of the four were SILENT, which a compile-only harness
+cannot see by itself**: it named the loud half and
+`cxx-wstring-test.cpp`/`cxx-striter-test.cpp` found the rest. *A package
+that COMPILES has not been shown to RUN* — the same rule as "a header that
+compiles is not a template that instantiates", one level up.
+
+**What is still not measured**: the link, the C side (these compile
+against the host's `<unistd.h>`), cpfe's own acceptance, and anything at
+run time. There is no unrar mkfile for Plan 9 yet.
+
+### `cxxapp-host.sh --control`, expiring for the second time
+
+Its first version required the harness to still report `to_wstring`
+missing; `to_wstring` was added and **what it reported was a success**. It
+was re-pointed at a structural pair — a compile floor plus "a gap is still
+named" — and ***the second half expired one round later, exactly as its
+own comment said it would***: unrar reached 44 of 44 with no header
+stubbed, so there was no gap left to require, and the control printed its
+"this may be good news" branch and exited 1.
+
+It asserts the **measured state** now: 44 objects, 0 failures, no stubbed
+header, with `>=` on the count so a new unrar object does not trip it.
+Verified both ways — it passes at 44, and with the cpfe predefines emptied
+it answers `0/44` and fires. *A control made of a finding expires when the
+finding is fixed; the honest move each time is to re-point it at what is
+now true rather than to loosen it, and what is now true here is a result,
+so the control has become a regression gate on it.*
+
+### re2c has not moved, and the reason is two things
+
+`--headers` says it wants 24 and is missing **ten**: `cassert fstream
+iomanip iostream ostream queue sstream stack unordered_set valarray`.
+`unrar` is now `wants 6, missing 0`. And re2c has **no `makefile`** for
+the harness to read an object list out of — only `Makefile.in` with
+autoconf substitutions and a `CMakeLists.txt` — so even with the headers
+it could not be measured as it stands. *The streams family is the large
+part of the ten and is a decision rather than a patch*: de novo headers,
+or a copy from LLVM libc++ the way musl was copied into libap — and copied
+`.cpp` files would need a `libc++` mkfile after `edg`, plus probably a
+`sys/src/ape/c++` for things that need C++ built first.

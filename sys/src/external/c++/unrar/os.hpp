@@ -12,7 +12,15 @@
 #include <new>
 #include <string>
 #include <vector>
-#include <deque>
+// APExp: <deque> was here and is dropped.  APExp's C++ library has no
+// deque, and `deque' appears NOWHERE ELSE in unrar -- not one
+// `std::deque', not one mention outside this line -- so the include
+// was unused and removing it is cheaper than shipping a <deque> that
+// declares nothing.  A header that answers an include and declares
+// nothing is what EDG's own empty <stdexcept> did to this port, and
+// it cost a whole campaign before anyone noticed; see
+// sys/lib/tests/cxx-stdexcept-test.cpp.  If a later package wants a
+// real deque, that is a library decision, not this line.
 #include <stdexcept> // For std::length_error.
 #include <memory> // For automatic pointers.
 #include <algorithm>

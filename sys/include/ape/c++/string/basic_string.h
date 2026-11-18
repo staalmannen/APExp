@@ -29,6 +29,7 @@
 #include "../metaprogramming/cv_modifications/is_same_uncvref.h"
 #include "../metaprogramming/type_properties/is_default_constructible.h"
 #include "../metaprogramming/type_relations/is_convertible.h"
+#include "../metaprogramming/type_traits/has_forward_iterator_category.h"
 #include "../metaprogramming/type_relations/is_nothrow_convertible.h"
 #include "../utility/expected/expected.h"
 #include "../utility/expected/unexpected.h"
@@ -196,6 +197,79 @@ private:
       ::std::negation<::std::is_same_uncvref<t_string_view_like, basic_string>>,
       ::std::negation<::std::is_convertible<t_string_view_like const &, value_type const *>>>,
     void *>;
+
+  /*
+   * ***THE ITERATOR-PAIR OVERLOADS USED TO `to_address' THE FIRST
+   * ELEMENT AND COPY A BLOCK***, which is what these two replace.
+   * They were
+   *
+   *     basic_string(::std::to_address(first),
+   *                  static_cast<size_type>(::std::distance(first, last)),
+   *                  allocator)
+   *
+   * and the same inside `make_string' and `append'.  Two things wrong
+   * with that, and the loud one is the lucky one:
+   *
+   * (a) It only compiles for an iterator whose `value_type' IS
+   *     `value_type'.  unrar's `win32stm.cpp:240' is
+   *     `std::string Src(v.begin(), v.end())' over a
+   *     `vector<unsigned char>' -- `unsigned char' converts to `char'
+   *     perfectly well, and `to_address' hands over an
+   *     `unsigned char *' which does not.  The guard SFINAE'd out and
+   *     the diagnostic then named the `(const char *, size_type,
+   *     allocator)' overload, which is not the constructor anybody
+   *     wrote.
+   *
+   * (b) ***FOR A NON-CONTIGUOUS ITERATOR IT WAS SILENTLY WRONG.***
+   *     `to_address' on a `list' iterator answers the address of the
+   *     element inside one node, and the copy then read `distance'
+   *     elements of whatever followed that node in memory.  The guard
+   *     admits `input_iterator_tag', so the implementation promised
+   *     far more than it could do -- and nothing in this tree had
+   *     ever handed a string a non-contiguous range, so there was no
+   *     symptom to notice.
+   *
+   * A per-element loop is correct for both, and `M_reserve_for_range'
+   * keeps it O(n) for any iterator whose length can be measured
+   * WITHOUT CONSUMING IT.  *A single-pass input iterator cannot be
+   * measured twice*, which is the whole reason for the tag dispatch
+   * rather than an unconditional `distance'.
+   *
+   * The block-copy fast path is deliberately NOT kept beside the
+   * loop: it would need a trait for "contiguous AND the same
+   * character type", and a wrong fast path here is silent, which is
+   * the half of this bug that cost nothing to find only because
+   * nobody had triggered it.  `append(1, ch)' re-enters `reserve'
+   * per element and that returns early once the capacity is there,
+   * so the loop is a byte-at-a-time copy and not a quadratic one.
+   */
+  template<class t_input_iterator>
+  bool M_reserve_for_range(t_input_iterator first, t_input_iterator last, ::std::true_type) noexcept {
+    auto const count = static_cast<size_type>(::std::distance(first, last));
+    if ((size() + count + 1U) <= m_storage.capacity()) {
+      return true;
+    }
+    return m_storage.reserve(size() + count + 1U);
+  }
+
+  /* a single-pass range: nothing to reserve, because measuring it
+   * would consume it. */
+  template<class t_input_iterator>
+  bool M_reserve_for_range(t_input_iterator, t_input_iterator, ::std::false_type) noexcept {
+    return true;
+  }
+
+  template<class t_input_iterator> bool M_append_range(t_input_iterator first, t_input_iterator last) noexcept {
+    if (!M_reserve_for_range(first, last, ::std::has_forward_iterator_category<t_input_iterator>{})) {
+      return false;
+    }
+    for (; first != last; ++first) {
+      if (!append(size_type{1}, static_cast<value_type>(*first))) {
+        return false;
+      }
+    }
+    return true;
+  }
 
 public:
   /**
@@ -540,8 +614,8 @@ public:
              void *>
            = nullptr>
   basic_string(t_input_iterator first, t_input_iterator last, allocator_type const &allocator = allocator_type{})
-      : basic_string(
-          ::std::to_address(first), static_cast<size_type>(::std::distance(first, last)), allocator) {
+      : m_storage(allocator) {
+    ::std::throw_on_true<::std::bad_alloc>(!M_append_range(first, last));
   }
 
   /**
@@ -560,8 +634,12 @@ public:
            = nullptr>
   static ::std::expected<basic_string, ::std::std_error> make_string(
     t_input_iterator first, t_input_iterator last, allocator_type const &allocator = allocator_type{}) noexcept {
-    return make_string(
-      ::std::to_address(first), static_cast<size_type>(::std::distance(first, last)), allocator);
+    basic_string ret_string{allocator};
+    if (!ret_string.M_append_range(first, last)) {
+      return ::std::unexpected<::std::std_error>{
+        ::std::std_error::allocate_error};
+    }
+    return ::std::expected<basic_string, ::std::std_error>{::std::move(ret_string)};
   }
 
   /**
@@ -1779,7 +1857,12 @@ public:
            = nullptr>
   ::std::expected<string_reference_wrap, ::std::std_error> append(t_input_iterator first,
                                                                                              t_input_iterator last) {
-    return append(std::to_address(first), static_cast<size_type>(std::distance(first, last)));
+    if (!M_append_range(first, last)) {
+      return ::std::unexpected<::std::std_error>{
+        ::std::std_error::allocate_error};
+    }
+    return ::std::expected<string_reference_wrap, ::std::std_error>{
+      ::std::ref(*this)};
   }
 
   /**
