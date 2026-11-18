@@ -1420,3 +1420,53 @@ sources, since `lib/gd/mkfile` derives its object list the same way
 and the two disagreeing means one of them is wrong. *`ls *.c` gives
 70: the other 23 are upstream's own demo programs, each with its own
 `main`.*
+
+## `cxx-wstring-test.cpp` — the first instrument in this tree whose subject is a *coincidence*
+
+**Came from**: the user's "do `to_wstring` first", which looked like six
+wrappers over machinery the library already had, and was.
+
+**What it cost**: the wrappers were half an hour. What they *uncovered* was
+six sites in `basic_string` and its storage that pass an element count where
+`memcpy`/`memmove`/`memset` want bytes — **all six correct for `char` and
+wrong for every wider character type**. `docs/notes/cxx-library.md` has the
+table and the mechanism.
+
+**Why nothing had found it.** `sizeof(char)` is 1, so the bug is unreachable
+through `std::string`, and `std::string` is what every existing instrument
+touches: `cxx-library-test` has one string section, `cxxlib-host.sh
+--headers` compiles declarations, and `--instantiate` instantiates
+`basic_string<char>`. *A library can be green over a whole class of bug
+because the only type anybody tests makes the arithmetic come out right.*
+
+**Three arms, and each answers a question the others cannot:**
+
+* **Subject** — APExp's library under `g++ -nostdinc++`: 0 failures.
+* **Reference** — `-DREFERENCE`, i.e. libstdc++: 0 failures. Every assertion
+  is a standard-library rule, so a reference implementation answers the same
+  questions and the whole control costs **one flag**. *This is the cheapest
+  form the cross-check idiom has taken here.*
+* **Control** — the pre-fix headers staged out of git: **21 failures**, with
+  all ten `char` cases passing.
+
+**The sizing rule is the half worth copying.** The SSO buffer is 23 **bytes**,
+so it holds 23 `char` and **5** `wchar_t`, and only a case that crosses that
+boundary reaches the reallocating path. A case sized to look reasonable for
+`char` never reallocates — the first draft's `append` case passed against the
+broken library for that reason while `+=` on the same data failed. Both are
+kept: *the case that passes is what made the rule visible.*
+
+**And its header first counted eight bugs, not six.** Two of the eight are in
+`short_object_optimization.h`'s `sizeof(value_type) == 1` **specialisation**,
+where a scaled index and an unscaled width are both right. They were changed
+to match the primary template and are **not findings**. *A fact about the
+code was read as a conclusion about it; the specialisation condition is one
+line above the class.*
+
+**What a mechanical sweep can and cannot see here.** "A `mem*` call with no
+`sizeof` in its statement" finds seven of the eight sites in one `awk` and
+**cannot see the eighth**, which says `sizeof` — on the index rather than the
+width. That is also the one that was never a bug, so the sweep's blind spot
+and its false-positive risk happen to coincide; a standing sweep was not
+added, because after the fix the shape occurs nowhere and it would have no
+positive control.

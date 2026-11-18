@@ -2313,3 +2313,173 @@ Its control is external and will need re-pointing: the harness must still see
 the known `to_wstring` gap, and **when that is fixed the control must be aimed
 at the next one** — the honest cost of a control made of a real finding rather
 than a planted one.
+
+*That paragraph is kept as written because the very next round proved it
+wrong in the cheapest possible way: `to_wstring` was added, the control
+failed, and re-pointing it at another real finding would only have bought the
+same expiry again. It asks structurally now — see the end of this file.*
+
+## `to_wstring`: six wrappers, and a silent miscompile two layers under it
+
+The user's direction after `cxx-library-test` ran was *"make sure the library
+is capable of building real world applications"*, with unrar and re2c in
+`sys/src/external/c++` as the two challenges, and *"do `to_wstring` first"*.
+
+**What `to_wstring` itself cost is six wrappers**, because the implementation
+was already in the tree: `string/to_string2.h` carries a generic
+`to_string2<t_string>` over `base_to_string_converter`, which works for any
+`basic_string` whose `value_type` has a `unicode_helper` — and `wchar_t` has
+one. So `string/to_wstring.h` is six `inline` forwarders and
+`string.stdh` includes it.
+
+### "Already there" was too strong until it was compiled
+
+A grep for `to_string2` over the whole library found **the file and no
+user**. Compiling it for the first time:
+
+    convert.h:122: error: 'uint32_t' does not name a type
+
+Three unqualified uses, inside `namespace std`, with nothing declaring
+`::std::uint32_t`. One `#include "../common/uint32_t.h"`. *This tree's own
+rule about a change that makes code reach code nothing reached before,
+arriving on the first command rather than three rounds in.*
+
+### Six overloads and deliberately no float
+
+[string.conversions] gives `to_wstring` nine overloads, the last three
+specified as if by `swprintf(..., L"%f", val)`.
+`base_to_string_converter`'s floating-point specialisation **works** — it was
+run on the host first: `1.5` → `"1.5"`, `0.125` → `"0.125"`, `-1.5` →
+`"-1.5"`, `1e20` → `"100000000000000000000"`.
+
+**But `%f` on 100.0 is `"100.000000"` and that converter answers `"100"`.**
+Shipping it under the standard's name hands every caller a different string
+from the one the standard promises, which is this tree's most common bug
+class. The float forms are **absent**, where a caller gets a compile error
+naming them; `to_string` has no float overload either, so the two stay
+symmetric; and `to_string2<t_string>(double)` is reachable by name for anyone
+who wants shortest-form output on purpose.
+
+The six are six for an ABI reason and not for tidiness: kencc is LLP64, so a
+`size_t` argument binds `unsigned long long` here and `unsigned long` on an
+LP64 host. A set missing either would compile on one and not the other.
+
+### ***AND THEN IT PRINTED THE WRONG STRING***
+
+    std::wstring(L" -md=") + std::to_wstring(3)
+      ->  0020 002D 0000 0000 0000 0033        (" -\0\0\0" "3")
+
+Five elements asked for, **five BYTES copied** — one element and a quarter,
+the rest left as the zero fill. **Six sites in the library pass an element
+count where `memcpy`/`memmove`/`memset` want bytes:**
+
+| file | function | call |
+|---|---|---|
+| `basic_string.h` | `insert(index, sv)` | `memcpy`, count unscaled |
+| | `erase(index, count)` | `memmove`, count unscaled |
+| | `append(sv)` | `memcpy`, count unscaled |
+| | `replace(pos, n, sv)` | `memcpy`, count unscaled |
+| | `replace(pos, n, n2, ch)` | `memset` — see below |
+| `short_object_optimization.h` | `replace(...)`, PRIMARY template | `memmove`, count unscaled |
+
+***EVERY ONE IS CORRECT FOR `char`.*** `sizeof(char)` is 1, so nothing
+reachable through `std::string` can show it — which is why the whole library,
+`cxx-library-test` and `cxxlib-host.sh --instantiate` were green while
+`std::wstring` silently corrupted itself on insert, erase, append and
+replace. **The library's own neighbours scale theirs**: `insert` nine lines
+above the broken `replace` says `* sizeof(value_type)`, and so do both
+`memcpy`s in `reserve`.
+
+**The `memset` one is a type bug and not an arithmetic one.** `memset` writes
+one byte per unit whatever the count, so `replace(1, 2, 3, L'Q')` put
+`0x00515151` in the first element and nothing in the other two. Scaling its
+count would not have fixed it; `traits_type::assign(ptr, count, ch)` is the
+per-element fill every char_traits specialisation here already provides.
+
+### Two more that look like the same bug and are not
+
+`short_object_optimization.h` holds **two** classes: a primary template and a
+`sizeof(value_type) == 1` specialisation. The specialisation carries the same
+`replace` line, and its copy constructor wrote
+
+    memset(&temp.get()[size() * sizeof(value_type)], 0, 1);
+
+an index that is scaled and a width that is not — which reads exactly like
+the bug above, and **is correct by construction there**, because that class
+only ever serves a one-byte type. Both were changed to match the primary
+template so the two read the same, and **they are not findings**. *The first
+draft of the test's header counted eight bugs; the specialisation condition
+is one line above the class and says so.*
+
+The consequence for the test: a case that goes through the specialisation can
+never fail, so its `char` section is a control **by construction** and not
+merely by intent.
+
+### The instrument, and what its two controls each catch
+
+`sys/lib/tests/cxx-wstring-test.cpp` — the eight mutators once per character
+type (`char`, `wchar_t`, `char16_t`, `char32_t`), the six `to_wstring`
+overloads, and the four spellings unrar actually writes.
+
+* **Subject**: 0 failures.
+* **Reference**: every assertion is a standard-library rule, so
+  `g++ -std=c++14 -DREFERENCE` builds it against libstdc++ — **0 failures**,
+  which is the strongest control available here and costs one flag.
+* **Control**: the pre-fix headers out of git give **21 failures**, all ten
+  `char` cases passing.
+
+***EVERY CASE MUST CROSS THE SHORT-STRING BOUNDARY FOR AT LEAST ONE TYPE OR
+IT PASSES AGAINST THE BROKEN LIBRARY.*** The SSO buffer is 23 **bytes**, so
+it holds 23 `char` and only **5** `wchar_t`: a case sized to look reasonable
+for `char` never reallocates. The first draft's `append` case passed against
+the broken library for exactly that reason while `+=` on the same data
+failed — *and both are kept, because the one that passes is what made the
+rule visible.*
+
+The control's own coverage is honestly short in one place: `wchar_t`'s
+`append` case passes either way, so that site is caught through `+=` for
+`wchar_t` and directly for `char16_t`. The `copy of a heap string` cases pass
+both ways and cover nothing — they are legitimate assertions and are not
+claimed as coverage.
+
+### unrar: 39 of 44 → 42 of 44
+
+`to_wstring` cleared `filefn.cpp`, `arcread.cpp` and `list.cpp`. What is
+left:
+
+* `basic_string(InputIt, InputIt)` — `win32stm.cpp:240` is
+  `std::string Src(v.begin(), v.end())` with `unsigned char*` iterators, and
+  the iterator-pair constructor SFINAEs out
+  (`enable_if_bool_constant<false>`, then a cascade onto the
+  `(const char *, size_type, allocator)` overload).
+* **The exception hierarchy is TEMPLATES.**
+  `template<class = void> class length_error : public logic_error<>`, so
+  `catch (std::length_error&)` — `rar.cpp:95`, and what every real program
+  writes — does not compile; g++ even offers C++17 CTAD as the explanation.
+  Upstream's reason is visible and good: a template member `what()` needs no
+  `.cpp`. They also have **none of the standard's `(char const *)`
+  constructors**, so `throw std::length_error("too long")` is out too.
+* `<deque>`, which unrar includes in `os.hpp` and never names.
+
+*The harness was built to name missing NAMES, and what the first one was
+worth was a silent miscompile two layers underneath one.*
+
+### `cxxapp-host.sh --control` is structural now
+
+Its first version required the harness to still report `to_wstring` as
+missing. `to_wstring` was added, the control failed, and **what it was
+reporting was a success** — and the next reader cannot tell "fixed" from
+"harness broke", which is what a control is for. It now asks two structural
+things: that at least 35 of unrar's 44 objects compiled (a run that compiles
+nothing reports a tidy `0 failed`), and that it still produced a report with
+the gaps named. **Measured both ways**: it passes at 42, and with `EDGDEF`
+emptied it reports `0 compiled, 44 failed` and fires.
+
+### A pre-existing failure found while regression-testing, and it is NOT this
+
+`cxxlib-host.sh --instantiate` reports **`***CONTROL PASSED, WHICH IS A
+FAILURE.***`** — the pre-fix `split_buffer.h` staged out of git instantiates
+cleanly, so that mode is not asking what it claims. **This was already true
+before any change here**, measured by stashing the whole diff and re-running:
+same message. Recorded in 0.6's inventory; not fixed in the same round as a
+change to the same library.

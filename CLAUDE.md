@@ -503,6 +503,22 @@ shown**, which is why the parser reads every word and not `$1`.
 `--run` builds and executes the test. **Sound for everything that is
 not cpfe itself**; it says nothing about the C output, the template
 model or the ABI. It found `split_buffer.h`, which cpfe never reached.
+**Its `--instantiate` CONTROL NO LONGER FIRES**, so that mode's clean
+`0 of 5` says nothing; 0.6's inventory has it.
+***ITS SIBLING `hostkencc/cxxapp-host.sh` ASKS THE APPLICATION'S
+QUESTION*** — can the library build a real package in
+`sys/src/external/c++`? It **reports rather than gates**, reads the
+object list and the `-D` set from the package's OWN makefile, STUBS a
+missing header and ANNOUNCES the stub, and its control is a compile
+FLOOR plus a named gap. unrar is 42 of 44; the four faults that each
+gave a result-shaped non-result are in the ports list above, and so is
+what it was worth, which was not the missing name it was looking for.
+**`cxx-wstring-test.cpp` is what came out of it**, and the one test
+here whose subject is a COINCIDENCE: six library sites pass an element
+count where `memcpy` wants bytes, and `sizeof(char)` being 1 made
+every one of them correct for the only character type anything tested.
+Three arms — subject 0, **libstdc++ as the reference for one flag**
+(`-DREFERENCE`), pre-fix headers 21.
 
 ***AND `cpp-xcheck/` IS THE CHEAPEST INSTRUMENT IN THIS TREE***:
 `cpp-xcheck.sh` builds kencc's OWN `cpp` with gcc on the build host and
@@ -1753,6 +1769,12 @@ silent:
   label that did not match the loop's, so `No such file or directory`
   read as "the control fired". It demands `M_M_alloc` in the
   diagnostic now — *caught by reading the output, not the status.*
+  ***AND ITS CONTROL DOES NOT FIRE ANY MORE***: the staged pre-fix
+  `split_buffer.h` instantiates cleanly, so the mode is not asking
+  what it claims and **its clean `0 of 5` says nothing**. *Established
+  as pre-existing by stashing an unrelated diff and re-running*, which
+  is the cheapest way to tell "my change did this" from "this was
+  already so"; in 0.6's inventory.
   ***AND THE CRASH IS BACK ON THE BIGGER INPUT AT A DIFFERENT pc, AND
   IT IS NOT THE MEMORY MANAGER AT ALL.*** `evicted=0x42` plus 4096 live
   is `carves=0x1042` exactly, so **the pad scan is complete and
@@ -1888,6 +1910,60 @@ silent:
   exception-free convention, `vector::push_back` returning
   `expected<void, ...>`, so it is not a drop-in `std`.
   `docs/notes/cxx-library.md` has all sixteen and the instrument.
+  ***AND THE NEXT QUESTION IS REAL APPLICATIONS, WHICH IS A DIFFERENT
+  QUESTION FROM A LIBRARY THAT COMPILES.***
+  `hostkencc/cxxapp-host.sh` compiles a package in
+  `sys/src/external/c++` against the library on the host and **reports
+  rather than gates** (these are ports in progress; a gate would fail
+  every run and get switched off). **unrar: 42 of 44 objects.** Four
+  harness faults each gave a result-shaped non-result first — the four
+  cpfe predefines missing (85/85 fail on `__EDG_SIZE_TYPE__`), an
+  include scan that globbed `.cpp/.h/.cc` while **every unrar header
+  is `.hpp`**, compiling `*.cpp` when unrar `#include`s several INTO
+  others (38 failures, all `wchar does not name a type` at line 1),
+  and an `OBJECTS` parse that took only the first physical line, 9 of
+  44, reported as a tidy "9 failed". Missing headers are STUBBED and
+  the stub is ANNOUNCED, since the first absent header otherwise stops
+  every file and says nothing about what else is missing.
+  ***AND THE GAP IT NAMED WAS NOT THE BUG IT FOUND.***
+  `std::to_wstring` was ten unrar sites and six wrappers over the
+  generic `to_string2<t_string>` already in the tree — but **nothing
+  had ever included that file**, so compiling it found `convert.h`
+  using `uint32_t` with nothing declaring it, and *running* it found
+  **six sites in `basic_string` and its storage passing an ELEMENT
+  count where `memcpy`/`memmove`/`memset` want BYTES**.
+  `wstring(L" -md=") + to_wstring(3)` answered `" -\0\0\0" "3"`: five
+  elements asked for, five bytes copied. ***EVERY ONE IS CORRECT FOR
+  `char`***, so the whole library, `cxx-library-test` and
+  `--instantiate` were green over it — *a class of bug unreachable
+  through the only character type anybody tests.* The `memset` one is
+  a TYPE bug and not an arithmetic one (`replace(1,2,3,L'Q')` gave
+  `0x00515151`; `traits_type::assign` is the per-element fill).
+  **`cxx-wstring-test.cpp` has three arms**: subject 0, **reference 0
+  under `-DREFERENCE`, which is libstdc++ answering the same questions
+  for one flag**, and the pre-fix headers out of git **21**. *Its
+  sizing rule is the keeper*: the SSO buffer is 23 BYTES, so 23 `char`
+  and **5** `wchar_t`, and a case sized to look reasonable for `char`
+  never reallocates — the first `append` case passed against the
+  broken library while `+=` on the same data failed. **And its header
+  first counted EIGHT bugs**: two are in the `sizeof(value_type) == 1`
+  specialisation, where a scaled index and an unscaled width are both
+  right. *A fact about the code read as a conclusion about it, with
+  the specialisation condition one line above the class.*
+  **`to_wstring` has SIX overloads and no float, deliberately**: the
+  generic converter works but answers `"100"` where `%f` gives
+  `"100.000000"`, and a different string from the one the standard
+  promises is worse than a compile error. What is left in unrar is the
+  iterator-pair `basic_string(InputIt,InputIt)` over `unsigned char *`
+  and **the exception hierarchy being TEMPLATES**, so
+  `catch (std::length_error &)` does not compile; both in 0.6's
+  inventory with the mechanism, along with re2c's ten missing headers.
+  ***AND `cxxapp-host.sh --control` IS STRUCTURAL NOW***: its first
+  version required the harness to still report `to_wstring` missing,
+  `to_wstring` was added, the control failed, and **what it was
+  reporting was a success** — so it asks for a compile FLOOR plus a
+  named gap instead, and was measured both ways (42 passes; `EDGDEF`
+  emptied gives `0 compiled, 44 failed` and fires).
 - **muon** — builds and prints its own usage. *A port that builds and
   prints a usage is not a port*: `muon setup` on a real `meson.build` is
   the next thing that would say anything.
