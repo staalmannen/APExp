@@ -1552,3 +1552,48 @@ ever handed a string a non-contiguous range, so there was no symptom, and
 `cxxapp-host.sh` could only ever have seen fault (a), the one that
 produces a diagnostic. *A package that compiles has not been shown to
 run.*
+
+## `cxxapp-host.sh`, fault five: the object list is in the LINK RULE
+
+Worth its own entry because it is the **fifth** fault in one harness, all
+of the same shape — *a reading of a package's build files that looked like
+the answer and was a subset of it* — and because it invalidated a number
+that four rounds of work had been measured against.
+
+It read `OBJECTS=`. unrar's makefile link rule is
+
+    unrar:	$(OBJECTS) $(UNRAR_OBJ)
+
+so `filestr recvol rs scantree qopen` were **never compiled**, and
+`-DUNRAR` was never passed either, because that arrives as `-D$(WHAT)` in
+the `.cpp.o` rule rather than through `DEFINES=`. All five compile and the
+define changes nothing here, so what was wrong was the harness — **but a
+clean "44 objects, 0 failed" had been read as "the package builds", and 44
+was not the package.**
+
+*A variable named `OBJECTS` in a makefile that has a second object
+variable is a trap the name itself sets.* The only place that cannot lie
+is the rule that builds the program, so the rule is found by the
+package's own name, every `$(VAR)` in its prerequisites is expanded, and
+**`OBJECTS` alone is the fallback, announced on stderr when taken** —
+a silent fallback to the old behaviour is the bug coming back. Measured
+with the `unrar:` rule renamed: it prints the fallback line and reports
+44, which is the old answer, visibly.
+
+**And the two readings of that list are now required to agree.**
+`sys/src/ape/c++/unrar/mkfile` writes `OFILES` by hand, so it and the
+harness are two derivations of one thing and a disagreement means one is
+wrong without saying which — the shape `gd-xcheck.sh` already gates on
+(`Makefile.am` against `lib/gd/mkfile`). `--control` fails on drift;
+controlled by planting one extra entry, which fires and names the
+difference in both directions. **The marker is a FILE and not a variable**,
+because `compile_pkg` runs inside `$(...)` and every assignment it makes
+dies with the subshell — the same boundary that had already cost this
+harness an `exit 2` nobody saw.
+
+*The DEFINE sets are deliberately not required to agree*: the harness
+takes upstream's own, because its question is "does the library have what
+the package asks for", while the mkfile builds the subset that is one
+thing at a time. Saying which is authoritative for what is the point —
+**a harness and a build that quietly differ are two results wearing one
+number.**
