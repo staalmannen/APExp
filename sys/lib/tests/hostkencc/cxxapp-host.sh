@@ -52,9 +52,18 @@
 #
 # ---- WHAT IT FOUND -------------------------------------------------
 #
-# unrar, 44 objects: **42 compile, 2 fail**, and the failures are
-# library gaps rather than anything of unrar's.  It was 39 of 44 on
-# the first run; the three that moved were `std::to_wstring'.
+# ***unrar BUILDS CLEAN: 44 objects, 0 failures, no stubbed header.***
+# It was **39 of 44** on the first run, then 42, then 43, then 44 --
+# four rounds, each one library gap, and the walk is worth more than
+# the number:
+#
+#   39 -> 42  `std::to_wstring' (and six silent miscompiles under it)
+#   42 -> 43  `<stdexcept>' was EMPTY and its classes were TEMPLATES
+#   43 -> 44  `basic_string(InputIt, InputIt)' copied a BLOCK
+#   44        `<deque>' -- unused in unrar, so the include is dropped
+#
+# *Every one of the four was the library's and not unrar's*, which is
+# the result this harness existed to get.
 #
 # ***AND THE GAP IT NAMED WAS NOT THE BUG IT FOUND.***  `to_wstring'
 # looked like six wrappers over the generic `to_string2<t_string>'
@@ -71,22 +80,30 @@
 # *The harness was built to name missing NAMES and what it was worth
 # was a silent miscompile two layers underneath one.*
 #
-# What is left:
+# ***AND TWO OF THE FOUR WERE SILENT, WHICH IS WHAT A COMPILE-ONLY
+# HARNESS CANNOT SEE BY ITSELF.***  `to_wstring' named a missing NAME
+# and what it was worth was six places in `basic_string' passing an
+# ELEMENT count where `memcpy' wants BYTES -- every one correct for
+# `char', so the whole library was green over it.  The iterator-pair
+# constructor `to_address'ed the first element and copied a block,
+# which for a `list' iterator read 66 bytes of the wrong memory at
+# the right length.  **Neither was found by this harness**: it named
+# the loud half and the tests
+# (`cxx-wstring-test.cpp', `cxx-striter-test.cpp') found the rest.
+# *A package that COMPILES has not been shown to RUN*, which is the
+# same rule as "a header that compiles is not a template that
+# instantiates", one level up.
 #
-#   * `basic_string(InputIt, InputIt)' -- `win32stm.cpp:240' is
-#     `std::string Src(v.begin(), v.end())' with `unsigned char*'
-#     iterators, and the iterator-pair constructor does not take it
-#     (`enable_if_bool_constant<false>', then a cascade onto the
-#     `(const char *, size_type, allocator)' overload).
-#   * **The exception hierarchy is TEMPLATES**:
-#     `template<class = void> class length_error', so
-#     `catch (std::length_error&)' -- `rar.cpp:95', and what every
-#     real program writes -- does not compile.  Upstream's reason is
-#     visible: a template member `what()' needs no .cpp.  They also
-#     have none of the standard's `(char const *)' constructors.
-#   * `<deque>' is a third gap and a smaller one than it looks: unrar
-#     includes it in `os.hpp' and **never names `std::deque'
-#     anywhere**.
+# `<deque>' was the fourth and is the one fixed in unrar rather than
+# in the library: `deque' appears NOWHERE ELSE in the package -- not
+# one `std::deque' -- so the include was unused and dropping it is
+# cheaper than shipping a `<deque>' that declares nothing, which is
+# precisely what EDG's empty `<stdexcept>' did to this port.  A real
+# deque is a library decision and is in 0.6's inventory.
+#
+# **What is NOT measured by any of this**: the link, the C side (these
+# compile against the HOST's `<unistd.h>'), cpfe's own acceptance, and
+# anything at run time.  unrar's mkfile for Plan 9 does not exist yet.
 
 set -u
 
@@ -229,18 +246,26 @@ if [ "${1:-}" = "--control" ]; then
 	# "fixed" from "harness broke", which is exactly what a control is
 	# for.
 	#
-	# So it asks STRUCTURALLY instead, which is this tree's rule
-	# elsewhere.  Two things, and each covers a failure the other
-	# cannot see:
+	# It asked STRUCTURALLY instead -- a compile FLOOR plus "a gap is
+	# still named" -- and ***THAT SECOND HALF THEN EXPIRED TOO, ONE
+	# ROUND LATER AND EXACTLY AS IT SAID IT WOULD.***  unrar reached
+	# 44 of 44 with no header stubbed, so there was no gap left to
+	# require, and the control printed its own "this may be good news"
+	# branch and exited 1.
 	#
-	#   1. The harness really compiled this package.  Not "it ran" --
-	#      a run that compiles nothing reports a tidy `0 failed'.  The
-	#      floor is well under the current count so that fixing gaps
-	#      never trips it.
-	#   2. It still produced a report with the gaps named.  If every
-	#      gap is one day fixed this half stops firing, and the right
-	#      answer then is to say so here rather than to loosen it.
-	MINOK=35
+	# **So it asserts the MEASURED STATE now, which is the strongest
+	# form available and the one a clean package allows.**  unrar
+	# builds clean: 44 objects, 0 failures, no stubbed header.  A
+	# regression in the library fails this; a new unrar object does
+	# not, since the floor is `>=' and not `=='.
+	#
+	# *The lesson is the one the first version already carried and the
+	# second only half took*: a control made of a FINDING expires when
+	# the finding is fixed, and the honest move each time is to
+	# re-point it at what is now true rather than to loosen it.  What
+	# changes here is that the thing now true is a RESULT, so the
+	# control has become a regression gate on it.
+	MINOK=44
 	set -- $(compile_pkg unrar 2>"$OUT/ctl.err")
 	if [ $# -ne 2 ]; then
 		echo "cxxapp-host: ***THE CONTROL DID NOT RUN.***  compile_pkg gave" >&2
@@ -249,23 +274,23 @@ if [ "${1:-}" = "--control" ]; then
 	fi
 	ok=$1; bad=$2
 	echo "control: unrar $ok compiled, $bad failed"
-	if [ "$ok" -lt "$MINOK" ]; then
-		echo "cxxapp-host: ***THE CONTROL FIRED.***  Only $ok of unrar's" >&2
-		echo "cxxapp-host: objects compiled, under the floor of $MINOK.  The" >&2
-		echo "cxxapp-host: harness, the staged shim or the predefines broke --" >&2
-		echo "cxxapp-host: this is NOT a library regression report." >&2
+	if [ "$ok" -lt "$MINOK" ] || [ "$bad" -ne 0 ]; then
+		echo "cxxapp-host: ***THE CONTROL FIRED.***  unrar built clean when" >&2
+		echo "cxxapp-host: this was written -- $MINOK objects, 0 failures -- and" >&2
+		echo "cxxapp-host: now answers $ok/$bad.  Either the library regressed," >&2
+		echo "cxxapp-host: or the harness, the staged shim or the cpfe" >&2
+		echo "cxxapp-host: predefines broke.  Run without --control: a harness" >&2
+		echo "cxxapp-host: fault fails EVERY object, a library regression a few." >&2
 		exit 1
 	fi
-	if [ "$bad" -eq 0 ] && ! grep -q 'STUBBED' "$OUT/ctl.err"; then
-		echo "cxxapp-host: ***THE CONTROL DID NOT FIRE AND THAT MAY BE GOOD" >&2
-		echo "cxxapp-host: NEWS.***  Every object compiled and no header was" >&2
-		echo "cxxapp-host: stubbed, so there is no known gap left for the" >&2
-		echo "cxxapp-host: control to require.  Check it by hand, then write" >&2
-		echo "cxxapp-host: down here that unrar builds clean -- do not just" >&2
-		echo "cxxapp-host: relax the condition." >&2
+	if grep -q 'STUBBED' "$OUT/ctl.err"; then
+		echo "cxxapp-host: ***THE CONTROL FIRED.***  A header was stubbed," >&2
+		echo "cxxapp-host: and unrar needed none when this was written.  A" >&2
+		echo "cxxapp-host: stub makes every later count optimistic, so the" >&2
+		echo "cxxapp-host: 0 failures above cannot be read." >&2
 		exit 1
 	fi
-	echo "control: the harness compiled $ok objects and still names its gaps"
+	echo "control: unrar still builds clean, $ok objects and no stubbed header"
 	exit 0
 fi
 

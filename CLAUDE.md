@@ -510,15 +510,21 @@ QUESTION*** — can the library build a real package in
 `sys/src/external/c++`? It **reports rather than gates**, reads the
 object list and the `-D` set from the package's OWN makefile, STUBS a
 missing header and ANNOUNCES the stub, and its control is a compile
-FLOOR plus a named gap. unrar is 42 of 44; the four faults that each
-gave a result-shaped non-result are in the ports list above, and so is
-what it was worth, which was not the missing name it was looking for.
-**`cxx-wstring-test.cpp` is what came out of it**, and the one test
-here whose subject is a COINCIDENCE: six library sites pass an element
-count where `memcpy` wants bytes, and `sizeof(char)` being 1 made
-every one of them correct for the only character type anything tested.
-Three arms — subject 0, **libstdc++ as the reference for one flag**
-(`-DREFERENCE`), pre-fix headers 21.
+compile FLOOR plus, now, `bad == 0` and no stub — **unrar is 44 of
+44**, so the control has become a regression gate on a result rather
+than on a finding. The four harness faults that each gave a
+result-shaped non-result are in the ports list above, and so is what
+the harness was WORTH, which was not the missing name it was looking
+for. **Two tests came out of it, and both found something no
+compile-only check could**: `cxx-wstring-test.cpp`, the one test here
+whose subject is a COINCIDENCE — six library sites pass an element
+count where `memcpy` wants bytes, and `sizeof(char)` being 1 made every
+one correct for the only character type anything tested — and
+`cxx-striter-test.cpp`, **whose control had to be SPLIT** because the
+whole file cannot compile against the pre-fix headers, so
+`-DCONTROL_SECTION2_ONLY` leaves the one section that gives a wrong
+ANSWER rather than a wrong diagnostic. Both carry **libstdc++ as the
+reference for one flag** (`-DREFERENCE`).
 
 ***AND `cpp-xcheck/` IS THE CHEAPEST INSTRUMENT IN THIS TREE***:
 `cpp-xcheck.sh` builds kencc's OWN `cpp` with gcc on the build host and
@@ -1979,13 +1985,39 @@ silent:
   nine SIBLINGS, passes every line of section 1 and fails every line
   of section 2, because `catch (std::logic_error &)` must catch a
   thrown `length_error`. **unrar is 43 of 44.**
-  What is left is `basic_string`'s iterator-pair overloads, which
-  `to_address` the first element and copy a BLOCK — so they reject an
-  iterator whose `value_type` merely converts (unrar's
-  `unsigned char *`) and ***would be silently wrong for a
-  NON-CONTIGUOUS one***, which the `input_iterator_tag` guard admits.
-  In 0.6's inventory with the mechanism, along with the missing
-  `(char const *)` constructors and re2c's ten missing headers.
+  ***AND THE FOURTH WAS THE ITERATOR-PAIR OVERLOADS, WHOSE LOUD HALF
+  WAS THE LUCKY ONE.*** They `to_address`ed the first element and
+  copied a BLOCK, so they rejected an iterator whose `value_type`
+  merely CONVERTS (unrar's `unsigned char *`, and the diagnostic then
+  named the wrong constructor) and ***were SILENTLY WRONG for a
+  non-contiguous one*** — `to_address` on a `list` iterator answers an
+  address inside one node, measured at **66 bytes of the wrong memory
+  at the right length**. A per-element loop now, with the reserve
+  TAG-DISPATCHED on `has_forward_iterator_category`, *because a
+  single-pass iterator cannot be measured and then read* — which is
+  the whole design constraint and why `cxx-striter-test.cpp` carries a
+  hand-written input iterator with no `operator->`. **Its control had
+  to be SPLIT**: the whole file does not compile against the pre-fix
+  headers (19 errors), so `-DCONTROL_SECTION2_ONLY` drops the two
+  sections needing the fix and the remaining one reports 3 failures
+  with the garbage printed — *a control that can only say "it did not
+  build" cannot tell this bug's silent half from its loud one.*
+  ***unrar IS 44 OF 44 NOW***, four rounds and four library gaps
+  (`to_wstring`, `<stdexcept>`, the iterator pair, `<deque>`), **and
+  two of the four were silent, which a compile-only harness cannot
+  see**: it named the loud half and the tests found the rest. `<deque>`
+  is fixed in UNRAR rather than the library, the include being unused
+  there — shipping one that declares nothing is what EDG's empty
+  `<stdexcept>` already did to this port. **Not measured**: the link,
+  the C side, cpfe's acceptance, run time; there is no unrar mkfile
+  yet. **re2c has not moved** — ten missing headers and no `makefile`
+  to read an object list from, both in 0.6's inventory with the missing
+  `(char const *)` constructors.
+  ***AND `--control` EXPIRED A SECOND TIME, EXACTLY AS ITS OWN COMMENT
+  SAID***: with no gap left to require it printed its "this may be good
+  news" branch and exited 1. It asserts the MEASURED STATE now — 44
+  objects, 0 failures, no stubbed header — so it has become a
+  regression gate on a result.
   ***AND `cxxapp-host.sh --control` IS STRUCTURAL NOW***: its first
   version required the harness to still report `to_wstring` missing,
   `to_wstring` was added, the control failed, and **what it was
