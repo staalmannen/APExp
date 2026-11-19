@@ -89,11 +89,22 @@
  * value*, and the Cfront regeneration wall recorded below is not in
  * the way of them.
  *
- * They are live settings now, in `src/target.c', because unrar's 49
- * objects collided at the link on every `inline' entity they share:
- * `_ZSt11memcpy_implPvPKvy' is a plain inline function and no
- * template at all, so `--instantiate local' could never reach it.
- * See that file for the mechanism and the cost.
+ * ***THEY ARE INERT TODAY AND THAT IS MEASURED***: the round that set
+ * them predicted the unrar link would stop colliding, and the same
+ * `redefinition' list came back byte for byte.
+ * `lower_il.c:61268' explains it -- `lower_extern_inline_routine' is
+ * `if (!suppress_inline_body) put_routine_into_comdat_group(...)' and
+ * nothing else, UNCONDITIONAL, because the other arm was compiled out
+ * when this corpus was generated under
+ * `LINKER_CAN_DISCARD_DUPLICATE_DEFINITIONS' 1.  *A setting named in
+ * a header is not a setting the generated code still reads.*
+ *
+ * They are kept so the two files agree and so a regeneration inherits
+ * the right value.  **What actually links a multi-file C++ program is
+ * `-C' on the generated C** (`cc/cc.h:649', `6c/txt.c:1518'), which
+ * marks every TEXT and GLOBL `DUPOK' and lets `6l' discard the
+ * duplicates -- the same flag `cmd/edg/mkfile' has always used to
+ * link cpfe itself.
  */
 #define INSTANTIATE_EXTERN_INLINE                1
 #define INSTANTIATE_INLINE_VARIABLES             1

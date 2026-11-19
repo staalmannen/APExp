@@ -3436,3 +3436,62 @@ and the link either succeeds or stops on something else — a genuinely
 undefined symbol, or exceptions. *Refuted by the same list*, which
 would say the setting is not read on this path rather than that it is
 the wrong setting.
+
+### The prediction was refuted, and the fix was already in the tree
+
+`INSTANTIATE_EXTERN_INLINE` did not move it. The refutation condition
+written down was "the same `redefinition` list", and that is what came
+back, byte for byte.
+
+***THE BRANCH IT SWITCHES IS NOT IN THIS CORPUS.*** `lower_il.c:61268`
+is the whole of `lower_extern_inline_routine`:
+
+    if (!routine->suppress_inline_body)
+      put_routine_into_comdat_group(routine);
+
+Unconditional, no flag in it. The corpus was generated with
+`LINKER_CAN_DISCARD_DUPLICATE_DEFINITIONS` 1 and **the other arm was
+compiled out at generation time** — that macro survives in 2.9M lines
+only as a *string* in a `#define` dump (`cmd_line.c:17433`), never as a
+variable. *A setting named in a header is not a setting the generated
+code still reads*, and that is what `kencc_targ.h`'s "reachable by
+REGENERATING the macro configuration" means from the inside.
+
+***AND THEN THE LINKER TURNED OUT TO HAVE DONE IT ALL ALONG.***
+`6l/obj.c:995` is
+
+    if(p->from.scale & DUPOK) { skip = 1; goto casdef; }
+
+on a duplicate `ATEXT`, with `DUPOK` `(1<<1)` in eight `*.out.h` —
+Plan 9's object format has had COMDAT's semantics the whole time. And
+**`-C` already exists to set it from C** (`cc/cc.h:649`,
+`6c/txt.c:1518`), *added for this very corpus*: its own documentation
+counts **3,124 symbols defined in more than one of 75 objects and
+6,410 surplus definitions**, with `edg::skip_typerefs` emitted 41
+times, and quotes the identical symptom — `redefinition:` until `too
+many errors`.
+
+**`cmd/edg/mkfile:255` is `CFLAGS= -c -C`, and its line 95 says "`-C`
+IS WHY THIS LINKS AT ALL".** cpfe itself has linked only because of it
+since the day it was written. ***`eccp`, which compiles the same kind
+of generated C for everyone else, never passed it*** — and nothing
+could notice, because no multi-TU C++ program had ever been linked
+here. One word.
+
+**It goes on the generated C only.** `-C` is per translation unit and
+blunt — it marks every TEXT and GLOBL, not the vague-linkage ones — so
+it belongs where every duplicate is one EDG deliberately emitted many
+times. Stage 2 compiles the caller's own `.c`, where a duplicate symbol
+is a bug and the diagnostic is the point.
+
+**Independent corroboration, from the other direction**: the host build
+of cpfe (`cpfe-host.sh`) stops before its link with exactly the same
+problem, and the remedy recorded there is GNU ld's
+`--allow-multiple-definition`. *The same corpus needs the same
+accommodation from two unrelated linkers*, which is what says this is
+intrinsic to a C++ front end lowered to C rather than a setting anyone
+mis-set.
+
+The two `INSTANTIATE_*` settings stay — the files must agree for
+`edgtarg-sweep.py` and the value is right for any regeneration — with
+their comments corrected to say they are inert today.
