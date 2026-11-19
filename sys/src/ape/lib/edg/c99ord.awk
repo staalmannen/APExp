@@ -63,6 +63,25 @@
 # is what says the awk brace counting is right rather than merely
 # plausible.
 #
+# **AND IT MUST BE ONE-TRUE-AWK, NOT gawk, FOR A BUILD-ORDER REASON.**
+# In APExp `awk' and `gawk' are different programs: `/bin/awk' is
+# 9front's own and `gawk' is what `sys/src/ape/cmd/awk' installs --
+# and the top-level mkfile builds `sys/src/ape/lib' BEFORE
+# `sys/src/ape/cmd', so **on a clean tree gawk does not exist yet
+# when this directory builds**.  The recipe therefore says `awk', and
+# nothing here may use a gawk extension.  (Longest input line is 301
+# characters, so no record-size question arises either.)
+#
+# **THE SUMMARY IS A TRAILING C COMMENT AND NOT A WRITE TO stderr**,
+# which is the one thing that changed after the first VM run.  An
+# earlier draft ended `| "cat 1>&2"', and a pipe in awk goes through
+# whatever shell that awk's `popen' execs -- `rc' for the Plan 9 one,
+# where `1>&2' is not redirection syntax at all but a parse error.
+# *It worked when run by hand from bash, which says nothing about a
+# recipe mk hands to rc.*  Writing it into the output instead removes
+# the shell from the question entirely and leaves the provenance in
+# the artifact, where `grep c99ord c99ord.c' finds it.
+#
 # ---- WHAT IT PRODUCES, MEASURED ON THE HOST --------------------------
 #
 #	273 top-level constructs, 96 kept, 177 dropped
@@ -114,5 +133,5 @@ BEGIN { depth = 0; buf = ""; kept = 0; dropped = 0 }
 }
 END {
 	if (buf != "") printf "%s", buf
-	printf "c99ord: kept %d dropped %d\n", kept, dropped | "cat 1>&2"
+	printf "\n/* c99ord: kept %d dropped %d */\n", kept, dropped
 }
