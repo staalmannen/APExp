@@ -134,9 +134,21 @@ this is the whole record, including the wrong turns.*
     **`mk -k install` ANSWERED: 50 OF 51 COMPILE, AND ONLY
     `c99_complex.c` FAILS** -- predicted by name and by token
     (`syntax error, last name: _Float16`). Commented out of OFILES
-    now the measurement is taken; a C++ front end has no use for a
-    `_Complex` runtime, and the extended floats drag libgcc's
-    soft-float family in behind them.
+    at the time, on the reading that a C++ front end has no use for a
+    `_Complex` runtime -- ***AND THAT READING CONFLATED cpfe WITH
+    EVERYTHING `eccp` COMPILES***. It is seven families of sixteen
+    operations and only four are out of reach, so dropping the file
+    dropped `float`, `double` and `long_double` with them, and a
+    translation unit using `_Complex double` link-failed on
+    `__c99_complex_double_multiply`. **`lib/edg/c99ord.awk` splits it
+    structurally** -- whole top-level constructs by brace depth, 273
+    constructs, 96 kept, 177 dropped, **42 symbols** -- and
+    `c99ord.$O` is in OFILES, `pcc -c` clean on the VM. *A LINE filter
+    was tried first and keeps exactly the right 48 names and then does
+    not compile*, the file not being one-definition-per-line
+    throughout. The extended floats stay out: they drag libgcc's
+    soft-float family in behind them, and teaching kencc the four
+    types is costed in 0.6's inventory as the wrong trade.
     **AND THE TWO `__thread` PREDICTIONS WERE WRONG, WHICH IS THE MORE
     USEFUL HALF.** I checked EDG's constructs against C dialects FROM
     MEMORY rather than against the compiler in this repository, where

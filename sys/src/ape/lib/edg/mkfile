@@ -111,19 +111,29 @@ EDGSRC=../../../external/edg/lib_src
 # cheap version was tried and it failed, which is why the cost is
 # written down rather than guessed at.*  In 0.6's inventory.
 #
-# ***AND THE STRUCTURAL SPLIT DOES WORK: SEE `c99ord.awk' BESIDE THIS
-# FILE.***  Whole top-level constructs by brace depth rather than
-# lines: 273 constructs, 96 kept, 177 dropped, `gcc -std=c89 -c'
-# clean, **42 symbols -- float, double and long_double with all eight
-# operations each, plus the 18 conversions among them**.  Written
-# against a python reference whose output it matches BYTE FOR BYTE,
-# and in awk because there is no python on the VM.
+# ***AND THE STRUCTURAL SPLIT DOES WORK, AND IS IN `OFILES' AS
+# `c99ord.$O': SEE `c99ord.awk' BESIDE THIS FILE.***  Whole top-level
+# constructs by brace depth rather than lines: 273 constructs, 96
+# kept, 177 dropped, `gcc -std=c89 -c' clean, **42 symbols -- float,
+# double and long_double with all eight operations each, plus the 18
+# conversions among them**.  Written against a python reference whose
+# output it matches BYTE FOR BYTE, and in awk because there is no
+# python on the VM.
 #
-# **It is deliberately NOT in `OFILES' yet**: `pcc' is not `gcc', and
-# one failing member aborts the whole tree's `mk' -- the same hazard
-# this comment already cites.  `c99ord.awk''s header has the single
-# command that settles it; clean, and the rule and the `OFILES' entry
-# go in together.
+# **IT WAS HELD OUT OF `OFILES' FOR ONE ROUND AND THAT WAS THE POINT**:
+# `pcc' is not `gcc', one failing member aborts the whole tree's `mk',
+# and a file compiled by only one compiler has not been measured in
+# the position it is about to occupy -- the exact hazard this comment
+# already cites for `c99_complex.$O' itself.  `pcc -c' on the VM is
+# clean, so the rule and the entry went in together.
+#
+# **THE GENERATED `c99ord.c' IS BUILD OUTPUT AND `clean' REMOVES IT**,
+# which is not tidiness: `mksyslib''s `clean' is `rm -f *.[$OS]' and
+# touches neither `$LIB' nor anything else, so a stale `c99ord.c' left
+# beside the mkfile would be rebuilt-over silently and a RENAMED or
+# re-split source would leave its object in the archive for ever --
+# this tree's `mcontext.6' trap, which `ar vu' replacing members by
+# NAME is what makes permanent.
 #
 # **Teaching kencc the four extended types instead was costed and is
 # the wrong trade**: `specbits-model.py' says 7 spare type bits so the
@@ -188,7 +198,7 @@ OFILES=\
 	array_pdel.$O\
 	array_pnew.$O\
 	bad_alloc.$O\
-#	c99_complex.$O\
+	c99ord.$O\
 	del_virt.$O\
 	delete.$O\
 	delete_aligned.$O\
@@ -260,6 +270,29 @@ CFLAGS= -c -C
 
 %.$O: $EDGSRC/%.c
 	$CC $CFLAGS $EDGSRC/$stem.c
+
+# `c99ord.c' IS GENERATED HERE and is the only member of this archive
+# that is not a file somebody can open in the source tree.  The split
+# itself, what it keeps and why teaching kencc the four extended float
+# types is the wrong trade are all in `c99ord.awk''s own header; what
+# belongs here is only how it is built.
+#
+# IT IS A SEPARATE TARGET FROM THE OBJECT so that `mk' rebuilds the
+# split when EITHER input moves -- the upstream file or the splitter.
+# Folding both steps into one recipe would make the awk script
+# invisible to mk, and a change to the filter would then produce the
+# PREVIOUS object with no diagnostic from anyone: the `HFILES' shape,
+# one level up.
+#
+# `-C' IS RIGHT HERE for the same reason it is right on the pattern
+# rule above: this is EDG's generated C with 177 constructs removed,
+# not a file anybody wrote, so a duplicate is the same entity by
+# construction.
+c99ord.c: $EDGSRC/c99_complex.c c99ord.awk
+	awk -f c99ord.awk $EDGSRC/c99_complex.c >c99ord.c
+
+c99ord.$O: c99ord.c
+	$CC $CFLAGS c99ord.c
 
 # `main.c' IS RENAMED, AND IT IS WHY cpfe CRASHED ON EVERY RUN.
 # `lib_src/main.c' defines `void _main(void)' -- EDG's static-init
@@ -348,7 +381,7 @@ dso_handle.$O: dso_handle.c
 	$CC -c dso_handle.c
 
 clean:V:
-	rm -f *.[$OS]
+	rm -f *.[$OS] c99ord.c
 
 nuke:V:
 	rm -f $LIB

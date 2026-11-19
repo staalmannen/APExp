@@ -63,6 +63,25 @@
 # is what says the awk brace counting is right rather than merely
 # plausible.
 #
+# **AND IT MUST BE ONE-TRUE-AWK, NOT gawk, FOR A BUILD-ORDER REASON.**
+# In APExp `awk' and `gawk' are different programs: `/bin/awk' is
+# 9front's own and `gawk' is what `sys/src/ape/cmd/awk' installs --
+# and the top-level mkfile builds `sys/src/ape/lib' BEFORE
+# `sys/src/ape/cmd', so **on a clean tree gawk does not exist yet
+# when this directory builds**.  The recipe therefore says `awk', and
+# nothing here may use a gawk extension.  (Longest input line is 301
+# characters, so no record-size question arises either.)
+#
+# **THE SUMMARY IS A TRAILING C COMMENT AND NOT A WRITE TO stderr**,
+# which is the one thing that changed after the first VM run.  An
+# earlier draft ended `| "cat 1>&2"', and a pipe in awk goes through
+# whatever shell that awk's `popen' execs -- `rc' for the Plan 9 one,
+# where `1>&2' is not redirection syntax at all but a parse error.
+# *It worked when run by hand from bash, which says nothing about a
+# recipe mk hands to rc.*  Writing it into the output instead removes
+# the shell from the question entirely and leaves the provenance in
+# the artifact, where `grep c99ord c99ord.c' finds it.
+#
 # ---- WHAT IT PRODUCES, MEASURED ON THE HOST --------------------------
 #
 #	273 top-level constructs, 96 kept, 177 dropped
@@ -73,19 +92,27 @@
 #	nothing undefined but `__stack_chk_fail', which is gcc's own
 #	stack protector and does not exist under kencc
 #
-# ---- WHY IT IS NOT IN `OFILES' YET -----------------------------------
+# ---- AND IT IS IN `OFILES', MEASURED ---------------------------------
 #
-# **pcc is not gcc, and one failing member aborts the whole tree's
-# `mk'** -- which is the exact hazard the comment above `OFILES' cites
-# for leaving `c99_complex.$O' in.  A port that has only been built by
-# one compiler has not been measured in that position.  The one
-# command that settles it:
+# It was held out for one round, and that was the point: **pcc is not
+# gcc, and one failing member aborts the whole tree's `mk'** -- the
+# exact hazard the comment above `OFILES' cites for leaving
+# `c99_complex.$O' in -- so a file compiled by only one compiler had
+# not been measured in the position it was about to occupy.  The one
+# command that settles it, run on the VM:
 #
 #	cd sys/src/ape/lib/edg
 #	awk -f c99ord.awk ../../../external/edg/lib_src/c99_complex.c >/tmp/c99ord.c
 #	pcc -c /tmp/c99ord.c
 #
-# Clean, and the rule and the `OFILES' entry go in together.
+# Clean -- `c99ord: kept 96 dropped 177' on stderr and nothing from
+# `pcc' -- so the mkfile rule and the `OFILES' entry went in together.
+#
+# **The mkfile builds `c99ord.c' as its OWN target** rather than
+# folding the awk into the compile, so that `mk' rebuilds the split
+# when either input moves.  A one-recipe version hides this script
+# from mk, and then a change to the filter yields the PREVIOUS object
+# with no diagnostic from anyone.
 #
 # Keep only the ordinary float/double/long_double families of EDG's
 # `_Complex' helper runtime, dropping every top-level construct that
@@ -106,5 +133,5 @@ BEGIN { depth = 0; buf = ""; kept = 0; dropped = 0 }
 }
 END {
 	if (buf != "") printf "%s", buf
-	printf "c99ord: kept %d dropped %d\n", kept, dropped | "cat 1>&2"
+	printf "\n/* c99ord: kept %d dropped %d */\n", kept, dropped
 }
