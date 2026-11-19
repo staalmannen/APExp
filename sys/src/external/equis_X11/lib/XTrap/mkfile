@@ -1,0 +1,18 @@
+X11=/sys/src/ape/X11
+<$X11/config
+
+LIB=$X11LIB/libXTrap.a
+
+OFILES=\
+	XECallBcks.$O\
+	XEConTxt.$O\
+	XEDsptch.$O\
+	XEPrInfo.$O\
+	XERqsts.$O\
+	XEStrMap.$O\
+	XETrapInit.$O\
+	XEWrappers.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I.

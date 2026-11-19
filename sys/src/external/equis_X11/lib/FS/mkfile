@@ -1,0 +1,35 @@
+X11=/sys/src/ape/X11
+<$X11/config
+
+LIB=$X11LIB/libFS.a
+
+OFILES=\
+	FSClServ.$O\
+	FSCloseFt.$O\
+	FSConnServ.$O\
+	FSErrDis.$O\
+	FSErrHndlr.$O\
+	FSFlush.$O\
+	FSFontInfo.$O\
+	FSFtNames.$O\
+	FSGetCats.$O\
+	FSListCats.$O\
+	FSListExt.$O\
+	FSMisc.$O\
+	FSNextEv.$O\
+	FSOpenFont.$O\
+	FSOpenServ.$O\
+	FSQGlyphs.$O\
+	FSQXExt.$O\
+	FSQXInfo.$O\
+	FSQuExt.$O\
+	FSServName.$O\
+	FSSetCats.$O\
+	FSSync.$O\
+	FSSynchro.$O\
+	FSlibInt.$O\
+	fs_transport.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I. -I/sys/include/ape/X11/fonts/  -DFS_t -DTRANS_CLIENT

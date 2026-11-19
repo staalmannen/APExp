@@ -1,0 +1,21 @@
+X11=/sys/src/ape/X11
+<$X11/config
+
+LIB=$X11LIB/libX11.a
+
+OFILES=\
+	Utf8/lcUTF8Load.$O\
+	def/lcDefConv.$O\
+	gen/lcGenConv.$O\
+	xlocale/lcEuc.$O\
+	xlocale/lcJis.$O\
+	xlocale/lcSjis.$O\
+
+CLEANFILES=$OFILES
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I../../src -I../../src/xcms -I../../src/xkb -I../../src/xlibi18n  -I/sys/include/ape/X11
+
+%.$O: %.c
+	$CC  $CFLAGS -o $stem.$O $stem.c

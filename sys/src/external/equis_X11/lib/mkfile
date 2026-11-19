@@ -1,0 +1,10 @@
+#DIRS=FS Xau Xdmcp Xext Xfont Xi fontenc pixman
+DIRS=`{ls -l | sed '/^d/!d; s/.* //; /\./d'}
+
+default:V:	all
+
+all clean nuke install installall:V:
+	for (i in $DIRS) @{
+		cd $i
+		mk $target
+	}

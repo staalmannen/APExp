@@ -1,0 +1,163 @@
+X11=/sys/src/ape/X11
+<$X11/config
+
+LIB=$X11LIB/libXfont.a
+
+OFILES=\
+# FreeType \
+	ftenc.$O\
+	ftfuncs.$O\
+	ftsystem.$O\
+	fttools.$O\
+	xttcap.$O\
+# Speedo \
+	bics-unicode.$O\
+	do_char.$O\
+	do_trns.$O\
+	out_bl2d.$O\
+	out_blk.$O\
+	out_outl.$O\
+	out_scrn.$O\
+	out_util.$O\
+	reset.$O\
+	set_spcs.$O\
+	set_trns.$O\
+	spencode.$O\
+	sperr.$O\
+	spfile.$O\
+	spfont.$O\
+	spfuncs.$O\
+	spglyph.$O\
+	spinfo.$O\
+# Type1 \
+	arith.$O\
+	curves.$O\
+	fontfcn.$O\
+	hints.$O\
+	lines.$O\
+	objects.$O\
+	paths.$O\
+	regions.$O\
+	scanfont.$O\
+	spaces.$O\
+	t1funcs.$O\
+	t1info.$O\
+	t1io.$O\
+	t1malloc.$O\
+	t1snap.$O\
+	t1unicode.$O\
+	token.$O\
+	type1.$O\
+	util.$O\
+# bitmap \
+	bdfread.$O\
+	bdfutils.$O\
+	bitmap.$O\
+	bitmapfunc.$O\
+	bitmaputil.$O\
+	bitscale.$O\
+	fontink.$O\
+	pcfread.$O\
+	pcfwrite.$O\
+	snfread.$O\
+# builtins \
+	dir.$O\
+	file.$O\
+	fonts.$O\
+	fpe.$O\
+	render.$O\
+# dummy \
+	dummy.$O\
+# fc \
+	fsconvert.$O\
+	fserve.$O\
+	fsio.$O\
+	fstrans.$O\
+# fontcache \
+	fontcache.$O\
+# fontfile \
+	bitsource.$O\
+	bufio.$O\
+	catalogue.$O\
+	decompress.$O\
+	defaults.$O\
+	dirfile.$O\
+	ffcheck.$O\
+	fileio.$O\
+	filewr.$O\
+	fontdir.$O\
+	fontencc.$O\
+	fontfile.$O\
+	fontscale.$O\
+	gunzip.$O\
+	printerfont.$O\
+	register.$O\
+	renderers.$O\
+# stubs \
+	cauthgen.$O\
+	csignal.$O\
+	delfntcid.$O\
+	errorf.$O\
+	fatalerror.$O\
+	findoldfnt.$O\
+	fontmod.$O\
+	getcres.$O\
+	getdefptsize.$O\
+	getnewfntcid.$O\
+	gettime.$O\
+	initfshdl.$O\
+	regfpefunc.$O\
+	rmfshdl.$O\
+	servclient.$O\
+	setfntauth.$O\
+	stfntcfnt.$O\
+	xpstubs.$O\
+# util \
+	atom.$O\
+	fontaccel.$O\
+	fontnames.$O\
+	fontutil.$O\
+	fontxlfd.$O\
+	format.$O\
+	miscutil.$O\
+	patcache.$O\
+	private.$O\
+	utilbitmap.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I. -I/sys/include/ape/X11/fonts
+
+%.$O: FreeType/%.c
+	$CC $CFLAGS -o $target FreeType/$stem.c
+
+%.$O: Speedo/%.c
+	$CC $CFLAGS -o $target Speedo/$stem.c
+
+%.$O: Type1/%.c
+	$CC $CFLAGS -o $target Type1/$stem.c
+
+%.$O: bitmap/%.c
+	$CC $CFLAGS -o $target bitmap/$stem.c
+
+%.$O: builtins/%.c
+	$CC $CFLAGS -o $target builtins/$stem.c
+
+%.$O: dummy/%.c
+	$CC $CFLAGS -o $target dummy/$stem.c
+
+%.$O: fc/%.c
+	$CC $CFLAGS -o $target fc/$stem.c
+
+%.$O: fontcache/%.c
+	$CC $CFLAGS -o $target fontcache/$stem.c
+
+%.$O: fontfile/%.c
+	$CC $CFLAGS -D'FONT_ENCODINGS_DIRECTORY="/sys/lib/ape/X11/fonts/encodings/encodings.dir"' -o $target fontfile/$stem.c
+
+%.$O: stubs/%.c
+	$CC $CFLAGS -o $target stubs/$stem.c
+
+%.$O: util/%.c
+	$CC $CFLAGS -Istubs -o $target util/$stem.c
+

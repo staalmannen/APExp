@@ -1,0 +1,12 @@
+X11=/sys/src/ape/X11
+<$X11/config
+
+LIB=$X11LIB/libXprintUtil.a
+
+OFILES=\
+	xprintutil.$O\
+	xprintutil_printtofile.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I. -I/sys/include/ape/X11/XprintUtil

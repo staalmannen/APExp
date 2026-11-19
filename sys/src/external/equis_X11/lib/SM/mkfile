@@ -1,0 +1,17 @@
+X11=/sys/src/ape/X11
+<$X11/config
+
+LIB=$X11LIB/libSM.a
+
+OFILES=\
+	sm_auth.$O\
+	sm_client.$O\
+	sm_error.$O\
+	sm_genid.$O\
+	sm_manager.$O\
+	sm_misc.$O\
+	sm_process.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I.

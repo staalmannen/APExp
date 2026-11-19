@@ -1,0 +1,34 @@
+X11=/sys/src/ape/X11
+<$X11/config
+
+LIB=$X11LIB/libpixman.a
+
+OFILES=\
+	pixman-compose-accessors.$O\
+	pixman-compose.$O\
+	pixman-compute-region.$O\
+	pixman-edge-accessors.$O\
+	pixman-edge.$O\
+	pixman-image.$O\
+	pixman-mmx.$O\
+	pixman-pict.$O\
+	pixman-region.$O\
+	pixman-timer.$O\
+	pixman-trap.$O\
+	pixman-utils.$O\
+
+HFILES=\
+	/sys/include/ape/X11/pixman.h\
+
+UPDATE=\
+	mkfile\
+	$HFILES\
+	${OFILES:%.$O=%.c}\
+	${LIB:/$objtype/%=/386/%}\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I. -D_SUSV2_SOURCE
+
+$O.fetch-test: fetch-test.$O $LIB
+	$LD -o $target $prereq

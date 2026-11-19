@@ -1,0 +1,75 @@
+X11=/sys/src/ape/X11
+<$X11/config
+
+LIB=$X11LIB/libXt.a
+
+OFILES=\
+	ActionHook.$O\
+	Alloc.$O\
+	ArgList.$O\
+	Callback.$O\
+	ClickTime.$O\
+	Composite.$O\
+	Constraint.$O\
+	Convert.$O\
+	Converters.$O\
+	Core.$O\
+	Create.$O\
+	Destroy.$O\
+	Display.$O\
+	Error.$O\
+	Event.$O\
+	EventUtil.$O\
+	Functions.$O\
+	GCManager.$O\
+	Geometry.$O\
+	GetActKey.$O\
+	GetResList.$O\
+	GetValues.$O\
+	HookObj.$O\
+	Hooks.$O\
+	Initialize.$O\
+	Intrinsic.$O\
+	Keyboard.$O\
+	Manage.$O\
+	NextEvent.$O\
+	Object.$O\
+	PassivGrab.$O\
+	Pointer.$O\
+	Popup.$O\
+	PopupCB.$O\
+	RectObj.$O\
+	ResConfig.$O\
+	Resources.$O\
+	Selection.$O\
+	SetSens.$O\
+	SetValues.$O\
+	SetWMCW.$O\
+	Shell.$O\
+	TMaction.$O\
+	TMgrab.$O\
+	TMkey.$O\
+	TMparse.$O\
+	TMprint.$O\
+	TMstate.$O\
+	Threads.$O\
+	VarCreate.$O\
+	VarGet.$O\
+	Varargs.$O\
+	Vendor.$O\
+	sharedlib.$O\
+	StringDefs.$O\
+
+CLEANFILES=\
+	$O.makestrs\
+	StringDefs.c\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I. -I/sys/include/ape/X11
+
+StringDefs.c: $O.makestrs
+	./$O.makestrs -i . < util/string.list > StringDefs.c
+
+$O.makestrs: util/makestrs.c
+	$CC -D_POSIX_SOURCE -D_BSD_EXTENSION -o $target $prereq

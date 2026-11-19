@@ -1,0 +1,16 @@
+X11=/sys/src/ape/X11
+<$X11/config
+
+LIB=$X11LIB/libXaw.a
+
+OFILES=\
+	`{cat ../common}\
+	PrintShell.$O\
+	Tip.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I. -I/sys/include/ape/X11/Xaw
+
+%.$O: ../%.c
+	$CC $CFLAGS ../$stem.c

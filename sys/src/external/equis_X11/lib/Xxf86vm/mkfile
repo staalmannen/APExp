@@ -1,0 +1,11 @@
+X11=/sys/src/ape/X11
+<$X11/config
+
+LIB=$X11LIB/libXxf86vm.a
+
+OFILES=\
+	XF86VMode.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I.
