@@ -2079,11 +2079,28 @@ silent:
   and **every reading of the tree says that cannot happen**
   (`stdarg_arch.h` defines it, both wrappers chain to it,
   `mount-include` binds them, nothing else defines `__STDARG`). Not
-  guessed: `cxx-stdarg-probe.cpp` asks, `--trace_includes` names the
-  file in one command, and **the C side splits the answer in half**
-  since `pcc` searches the same roots in the same order — C right and
-  C++ wrong is cpfe's, both wrong is the header or the bind and has
-  been true for every C program all along.
+  guessed: `cxx-stdarg-probe.cpp` asks, and **it answered** —
+  `__STDARG` is NOT defined, so neither APExp's `stdarg_arch.h` nor
+  stock 9front's (same guard, which is how it once DISABLED APExp's)
+  was read, while `va_list` is a type **cpfe enters itself**
+  (`symbol_tbl.c:33309`) and `va_start`/`va_arg`/`va_end` are its
+  builtins. *Four of the five names work with no header at all*, which
+  is why only the fifth failed. What is open is whether `<stdarg.h>`
+  was opened at all; `--trace_includes` (cpfe's `-H`) names every file
+  it opens, and **the C side splits the answer in half** since `pcc`
+  searches the same roots in the same order — C right and C++ wrong is
+  cpfe's, both wrong is the header or the bind and has been true for
+  every C program all along.
+  ***AND THE RUN THAT ANSWERED IT WAS INVALID AS A DUMP, WHICH IS THE
+  INSTRUMENT HALF***: **`eccp -F` is NOT a preprocess** — it is cpfe
+  doing a FULL TRANSLATION that stops before `cc` — and **`eccp` had
+  no `-E` at all**, so a probe written to be read after the
+  preprocessor was compiled instead and reported its own syntax. `-E`
+  runs cpfe's `--preprocess` now, to STDOUT and deliberately not to
+  `-o`, since a redirection inside the driver creates the target
+  whatever the command does. *And the dump lost its second question to
+  a parse CASCADE*, so the probe is a RUNNABLE PROGRAM now: every
+  question an `#ifdef` printing its own line, all reached in one run.
   ***AND IT IS `cxxapp-host.sh`'s OWN STATED LIMIT BITING***: it
   compiles against the HOST's C headers, glibc's `<stdarg.h>` has
   `va_copy`, so all 49 files compile clean there and always will. *A

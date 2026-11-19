@@ -1630,14 +1630,37 @@ the header or the bind, and would have been true for every C program all
 along, since nothing in this tree has needed `va_copy` before. *A probe
 that can only ask one of two toolchains answers half a question.*
 
-**Its own fault, caught on the host before it shipped**: the `PROBE_`
-lines are not valid C++, so a plain compile reported six errors of the
-probe's own making rather than reproducing unrar's one. They are behind
-`-DCXX_STDARG_PROBE_DUMP` now, so `-F` dumps and a compile reproduces.
-*A probe whose own syntax is the first thing to fail cannot report
-anything about its subject.* The brackets come from the same host run:
-gcc splits a macro expansion across lines, so verbatim-versus-expanded
-has to be readable without matching whole lines.
+***AND THE WHOLE DUMP DESIGN WAS WRONG, WHICH THE FIRST VM RUN
+SHOWED.***  The `PROBE_x [subject]` lines were to be read after the
+preprocessor and were guarded behind a `-D` so a compile would not see
+them -- and the instruction said to pass that `-D` with `eccp -F`.
+**`-F` is not a preprocess**: it is cpfe doing a FULL TRANSLATION that
+stops before `cc`, so the guarded lines were compiled after all and the
+run reported the probe's own syntax. *`eccp` had no `-E` at all* -- a
+C++ driver without a preprocess-only mode cannot be asked what a header
+expanded to, which is the only question this probe has. It has one now.
+
+**And the dump had a third weakness the same run demonstrated**: the
+second question was lost to a PARSE CASCADE. Line 115 answered
+`__STDARG`, line 116 came back as `expected a ";"` and said nothing --
+and that was the question separating "the wrapper ran and the arch
+header was not found" from "nothing was read". *A probe that asks
+several questions in one file must not let the first answer destroy the
+rest.*
+
+So it is a **runnable program**: every question an `#ifdef` inside
+`main` printing its own line, all reached in one run, and the file
+compiles whether or not `va_copy` exists. The one case that must fail
+without it is behind `-DCXX_STDARG_PROBE_USE`, opt-in, because the point
+of the rest is to REPORT the absence rather than die of it. Checked on
+the host in both languages first: `g++` and `gcc -std=c89 -x c` each
+reach all three sections.
+
+***AND IT ANSWERED*** -- `__STDARG` undefined, so neither APExp's
+`stdarg_arch.h` nor stock 9front's (same guard) was read, while
+`va_list` is a type cpfe enters itself (`symbol_tbl.c:33309`) and
+`va_start`/`va_arg`/`va_end` are its builtins. *Four of the five names
+work with no header at all*, which is why only the fifth failed.
 
 **And it is `cxxapp-host.sh`'s stated limit biting for the first time.**
 That harness compiles against the **host's** C headers — its own header

@@ -6,8 +6,20 @@
 #
 # Usage:
 #   eccp [flags] file.cpp ...        compile and link
+#
+# ***`-E' AND `-F' ARE DIFFERENT THINGS AND THE DIFFERENCE COST A
+# ROUND.***  `-F' is cpfe doing a FULL TRANSLATION -- parse, semantic
+# analysis, the lot -- that happens to stop before `cc'; its product is
+# C, and every C++ error in the file is reported.  `-E' is the
+# preprocessor alone, cpfe's `--preprocess'.  A probe written to be
+# READ AFTER THE PREPROCESSOR was run with `-F' here and reported its
+# own non-C++ lines as errors, which is a run that measures the
+# instrument.  **There was no `-E' at all until that happened**: a C++
+# driver without a preprocess-only mode has no way to ask what a
+# header expanded to.
 #   eccp -c [flags] file.cpp ...     compile to ./<base>.$O, do not link
 #   eccp -c -o dir/x.o file.cpp      compile that one source to that path
+#   eccp -E [flags] file.cpp ...     PREPROCESS ONLY, to stdout
 #   eccp -F [flags] file.cpp         cpfe only: write the generated C
 #   eccp -K [flags] file.cpp ...     keep the generated .eccp.c intermediates
 #   eccp -o out [flags] file.cpp ... compile, link, write to out
@@ -181,13 +193,14 @@ if(~ $OBJEXT '') {
 }
 
 fn usage {
-	echo 'usage: eccp [-cFvK] [-o out] [-I dir] [-D sym] [-U sym]' \
+	echo 'usage: eccp [-cEFvK] [-o out] [-I dir] [-D sym] [-U sym]' \
 	     '[-l lib] [-L dir] [-fexceptions] [-frtti] file.cpp ...' >/fd/2
 	exit usage
 }
 
 # ---- parse arguments ----
 cflag    = ''	# -c: compile only, skip the link
+eflag    = ''	# -E: preprocess only, to stdout
 fflag    = ''	# -F: cpfe only, write the generated C
 vflag    = ''	# -v: echo each command
 kflag    = ''	# -K: keep the generated .eccp.c files
@@ -210,6 +223,8 @@ while(! ~ $#args 0) {
 	switch($a) {
 	case -c
 		cflag = 1
+	case -E
+		eflag = 1
 	case -F
 		fflag = 1
 	case -v
@@ -370,6 +385,28 @@ if(! ~ $cflag '' && ! ~ $outfile '') {
 		exit usage
 	}
 	objdir = `{dirname $outfile}
+}
+
+# ---- -E: the preprocessor alone ----
+# ***TO STDOUT, AND DELIBERATELY NOT TO `-o'.***  gcc's `-E' without
+# `-o' writes to stdout and that is what every caller of this will
+# redirect; honouring `-o' here would mean a shell redirection in the
+# driver, and *a redirection CREATES the target whatever the command
+# then does* -- the other half of the `c++lib' bug this file already
+# carries a note about, where `mk' saw a recipe that succeeded because
+# the file existed.  One less way to report a success that did not
+# happen.
+#
+# `--preprocess' is cpfe's own spelling (`cmd_line.c:8820', short form
+# `E'); `--trace_includes' (`-H') is passed through by the `--*' case
+# above and is what names the files a header search actually opened.
+if(! ~ $eflag '') {
+	for(s in $sources $cfiles) {
+		run $CPFE $cpfeopts --preprocess $s
+		st = $status
+		if(! ~ $st '') die cpfe $s
+	}
+	exit 0
 }
 
 # ---- stage 1: cpfe, C++ -> C ----
