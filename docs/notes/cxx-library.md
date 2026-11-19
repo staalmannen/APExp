@@ -3566,3 +3566,72 @@ in `lib_src`, and whether they are static in the *application's*
 generated C is the thing to look at. *A flag that suppresses a
 diagnostic can hide the bug the diagnostic would have named*, which is
 the cost side of the round that made the link work.
+
+### EH fails in ONE translation unit, and that is the useful half
+
+`eccp -fexceptions -o stdex cxx-stdexcept-test.cpp && ./stdex` prints
+its header, prints section 1's title, and aborts on the **first
+throw**:
+
+    cxx-stdexcept-test: starting
+    -- 1. the nine, each by its own name --
+    C++ runtime abort: terminate() called by the exception handling
+    mechanism
+
+So the reproducer is **one file instead of forty-nine**, and the
+cross-TU reading is dead: the `throw` and its `catch` are in the same
+function. ***`-C` is cleared as a suspect by the same datum*** — it
+was the named one for the cross-TU case, and there is no cross-TU case.
+
+**`catch (...)` not catching and a same-TU catch-by-name not catching
+are one fact**: the handler list was never consulted, so the EH stack
+was empty when the throw walked it.
+
+### What that leaves, and what it rules out
+
+* **The EH runtime is linked.** `lib/edg/mkfile`'s `OFILES` against
+  `ls lib_src/*.c` leaves out exactly one file, `c99_complex`, and
+  that deliberately. `eh_util.$O` is in, which is also why its
+  `__default_terminate` is what printed.
+* **`lib_src` pushes EH entries itself** —
+  `(__T.next) = __curr_eh_stack_entry; __curr_eh_stack_entry = &__T;`
+  appears all over `bad_alloc.c` — so the mechanism is not inert in
+  the runtime. *The per-file struct tags differ (`__C7` there, `__C8`
+  in `eh_util.c`) and that is EDG numbering its generated structs per
+  translation unit, not a disagreement.*
+
+### ***AND MY REFUTATION FROM LAST ROUND WAS ITSELF WRONG***
+
+Last round I said `-fexceptions` could not be the problem because
+`check_and_set_ansi_mode_options` (`cmd_line.c:13335`) sets
+`exceptions_enabled` unless the option was given. **Its caller is
+`if (strict_ansi_mode) ...` (`:22069`)**, and `eccp` does not pass
+`--strict_ansi`. *I read "ansi mode" as "the default standard mode"
+and it means the flag* — the same shape as reading a macro's default
+as a constraint on its value, two rounds running.
+
+**The conclusion survives by a different route, which is why it is
+worth saying rather than quietly correcting**: `--c++14` gives
+`std_version` 201402, so `cmd_line.c:12839` calls
+`check_and_set_cpp11_mode_options(1)`, whose `:12409` is
+`if (!option_kind_used[34]) exceptions_enabled = value`. Exceptions
+are on. *A right answer reached through a wrong reading is still a
+wrong reading, and the next question asked of that arm would have got
+a wrong answer.*
+
+### The next measurement, and why reading stops here
+
+Every cheap source question is now answered, and the remaining ones
+are about what cpfe actually *wrote*. `eccp -F` writes the generated
+C, so one command splits the space:
+
+    eccp -F -fexceptions -o /tmp/stdex.c sys/lib/tests/cxx-stdexcept-test.cpp
+    grep -c __curr_eh_stack_entry /tmp/stdex.c
+    grep -c setjmp /tmp/stdex.c
+
+**Both zero** → cpfe emitted no EH code after all, and the fix is to
+pass `--exceptions` positively rather than rely on a mode arm.
+**Non-zero** → the region IS pushed and the fault is at run time in
+the push/`setjmp`/throw path — and then the generated C of a
+*one-file* reproducer is in hand to read, which is the first time this
+port has had that for an EH question.

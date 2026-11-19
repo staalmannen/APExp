@@ -2301,6 +2301,38 @@ silent:
   that suppresses a diagnostic can hide the bug the diagnostic would
   have named*, which is the cost side of the round that made the link
   work.
+  ***AND THE MEASUREMENT ANSWERED: EH FAILS IN ONE TRANSLATION UNIT.***
+  `cxx-stdexcept-test` prints its header, prints section 1's title and
+  aborts on the FIRST throw — so **the reproducer is one file instead
+  of forty-nine**, the cross-TU reading is dead (throw and catch are
+  in the same function), and ***`-C` is cleared by the same datum***,
+  it having been the named suspect only for the cross-TU case.
+  **`catch (...)` not catching and a same-TU catch-by-name not
+  catching are ONE fact**: the handler list was never consulted, so
+  the EH stack was empty when the throw walked it. The runtime is not
+  the gap — `lib/edg/mkfile`'s `OFILES` leaves out exactly
+  `c99_complex` of all `lib_src/*.c`, and `bad_alloc.c` pushes EH
+  entries on every page.
+  ***AND MY REFUTATION FROM LAST ROUND WAS ITSELF WRONG***: I said
+  `-fexceptions` could not be the problem because
+  `check_and_set_ansi_mode_options` sets `exceptions_enabled` — **its
+  caller is `if (strict_ansi_mode)`**, which `eccp` does not pass. *I
+  read "ansi mode" as "the default standard mode" and it means the
+  flag*, the same shape as reading a macro's default as a constraint
+  on its value, two rounds running. **The conclusion survives by
+  another route** (`--c++14` → `std_version` 201402 →
+  `check_and_set_cpp11_mode_options(1)` → `exceptions_enabled = 1`),
+  *and a right answer reached through a wrong reading is still a wrong
+  reading* — the next question asked of that arm would have got a
+  wrong answer.
+  **Reading stops here and the measurement is `eccp -F`**: one command
+  on the generated C, `grep -c __curr_eh_stack_entry` and
+  `grep -c setjmp`. Both zero means no EH code was emitted after all
+  and `--exceptions` must be passed positively; non-zero means the
+  region IS pushed and the fault is at run time in the
+  push/`setjmp`/throw path — **with the generated C of a ONE-FILE
+  reproducer in hand to read**, which this port has never had for an
+  EH question.
   **re2c has not moved** — ten missing headers and no `makefile` to
   read an object list from, both in 0.6's inventory with the missing
   `(char const *)` constructors.
