@@ -2183,6 +2183,34 @@ silent:
   run would have been believed on sight*. Control is EXTERNAL (the
   finding is fixed, so `HEAD` cannot show it): staging the pre-fix
   `unistd.h` answers `ELSEWHERE getpass -> libv.h`, run and recorded.
+  ***AND PAST `getpass` IT IS `lstat`, WHICH DROPPED A `const` ITS
+  FIVE NEIGHBOURS HAVE.*** `<sys/stat.h>` said
+  `lstat(char *, struct stat *)` while `stat`, `chmod`, `mkdir`,
+  `unlink` and `access` all say `const char *`, which is POSIX for all
+  six; unrar's `find.cpp:122` passes `c_str()`. **A C++ error and
+  nothing else** — C converts `const char *` to `char *` with at most
+  a warning — so every C caller compiled and ran for years. *The port
+  that first reaches a header is the one that measures it*, the
+  `<wchar.h>` `extern "C"` shape again.
+  **`apconst-xcheck.py` is the general form and REPORTS**: a bare grep
+  cannot ask this, since 30 `char *` parameters in these headers are
+  nearly all CORRECT (`fgets`, `strerror_r`, `mktemp`, `putenv` are
+  non-const in POSIX itself), so it needs an oracle — and
+  **`gcc -aux-info` is one**, dumping every declaration a TU saw.
+  *Const-ness only, position by position*, never the types, which
+  sidesteps `mode_t` against `__mode_t` and every typedef difference
+  at once. **22 drop a const, 5 are stricter than glibc** — and
+  **unrar reaches only `utimensat`**, where it passes a non-const
+  array into a const parameter, so *`lstat` was the only one blocking
+  anything*; the other 21 are a round of their own. It does not gate
+  because **glibc is not POSIX**, and `basename` proves that limit is
+  real rather than a hedge: glibc has TWO, and `-aux-info` reported
+  GNU's `const` one while APExp declares XPG's non-const one
+  **correctly** — the single EXEMPT entry, named with its reason,
+  since *an exemption with no reason is indistinguishable from a bug
+  someone got tired of*. Control is EXTERNAL and REFUSES TO RUN if
+  `lstat` is not currently const, because then it could not
+  distinguish anything.
   **re2c has not moved** — ten missing headers and no `makefile` to
   read an object list from, both in 0.6's inventory with the missing
   `(char const *)` constructors.

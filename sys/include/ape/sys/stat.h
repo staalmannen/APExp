@@ -190,7 +190,18 @@ extern int chmod(const char *, mode_t);
 extern int fchown (int fd, uid_t uid, gid_t gid);
 extern int fchmod (int fd, mode_t mode);
 
-extern int	lstat(char *, struct stat *);
+/*
+ * `const char *', as POSIX says and as `stat', `chmod', `mkdir',
+ * `unlink' and `access' all already said -- **a single prototype out
+ * of step with its five neighbours.**  unrar's `find.cpp:122' passes
+ * `FindMaskA.c_str()', which is `const char *', and C++ refuses the
+ * conversion outright where C allows it with at most a warning: *it
+ * was a C++ error and nothing else*, which is why every C caller in
+ * the tree compiled and ran for years.  The same shape as `<wchar.h>'
+ * having no `extern "C"' guard -- invisible until a C++ program
+ * arrived.  `apconst-xcheck.py' asks the question generally.
+ */
+extern int	lstat(const char *, struct stat *);
 extern int	symlink(const char *, const char *);
 extern ssize_t readlink(const char *, char*, size_t);
 

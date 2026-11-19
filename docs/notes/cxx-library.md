@@ -3295,3 +3295,66 @@ reason — the finding it was built on is fixed, so `HEAD` cannot show
 it. Staging the pre-fix `unistd.h` and re-running answers
 `ELSEWHERE getpass -> libv.h`, `1 only elsewhere`, against `0` now. Run
 and recorded.
+
+## `lstat` dropped a `const` its five neighbours had
+
+Past `getpass`, unrar reached `find.cpp:122`:
+
+    argument of type "std::...::const_pointer" (aka "const char *") is
+    incompatible with parameter of type "char *"
+      if (lstat(FindMaskA.c_str(),&st)!=0)
+
+`<sys/stat.h>:193` declared `extern int lstat(char *, struct stat *)`
+while `stat`, `chmod`, `mkdir`, `unlink` and `access` — the same two
+headers — all say `const char *`, which is what POSIX says for all six.
+**A single prototype out of step with its neighbours.**
+
+***IT IS A C++ ERROR AND NOTHING ELSE***, which is why it survived. C
+converts `const char *` to `char *` with at most a warning, so every C
+caller in the tree compiled and ran; C++ refuses outright. *The port
+that first reaches a header is the one that measures it* — the same
+shape as `<wchar.h>` having no `extern "C"` guard, invisible until a
+C++ program linked. Fixed in the header and in
+`lib/ap/stat/lstat.c`, which only forwards to `stat`.
+
+### `apconst-xcheck.py`: the general question, with an oracle
+
+A bare grep cannot ask this. There are 30 `char *` parameters in these
+headers and **nearly all are correct**: `fgets`, `setvbuf`,
+`getpwuid_r`, `strerror_r`, `ctime_r`, `mktemp`, `mkdtemp` and
+`putenv` all take a non-const `char *` in POSIX *itself*, because the
+buffer is an output or the string is retained. A list that cannot tell
+those from `lstat` is a list nobody reads twice.
+
+So it needs an oracle, and **`gcc -aux-info` is one**: it dumps every
+declaration a translation unit saw, with real types. The comparison is
+**const-ness only, position by position** — never the types — which
+sidesteps `mode_t` against `__mode_t` and every other typedef
+difference between the two libraries at once.
+
+**22 prototypes drop a `const` glibc has**, in both directions
+reported separately (5 are stricter than glibc, which is almost always
+fine). Of the 22, **unrar reaches only `utimensat`**, and there it
+passes a non-const array into a const parameter, which always
+converts — *so `lstat` was the only one blocking anything*. The other
+21 are real conformance bugs that nothing in flight reaches; they are
+a round of their own, because each needs its implementation moved too
+and a header change that cannot be compiled on the host is not a
+change to make beside a fix someone is waiting for.
+
+**It reports and does not gate, and the reason is in the output.**
+glibc is not POSIX, and `basename` proves that is a real limit rather
+than a hedge: glibc has **two**, POSIX/XPG's `char *basename(char *)`
+in `<libgen.h>` (non-const, because it may modify in place) and GNU's
+`const char *basename(const char *)` in `<string.h>`, and `-aux-info`
+reported the GNU one. **APExp's non-const declaration is the POSIX one
+and is correct; the oracle is what is wrong there.** It is the single
+`EXEMPT` entry, named with its reason rather than dropped, because an
+exemption with no reason is indistinguishable from a bug someone got
+tired of.
+
+**Its control is external**, like `truefalse-sweep`'s and `--cnames`':
+the finding is fixed, so the tree cannot show it. `--control`
+re-reads the header, *refuses to run if `lstat` is not currently
+const* — otherwise it could not distinguish anything — and then
+compares the pre-fix spelling against the oracle. It fires.
