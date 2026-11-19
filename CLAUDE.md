@@ -2310,9 +2310,9 @@ silent:
   **`catch (...)` not catching and a same-TU catch-by-name not
   catching are ONE fact**: the handler list was never consulted, so
   the EH stack was empty when the throw walked it. The runtime is not
-  the gap — `lib/edg/mkfile`'s `OFILES` leaves out exactly
-  `c99_complex` of all `lib_src/*.c`, and `bad_alloc.c` pushes EH
-  entries on every page.
+  the gap — `lib/edg/mkfile`'s `OFILES` now covers every one of
+  `lib_src/*.c`, `c99_complex` included by way of `c99ord.awk`, and
+  `bad_alloc.c` pushes EH entries on every page.
   ***AND MY REFUTATION FROM LAST ROUND WAS ITSELF WRONG***: I said
   `-fexceptions` could not be the problem because
   `check_and_set_ansi_mode_options` sets `exceptions_enabled` — **its

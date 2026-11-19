@@ -73,19 +73,27 @@
 #	nothing undefined but `__stack_chk_fail', which is gcc's own
 #	stack protector and does not exist under kencc
 #
-# ---- WHY IT IS NOT IN `OFILES' YET -----------------------------------
+# ---- AND IT IS IN `OFILES', MEASURED ---------------------------------
 #
-# **pcc is not gcc, and one failing member aborts the whole tree's
-# `mk'** -- which is the exact hazard the comment above `OFILES' cites
-# for leaving `c99_complex.$O' in.  A port that has only been built by
-# one compiler has not been measured in that position.  The one
-# command that settles it:
+# It was held out for one round, and that was the point: **pcc is not
+# gcc, and one failing member aborts the whole tree's `mk'** -- the
+# exact hazard the comment above `OFILES' cites for leaving
+# `c99_complex.$O' in -- so a file compiled by only one compiler had
+# not been measured in the position it was about to occupy.  The one
+# command that settles it, run on the VM:
 #
 #	cd sys/src/ape/lib/edg
 #	awk -f c99ord.awk ../../../external/edg/lib_src/c99_complex.c >/tmp/c99ord.c
 #	pcc -c /tmp/c99ord.c
 #
-# Clean, and the rule and the `OFILES' entry go in together.
+# Clean -- `c99ord: kept 96 dropped 177' on stderr and nothing from
+# `pcc' -- so the mkfile rule and the `OFILES' entry went in together.
+#
+# **The mkfile builds `c99ord.c' as its OWN target** rather than
+# folding the awk into the compile, so that `mk' rebuilds the split
+# when either input moves.  A one-recipe version hides this script
+# from mk, and then a change to the filter yields the PREVIOUS object
+# with no diagnostic from anyone.
 #
 # Keep only the ordinary float/double/long_double families of EDG's
 # `_Complex' helper runtime, dropping every top-level construct that
