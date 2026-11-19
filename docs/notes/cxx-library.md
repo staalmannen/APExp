@@ -3495,3 +3495,74 @@ mis-set.
 The two `INSTANTIATE_*` settings stay — the files must agree for
 `edgtarg-sweep.py` and the value is right for any regeneration — with
 their comments corrected to say they are inert today.
+
+## unrar BUILDS, LINKS AND RUNS — and the abort is EH, as predicted
+
+`unrar -V` prints its banner and its whole usage. **That is the first
+real C++ application on this machine**, and it is a capability rather
+than a stage: 49 translation units, templates, virtual dispatch, the
+C++ library, cpfe, `pcc` and `6l` end to end.
+
+It then ends with
+
+    C++ runtime abort: terminate() called by the exception handling
+    mechanism
+
+which is `lib_src/eh_util.c:214`, `__default_terminate` — reached when
+the unwinder finds **no handler at all**.
+
+**That is the thing `c++/unrar/mkfile` named as what it was waiting on
+rather than a compile**: `eccp` passes `--no_exceptions` by default
+because EDG itself is built that way, so *EDG's setjmp-based EH has
+never been run here*.
+
+### What is already ruled out
+
+* **It is not a missing `catch`.** `errhnd.cpp:242`'s
+  `ErrorHandler::Exit` calls `Throw`, which `throw`s `RAR_EXIT`, and
+  `rar.cpp:35` opens a `try` whose handlers are `RAR_EXIT`,
+  `std::bad_alloc &`, `std::length_error &` **and `catch (...)`**. A
+  `catch (...)` that does not catch means the unwinder never saw the
+  region.
+* **It is not `-fexceptions` failing to take effect.**
+  `fe_init.c:50235` defaults `exceptions_enabled` to 0, which looked
+  like the answer — but `check_and_set_ansi_mode_options`
+  (`cmd_line.c:13335`) is `if (!option_kind_used[34]) exceptions_enabled
+  = 1`, so ANSI mode turns them on unless the option was *given*.
+  Omitting `--no_exceptions` is therefore enough. *A default that is
+  overridden by the mode is not a default that applies*, and passing
+  `--exceptions` explicitly would be a change whose justification was
+  refuted before it was made.
+* **It is not the setjmp name or buffer**, both already checked and
+  recorded in `kencc_targ.h:227`: the committed generated C calls plain
+  `setjmp` (which APE has), and `long[25]` is 100 bytes under kencc's
+  4-byte `long` against `jmp_buf`'s 80 and the 64 amd64 writes. *The
+  half that would have been silent is the buffer*, and it was measured
+  rather than assumed.
+* **There is no EH-model target switch to get wrong**: the only
+  exception-adjacent settings in the baked `target.c` are
+  `targ_setjmp_func` and `targ_unwind_word_mode`. Lowering to C leaves
+  setjmp EH as the only model.
+
+### The next measurement, and why it is this one
+
+`cxx-stdexcept-test.cpp` built **with `-fexceptions`** asks whether
+throw/catch works in **one** translation unit at all. It separates two
+different bugs that give one symptom:
+
+* **It fails** → EH is broken outright, and the reproducer is one file
+  instead of a 49-file program.
+* **It passes** → EH works within a TU, so unrar's failure is
+  CROSS-TU — the `throw` is in `errhnd.$O` and the `try` in `rar.$O` —
+  which points at the EH stack globals (`__curr_eh_stack_entry`,
+  `__eh_curr_region`) rather than at the mechanism.
+
+**And `-C` is a named suspect in the second case, by its own
+documentation.** It marks every TEXT and GLOBL `DUPOK`, so a duplicate
+is silently merged and `cc/cc.h:649`'s own warning applies — "two
+genuinely different functions with one name". EDG's generated C names
+its EH tables `__T<digits>` from a per-TU counter; those are `static`
+in `lib_src`, and whether they are static in the *application's*
+generated C is the thing to look at. *A flag that suppresses a
+diagnostic can hide the bug the diagnostic would have named*, which is
+the cost side of the round that made the link work.

@@ -2270,6 +2270,37 @@ silent:
   same corpus needing the same accommodation from two unrelated
   linkers** is what says it is intrinsic to a C++ front end lowered to
   C.
+  ***AND unrar BUILDS, LINKS AND RUNS: `unrar -V` PRINTS ITS BANNER
+  AND ITS WHOLE USAGE.*** **The first real C++ application on this
+  machine** — 49 TUs, templates, virtual dispatch, the C++ library,
+  cpfe, `pcc` and `6l` end to end, a capability rather than a stage.
+  **It ends with `C++ runtime abort: terminate() called by the
+  exception handling mechanism`** (`lib_src/eh_util.c:214`), reached
+  when the unwinder finds NO HANDLER — which is exactly what
+  `c++/unrar/mkfile` named as what it was waiting on rather than a
+  compile, EDG's setjmp EH never having been run here.
+  **Three cheap explanations are already refuted**: it is not a
+  missing `catch` (`rar.cpp:35`'s `try` has `catch (...)`, and a
+  `catch (...)` that does not catch means the region was never seen);
+  it is not `-fexceptions` failing to take effect (`fe_init.c:50235`
+  defaults `exceptions_enabled` 0, *which looked like the answer*, but
+  `cmd_line.c:13335` is `if(!option_kind_used[34]) exceptions_enabled
+  = 1` in ANSI mode, so omitting `--no_exceptions` IS enough — *a
+  default overridden by the mode is not a default that applies*, and
+  passing `--exceptions` would have been a change whose justification
+  was refuted before it was made); and it is not the setjmp name or
+  buffer, both recorded in `kencc_targ.h:227`.
+  **The next measurement is `cxx-stdexcept-test.cpp` built WITH
+  `-fexceptions`**, because it separates two bugs with one symptom: a
+  failure makes the reproducer ONE file instead of 49, and a pass says
+  the fault is CROSS-TU (the `throw` in `errhnd.$O`, the `try` in
+  `rar.$O`) and points at the EH stack globals. ***AND `-C` IS A NAMED
+  SUSPECT IN THAT SECOND CASE, BY ITS OWN DOCUMENTATION***: it marks
+  every TEXT and GLOBL `DUPOK`, so `cc/cc.h:649`'s own warning about
+  "two genuinely different functions with one name" applies — *a flag
+  that suppresses a diagnostic can hide the bug the diagnostic would
+  have named*, which is the cost side of the round that made the link
+  work.
   **re2c has not moved** — ten missing headers and no `makefile` to
   read an object list from, both in 0.6's inventory with the missing
   `(char const *)` constructors.
