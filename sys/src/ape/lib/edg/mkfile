@@ -81,6 +81,58 @@ EDGSRC=../../../external/edg/lib_src
 # front end and has no use for a `_Complex' runtime, and leaving it in
 # makes a plain `mk' stop for a member nothing references.
 #
+# ***AND THAT LAST SENTENCE UNDERSTATES WHAT GOES WITH IT, WHICH IS
+# WHAT THIS PARAGRAPH IS FOR.***  "cpfe has no use for it" is true OF
+# CPFE and conflates cpfe with everything `eccp' compiles.  The file
+# is SEVEN FAMILIES of sixteen operations --
+#
+#	float   double   long_double     <- kencc supports all three
+#	float16 bfloat16 float80 float128 <- kencc has none of them
+#
+# -- so dropping it drops the three USABLE families with the four
+# unusable ones, and a C++ translation unit using `_Complex double'
+# would link-fail on `__c99_complex_double_multiply'.
+#
+# **NONE OF WHICH IS ABOUT C99 COMPLEX, and that was the question
+# asked**: `cc/lex.c''s `itab' carries `_Complex' and `_Imaginary',
+# and `lib/ap/complex' is musl's, 69 files.  C99 complex WORKS here.
+# What this file cannot have is gcc's EXTENDED floats, which are
+# TS 18661-3 and GNU rather than C99.
+#
+# **NOT LIVE, measured**: `_Complex' appears nowhere in
+# `sys/include/ape/c++' and nowhere in any compiled C++ package -- the
+# single hit under `external/c++' is a re2c EXAMPLE for Rust.
+#
+# **AND THE SPLIT IS REAL WORK RATHER THAN A `sed', also measured**: a
+# line filter dropping every line that names an extended type keeps
+# exactly 48 functions, which is the right three-by-sixteen, and then
+# DOES NOT COMPILE -- the file is not one-definition-per-line
+# throughout, so the filter cuts multi-line constructs in half.  *The
+# cheap version was tried and it failed, which is why the cost is
+# written down rather than guessed at.*  In 0.6's inventory.
+#
+# ***AND THE STRUCTURAL SPLIT DOES WORK: SEE `c99ord.awk' BESIDE THIS
+# FILE.***  Whole top-level constructs by brace depth rather than
+# lines: 273 constructs, 96 kept, 177 dropped, `gcc -std=c89 -c'
+# clean, **42 symbols -- float, double and long_double with all eight
+# operations each, plus the 18 conversions among them**.  Written
+# against a python reference whose output it matches BYTE FOR BYTE,
+# and in awk because there is no python on the VM.
+#
+# **It is deliberately NOT in `OFILES' yet**: `pcc' is not `gcc', and
+# one failing member aborts the whole tree's `mk' -- the same hazard
+# this comment already cites.  `c99ord.awk''s header has the single
+# command that settles it; clean, and the rule and the `OFILES' entry
+# go in together.
+#
+# **Teaching kencc the four extended types instead was costed and is
+# the wrong trade**: `specbits-model.py' says 7 spare type bits so the
+# specifiers would fit, but `NTYPE' feeds seven tables in `cc/cc.h'
+# and `ewidth[]' appears in 27 files across the ten backends -- and
+# there is no HARDWARE for any of the four here, `sub.c:266' making
+# `long double' into `double', so all four would need libgcc's soft-fp
+# in libap with its rounding untestable while the fenv API is a stub.
+#
 # The corpus was swept for the whole class at once, with comments,
 # string and character literals and `#line' stripped FIRST -- and the
 # stripping is the measurement rather than a tidying step.  A raw grep
