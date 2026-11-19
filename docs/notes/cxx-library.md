@@ -3024,6 +3024,10 @@ So the question is no longer "which header lacks `va_copy`" but **"was
 `<stdarg.h>` opened at all"** — and `--trace_includes` (cpfe's `-H`,
 `cmd_line.c:8837`) names every file it opens, which answers it outright.
 
+*(It is answered **no**, by the source rather than by `-H`, in the
+section below — and the half of that answer which mattered was not the
+one this paragraph was waiting for.)*
+
 ### ***`eccp -F` IS NOT A PREPROCESS, AND THERE WAS NO `-E`***
 
 The run that produced the result above was, as a dump, invalid — and the
@@ -3065,3 +3069,138 @@ file is to *report* the absence rather than die of it.
 Checked on the host in both languages before it shipped: `g++` and
 `gcc -std=c89 -x c` each reach all three sections, and the
 `CXX_STDARG_PROBE_USE` arm compiles where `va_copy` exists.
+
+## `va_copy`: cpfe suppresses the include, and the ABI underneath it
+
+The rebuilt probe ran on the VM and answered every question at once:
+
+    -- 1. which <stdarg.h> was read --
+      __STDARG          not defined
+      _APEXP_STDARG_H_  not defined
+    -- 2. which names are macros --
+      va_start          is a macro
+      va_arg            is a macro
+      va_end            is a macro
+      va_copy           NOT a macro   <-- unrar's stop
+    -- 3. va_list --
+      va_list           names a type (sizeof 24)
+
+### Section 2 is what named the mechanism
+
+**`va_start`, `va_arg` and `va_end` are MACROS**, and section 1 says no
+header was read. A macro came from somewhere, and with no file opened
+the only candidate left is cpfe — which is a sharper statement than the
+previous round's "cpfe supplies them", because a *builtin* is not a
+macro and an `#ifdef` can tell the two apart. ***That one line is what
+turned a search-path question into a source-reading one.***
+
+`preproc.c:15496`:
+
+    if (pass_stdarg_references_to_generated_code &&
+        (strcmp(name,"stdarg.h")==0 || (C++ && name=="cstdarg")))
+      { proc_stdarg_include(is_cstdarg);
+        actual_include_was_suppressed = 1; }
+    else open_file_and_push_input_stack(...);
+
+**`actual_include_was_suppressed`** — cpfe intercepts `#include
+<stdarg.h>`, synthesises the names itself and *never looks for the
+file*. `target.c:10838` sets that flag to 1 and `kencc_targ.h` says
+nothing about it, which is `edgtarg-sweep.py`'s **absent** class: a
+setting the baked target carries and the target description does not
+mention.
+
+`proc_stdarg_include` (`preproc.c:15369`) then enters
+`va_start`/`va_arg`/`va_end` as keywords and predef macros
+unconditionally, and `va_copy` **only `if (va_copy_macro_allowed)`**.
+That variable defaults to 0 (`fe_init.c:51105`) and is set to 1 in
+exactly two places: `check_and_set_new_c_mode_options`
+(`cmd_line.c:11993`), a **C** path, and `microsoft_version >= 1900`
+(`:10939`). *There is no command-line option for it and no C++ arm at
+all*, so under `--c++14` cpfe never allows `va_copy` — which is unrar's
+`strfn.cpp:538` exactly.
+
+**So the search order, the binds, the wrapper and the header were all
+innocent.** Every reading of the tree that said "this cannot happen"
+was correct about the tree; the question was never about the tree.
+
+### ***THE FINDING IS SECTION 3, NOT `va_copy`***
+
+`sizeof(va_list)` came back **24** — cpfe's own answer, folded into a
+literal the way EDG's C back end folds every `sizeof`, because with the
+builtin in force `sys_predef.c:312656` does
+`#define va_list __gnuc_va_list`. APExp's `<stdarg.h>` is
+`typedef char *va_list`, which is **8**.
+
+Those cannot both be right for a vararg function **defined** in C++ and
+compiled by `pcc`. The *caller's* side of a vararg call is the target's
+calling convention, which cpfe takes from `target.c` and which every
+working `printf` in the probe already confirms; the *callee's* side is
+`va_list` itself, and it is in force only where the `...` function is
+compiled through `eccp`. libap's `printf` is `pcc`'s, so it is
+unaffected — **nothing built through this driver had ever run a vararg
+function of its own**, which is why a 24-against-8 disagreement had cost
+nothing and shown nothing.
+
+### The fix is the flag, and the cheap fix would have hidden this
+
+`cmd_line.c:9769` registers `no_stdarg_builtin`, and
+`add_option_description`'s **fourth argument is the value**: the
+`exceptions`/`no_exceptions` pair at `:8950`/`:8953` is 1/0 and the
+`export`/`no_export` pair immediately above is 1/0, so
+`--no_stdarg_builtin` gives `opt_value` 0 and `cmd_line.c:21593` sets
+`pass_stdarg_references_to_generated_code = 0`. **Only the negative
+spelling is registered**, which says EDG expects the builtin to be the
+default and this to be the exception; for a target whose back end is a
+real C compiler with its own `<stdarg.h>`, it is the right exception.
+
+`eccp` passes it now. cpfe opens the real header, so **cpfe and `pcc`
+agree because they read the same file** rather than by coincidence, and
+the macros the generated C carries are APExp's own expansions over
+kencc's real vararg layout.
+
+***PATCHING `va_copy_macro_allowed` IN THE CORPUS WAS THE OBVIOUS FIX
+AND WOULD HAVE BEEN THE WRONG ONE.*** It clears the error message and
+leaves the 24-against-8 split standing — a build that compiles, links,
+runs, and is wrong only in a vararg function nobody had written yet.
+*The one-line fix for the diagnostic is not always the fix for the
+bug the diagnostic found.*
+
+### Section 4, so that this is measured rather than argued
+
+The probe gained a section that **defines and calls** vararg functions:
+`probe_sum` over five `int`s, `probe_mix` alternating `int` and
+`double` (they travel differently on amd64, so a `va_arg` walking the
+wrong structure is likeliest to get the second wrong), and — behind
+`#ifdef va_copy`, so the file still builds without it — `probe_twice`,
+which walks the list twice through a copy and so gives a readably wrong
+answer for a `va_copy` that aliases instead of copying.
+
+**The prediction, written before the run**: with the flag, section 1
+reports `__STDARG` **defined**, section 2 all five names macros, section
+3 `sizeof` **8**, section 4 unchanged and still right. *Section 4 being
+right **both** ways would mean the 24-byte `va_list` was never actually
+reached* — a real result, and the one that retires this section.
+
+Both arms check on the host: `g++` and `gcc -std=c89` each reach all
+four sections with 0 diagnostics under `-Wall -Wextra` and section 4 is
+right on both. **The C89 arm is a free control for the `#ifdef`**:
+glibc's `va_copy` is C99, so `-std=c89` does not define it and the
+`probe_twice` arm correctly reports itself skipped — the same shape the
+VM showed, from a compiler that is known good.
+
+### Two instrument faults in the same run
+
+**`eccp` had no `-H`.** The driver's own comment above the `-E` block
+said `-H` was "passed through by the `--*` case", and that is false —
+`-H` does not begin with `--`, so the catch-all answered
+`unrecognised argument: -H` and the one command that can name the files
+a header search opened could not be given. It has a case of its own
+now, appending `--trace_includes`. *A claim in a comment about which arm
+handles something is a claim like any other.*
+
+**`pcc` will not compile a `.cpp`.** `pcc cxx-stdarg-probe.cpp` answers
+`cc: no files to compile or load` — it dispatches on the suffix, and
+`.cpp` is not one it takes, so the command exits having done nothing
+with a message that reads like an empty argument list rather than a
+refusal. The C half needs `cp ... /tmp/sp.c` first. *A run that compiled
+nothing and a run that found nothing wrong both print almost nothing.*

@@ -17,7 +17,7 @@
  * **`va_list' on the line ABOVE it is fine, and so are `va_start',
  * `va_arg' and `va_end' elsewhere in the same file.**
  *
- * ---- WHAT THE FIRST RUN ANSWERED ----------------------------------
+ * ---- WHAT THE FIRST RUN ANSWERED, AND WHAT IT LED TO ---------------
  *
  * ***`__STDARG' IS NOT DEFINED***, so **APExp's `stdarg_arch.h' was
  * never read** -- that file is `#ifndef __STDARG' / `#define __STDARG'
@@ -31,19 +31,50 @@
  * same `__STDARG' guard -- which is how it once DISABLED APExp's -- so
  * if cpfe had read that one, `__STDARG' would be defined.
  *
- * ***SO WHERE DO THE OTHER FOUR NAMES COME FROM?  cpfe ITSELF.***
- * `symbol_tbl.c:33309' is
- * `full_enter_symbol("va_list", 7, sk_type, ...)' -- cpfe enters
- * `va_list' as a TYPE of its own -- and `lexical.c' carries
- * `__builtin_va_start', `__builtin_va_end' and `__builtin_va_copy' as
- * builtins.  `sys_predef.c:313963' predefines the typedef
- * `__builtin_va_list'.  *`va_copy' is the one name in that family that
- * is not predefined as a MACRO*, which is exactly the shape of the
- * failure.
+ * **But section 2 said `va_start', `va_arg' and `va_end' ARE MACROS**,
+ * and that is the datum that named the mechanism: a macro came from
+ * somewhere, and with no header read the only candidate left is cpfe.
+ * ***IT INTERCEPTS THE INCLUDE.***  `preproc.c:15496':
  *
- * What is NOT yet settled is whether `<stdarg.h>' was opened at all.
- * `--trace_includes' (cpfe's `-H', `cmd_line.c:8837') names every file
- * it opens and answers that outright.
+ *	if (pass_stdarg_references_to_generated_code &&
+ *	    (strcmp(name,"stdarg.h")==0 || (C++ && name=="cstdarg")))
+ *	  { proc_stdarg_include(is_cstdarg);
+ *	    actual_include_was_suppressed = 1; }
+ *	else open_file_and_push_input_stack(...);
+ *
+ * -- `actual_include_was_suppressed', so **no file is opened and the
+ * search never happens**.  `proc_stdarg_include' then enters
+ * `va_start'/`va_arg'/`va_end' unconditionally and `va_copy' only
+ * `if (va_copy_macro_allowed)', which is set in a C-mode path and for
+ * `microsoft_version >= 1900' and **nowhere in C++**.  *So the search
+ * order, the binds and the header were all innocent*, and the one
+ * question this file was built to leave open -- whether `<stdarg.h>'
+ * was opened at all -- is answered NO by the source rather than by
+ * `-H'.  (`-H' is worth running anyway: it CONFIRMS the absence, and
+ * `eccp' had no `-H' either until this round.)
+ *
+ * ***AND THE REAL FINDING IS NOT `va_copy', IT IS SECTION 3.***
+ * `sizeof(va_list)' came back **24** -- cpfe's own, folded into a
+ * literal, since with the builtin in force `sys_predef.c:312656' does
+ * `#define va_list __gnuc_va_list'.  APExp's `<stdarg.h>' is
+ * `typedef char *va_list', which is **8**.  Those cannot both be right
+ * for a vararg function DEFINED in C++ and compiled by `pcc'.  Nothing
+ * built through `eccp' had ever run one, which is why it had cost
+ * nothing -- *and section 4 exists so that it is measured rather than
+ * reasoned about.*
+ *
+ * The fix is `--no_stdarg_builtin' (`cmd_line.c:9769'), now passed by
+ * `eccp', which makes cpfe open the real header -- so cpfe and `pcc'
+ * agree because they read the SAME FILE.  **Patching
+ * `va_copy_macro_allowed' in the corpus would have cleared the error
+ * message and left the ABI split standing.**
+ *
+ * **What this probe must say once the flag is in**: section 1
+ * `__STDARG' DEFINED, section 2 all five names macros, section 3
+ * `sizeof' **8** and not 24, section 4 unchanged and still right.
+ * *Section 4 being right BOTH ways would mean the 24-byte va_list was
+ * never actually reached* -- a real result, and the one that would
+ * retire this paragraph.
  *
  * ---- IT IS A RUNNABLE PROGRAM, AND THE FIRST VERSION WAS NOT -------
  *
@@ -87,11 +118,21 @@
  *
  * ***AND RUN THE C SIDE, BECAUSE IT SPLITS THE ANSWER IN HALF***:
  *
- *	pcc -o /tmp/stdargprobe-c sys/lib/tests/cxx-stdarg-probe.cpp
+ *	cp sys/lib/tests/cxx-stdarg-probe.cpp /tmp/sp.c
+ *	pcc -o /tmp/sp /tmp/sp.c && /tmp/sp
  *
- * (`pcc' compiles this file as C: it is C89 but for the `//'-free
- * comments, and `va_list' is the only type it names.)  `pcc' and
- * `eccp' search the same two header roots in the same order, so:
+ * ***THE COPY IS NOT OPTIONAL AND THE FIRST ATTEMPT DID NOT RUN.***
+ * `pcc cxx-stdarg-probe.cpp' answers `cc: no files to compile or
+ * load' -- `pcc.c' dispatches on the SUFFIX and `.cpp' is not one it
+ * compiles, so the command exits having done nothing, with a message
+ * that reads like an empty argument list rather than a refusal.  *A
+ * run that compiled nothing and a run that found nothing wrong both
+ * print almost nothing*, which is this tree's rule about silence
+ * arriving one directory from where it was written down.
+ *
+ * (The file is C89 but for its `//'-free comments, and `va_list' is
+ * the only type it names.)  `pcc' and `eccp' search the same two
+ * header roots in the same order, so:
  *
  *   * **C right and C++ wrong** -> the fault is cpfe's, and its
  *     `--sys_include' list in `rc/bin/ape/eccp' is where to look.
@@ -124,6 +165,71 @@ static void probe_use(char const *fmt, ...) {
   va_copy(b, a);
   va_end(b);
   va_end(a);
+}
+#endif
+
+/*
+ * SECTION 4's SUBJECTS: vararg functions DEFINED HERE, which is the
+ * only shape that can show the va_list disagreement.
+ *
+ * ***A CALL TO `printf' CANNOT***, and that is why these exist.  The
+ * CALLER's side of a vararg call is the target's calling convention,
+ * which cpfe takes from `target.c' and which the whole program
+ * already depends on -- every `printf' above works, so it is right.
+ * The CALLEE's side is `va_list' itself, and it is in force only
+ * where the `...' function is COMPILED THROUGH `eccp'.  libap's
+ * `printf' is `pcc''s, so it uses APExp's `va_list' whatever cpfe
+ * thinks; these do not.
+ *
+ * `probe_mix' takes an `int' and a `double' because the two travel
+ * differently on amd64 and a `va_arg' that walks the wrong structure
+ * is far likelier to get the second wrong than the first.
+ */
+static int probe_sum(int n, ...) {
+  va_list ap;
+  int i;
+  int s = 0;
+  va_start(ap, n);
+  for (i = 0; i < n; i++) { s += va_arg(ap, int); }
+  va_end(ap);
+  return s;
+}
+
+static double probe_mix(int n, ...) {
+  va_list ap;
+  int i;
+  double d;
+  double s = 0.0;
+  va_start(ap, n);
+  for (i = 0; i < n; i++) {
+    s += (double)va_arg(ap, int);
+    d = va_arg(ap, double);
+    s += d;
+  }
+  va_end(ap);
+  return s;
+}
+
+#ifdef va_copy
+/*
+ * Only compiled when `va_copy' exists, so this file builds either
+ * way -- the whole point of the rest of it being to REPORT the
+ * absence rather than die of it.  It walks the list twice through a
+ * copy, so a `va_copy' that aliases rather than copies gives a
+ * readably wrong answer instead of the right one.
+ */
+static int probe_twice(int n, ...) {
+  va_list ap;
+  va_list bp;
+  int i;
+  int s = 0;
+  va_start(ap, n);
+  va_copy(bp, ap);
+  for (i = 0; i < n; i++) { s += va_arg(ap, int); }
+  for (i = 0; i < n; i++) { s += va_arg(bp, int); }
+  va_end(bp);
+  va_end(ap);
+  return s;
 }
 #endif
 
@@ -205,7 +311,37 @@ int main(void) {
     va_list a;
     (void)a;
     printf("  va_list           names a type (sizeof %d)\n", (int)sizeof(va_list));
+    printf("                    (8 = APExp's `char *'; 24 = cpfe's own\n");
+    printf("                     __gnuc_va_list, i.e. the builtin path)\n");
   }
+
+  /*
+   * 4.  DOES A VARARG FUNCTION COMPILED THROUGH THIS TOOLCHAIN WORK?
+   * The one question section 3's number raises and cannot answer.
+   * Reported and not asserted, like everything else here -- but the
+   * wanted value is printed beside each, so a wrong answer is
+   * readable without knowing the arithmetic.
+   */
+  printf("\n-- 4. a vararg function DEFINED here and CALLED --\n");
+  {
+    int s = probe_sum(5, 1, 2, 3, 4, 5);
+    printf("  probe_sum(1..5)   = %d\t(want 15)%s\n",
+           s, (s == 15) ? "" : "   <-- WRONG");
+  }
+  {
+    double d = probe_mix(2, 10, 0.5, 20, 0.25);
+    printf("  probe_mix         = %.3f\t(want 30.750)%s\n",
+           d, (d > 30.74 && d < 30.76) ? "" : "   <-- WRONG");
+  }
+#ifdef va_copy
+  {
+    int s = probe_twice(3, 10, 20, 30);
+    printf("  probe_twice       = %d\t(want 120)%s\n",
+           s, (s == 120) ? "" : "   <-- WRONG");
+  }
+#else
+  printf("  probe_twice         skipped -- va_copy is not available\n");
+#endif
 
   printf("\ncxx-stdarg-probe: done\n");
   return 0;

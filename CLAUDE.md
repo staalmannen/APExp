@@ -2085,12 +2085,45 @@ silent:
   was read, while `va_list` is a type **cpfe enters itself**
   (`symbol_tbl.c:33309`) and `va_start`/`va_arg`/`va_end` are its
   builtins. *Four of the five names work with no header at all*, which
-  is why only the fifth failed. What is open is whether `<stdarg.h>`
-  was opened at all; `--trace_includes` (cpfe's `-H`) names every file
-  it opens, and **the C side splits the answer in half** since `pcc`
-  searches the same roots in the same order — C right and C++ wrong is
-  cpfe's, both wrong is the header or the bind and has been true for
-  every C program all along.
+  is why only the fifth failed.
+  ***AND THE NEXT RUN FOUND THE MECHANISM, AND THE LINE THAT NAMED IT
+  WAS `va_start IS A MACRO`.*** With no header read, a macro can only
+  be cpfe's — and a BUILTIN is not a macro, which is what an `#ifdef`
+  separates. `preproc.c:15496` intercepts `#include <stdarg.h>` and
+  sets **`actual_include_was_suppressed`**, so no file is opened and
+  the search never happens; `proc_stdarg_include` enters the first
+  three unconditionally and `va_copy` only `if (va_copy_macro_allowed)`
+  — set in a C-mode path and for `microsoft_version >= 1900`, **never
+  in C++, and no option for it**. *So the search order, the binds, the
+  wrapper and the header were all innocent*: every reading that said
+  "this cannot happen" was right about the tree, and the question was
+  never about the tree.
+  ***AND THE FINDING IS NOT `va_copy`, IT IS `sizeof(va_list)` = 24.***
+  With the builtin in force `sys_predef.c:312656` does
+  `#define va_list __gnuc_va_list`, so cpfe's own 24-byte `va_list` is
+  what the generated C carries while APExp's is `char *`, which is 8.
+  The CALLER's side of a vararg call is the target's convention and is
+  fine (every `printf` works); the CALLEE's is `va_list`, and it bites
+  only in a `...` function **defined** in C++ — which nothing built
+  through `eccp` had ever run. Fixed with **`--no_stdarg_builtin`**
+  (`cmd_line.c:9769`; `add_option_description`'s 4th argument is the
+  value, as the `exceptions`/`no_exceptions` and `export`/`no_export`
+  pairs both show), so cpfe opens the real header and cpfe and `pcc`
+  agree **because they read the same file**. ***Patching
+  `va_copy_macro_allowed` in the corpus was the obvious fix and would
+  have cleared the message while leaving the ABI split standing*** — a
+  build that compiles, links, runs and is wrong only in a vararg
+  function nobody had written yet. *The one-line fix for a diagnostic
+  is not always the fix for the bug the diagnostic found.* The probe
+  has a **section 4** that defines and calls vararg functions so this
+  is measured rather than argued, and the prediction is written down:
+  `__STDARG` defined, all five macros, `sizeof` **8**, section 4
+  unchanged. **Two instrument faults in the same run**: `eccp` had no
+  `-H` at all, its own comment claiming the `--*` case passed it
+  through — *a claim in a comment about which arm handles something is
+  a claim like any other* — and **`pcc` will not compile a `.cpp`**,
+  answering `no files to compile or load`, so the C half needs a `.c`
+  copy first.
   ***AND THE RUN THAT ANSWERED IT WAS INVALID AS A DUMP, WHICH IS THE
   INSTRUMENT HALF***: **`eccp -F` is NOT a preprocess** — it is cpfe
   doing a FULL TRANSLATION that stops before `cc` — and **`eccp` had
