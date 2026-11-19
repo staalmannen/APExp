@@ -10840,7 +10840,36 @@ _ZN3edg40pass_stdarg_references_to_generated_codeE = ((_ZN3edg9a_booleanE)1);
 _ZN3edg24va_list_in_std_namespaceE = ((_ZN3edg9a_booleanE)1);
 _ZN3edg41va_list_using_using_decl_in_std_namespaceE = ((_ZN3edg9a_booleanE)0);
 /*
- * APExp: 1, and it was baked 0.  Plan 9 has no COMDAT.
+ * APExp: 1, and it was baked 0.
+ *
+ * ***THIS DOES NOT FIX THE LINK, AND THE ROUND THAT SET IT PREDICTED
+ * THAT IT WOULD.***  The refutation condition written down was "the
+ * same `redefinition' list", and that is exactly what came back,
+ * byte for byte.  **The branch it switches is not in this corpus.**
+ * `lower_il.c:61268' is the whole of
+ * `lower_extern_inline_routine' --
+ *
+ *     if (!routine->suppress_inline_body)
+ *       put_routine_into_comdat_group(routine);
+ *
+ * -- UNCONDITIONAL, with no flag anywhere in it, because the corpus
+ * was generated with `LINKER_CAN_DISCARD_DUPLICATE_DEFINITIONS' 1 and
+ * *the other arm was compiled out at generation time*.  That macro
+ * survives in these 2.9M lines only as a STRING in a `#define' dump
+ * (`cmd_line.c:17433'), never as a variable, which is what "the
+ * Cfront ABI is reachable by REGENERATING the macro configuration"
+ * in `kencc_targ.h' means from the inside.
+ *
+ * *A setting named in a header is not a setting the generated code
+ * still reads.*  The real fix is `-C' on the generated C, which asks
+ * the LINKER to discard the duplicates -- see `rc/bin/ape/eccp'.
+ *
+ * The pair is KEPT because `kencc_targ.h' declares 1, the two files
+ * must agree for `edgtarg-sweep.py', and the value is right for any
+ * future regeneration.  It is inert today, and saying so is the point.
+ *
+ * What follows is the mechanism, which is correct and was worth
+ * establishing: Plan 9 has no COMDAT.
  *
  * With these 0, every `inline' entity is emitted with EXTERNAL
  * linkage in every TU that uses it and the duplicates are left for

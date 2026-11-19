@@ -2241,6 +2241,35 @@ silent:
   sees 49 up-to-date objects and relinks the stale ones. *A COMPILER
   fix does not reach a built object, and no mkfile here expresses
   that* — the libap rule one level up.
+  ***AND THAT PREDICTION WAS REFUTED BY ITS OWN STATED CONDITION: the
+  SAME list came back byte for byte.*** `lower_il.c:61268` is the whole
+  of `lower_extern_inline_routine` —
+  `if(!suppress_inline_body) put_routine_into_comdat_group(...)` —
+  **unconditional, because the other arm was compiled out when the
+  corpus was generated** under `LINKER_CAN_DISCARD_DUPLICATE_DEFINITIONS`
+  1; that macro survives in 2.9M lines only as a STRING in a `#define`
+  dump. *A setting named in a header is not a setting the generated
+  code still reads.* The pair is kept (the files must agree and a
+  regeneration wants them) with its comments corrected to say it is
+  INERT.
+  ***AND THE FIX WAS IN THE TREE THE WHOLE TIME: `-C`.***
+  `6l/obj.c:995` is `if(p->from.scale & DUPOK){skip = 1; goto casdef;}`
+  and `-C` (`cc/cc.h:649`, `6c/txt.c:1518`) is how C sets that bit —
+  **added for this very corpus**, its own documentation counting 3124
+  symbols defined in more than one of 75 objects and quoting the same
+  `redefinition:` / `too many errors`. **`cmd/edg/mkfile:255` is
+  `CFLAGS= -c -C` and its line 95 says "`-C` IS WHY THIS LINKS AT
+  ALL"** — so cpfe itself has always linked by it, while ***`eccp`,
+  which compiles the same generated C for everyone else, never passed
+  it***, and nothing could notice until a multi-TU C++ program was
+  linked. **On the GENERATED C only**: `-C` is blunt, per-TU, so it
+  belongs where every duplicate is one EDG emitted on purpose, and the
+  caller's own `.c` must keep its diagnostic. *Corroborated from the
+  other direction*: the HOST cpfe build stops at the same wall and its
+  recorded remedy is GNU ld's `--allow-multiple-definition` — **the
+  same corpus needing the same accommodation from two unrelated
+  linkers** is what says it is intrinsic to a C++ front end lowered to
+  C.
   **re2c has not moved** — ten missing headers and no `makefile` to
   read an object list from, both in 0.6's inventory with the missing
   `(char const *)` constructors.

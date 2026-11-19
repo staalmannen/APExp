@@ -493,7 +493,37 @@ for(s in $sources) {
 	generated = ($generated $gen)
 	if(! ~ $st '') die cpfe $s
 	if(~ $fflag '') {
-		run $CC -c -o $obj $ccopts $iflags $gen
+		# ***`-C' IS WHY A MULTI-FILE C++ PROGRAM LINKS AT ALL, AND
+		# IT IS ON THE GENERATED C ONLY.***
+		#
+		# A C++ front end lowered to C emits inline members, template
+		# instantiations, vtables and typeinfo into EVERY translation
+		# unit that uses them, because C has no way to say "one of
+		# these, any of them".  Every other toolchain spells that
+		# `__attribute__((weak))' or a COMDAT section; `6l' answered
+		# `redefinition:' once per shared entity until `too many
+		# errors'.
+		#
+		# **The linker could always do this and nothing could ask
+		# it**: `6l/obj.c:995' is
+		# `if(p->from.scale & DUPOK){ skip = 1; goto casdef; }' and
+		# `DUPOK' is `(1<<1)' in eight `*.out.h'.  `-C' (`cc/cc.h:649',
+		# `6c/txt.c:1518') is the way C sets the bit, and it was added
+		# FOR THIS CORPUS -- `cmd/edg/mkfile:95' says "`-C' IS WHY
+		# THIS LINKS AT ALL" and its `CFLAGS' carry it.  *cpfe itself
+		# has linked only because of it since the day it was written;
+		# this driver, which compiles the same kind of generated C for
+		# everyone else, never passed it* -- and nothing noticed
+		# because no multi-TU C++ program had ever been linked here.
+		#
+		# **It is per translation unit and blunt**, marking every TEXT
+		# and GLOBL rather than the vague-linkage ones, which is why
+		# it goes HERE and not in `$ccopts': this file is cpfe's
+		# output, where every duplicate is one EDG deliberately
+		# emitted many times.  Stage 2 below compiles the caller's OWN
+		# `.c' and must not get it -- there a duplicate symbol is a
+		# bug and the diagnostic is the point.
+		run $CC -c -C -o $obj $ccopts $iflags $gen
 		st = $status
 		if(! ~ $st '') die $CC $gen
 		objs = ($objs $obj)
