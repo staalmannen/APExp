@@ -94,8 +94,7 @@ DIRS=\
 	$_CORE_APPS\
 	$_OPTIONAL_APPS\
 	$_LLP64_ONLY_APPS\
-# always last :) \
-	celebrate_finish
+
 
 BIN=$APEXPROOT/$objtype/bin/ape
 <$APEXPROOT/sys/src/cmd/mkmany

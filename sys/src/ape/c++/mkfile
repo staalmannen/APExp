@@ -74,7 +74,9 @@ APE=$APEXPROOT/sys/src/ape
 # noticed.*
 #
 #	DIRS=unrar
-DIRS=
+DIRS=\
+# always last :) \
+	celebrate_finish
 
 none:VQ:
 	echo usage: mk all, install, installall, clean, nuke
