@@ -10839,8 +10839,55 @@ _ZN3edg40pass_stdarg_references_to_generated_codeE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg24va_list_in_std_namespaceE = ((_ZN3edg9a_booleanE)1);
 _ZN3edg41va_list_using_using_decl_in_std_namespaceE = ((_ZN3edg9a_booleanE)0);
-_ZN3edg25instantiate_extern_inlineE = ((_ZN3edg9a_booleanE)0);
-_ZN3edg28instantiate_inline_variablesE = ((_ZN3edg9a_booleanE)0);
+/*
+ * APExp: 1, and it was baked 0.  Plan 9 has no COMDAT.
+ *
+ * With these 0, every `inline' entity is emitted with EXTERNAL
+ * linkage in every TU that uses it and the duplicates are left for
+ * the linker to discard -- which `6l' cannot do, so unrar's 49
+ * objects collided on `_ZNSaIwEC1ERKS_', `_ZSt11memcpy_implPvPKvy'
+ * and the rest: `redefinition', once per shared header entity.
+ * `GCC_IS_GENERATED_CODE_TARGET' being baked 1 is what makes it
+ * SILENT rather than loud -- cpfe writes
+ * `__attribute__((__weak__))' and kencc swallows the attribute
+ * whole, so a weak definition becomes a strong one with no
+ * diagnostic from either tool.
+ *
+ * With them 1, an extern inline entity is routed through the
+ * TEMPLATE INSTANTIATION machinery instead, which `--instantiate
+ * local' (passed by `rc/bin/ape/eccp') then emits with INTERNAL
+ * linkage in each TU that needs it.  One mechanism covers both
+ * halves of the collision list: `memcpy_impl' is a plain `inline'
+ * function and no template at all, so `--instantiate local' could
+ * never have reached it, while `allocator<wchar_t>::allocator' is a
+ * template member DEFINED IN-CLASS and therefore inline -- and
+ * inline-ness is what chose the COMDAT path over the instantiation
+ * path for both.
+ *
+ * `kencc_targ.h' declares both 1 and put them inside its
+ * `APEXP_TRY_CFRONT_ABI' block, which reads as though they need
+ * `IA64_ABI 0'.  **They do not**: IA64_ABI decides their DEFAULT
+ * (targ_def.h routes extern inline to COMDAT when it is on), not
+ * what they may be set to, and nothing in the corpus tests them
+ * together with it.  *A fact about a macro's default was read as a
+ * constraint on its value* -- which is why the Cfront regeneration
+ * wall recorded there is not in the way of this.
+ *
+ * THE COST IS THE ONE `--instantiate local' ALREADY CARRIES, widened:
+ * internal linkage means each object gets its own copy, so a static
+ * local inside an inline function, or a function-local static in a
+ * template, stops being one object shared across the program.  A
+ * program whose correctness rests on that identity is silently wrong
+ * rather than loudly broken.  `eccp''s own header says the same of
+ * templates; this extends it to inline functions.
+ *
+ * `instantiate_inline_variables' is the same family and is nearly
+ * moot here, inline variables being C++17 while `eccp' passes
+ * `--c++14' -- set with its sibling because `kencc_targ.h' declares
+ * the pair and `edgtarg-sweep.py' gates on the two files agreeing.
+ */
+_ZN3edg25instantiate_extern_inlineE = ((_ZN3edg9a_booleanE)1);
+_ZN3edg28instantiate_inline_variablesE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg28sun_is_generated_code_targetE = ((_ZN3edg9a_booleanE)0);
 _ZN3edg30clang_is_generated_code_targetE = ((_ZN3edg9a_booleanE)0);
