@@ -2886,3 +2886,103 @@ through `mk` or `eccp`** — there is no rc and no mk on the build host, so
 the two mkfiles and the `eccp` change are checked by `rceq-sweep.py`,
 `mkcont-sweep.py` and reading. The old C `sys/src/ape/cmd/unrar` (one
 file, pre-2.71) and `sys/src/external/unrar` stay until this one runs.
+
+## The first `mk install`: `.o` was the wrong suffix, and `va_copy` is open
+
+Two things came back from the VM, and only one of them is settled.
+
+### `.$O` and not `.o`, and the reason is cross-compilation
+
+***`.o` IS THE SAME NAME ON EVERY ARCHITECTURE, AND THAT IS THE
+PROBLEM.*** Plan 9 names an object after what it was compiled **for** —
+`.6` amd64, `.8` 386, `.5` arm — so one source directory can hold several
+targets' objects at once and `mk` tells them apart. `.o` cannot: a cross
+build after a native one reads whichever `rar.o` is there, and the link
+either fails on the exec header or does not. *Nothing in that message is
+about architectures*, which is this tree's recorded shape for
+`bash/mkfile`'s `LD`.
+
+`eccp` ran `cc` rather than `pcc` **precisely to get `.o`**, and said so
+in its own note 4: `sys/src/ape/9src/cc.c` is one line including `pcc.c`,
+and `pcc.c:75` is
+`objext = (strcmp(prog,"cc")==0) ? "o" : ot->o` — one binary, and the
+name it is invoked under chooses the extension. Under `cc` that is `.o`
+everywhere, so the driver needed no objtype-to-suffix table.
+
+**That trade is paid off by last round's own change.** Since `-c` now
+names the object with `-o` explicitly, the extension is the script's
+choice rather than the driver's — so it can be the right one. `pcc` now,
+and the suffix is read from `/$objtype/mkfile`'s `O=` line, *the same
+place mk reads it*: deriving it from the authority rather than
+transcribing an eleven-entry table, the same rule as `cxxapp-host.sh`
+taking its object list from the link rule.
+
+The argument parser accepts `*.o *.a *.[1-9kqv]` — the ten compilers'
+suffixes as a class rather than `*.`^`$OBJEXT`, so a link of objects
+built for this target is recognised whatever `$OBJEXT` says, and `.o`
+stays because that is what every object this driver made before today is
+called.
+
+### `va_copy` is undefined under cpfe, and reading cannot say why
+
+`strfn.cpp:538` stops the build:
+
+    identifier "va_copy" is undefined
+      va_copy(argscopy, arglist);
+
+***`va_list` ON THE LINE ABOVE IS FINE***, and so are `va_start`,
+`va_arg` and `va_end` elsewhere in the same file. So a `<stdarg.h>` was
+found and read — cpfe would otherwise have said `cannot open source
+file` — and the one it read defines everything except `va_copy`.
+
+**Every reading of the tree says that cannot happen.**
+`amd64/include/ape/stdarg_arch.h` *does* define `va_copy`;
+`amd64/include/ape/stdarg.h` and `sys/include/ape/stdarg.h` both chain to
+it; `mount-include` binds all of them into place and `apexp-sh` runs
+`mount-include`; nothing in `sys/include/ape`, `sys/include/ape/c++` or
+EDG's `include_c++` defines `__STDARG` or ships a second `stdarg.h`; and
+unrar reaches the header through `os.hpp:148`, inside the `_UNIX` arm
+that `raros.hpp:23` turns on for any non-Windows target. *That is the
+point at which this tree's own rule says to stop reading and ask the
+machine.*
+
+`sys/lib/tests/cxx-stdarg-probe.cpp` asks it. Two candidate mechanisms,
+and the probe separates them:
+
+* **cpfe read somebody else's `stdarg.h`** — stock 9front's, which keeps
+  it in the architecture directory and has no `va_copy`. APExp's own
+  header comments record that stock file taking the same `__STDARG`
+  guard, which is how it once *disabled* APExp's. Then `__STDARG` is
+  defined and `va_copy` is not.
+* **cpfe read no `stdarg.h` at all** and the other four names came from
+  its own builtins, which EDG front ends have. Then `__STDARG` is not
+  defined. *This is the weaker of the two*: cpfe predefines
+  `__builtin_va_list`, not `va_list`.
+
+`--trace_includes` (cpfe has it, `src/cmd_line.c`) names the file
+outright and settles it in one command; `--list_macros` says what is
+defined rather than what ought to be. **And the C side splits the answer
+in half**: `pcc` searches the same two header roots in the same order, so
+C right and C++ wrong is cpfe's, both wrong is the header or the bind —
+and the second would be the more interesting, since it would have been
+true for every C program all along and nothing has needed `va_copy`
+before.
+
+***AND THIS IS `cxxapp-host.sh`'s STATED LIMIT BITING FOR THE FIRST
+TIME.*** Its header says it is not sound for "the C side — these compile
+against the HOST's `<unistd.h>` and friends, not APE's". glibc's
+`<stdarg.h>` has `va_copy`, so all 49 files compiled clean on the host
+and will go on doing so. *A harness that compiles a package against a
+different C library has measured the C++ and nothing else*, and the limit
+was written down a round before it cost anything — which is the only
+reason this was one line to recognise rather than a round to find.
+
+**The probe's own fault, caught before it shipped**: its `PROBE_` dump
+lines are not valid C++, so a plain compile of the file reported six
+errors of the probe's own making instead of reproducing unrar's one.
+They are behind `-DCXX_STDARG_PROBE_DUMP` now, so `-F` dumps and a
+compile reproduces. *A probe whose own syntax is the first thing to fail
+cannot report anything about its subject.* Found with
+`g++ -fsyntax-only`, and the bracketed subjects (`[va_copy(dst, src)]`)
+come from the same host run: gcc splits an expansion across lines, so
+verbatim-versus-expanded has to be readable without whole-line matching.

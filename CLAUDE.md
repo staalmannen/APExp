@@ -2060,6 +2060,37 @@ silent:
   basename, `-c -o` exact, several inputs refused. *Invisible to
   `eccp -o prog x.cpp`, which computes the object names it then links
   itself*, which is why it survived until something wanted an mkfile.
+  ***AND THE SUFFIX IS `$O` NOW, NOT `.o`.*** `eccp` ran `cc` rather
+  than `pcc` PRECISELY to get `.o` on every architecture
+  (`pcc.c:75` picks the extension from the name it is invoked under),
+  because that saved carrying a suffix table — **and `.o` is the same
+  name on every architecture**, so a cross build and a native one
+  cannot share a source directory, which is the one thing `%.$O`
+  exists to make possible. *Nothing in the resulting message is about
+  architectures*, the `bash/mkfile` `LD` family again. The `-o` change
+  above pays for it: the extension is the script's choice now, so
+  `pcc`, and `$O` is read from `/$objtype/mkfile`'s own `O=` line
+  rather than transcribed — **derive from the authority**, as
+  `cxxapp-host.sh` takes its object list from the link rule.
+  ***AND THE FIRST `mk install` STOPPED ON `va_copy`***, `strfn.cpp:538`,
+  `identifier "va_copy" is undefined` — while `va_list` one line above
+  it, and `va_start`/`va_arg`/`va_end` elsewhere in the file, are fine.
+  So a `<stdarg.h>` WAS read and the one read lacks only `va_copy`,
+  and **every reading of the tree says that cannot happen**
+  (`stdarg_arch.h` defines it, both wrappers chain to it,
+  `mount-include` binds them, nothing else defines `__STDARG`). Not
+  guessed: `cxx-stdarg-probe.cpp` asks, `--trace_includes` names the
+  file in one command, and **the C side splits the answer in half**
+  since `pcc` searches the same roots in the same order — C right and
+  C++ wrong is cpfe's, both wrong is the header or the bind and has
+  been true for every C program all along.
+  ***AND IT IS `cxxapp-host.sh`'s OWN STATED LIMIT BITING***: it
+  compiles against the HOST's C headers, glibc's `<stdarg.h>` has
+  `va_copy`, so all 49 files compile clean there and always will. *A
+  harness that compiles a package against a different C library has
+  measured the C++ and nothing else* — written down a round before it
+  cost anything, which is why this was one line to recognise rather
+  than a round to find.
   **re2c has not moved** — ten missing headers and no `makefile` to
   read an object list from, both in 0.6's inventory with the missing
   `(char const *)` constructors.

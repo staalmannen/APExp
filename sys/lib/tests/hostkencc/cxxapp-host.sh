@@ -249,8 +249,13 @@ compile_pkg() {			# $1 = package name; echoes "ok fail"
 	rm -f "$OUT/objdrift"
 	mkf=$ROOT/sys/src/ape/c++/$1/mkfile
 	if [ -f "$mkf" ]; then
+		# `.$O' and not `.o': the mkfile names objects the way every
+		# other mkfile in this tree does, so that a cross build and a
+		# native one can share a directory.  `.o' is still matched
+		# because that is what this file named them before today.
 		awk '/^OFILES=/{o=1;next} o{if($0 !~ /\\$/) exit; print}' "$mkf" \
-			| tr -d '\\\t ' | grep '\.o$' | sed 's/\.o$/.cpp/' \
+			| tr -d '\\\t ' | grep -E '\.(o|\$O)$' \
+			| sed -E 's/\.(o|\$O)$/.cpp/' \
 			| sort -u > "$OUT/mkobjs"
 		printf '%s\n' "$objs" | sort -u > "$OUT/upobjs"
 		if ! cmp -s "$OUT/mkobjs" "$OUT/upobjs"; then
