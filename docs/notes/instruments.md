@@ -1669,3 +1669,43 @@ compiled clean there and always will. *A harness that compiles a package
 against a different C library has measured the C++ and nothing else.*
 The limit was written down a round before it cost anything, which is the
 only reason this was one line to recognise rather than a round to find.
+
+***AND THE LINE THAT NAMED THE MECHANISM WAS `va_start IS A MACRO`.***
+With no header read, a macro can only be cpfe's -- and a BUILTIN is not
+a macro, which is exactly what an `#ifdef` separates and what the
+previous paragraph's "cpfe supplies them" did not. `preproc.c:15496`
+intercepts `#include <stdarg.h>` and sets
+`actual_include_was_suppressed`: **no file is opened and the search
+never happens**, so the search order, the binds, the wrapper and the
+header were all innocent. `va_copy` is then gated on
+`va_copy_macro_allowed`, which has no C++ arm and no option.
+
+***AND SECTION 3 WAS THE FINDING.*** `sizeof(va_list)` is 24 -- cpfe's
+own, folded -- against APExp's `char *`, which is 8; a disagreement
+that bites only in a `...` function DEFINED in C++, which nothing built
+through `eccp` had run. **So section 4 exists**: vararg functions
+defined and called here, `int` and `double` interleaved because the two
+travel differently on amd64, and a `va_copy` arm behind `#ifdef` so the
+file still builds without it. *The prediction is written down* --
+`__STDARG` defined, five macros, `sizeof` 8, section 4 unchanged -- and
+**section 4 being right both ways would mean the 24-byte `va_list` was
+never reached**, which is a result rather than a disappointment.
+
+**The C89 host arm is a free control for the new `#ifdef`**: glibc's
+`va_copy` is C99, so `gcc -std=c89` does not define it and the
+`probe_twice` arm reports itself skipped -- the same shape the VM
+showed, from a compiler that is known good. Both arms reach all four
+sections with 0 diagnostics under `-Wall -Wextra`.
+
+**Two instrument faults in the one run.** `eccp` had **no `-H`**, while
+the comment above its own `-E` block said `-H` was passed through by
+the `--*` case -- false, since `-H` does not begin with `--`, so the
+catch-all answered `unrecognised argument` and the one command that can
+name the files a header search opened could not be given. *A claim in a
+comment about which arm handles something is a claim like any other.*
+And **`pcc` will not compile a `.cpp`**: it dispatches on the suffix
+and answers `cc: no files to compile or load`, exiting having done
+nothing, with a message that reads like an empty argument list rather
+than a refusal -- so the C half needs `cp ... /tmp/sp.c` first. *A run
+that compiled nothing and a run that found nothing wrong both print
+almost nothing.*

@@ -20,6 +20,7 @@
 #   eccp -c [flags] file.cpp ...     compile to ./<base>.$O, do not link
 #   eccp -c -o dir/x.o file.cpp      compile that one source to that path
 #   eccp -E [flags] file.cpp ...     PREPROCESS ONLY, to stdout
+#   eccp -H [flags] file.cpp ...     name every file the include search opens
 #   eccp -F [flags] file.cpp         cpfe only: write the generated C
 #   eccp -K [flags] file.cpp ...     keep the generated .eccp.c intermediates
 #   eccp -o out [flags] file.cpp ... compile, link, write to out
@@ -193,7 +194,7 @@ if(~ $OBJEXT '') {
 }
 
 fn usage {
-	echo 'usage: eccp [-cEFvK] [-o out] [-I dir] [-D sym] [-U sym]' \
+	echo 'usage: eccp [-cEFHvK] [-o out] [-I dir] [-D sym] [-U sym]' \
 	     '[-l lib] [-L dir] [-fexceptions] [-frtti] file.cpp ...' >/fd/2
 	exit usage
 }
@@ -225,6 +226,16 @@ while(! ~ $#args 0) {
 		cflag = 1
 	case -E
 		eflag = 1
+	case -H
+		# `--trace_includes' (`cmd_line.c:8837', short form `H'), and
+		# it needs a case of its own.  **The note above the `-E' block
+		# said `-H' was passed through by the `--*' case and that was
+		# simply false** -- `-H' does not begin with `--', so the
+		# parser's catch-all answered `unrecognised argument: -H' and
+		# the one command that can name the files a header search
+		# opened could not be given.  *A claim in a comment about
+		# which arm handles something is a claim like any other.*
+		xxopts = ($xxopts --trace_includes)
 	case -F
 		fflag = 1
 	case -v
@@ -317,8 +328,64 @@ ehopts = ()
 if(~ $ehflag '')   ehopts = ($ehopts --no_exceptions)
 if(~ $rttiflag '') ehopts = ($ehopts --no_rtti)
 
+# ---- `--no_stdarg_builtin': READ THE REAL <stdarg.h> ----------------
+#
+# ***WITHOUT THIS, `#include <stdarg.h>' OPENS NO FILE AT ALL.***
+# `preproc.c:15496' is
+#
+#	if (pass_stdarg_references_to_generated_code &&
+#	    (strcmp(name,"stdarg.h")==0 || (C++ && name=="cstdarg")))
+#	  { proc_stdarg_include(is_cstdarg);
+#	    actual_include_was_suppressed = 1; }
+#	else open_file_and_push_input_stack(...);
+#
+# -- so cpfe INTERCEPTS the include, synthesises the names itself and
+# never looks for the header.  `target.c:10838' sets that flag to 1 and
+# `kencc_targ.h' says nothing about it, which is the `edgtarg-sweep'
+# ABSENT class.
+#
+# `proc_stdarg_include' (`preproc.c:15369') enters `va_start', `va_arg'
+# and `va_end' as keywords and predef macros unconditionally -- and
+# `va_copy' **only `if (va_copy_macro_allowed)'**, which
+# `fe_init.c:51105' defaults to 0 and which is set to 1 in exactly two
+# places: `check_and_set_new_c_mode_options' (`cmd_line.c:11993'), a C
+# path, and `microsoft_version >= 1900' (`:10939').  *There is no
+# command-line option for it and no C++ arm*, so under `--c++14' cpfe
+# never allows `va_copy' -- which is unrar's `strfn.cpp:538' exactly,
+# and why four of the five names worked and the fifth did not.
+#
+# **THE SYMPTOM IS `va_copy'; THE REASON TO FIX IT THIS WAY IS THE
+# ABI.**  With the builtin path in force `sys_predef.c:312656' does
+# `#define va_list __gnuc_va_list' and cpfe's own `va_list' is what the
+# generated C carries -- `cxx-stdarg-probe' measured `sizeof(va_list)'
+# as **24**, cpfe's folded answer, while APExp's `<stdarg.h>' is
+# `typedef char *va_list', which is **8**.  Those cannot both be right
+# for a vararg function DEFINED in C++ and compiled by `pcc', and
+# nothing built through this driver has ever run one, so the
+# disagreement has cost nothing yet.  Turning the builtin off makes
+# cpfe and `pcc' read the SAME HEADER, so they agree by construction
+# rather than by coincidence -- which patching `va_copy_macro_allowed'
+# in the corpus would not have done.  *The one-line fix for the error
+# message would have left the ABI split in place.*
+#
+# `cmd_line.c:9769' registers only the negative form, with the value 0
+# in `add_option_description''s fourth argument -- the same shape as
+# the `exceptions'/`no_exceptions' pair at `:8950'/`:8953' and the
+# `export'/`no_export' pair immediately above it, which is what fixes
+# the polarity.  That only the negative spelling exists says EDG
+# expects the builtin to be the default and this to be the exception;
+# for a target whose back end is a real C compiler with its own
+# `<stdarg.h>', it is the right exception to take.
+#
+# **The prediction, and what refutes it**: with this flag the probe's
+# section 1 must report `__STDARG' DEFINED, section 2 must report all
+# five names as macros, and section 3 must report `sizeof(va_list)' as
+# 8 rather than 24.  `__STDARG' still absent would mean the flag is
+# not reaching cpfe; `va_copy' still absent with `__STDARG' present
+# would mean the header was read and something else hides it.
 cpfeopts = ($EDGSTD $ehopts --target win64 \
 	    '--clear_flag=use_predefined_macro_file' \
+	    --no_stdarg_builtin \
 	    --instantiate local \
 	    $sysincl $iflags $xxopts)
 
