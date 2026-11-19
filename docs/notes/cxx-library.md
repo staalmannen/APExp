@@ -2986,3 +2986,82 @@ cannot report anything about its subject.* Found with
 `g++ -fsyntax-only`, and the bracketed subjects (`[va_copy(dst, src)]`)
 come from the same host run: gcc splits an expansion across lines, so
 verbatim-versus-expanded has to be readable without whole-line matching.
+
+## `va_copy`: the probe answered, and so did the run that was invalid
+
+Two results from one VM run, and the second is about the instrument.
+
+### `__STDARG` is not defined, so neither APExp's header nor stock 9front's was read
+
+    "cxx-stdarg-probe.cpp", line 115: error:
+        identifier "__STDARG" is undefined
+
+***THAT IS A MEASUREMENT AND NOT A GUESS.*** `identifier ... is
+undefined` is the diagnostic for a name that reached the **compiler**; a
+macro — even one defined as empty, which is what `#define __STDARG` is —
+could not have. So `stdarg_arch.h`, the only file in the tree that
+defines `va_copy`, was never processed.
+
+**And the same datum rules out the obvious alternative.** APExp's own
+`stdarg.h` comments record that stock 9front's APE header takes the
+*same* `__STDARG` guard — which is how it once *disabled* APExp's — so
+if cpfe had read that one instead, `__STDARG` would be defined. It is
+not. **Neither header was read.**
+
+### Where the other four names come from: cpfe itself
+
+`symbol_tbl.c:33309` is
+`full_enter_symbol("va_list", 7, sk_type, ...)` — **cpfe enters
+`va_list` as a type of its own** — and `lexical.c` carries
+`__builtin_va_start`, `__builtin_va_end` and `__builtin_va_copy` as
+builtins, with `sys_predef.c:313963` predefining the typedef
+`__builtin_va_list`. *`va_copy` is the one name in that family that is
+not also available as a macro*, which is exactly the shape of the
+failure: four of the five work with no header at all, and the fifth does
+not.
+
+So the question is no longer "which header lacks `va_copy`" but **"was
+`<stdarg.h>` opened at all"** — and `--trace_includes` (cpfe's `-H`,
+`cmd_line.c:8837`) names every file it opens, which answers it outright.
+
+### ***`eccp -F` IS NOT A PREPROCESS, AND THERE WAS NO `-E`***
+
+The run that produced the result above was, as a dump, invalid — and the
+reason is a gap in the driver rather than in the probe.
+
+**`-F` is cpfe doing a FULL TRANSLATION** that stops before `cc`: parse,
+semantic analysis, the lot, with its product in C and every C++ error in
+the file reported. The probe's `PROBE_x [subject]` lines were written to
+be read *after the preprocessor* and were guarded behind a `-D` so a
+compile would not see them — and then the instruction said to pass that
+`-D` with `-F`, so they were compiled after all. *The run reported the
+probe's own syntax.*
+
+**`eccp` had no preprocess-only mode at all.** A C++ driver without one
+has no way to ask what a header expanded to, which is the question this
+whole round is. `-E` now runs cpfe's `--preprocess` (`cmd_line.c:8820`,
+short form `E`) and writes to **stdout, deliberately not to `-o`**:
+honouring `-o` would mean a shell redirection inside the driver, and *a
+redirection creates the target whatever the command then does* — the
+other half of the `c++lib` bug this driver already carries a note about,
+where `mk` saw a recipe succeed because the file existed.
+
+### And the dump had a third weakness the same run demonstrated
+
+**The second question was lost to a parse cascade.** Line 115 answered
+`__STDARG`; line 116's `_APEXP_STDARG_H_` came back only as
+`expected a ";"`, which says nothing — and that is the question that
+separates "the wrapper ran and `<stdarg_arch.h>` was not found" from
+"nothing was read at all".
+
+*A probe that asks several questions in one file must not let the first
+answer destroy the rest.* So it is a **runnable program** now: every
+question is an `#ifdef` inside `main` printing its own line, all reached
+in one run, and the file compiles whether or not `va_copy` exists. The
+one case that must fail without it — unrar's six lines — is behind
+`-DCXX_STDARG_PROBE_USE`, opt-in, because the point of the rest of the
+file is to *report* the absence rather than die of it.
+
+Checked on the host in both languages before it shipped: `g++` and
+`gcc -std=c89 -x c` each reach all three sections, and the
+`CXX_STDARG_PROBE_USE` arm compiles where `va_copy` exists.
