@@ -252,11 +252,35 @@ int main(void) {
   printf("                                 NOR stock 9front's was read)\n");
 #endif
 #ifdef _APEXP_STDARG_H_
-  printf("  _APEXP_STDARG_H_  DEFINED     (APExp's <stdarg.h> wrapper WAS\n");
-  printf("                                 read -- so the wrapper ran and\n");
-  printf("                                 <stdarg_arch.h> did not)\n");
+  printf("  _APEXP_STDARG_H_  DEFINED     (APExp's <stdarg.h> wrapper was read)\n");
 #else
   printf("  _APEXP_STDARG_H_  not defined (APExp's wrapper was not read)\n");
+#endif
+  /*
+   * ***THE VERDICT IS THE PAIR, NOT EITHER GUARD.***  This block used
+   * to hang a conclusion off `_APEXP_STDARG_H_' alone -- "so the
+   * wrapper ran and <stdarg_arch.h> did not" -- which was written for
+   * the case where the wrapper is found and the arch header is not,
+   * and silently assumed the two were MUTUALLY EXCLUSIVE.  They are
+   * not: the healthy state has BOTH defined, and the first run after
+   * `--no_stdarg_builtin' printed that sentence beside a defined
+   * `__STDARG', contradicting itself in its own output.
+   *
+   * *A conclusion attached to one of two conditions is wrong in every
+   * case the other one changes*, which is this file's own rule about
+   * reporting rather than concluding, broken inside the report.
+   */
+  printf("  -> ");
+#if defined(__STDARG) && defined(_APEXP_STDARG_H_)
+  printf("wrapper AND arch header both read: the expected state\n");
+#elif defined(_APEXP_STDARG_H_)
+  printf("wrapper read, arch header NOT: the include of\n");
+  printf("     <stdarg_arch.h> missed -- a bind or search-order fault\n");
+#elif defined(__STDARG)
+  printf("arch header read WITHOUT the wrapper: reached directly\n");
+#else
+  printf("NEITHER was read -- cpfe suppressed the include\n");
+  printf("     (preproc.c:15496; pass --no_stdarg_builtin)\n");
 #endif
 
   /*

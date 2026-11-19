@@ -13,7 +13,13 @@ extern int	nrand(int);
 extern long	lrand(void);
 extern double	frand(void);
 
-extern char	*getpass(char *);
+/*
+ * `const char *' since this round: `<unistd.h>' declares it too (where
+ * every portable caller looks for it) and the two must agree, or a C++
+ * TU including both sees two overloads of an `extern "C"' function.
+ * gnulib's own prototype is the `const' one.
+ */
+extern char	*getpass(const char *);
 extern int	tty_echoon(int);
 extern int	tty_echooff(int);
 

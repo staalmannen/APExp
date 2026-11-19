@@ -3204,3 +3204,94 @@ handles something is a claim like any other.*
 with a message that reads like an empty argument list rather than a
 refusal. The C half needs `cp ... /tmp/sp.c` first. *A run that compiled
 nothing and a run that found nothing wrong both print almost nothing.*
+
+## `getpass`: present, implemented, declared — and unreachable
+
+With `--no_stdarg_builtin` in, unrar got about twenty files further and
+stopped at `consio.cpp:203`:
+
+    identifier "getpass" is undefined
+      strncpyz(StrA.data(),getpass(""),StrA.size());
+
+**libap has had `getpass` since before this tree** —
+`lib/ap/plan9/getpass.c` is a real implementation that opens
+`/dev/cons`, saves and restores the raw state through `_tty_raw` and
+handles kill and backspace. It was declared in **`<libv.h>`** and
+nowhere else: the Plan 9 / V10 header no portable program includes.
+SVID, BSD and glibc all put `getpass` in `<unistd.h>`, so every package
+that wants it looks there and finds nothing.
+
+### ***`apfunc-sweep.py` ANSWERS "defined" AND THE BUILD STILL FAILS***
+
+That sweep has three states — defined, declared-only, absent — and
+`getpass` is **defined**, naming a real file. That is the all-clear, and
+it is wrong, because the question the compile asks is *which header
+declares it*. **A capability can be present, implemented and declared
+and still be unreachable**, and none of the three states can say so.
+This is the fifth state the sweep cannot express, after the fourth
+(`lchown`, `towlower`, `towupper`: declared and then `#define`d over).
+
+*And a sixth turned up in the same pass*: `signal` came back
+`declared`, and `signal.c:61` defines it —
+`(*signal(int sig, void (*func)(int)))(int)`. **A function returning a
+function pointer has its name inside the declarator rather than at the
+start of it**, so the sweep's pattern misses the definition. Three
+blind spots, all of them reporting a name as less available than it is,
+which is the safe direction for a sweep that does not gate.
+
+### The signature is `const char *`, and that was checked rather than chosen
+
+`<libv.h>` had `char *getpass(char *)`. Two independent reasons to move
+it, either sufficient:
+
+* the one call in the tree passes a **string literal** (`getpass("")`),
+  which in C++ is `const char[1]` and does not convert to `char *`;
+* **every gnulib `unistd.in.h` under `external/`** — bison's and
+  diffutils' — declares
+  `_GL_FUNCDECL_SYS (getpass, char *, (const char *prompt))`, so a
+  `char *` here would disagree with the prototype two packages already
+  carry.
+
+*The signature was checked against what the tree's own packages expect
+rather than against what libap happened to write.* `<unistd.h>`,
+`<libv.h>` and the implementation all say `const char *` now — they must
+agree, or a C++ TU including both headers sees two overloads of an
+`extern "C"` function.
+
+The bare-word grep this tree requires before adding a name to a public
+header found no variable or macro called `getpass` anywhere.
+
+### `--cnames`: asking the other half of the question
+
+`cxxapp-host.sh --cnames <pkg>` compiles the package's objects for real
+(not `-fsyntax-only`), takes `nm -u` minus their own definitions, and
+for each plain-C name asks **which APE header declares it**: `NONE`,
+`ELSEWHERE` (declared, but only in a header a portable program does not
+include — `getpass`'s state), or silent. **It reports and does not
+gate**, for `hosthelper-sweep`'s reason: an `ELSEWHERE` may be a
+deliberate Plan 9 extension nothing portable should reach for.
+
+unrar is **95 plain-C names, 0 NONE, 0 ELSEWHERE** — so `getpass` was
+the only one of its kind, and the C-library side of this port is
+predicted complete. *That is the measurement that replaces one VM round
+per missing name*, which is what `php-mirror --undefined` was worth
+eight times over.
+
+***ITS FIRST RUN HAD TWO FAULTS AND BOTH REPORTED THE RIGHT ANSWER AS A
+FINDING.*** `POSIXH` is written across several lines, so its separators
+are **newlines** and the `*" $h "*` membership test never matched —
+`string.h`, `time.h`, `wctype.h` and `pwd.h` all came back `ELSEWHERE`.
+And glibc's LFS aliases (`lseek64`, `stat64`, `open64`, `readdir64`,
+`statvfs64`) came back `NONE`, though APExp's `off_t` is already 64-bit
+and no such name exists or is wanted — which `c++/unrar/mkfile` already
+records as the reason it passes no `_FILE_OFFSET_BITS`. Nine missing
+names and eleven unreachable ones, **every one of them the
+instrument's**. *A clean first run would have been believed on sight.*
+The LFS case is recognised by the **stem** resolving rather than by the
+suffix, so a real name ending in `64` is still reported.
+
+**Its control is external**, like `truefalse-sweep`'s and for the same
+reason — the finding it was built on is fixed, so `HEAD` cannot show
+it. Staging the pre-fix `unistd.h` and re-running answers
+`ELSEWHERE getpass -> libv.h`, `1 only elsewhere`, against `0` now. Run
+and recorded.
