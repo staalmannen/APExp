@@ -91,12 +91,19 @@ BIN=$APEXPROOT/$objtype/bin/ape
 #
 # ---- WHY NOT `mkone' ----------------------------------------------
 #
-# `mkone' and `mkmany' drive `$CC'/`$LD' over `%.$O' -- `.6' on amd64,
-# `.8' on 386 -- and `eccp' produces `.o' on every architecture,
-# because `sys/src/ape/9src/cc.c' is one line including `pcc.c' and
-# `pcc.c:75' picks the extension from the name it was invoked under.
-# So the object suffix here is architecture-INDEPENDENT and `$O' is
-# the wrong variable; the rules below are five lines and say so.
+# `mkone' and `mkmany' drive `$CC'/`$LD' over `%.$O' and then LINK with
+# `$LD', and the link here is `eccp''s -- cpfe's C output has to be
+# compiled before anything can be linked, and `libedg.a' has to come
+# last.  Four hand-written rules say that in less space than bending
+# `mkone' around it would take.
+#
+# **The object suffix IS `$O'**, and that is a change from the first
+# version of this file.  `eccp' used to run `cc' rather than `pcc'
+# purely to get `.o' on every architecture (`pcc.c:75' picks the
+# extension from the name it is invoked under), and *`.o' is the same
+# name on every architecture* -- so a cross build and a native one
+# could not share a source directory, which is the one thing `%.$O'
+# exists to make possible.
 #
 # ***AND `eccp -c' COULD NOT BE USED IN A PATTERN RULE AT ALL UNTIL
 # THIS ROUND.***  It named the object after the GENERATED C --
@@ -112,55 +119,55 @@ CXX=eccp
 CXXFLAGS=-c -fexceptions -I$RARSRC -DUNRAR
 
 OFILES=\
-	rar.o\
-	strlist.o\
-	strfn.o\
-	pathfn.o\
-	smallfn.o\
-	global.o\
-	file.o\
-	filefn.o\
-	filcreat.o\
-	archive.o\
-	arcread.o\
-	unicode.o\
-	system.o\
-	crypt.o\
-	crc.o\
-	rawread.o\
-	encname.o\
-	resource.o\
-	match.o\
-	timefn.o\
-	rdwrfn.o\
-	consio.o\
-	options.o\
-	errhnd.o\
-	rarvm.o\
-	secpassword.o\
-	rijndael.o\
-	getbits.o\
-	sha1.o\
-	sha256.o\
-	blake2s.o\
-	hash.o\
-	extinfo.o\
-	extract.o\
-	volume.o\
-	list.o\
-	find.o\
-	unpack.o\
-	headers.o\
-	threadpool.o\
-	rs16.o\
-	cmddata.o\
-	ui.o\
-	largepage.o\
-	filestr.o\
-	recvol.o\
-	rs.o\
-	scantree.o\
-	qopen.o\
+	rar.$O\
+	strlist.$O\
+	strfn.$O\
+	pathfn.$O\
+	smallfn.$O\
+	global.$O\
+	file.$O\
+	filefn.$O\
+	filcreat.$O\
+	archive.$O\
+	arcread.$O\
+	unicode.$O\
+	system.$O\
+	crypt.$O\
+	crc.$O\
+	rawread.$O\
+	encname.$O\
+	resource.$O\
+	match.$O\
+	timefn.$O\
+	rdwrfn.$O\
+	consio.$O\
+	options.$O\
+	errhnd.$O\
+	rarvm.$O\
+	secpassword.$O\
+	rijndael.$O\
+	getbits.$O\
+	sha1.$O\
+	sha256.$O\
+	blake2s.$O\
+	hash.$O\
+	extinfo.$O\
+	extract.$O\
+	volume.$O\
+	list.$O\
+	find.$O\
+	unpack.$O\
+	headers.$O\
+	threadpool.$O\
+	rs16.$O\
+	cmddata.$O\
+	ui.$O\
+	largepage.$O\
+	filestr.$O\
+	recvol.$O\
+	rs.$O\
+	scantree.$O\
+	qopen.$O\
 
 # `OFILES' IS UPSTREAM'S `OBJECTS' *PLUS* `UNRAR_OBJ', AND THE SECOND
 # HALF IS EASY TO MISS.  The makefile's link rule is
@@ -176,8 +183,8 @@ all:V:	$TARG
 $TARG:	$OFILES
 	$CXX -fexceptions -o $TARG $OFILES
 
-%.o:	$RARSRC/%.cpp
-	$CXX $CXXFLAGS -o $stem.o $RARSRC/$stem.cpp
+%.$O:	$RARSRC/%.cpp
+	$CXX $CXXFLAGS -o $stem.$O $RARSRC/$stem.cpp
 
 install:V:	$BIN/$TARG
 
@@ -199,7 +206,7 @@ installall:V:
 # `cc' failure after a successful translation, where the generated C is
 # deliberately left behind for someone to read.
 clean:V:
-	rm -f *.o *.eccp.c $TARG
+	rm -f *.[$OS] *.o *.eccp.c $TARG
 
 nuke:V:	clean
 

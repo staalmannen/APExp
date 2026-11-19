@@ -6,7 +6,7 @@
 #
 # Usage:
 #   eccp [flags] file.cpp ...        compile and link
-#   eccp -c [flags] file.cpp ...     compile to ./<base>.o, do not link
+#   eccp -c [flags] file.cpp ...     compile to ./<base>.$O, do not link
 #   eccp -c -o dir/x.o file.cpp      compile that one source to that path
 #   eccp -F [flags] file.cpp         cpfe only: write the generated C
 #   eccp -K [flags] file.cpp ...     keep the generated .eccp.c intermediates
@@ -64,14 +64,21 @@
 #    better of the two (guarded `#ifndef __cplusplus'; in C++ all eleven
 #    are keywords).
 #
-# 4. `cc' RATHER THAN `pcc', AND THE NAME IS THE WHOLE REASON.
+# 4. `pcc' RATHER THAN `cc', AND IT USED TO BE THE OTHER WAY ROUND.
 #    `sys/src/ape/9src/cc.c' is the single line
 #    `#include "../../cmd/pcc.c"', and `pcc.c:75' is
 #    `objext = (strcmp(prog,"cc")==0) ? "o" : ot->o' -- **one binary, and
 #    the name it is invoked under chooses the object extension.**  Under
-#    `cc' it is `.o' on every architecture, so this driver needs no
-#    objtype-to-suffix table and the object names it computes are right
-#    on all eleven.  bacon's recipe paid a round for exactly this.
+#    `cc' that is `.o' on every architecture, which is why this driver
+#    called it `cc': no objtype-to-suffix table to carry.
+#
+#    ***BUT `.o' IS THE SAME NAME ON EVERY ARCHITECTURE***, so a cross
+#    build and a native one cannot share a source directory -- which is
+#    exactly what `mk' relies on everywhere else in this tree, and what
+#    `%.$O' is for.  Since `-c' now names the object with `-o'
+#    explicitly, the extension is this script's choice rather than the
+#    driver's, and the suffix is read from `/$objtype/mkfile'.  See the
+#    OBJEXT block below.
 #
 # 5. `--instantiate local' IS WHAT MAKES A TEMPLATE LINK AT ALL HERE.
 #    Without it the first toy with a template translated cleanly, compiled
@@ -124,7 +131,8 @@
 #
 # Environment overrides:
 #   CPFE     path to the cpfe binary      (default: cpfe)
-#   CC       path to the C compiler       (default: cc -- see note 4)
+#   CC       path to the C compiler       (default: pcc -- see note 4)
+#   OBJEXT   object-file suffix           (default: read from /$objtype/mkfile)
 #   CXXINCL  C++ language-support headers (default: /sys/include/ape/c++)
 #   EDGLIB   EDG's C++ runtime            (default: /$objtype/lib/ape/libedg.a)
 #   STLINCL  extra C++ include root       (default: empty)
@@ -133,10 +141,44 @@
 rfork e
 
 if(~ $CPFE '')    CPFE    = cpfe
-if(~ $CC '')      CC      = cc
+if(~ $CC '')      CC      = pcc
 if(~ $CXXINCL '') CXXINCL = /sys/include/ape/c++
 if(~ $EDGLIB '')  EDGLIB  = /$objtype/lib/ape/libedg.a
 if(~ $EDGSTD '')  EDGSTD  = --c++14
+
+# ---- the object suffix, and WHY IT IS NOT `.o' ----------------------
+#
+# ***`.o' IS THE SAME NAME ON EVERY ARCHITECTURE, AND THAT IS THE
+# PROBLEM.***  Plan 9 names an object after what it was compiled FOR --
+# `.6' for amd64, `.8' for 386, `.5' for arm -- so one source directory
+# can hold the objects of several targets at once and `mk' tells them
+# apart.  `.o' cannot: a cross build after a native one reads whichever
+# `rar.o' happened to be there, and the link either fails on the exec
+# header or does not.  *Nothing in that message is about architectures*,
+# which is this tree's recorded shape for `bash/mkfile''s `LD'.
+#
+# This driver used to run `cc' PRECISELY TO GET `.o', because that was
+# simpler than carrying a suffix table: `sys/src/ape/9src/cc.c' is one
+# line including `pcc.c', and `pcc.c:75' is
+# `objext = (strcmp(prog,"cc")==0) ? "o" : ot->o' -- one binary, and the
+# name it is invoked under chooses the extension.  **That trade is paid
+# off now**: since `-c' names the object with `-o' explicitly, the
+# extension is this script's to choose rather than the driver's, so it
+# can be the right one.
+#
+# `$O' is MK's variable and is not in the environment, so it is read
+# from the same place mk reads it: `/$objtype/mkfile', the file every
+# mkfile in the tree begins by including.  *Deriving it from the
+# authority rather than transcribing a table* is the same rule as
+# `cxxapp-host.sh' taking its object list from the link rule -- an
+# eleven-entry table here would be an eleventh place to keep in step.
+if(~ $OBJEXT '') {
+	OBJEXT = o
+	if(test -f /$objtype/mkfile) {
+		_o = `{sed -n 's/^O=//p' /$objtype/mkfile}
+		if(! ~ $#_o 0) OBJEXT = $_o(1)
+	}
+}
 
 fn usage {
 	echo 'usage: eccp [-cFvK] [-o out] [-I dir] [-D sym] [-U sym]' \
@@ -211,7 +253,14 @@ while(! ~ $#args 0) {
 		sources = ($sources $a)
 	case *.c
 		cfiles = ($cfiles $a)
-	case *.o *.a
+	case *.o *.a *.[1-9kqv]
+		# ***THE PLAN 9 OBJECT SUFFIXES, NOT JUST `.o'.***  `6' for
+		# amd64, `8' for 386, `5' for arm, and so on across the ten
+		# compilers `[1-9kqv]c'.  Written as a class rather than as
+		# `*.'^$OBJEXT so that a LINK of objects built for this
+		# target is recognised whatever `$OBJEXT' says, and `.o' is
+		# kept because that is what every object this driver made
+		# before today is called.
 		objects = ($objects $a)
 	case *
 		echo 'eccp: unrecognised argument:' $a >/fd/2
@@ -332,7 +381,7 @@ objs = ()
 for(s in $sources) {
 	base = `{basename $s | sed 's/\.\(cpp\|cxx\|cc\|C\)$//'}
 	gen = $objdir^'/'^$base^'.eccp.c'
-	obj = $objdir^'/'^$base^'.o'
+	obj = $objdir^'/'^$base^'.'^$OBJEXT
 	if(! ~ $cflag '' && ! ~ $outfile '') obj = $outfile
 	if(! ~ $fflag '' && ! ~ $outfile '') gen = $outfile
 	run $CPFE $cpfeopts '--gen_c_file_name='^$gen $s
@@ -357,7 +406,7 @@ if(! ~ $fflag '') exit 0
 # in that directory while the name this loop recorded had none.  *The
 # list and the files agreed only when the path was bare.*
 for(c in $cfiles) {
-	cobj = $objdir^'/'^`{basename $c .c}^'.o'
+	cobj = $objdir^'/'^`{basename $c .c}^'.'^$OBJEXT
 	if(! ~ $cflag '' && ! ~ $outfile '' && ~ $#sources 0) cobj = $outfile
 	run $CC -c -o $cobj $ccopts $iflags $c
 	st = $status

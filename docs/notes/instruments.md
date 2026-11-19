@@ -1597,3 +1597,52 @@ the package asks for", while the mkfile builds the subset that is one
 thing at a time. Saying which is authoritative for what is the point —
 **a harness and a build that quietly differ are two results wearing one
 number.**
+
+## `cxx-stdarg-probe.cpp` — when every reading says it cannot happen
+
+**Came from**: the first `mk install` of `sys/src/ape/c++/unrar`, which
+compiled two files and stopped on `strfn.cpp:538` with
+`identifier "va_copy" is undefined`.
+
+**Why it is a probe and not a fix.** `va_list` one line above it is fine,
+and so are `va_start`, `va_arg` and `va_end` elsewhere in the same file —
+so a `<stdarg.h>` was found and read, and the one read defines everything
+except `va_copy`. And **every reading of the tree says that cannot
+happen**: `amd64/include/ape/stdarg_arch.h` defines `va_copy`, both
+wrappers chain to it, `mount-include` binds them and `apexp-sh` runs it,
+nothing else defines `__STDARG` or ships a second `stdarg.h`, and unrar
+reaches the header through the `_UNIX` arm that `raros.hpp` turns on by
+default. *The recorded tally for mechanisms guessed from code alone is
+about one in eight, and this is exactly the position that rule is for.*
+
+**It is built to answer in one command, three ways.**
+`--trace_includes` names the file cpfe actually opened, which separates
+"read somebody else's header" from "read none and used builtins" outright;
+`--list_macros` says what is defined rather than what ought to be; and the
+`PROBE_` dump lines show each subject bracketed, so expanded and
+unexpanded cannot be confused.
+
+***AND THE C SIDE IS THE HALF THAT MAKES IT WORTH KEEPING.*** `pcc`
+searches the same two header roots in the same order as `eccp` passes
+them, so running both gives a split a single run cannot: **C right and
+C++ wrong** is cpfe's include search or its builtins; **both wrong** is
+the header or the bind, and would have been true for every C program all
+along, since nothing in this tree has needed `va_copy` before. *A probe
+that can only ask one of two toolchains answers half a question.*
+
+**Its own fault, caught on the host before it shipped**: the `PROBE_`
+lines are not valid C++, so a plain compile reported six errors of the
+probe's own making rather than reproducing unrar's one. They are behind
+`-DCXX_STDARG_PROBE_DUMP` now, so `-F` dumps and a compile reproduces.
+*A probe whose own syntax is the first thing to fail cannot report
+anything about its subject.* The brackets come from the same host run:
+gcc splits a macro expansion across lines, so verbatim-versus-expanded
+has to be readable without matching whole lines.
+
+**And it is `cxxapp-host.sh`'s stated limit biting for the first time.**
+That harness compiles against the **host's** C headers — its own header
+says so — and glibc's `<stdarg.h>` has `va_copy`, so all 49 unrar files
+compiled clean there and always will. *A harness that compiles a package
+against a different C library has measured the C++ and nothing else.*
+The limit was written down a round before it cost anything, which is the
+only reason this was one line to recognise rather than a round to find.
