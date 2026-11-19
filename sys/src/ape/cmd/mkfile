@@ -45,7 +45,6 @@ _OPTIONAL_APPS=\
 	minigzip\
 	unace\
 	unarj\
-	unrar\
 	lz4\
 	xz\
 	zstd\

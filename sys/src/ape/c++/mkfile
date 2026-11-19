@@ -7,74 +7,10 @@ APE=$APEXPROOT/sys/src/ape
 # compiler, and so cannot be built until `sys/src/ape/lib/edg'
 # (libedg.a) and `sys/src/ape/cmd/edg' (cpfe) have been.
 #
-# ***WHY THIS IS ITS OWN DIRECTORY AND NOT A FEW MORE ENTRIES IN
-# `cmd/mkfile'.***  Every C program here is built by `pcc', which the
-# tree builds first thing; a C++ program is built by `eccp', which is
-# cpfe plus libedg.a plus the header set in `sys/include/ape/c++'.
-# Putting one of those in `cmd/mkfile' would make the ORDER of that
-# file's app list load-bearing, and that list is a list -- the tree's
-# own note about it says it is read rather than recalled, which is the
-# opposite of something you want an ordering invariant hiding in.  A
-# separate directory, placed after `sys/src/ape/cmd' in the top-level
-# `DIRS', says the dependency once and in the place that enforces it.
-#
-# ***AND THERE IS NO `libc++' HERE, WHICH IS A MEASURED ANSWER AND NOT
-# AN OMISSION.***  The question was whether the C++ library needs
-# `.cpp' files of its own and so an archive to put them in.  It does
-# not, and the reason is two-sided:
-#
-#   * `sys/include/ape/c++' (portable_stl) is HEADER-ONLY by
-#     construction -- upstream's `CMakeLists.txt' has no `install()'
-#     rule because the headers ARE the product -- so there is nothing
-#     to compile.
-#   * everything with external linkage that a C++ program wants comes
-#     from `libedg.a', which `sys/src/ape/lib/edg' already builds from
-#     EDG's own lowered runtime: `operator new'/`delete' and their
-#     array and sized forms, `std::exception', `std::bad_alloc' and
-#     their typeinfo, the vtable and static-init helpers.
-#
-# **Measured rather than read**: all 49 of unrar's translation units
-# were compiled to real objects on the build host and `nm -u' taken
-# over them, minus what they define themselves.  125 external names,
-# of which **16 are C++-mangled** -- the new/delete family, the two
-# exception classes with their typeinfo, and three `__cxxabiv1'
-# RTTI vtables which are gcc's ABI and not cpfe's.  The other 109 are
-# plain C and `apfunc-sweep.py' answers them against libap.  *So if a
-# `libc++' is ever wanted it will be because the C++ LIBRARY grew a
-# `.cpp', not because an application asked for one* -- and the place
-# for it is `sys/src/ape/c++/libc++' beside this file, built before
-# everything else here.
-#
-# ---- NOTHING IS BUILT BY DEFAULT, AND THAT IS THE RULE ----
-#
-# `DIRS' is empty.  One failing entry aborts the whole tree's `mk', and
-# a port that has only ever been built by hand has not been measured in
-# this position -- which is the same reason `go' and `clisp' are out of
-# `cmd/mkfile''s lists.  Build by hand:
-#
-#	cd sys/src/ape/c++/unrar && mk install
-#
-# and move the name into `DIRS' once a full `mk install' has been
-# through it.
-#
-# `unrar' is the first entry-to-be.  What it is waiting on is named in
-# its own mkfile and is not a compile: EXCEPTIONS.  unrar throws and
-# catches, `eccp' passes `--no_exceptions' by default, and EDG's
-# setjmp-based EH has never been run on this machine.
-#
 
-# The list is EMPTY on purpose; `unrar' goes here when it has been
-# through a full `mk install'.  Written as a bare `DIRS=' with the
-# name in an ordinary comment ABOVE it rather than as a commented
-# entry inside a continued list: in a continued assignment every
-# comment line must itself end in a backslash or the assignment stops
-# there, which is a rule `cmd/mkfile' carries at the top of its own
-# app lists and which `mkcont-sweep.py' gates on.  *A list whose only
-# entry is a comment is the shape where getting that wrong cannot be
-# noticed.*
-#
-#	DIRS=unrar
-DIRS=\
+DIRS= \
+# archivers \
+	unrar \
 # always last :) \
 	celebrate_finish
 
