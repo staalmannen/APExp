@@ -2,13 +2,27 @@
  * cxx-ehchain-probe.cpp -- what is ON the EH stack when EDG's
  * unwinder gives up.
  *
- *	eccp -fexceptions -o cxx-ehchain-probe cxx-ehchain-probe.cpp
+ *	pcc -c cxx-ehchain-walk.c
+ *	eccp -fexceptions -o cxx-ehchain-probe cxx-ehchain-probe.cpp \
+ *		cxx-ehchain-walk.$O
  *	./cxx-ehchain-probe
  *
  * and the gcc reference arm, which must print `caught' and must NOT
  * reach the handler:
  *
- *	g++ -std=c++14 -DREFERENCE -o /tmp/ehref cxx-ehchain-probe.cpp
+ *	gcc -DREFERENCE -c -o /tmp/ehwalk.o cxx-ehchain-walk.c
+ *	g++ -std=c++14 -DREFERENCE -o /tmp/ehref cxx-ehchain-probe.cpp \
+ *		/tmp/ehwalk.o
+ *
+ * ***THE WALK IS IN A SEPARATE C FILE AND THAT IS A FINDING, NOT A
+ * STYLE CHOICE.***  A C++ TU that uses exceptions at all already has
+ * cpfe's own `struct __C8 *__curr_eh_stack_entry;' in its generated
+ * C, so declaring the name here is a redeclaration with a different
+ * type -- `external redeclaration of: __curr_eh_stack_entry', which
+ * is what the first version of this probe answered.  The generated
+ * tag is per-TU, so no spelling would have agreed.  `cxx-ehchain-
+ * walk.c' has the walk and the reasoning; `eccp' already passes
+ * `*.o'/`*.[1-9kqv]' to the linker.
  *
  * ---- WHAT THIS IS FOR ------------------------------------------------
  *
@@ -69,13 +83,8 @@
  * whether `abort()' leaves a broken process in `/proc'.
  *
  * `__curr_eh_stack_entry' is a plain C name in EDG's generated C, so
- * `extern "C"' reaches it.  **Only `next' and `kind' are declared
- * here**, at offsets 0 and 8, and nothing is ever allocated through
- * this declaration -- a prefix is enough to WALK a list and getting
- * the union wrong cannot matter.  (`an_eh_stack_entry' is
- * `{ next; kind; variant; }' in `throw.c' and `struct __C7' is the
- * same three in a client TU -- checked, so the two sides agree about
- * where `kind' is.)
+ * `cxx-ehchain-walk.c' reaches it with an ordinary `extern' and this
+ * file calls that one function through `extern "C"'.
  *
  * ---- HOW TO READ IT, STATED BEFORE THE RUN ---------------------------
  *
@@ -120,51 +129,15 @@
 
 static int reached = 0;
 
-#ifndef REFERENCE
-
 /*
- * The walk only ever reads these two members; see the header for why
- * a prefix declaration is sound and the union is not needed.
+ * The whole of the walk is in `cxx-ehchain-walk.c'; see the header
+ * for why it cannot live in this file.  `char *' and not
+ * `char const *', to match a C file compiled by pcc without arguing
+ * about a prototype across two languages.
  */
-struct eh_entry {
-  struct eh_entry *next;
-  unsigned char kind;
-};
+extern "C" void eh_dump(char *when);
 
-extern "C" struct eh_entry *__curr_eh_stack_entry;
-
-static char const *kindname(unsigned char k) {
-  switch (k) {
-  case 0: return "old_try_block";
-  case 1: return "function";
-  case 2: return "throw_spec";
-  case 3: return "throw_processing_marker";
-  case 4: return "vec_new_or_delete";
-  case 5: return "TRY_BLOCK";
-  case 6: return "NOEXCEPT";
-  }
-  return "???";
-}
-
-static void dumpchain(char const *when) {
-  struct eh_entry *e;
-  int n;
-
-  printf("  chain at %s: head = %p\n", when, (void *)__curr_eh_stack_entry);
-  n = 0;
-  for (e = __curr_eh_stack_entry; e != 0 && n < 64; e = e->next, n++)
-    printf("    [%2d] %p kind %u %s\n", n, (void *)e,
-           (unsigned)e->kind, kindname(e->kind));
-  printf("  chain at %s: %d entr%s\n", when, n, n == 1 ? "y" : "ies");
-}
-
-#else
-
-static void dumpchain(char const *when) {
-  printf("  chain at %s: not available on the reference arm\n", when);
-}
-
-#endif
+static void dumpchain(char const *when) { eh_dump((char *)when); }
 
 static void on_terminate(void) {
   reached = 1;
