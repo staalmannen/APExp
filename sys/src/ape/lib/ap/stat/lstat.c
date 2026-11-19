@@ -3,7 +3,7 @@
 #include <errno.h>
 
 int
-lstat(char *name, struct stat *ans)
+lstat(const char *name, struct stat *ans)
 {
 	return stat(name, ans);
 }
