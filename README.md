@@ -178,7 +178,7 @@ sources could be a barrier. Because of this, APExp package several (un)archivers
 - minigzip (from zlib)
 - bzip2 utilities (from libbz2)
 - unarj (version 2.65)
-- unrar (version 2.71 ; can handle old rar archives. More recent versions written in c++)
+- unrar (version 7.30 ; c++)
 - unace (version 2.7)
 - clzip (version 1.14)
 - xz (version 5.8.3)
