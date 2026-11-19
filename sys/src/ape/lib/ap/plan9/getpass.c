@@ -4,8 +4,12 @@
 #include <libv.h>
 #include "lib.h"
 
+/*
+ * `const char *' to match `<unistd.h>' and `<libv.h>', which must
+ * agree with each other; the prompt is only ever handed to `fprintf'.
+ */
 char *
-getpass(char *prompt)
+getpass(const char *prompt)
 {
 	int c;
 	char *p;

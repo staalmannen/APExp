@@ -172,6 +172,30 @@ extern char *getlogin_r(char *, int);
 extern int getpagesize(void);
 extern int gethostname(char *, size_t);
 
+/*
+ * `getpass' HAS BEEN IN libap SINCE BEFORE THIS TREE
+ * (`lib/ap/plan9/getpass.c' -- a real implementation that opens
+ * `/dev/cons', saves and restores the raw state and handles kill and
+ * backspace), AND IT WAS DECLARED ONLY IN `<libv.h>', which is the
+ * Plan 9 / V10 header no portable program includes.  SVID, BSD and
+ * glibc all put it here, so every package that uses it looks here and
+ * finds nothing -- the capability-present-and-not-declared shape,
+ * which this tree has now hit often enough to have a name for it.
+ * unrar's `consio.cpp:203' is what asked.
+ *
+ * **`const char *' and NOT `char *', which the `<libv.h>' declaration
+ * had.**  Two independent reasons and either alone is enough: the one
+ * caller in the tree passes a STRING LITERAL (`getpass("")'), which in
+ * C++ is `const char[1]' and does not convert; and every gnulib
+ * `unistd.in.h' in `external/' declares
+ * `_GL_FUNCDECL_SYS (getpass, char *, (const char *prompt))', so a
+ * `char *' here would disagree with the prototype bison and diffutils
+ * already carry.  *The signature was checked against what the tree's
+ * own packages expect rather than against what libap happened to
+ * write*, and `<libv.h>' and the implementation were moved to match.
+ */
+extern char *getpass(const char *);
+
 /* musl */
 extern int truncate(const char *, off_t);
 extern int getdtablesize(void);

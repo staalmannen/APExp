@@ -132,8 +132,10 @@ command -v g++ >/dev/null 2>&1 || { echo "cxxapp-host: no g++" >&2; exit 2; }
 [ -d "$CXXDIR" ] || { echo "cxxapp-host: no $CXXDIR" >&2; exit 2; }
 
 OUT=${TMPDIR:-/tmp}/cxxapp-host.$$
-mkdir -p "$OUT/shim" || exit 2
+mkdir -p "$OUT/shim" "$OUT/obj" || exit 2
 trap 'rm -rf "$OUT"' EXIT
+
+CNAMES=0			# --cnames: see the block above compile_pkg
 
 # The four predefines cpfe has and gcc has not.  Copied from
 # cxxlib-host.sh, which carries the reasoning.
@@ -174,6 +176,134 @@ if [ "${1:-}" = "--headers" ]; then
 	done
 	exit 0
 fi
+
+# ---- `--cnames': WHICH APE HEADER DECLARES EACH C NAME -------------
+#
+# ***THE QUESTION `apfunc-sweep.py' CANNOT ASK.***  That sweep answers
+# "does libap DEFINE this name, only DECLARE it, or neither" -- three
+# states -- and `getpass' is `defined', pointing at a real file
+# (`lib/ap/plan9/getpass.c'), which is the all-clear.  unrar's
+# `consio.cpp:203' failed on it all the same, because the only
+# DECLARATION was in `<libv.h>', the Plan 9 / V10 header no portable
+# program includes.  **A capability can be present, implemented and
+# declared, and still be unreachable**, and the three states have no
+# way to say so.
+#
+# So this asks the other half: for every plain-C name the package
+# actually references, WHICH header under `sys/include/ape' (or the
+# arch root) declares it?  Three answers, and the middle one is the
+# point:
+#
+#   NONE      no APE header declares it -- a compile error waiting
+#   ELSEWHERE declared, but only in headers a portable program does
+#             not include -- `getpass''s state exactly
+#   (silent)  declared in a C or POSIX header, i.e. reachable
+#
+# **It REPORTS and does not gate**, for `hosthelper-sweep''s reason: a
+# name in `ELSEWHERE' may be a deliberate Plan 9 extension that no
+# portable caller should reach for, so a gate would demand a change
+# that must not always be made.
+#
+# *Its limit is the one every host check here has*: the NAMES come
+# from a g++ build against the HOST's C library, so a function glibc
+# inlines or renames (`__isoc23_wcstol', `__errno_location') appears
+# under a name APExp never has, and one glibc defines as a macro does
+# not appear at all.  The `__'-prefixed names are dropped for that
+# reason.
+#
+# ***ITS CONTROL HAS BEEN RUN AND IT IS EXTERNAL***, like
+# `truefalse-sweep''s and for the same reason: the one finding it was
+# built on is already fixed, so `HEAD' cannot show it.  Stage the
+# pre-fix header --
+#
+#	git show <before>:sys/include/ape/unistd.h > sys/include/ape/unistd.h
+#
+# -- and it answers `ELSEWHERE getpass -> libv.h', `1 only elsewhere',
+# against `0' on the current tree.  Restore the header afterwards.
+#
+# ***AND ITS FIRST RUN HAD TWO FAULTS OF ITS OWN, BOTH REPORTING THE
+# RIGHT ANSWER AS A FINDING***: `POSIXH' is written across lines, so
+# its separators are NEWLINES and a space-delimited match never fired
+# -- `string.h', `time.h', `wctype.h' and `pwd.h' all came back
+# ELSEWHERE -- and glibc's LFS aliases (`lseek64', `stat64', ...) came
+# back NONE though APExp's `off_t' is already 64-bit and no such name
+# exists or is wanted.  *Nine missing names and eleven unreachable
+# ones, every one of them the instrument's.*  **A clean first run
+# would have been believed on sight**; the noisy one is what got read.
+#
+# **It is sound for the question "is this name reachable from
+# an APE header" and not for "is this the complete set".**
+POSIXH=' assert.h complex.h ctype.h dirent.h dlfcn.h errno.h fcntl.h
+ fenv.h float.h glob.h grp.h iconv.h inttypes.h langinfo.h libgen.h
+ limits.h locale.h math.h monetary.h netdb.h poll.h pthread.h pwd.h
+ regex.h sched.h search.h semaphore.h setjmp.h signal.h spawn.h
+ stdarg.h stdbool.h stddef.h stdint.h stdio.h stdlib.h string.h
+ strings.h stropts.h syslog.h tar.h termios.h tgmath.h time.h
+ ucontext.h ulimit.h unistd.h utime.h utmpx.h wchar.h wctype.h
+ wordexp.h '
+# ***WRITTEN ACROSS LINES, SO ITS SEPARATORS ARE NEWLINES.***  The
+# membership test is `case "$POSIXH" in *" $h "*)', which wants a
+# SPACE on both sides -- and every name at the start of a continuation
+# line has a newline before it.  The first run reported `string.h',
+# `time.h', `wctype.h' and `pwd.h' as ELSEWHERE, which is to say it
+# reported the correct answer as the finding.  *A list laid out for a
+# human to read and matched as if it were one line.*
+POSIXH=" $(echo $POSIXH) "
+
+cnames_report() {
+	nm -u "$OUT"/obj/*.o 2>/dev/null | awk '{print $NF}' \
+		| grep -v '\.o:$' | sort -u > "$OUT/und"
+	nm --defined-only "$OUT"/obj/*.o 2>/dev/null | awk 'NF>=3{print $3}' \
+		| sort -u > "$OUT/def"
+	# `_Z' and the ABI families are C++; `__' is glibc's own spelling
+	# and says nothing about APExp (see the limit above).
+	comm -23 "$OUT/und" "$OUT/def" \
+		| grep -v '^_Z\|^_Unwind\|^_GLOBAL\|^__' > "$OUT/cext"
+	echo "  --cnames: $(wc -l < "$OUT/cext") plain-C names referenced"
+	n_none=0; n_else=0; n_lfs=0
+	while read -r nm_; do
+		[ -n "$nm_" ] || continue
+		hits=$(grep -rlw -- "$nm_" "$ROOT"/sys/include/ape/*.h \
+			"$ROOT"/sys/include/ape/*/*.h \
+			"$ROOT"/*/include/ape/*.h 2>/dev/null \
+			| sed 's|.*/include/ape/||' | sort -u | tr '\n' ' ')
+		if [ -z "$hits" ]; then
+			# ***glibc's LFS ALIASES ARE NOT MISSING NAMES.***
+			# `lseek64', `stat64', `open64', `readdir64' and
+			# `statvfs64' came back NONE on the first run, and
+			# they are the host's `_FILE_OFFSET_BITS'
+			# redirections -- **APExp's `off_t' is already
+			# 64-bit, so there is no such name and none is
+			# wanted**, which `c++/unrar/mkfile' already records
+			# as the reason it passes no `-D_FILE_OFFSET_BITS'.
+			# Recognised by the STEM resolving, not by the
+			# suffix alone: a real name ending in `64' whose
+			# stem is unknown is still reported.
+			stem=${nm_%64}
+			if [ "$stem" != "$nm_" ] && grep -rqlw -- "$stem" \
+				"$ROOT"/sys/include/ape/*.h \
+				"$ROOT"/sys/include/ape/*/*.h 2>/dev/null
+			then
+				n_lfs=$((n_lfs + 1))
+				continue
+			fi
+			echo "    NONE       $nm_"
+			n_none=$((n_none + 1))
+			continue
+		fi
+		reachable=0
+		for h in $hits; do
+			case "$POSIXH" in *" $h "*) reachable=1 ;; esac
+			case "$h" in sys/*|arpa/*|net/*|netinet/*) reachable=1 ;; esac
+		done
+		if [ "$reachable" = 0 ]; then
+			echo "    ELSEWHERE  $nm_  ->  $hits"
+			n_else=$((n_else + 1))
+		fi
+	done < "$OUT/cext"
+	echo "  --cnames: $n_none declared by no APE header, $n_else only elsewhere,"
+	echo "            $n_lfs glibc *64 aliases ignored (host artifact)"
+}
 
 compile_pkg() {			# $1 = package name; echoes "ok fail"
 	d=$APPS/$1
@@ -287,10 +417,16 @@ compile_pkg() {			# $1 = package name; echoes "ok fail"
 	ok=0; bad=0; : > "$OUT/err"; : > "$OUT/fails"
 	for b in $objs; do
 		[ -f "$d/$b" ] || continue
-		if g++ -std=c++14 -fsyntax-only -w -nostdinc++ $EDGDEF $defs \
+		if [ "$CNAMES" = 1 ]; then
+			cout="-c -o $OUT/obj/$(basename "$b" | sed 's/\.[^.]*$//').o"
+		else
+			cout=-fsyntax-only
+		fi
+		if g++ -std=c++14 $cout -w -nostdinc++ $EDGDEF $defs \
 			-I "$OUT/shim" -I "$CXXDIR" -I "$d" "$d/$b" 2>>"$OUT/err"
 		then ok=$((ok + 1)); else bad=$((bad + 1)); echo "$b" >> "$OUT/fails"; fi
 	done
+	[ "$CNAMES" = 1 ] && cnames_report >&2
 	echo "$ok $bad"
 }
 
@@ -391,6 +527,12 @@ if [ "${1:-}" = "--control" ]; then
 	fi
 	echo "control: unrar still builds clean, $ok objects and no stubbed header"
 	exit 0
+fi
+
+if [ "${1:-}" = "--cnames" ]; then
+	CNAMES=1
+	shift
+	[ $# -gt 0 ] || { echo "usage: cxxapp-host.sh --cnames <package>" >&2; exit 2; }
 fi
 
 if [ $# -gt 0 ]; then

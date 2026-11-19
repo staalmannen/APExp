@@ -2105,7 +2105,15 @@ silent:
   The CALLER's side of a vararg call is the target's convention and is
   fine (every `printf` works); the CALLEE's is `va_list`, and it bites
   only in a `...` function **defined** in C++ — which nothing built
-  through `eccp` had ever run. Fixed with **`--no_stdarg_builtin`**
+  through `eccp` had ever run. **Every line of the prediction held**:
+  `__STDARG` and `_APEXP_STDARG_H_` both defined, five macros,
+  `sizeof` 8, section 4 right — and *section 1's verdict text was then
+  wrong*, having hung a conclusion on `_APEXP_STDARG_H_` ALONE
+  ("so the wrapper ran and `<stdarg_arch.h>` did not") on the silent
+  assumption that the two guards were mutually exclusive. The healthy
+  state has both. **A conclusion attached to one of two conditions is
+  wrong in every case the other one changes**; the verdict reads the
+  pair now. Fixed with **`--no_stdarg_builtin`**
   (`cmd_line.c:9769`; `add_option_description`'s 4th argument is the
   value, as the `exceptions`/`no_exceptions` and `export`/`no_export`
   pairs both show), so cpfe opens the real header and cpfe and `pcc`
@@ -2141,6 +2149,40 @@ silent:
   measured the C++ and nothing else* — written down a round before it
   cost anything, which is why this was one line to recognise rather
   than a round to find.
+  ***AND PAST `va_copy` THE NEXT STOP WAS `getpass`, WHICH libap HAS
+  HAD ALL ALONG.*** `lib/ap/plan9/getpass.c` is a real implementation
+  (opens `/dev/cons`, saves and restores the raw state, handles kill
+  and backspace) **declared only in `<libv.h>`** — the Plan 9 / V10
+  header no portable program includes, while SVID, BSD and glibc all
+  put it in `<unistd.h>`. ***`apfunc-sweep.py` ANSWERS `defined` AND
+  NAMES THE FILE***, which is the all-clear: *a capability can be
+  present, implemented and declared and still be unreachable*, a FIFTH
+  state those three cannot express. (A sixth turned up beside it:
+  `signal` reads `declared` because `signal.c:61` is
+  `(*signal(int, void(*)(int)))(int)` — **a function returning a
+  function pointer has its name inside the declarator, not at the
+  start of it**.) The signature is **`const char *`**, checked rather
+  than chosen: the one call passes a string LITERAL, and every gnulib
+  `unistd.in.h` in `external/` already declares the `const` form, so
+  `char *` would have disagreed with bison's and diffutils' own
+  prototypes. All three sites moved together, since a C++ TU including
+  both headers would otherwise see two overloads of an `extern "C"`
+  function.
+  **`cxxapp-host.sh --cnames` is the general form and REPORTS**: build
+  the objects for real, `nm -u` minus their own definitions, and for
+  each plain-C name ask WHICH APE header declares it — `NONE`,
+  `ELSEWHERE` (`getpass`'s state), or silent. unrar is **95 names, 0
+  and 0**, so the C-library side is predicted complete; *one
+  measurement in place of one VM round per missing name*.
+  ***ITS FIRST RUN HAD TWO FAULTS AND BOTH REPORTED THE RIGHT ANSWER
+  AS A FINDING*** — `POSIXH` written across lines, so its separators
+  are NEWLINES and a space-delimited match never fired, and glibc's
+  LFS aliases (`lseek64`, `stat64`) read as `NONE` though APExp's
+  `off_t` is already 64-bit. **Nine missing names and eleven
+  unreachable ones, every one the instrument's**, and *a clean first
+  run would have been believed on sight*. Control is EXTERNAL (the
+  finding is fixed, so `HEAD` cannot show it): staging the pre-fix
+  `unistd.h` answers `ELSEWHERE getpass -> libv.h`, run and recorded.
   **re2c has not moved** — ten missing headers and no `makefile` to
   read an object list from, both in 0.6's inventory with the missing
   `(char const *)` constructors.

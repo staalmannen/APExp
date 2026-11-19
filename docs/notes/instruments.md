@@ -1709,3 +1709,61 @@ nothing, with a message that reads like an empty argument list rather
 than a refusal -- so the C half needs `cp ... /tmp/sp.c` first. *A run
 that compiled nothing and a run that found nothing wrong both print
 almost nothing.*
+
+### `cxxapp-host.sh --cnames`: which APE header declares each C name
+
+**The question `apfunc-sweep.py` cannot ask.** That sweep has three
+states -- defined, declared-only, absent -- and `getpass` is
+**defined**, naming `lib/ap/plan9/getpass.c`, which is the all-clear.
+unrar's `consio.cpp:203` failed on it all the same, because the only
+declaration was in `<libv.h>`, the Plan 9 / V10 header no portable
+program includes. ***A capability can be present, implemented and
+declared and still be unreachable***, and the three states have no way
+to say so -- the fifth blind spot, after the fourth (`lchown`,
+`towlower`, `towupper`: declared and then `#define`d over).
+
+*A sixth turned up in the same pass*: `signal` reads `declared`, and
+`signal.c:61` defines it as
+`(*signal(int sig, void (*func)(int)))(int)` -- **a function returning
+a function pointer has its name inside the declarator rather than at
+the start of it**, so the definition pattern misses it. All three
+blind spots report a name as LESS available than it is, which is the
+safe direction for a sweep that does not gate.
+
+So `--cnames` compiles the package's objects for real (not
+`-fsyntax-only`), takes `nm -u` minus their own definitions, and for
+each plain-C name asks which header under `sys/include/ape` or the
+arch root declares it: `NONE`, `ELSEWHERE` (declared, but only where a
+portable program will not look), or silent. **Reports, does not
+gate** -- `hosthelper-sweep`'s reason, since an `ELSEWHERE` may be a
+deliberate Plan 9 extension.
+
+unrar: **95 plain-C names, 0 `NONE`, 0 `ELSEWHERE`.** One measurement
+in place of one VM round per missing name, which is what
+`php-mirror --undefined` was worth eight times over.
+
+**Limit, and it is the harness's own**: the names come from a g++
+build against the HOST's C library, so a function glibc renames
+(`__isoc23_wcstol`, `__errno_location`) appears under a name APExp
+never has, and one glibc defines as a macro does not appear at all.
+`__`-prefixed names are dropped for that reason. *Sound for "is this
+name reachable from an APE header", not for "is this the complete
+set".*
+
+***ITS FIRST RUN HAD TWO FAULTS AND BOTH REPORTED THE RIGHT ANSWER AS
+A FINDING.*** `POSIXH` is written across several lines, so its
+separators are **newlines** and the `*" $h "*` membership test never
+matched -- `string.h`, `time.h`, `wctype.h` and `pwd.h` all came back
+`ELSEWHERE`. And glibc's LFS aliases (`lseek64`, `stat64`, `open64`,
+`readdir64`, `statvfs64`) came back `NONE`, though APExp's `off_t` is
+already 64-bit and no such name exists or is wanted. **Nine missing
+names and eleven unreachable ones, every one of them the
+instrument's** -- and *a clean first run would have been believed on
+sight*. The LFS case is recognised by the STEM resolving rather than
+by the suffix, so a real name ending in `64` is still reported.
+
+**Control is EXTERNAL**, like `truefalse-sweep`'s and for the same
+reason: the finding it was built on is fixed, so `HEAD` cannot show
+it. Staging the pre-fix `sys/include/ape/unistd.h` and re-running
+answers `ELSEWHERE getpass -> libv.h`, `1 only elsewhere`, against `0`
+on the current tree. Run and recorded.
