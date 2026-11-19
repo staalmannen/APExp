@@ -111,6 +111,28 @@ EDGSRC=../../../external/edg/lib_src
 # cheap version was tried and it failed, which is why the cost is
 # written down rather than guessed at.*  In 0.6's inventory.
 #
+# ***AND THE STRUCTURAL SPLIT DOES WORK: SEE `c99ord.awk' BESIDE THIS
+# FILE.***  Whole top-level constructs by brace depth rather than
+# lines: 273 constructs, 96 kept, 177 dropped, `gcc -std=c89 -c'
+# clean, **42 symbols -- float, double and long_double with all eight
+# operations each, plus the 18 conversions among them**.  Written
+# against a python reference whose output it matches BYTE FOR BYTE,
+# and in awk because there is no python on the VM.
+#
+# **It is deliberately NOT in `OFILES' yet**: `pcc' is not `gcc', and
+# one failing member aborts the whole tree's `mk' -- the same hazard
+# this comment already cites.  `c99ord.awk''s header has the single
+# command that settles it; clean, and the rule and the `OFILES' entry
+# go in together.
+#
+# **Teaching kencc the four extended types instead was costed and is
+# the wrong trade**: `specbits-model.py' says 7 spare type bits so the
+# specifiers would fit, but `NTYPE' feeds seven tables in `cc/cc.h'
+# and `ewidth[]' appears in 27 files across the ten backends -- and
+# there is no HARDWARE for any of the four here, `sub.c:266' making
+# `long double' into `double', so all four would need libgcc's soft-fp
+# in libap with its rounding untestable while the fenv API is a stub.
+#
 # The corpus was swept for the whole class at once, with comments,
 # string and character literals and `#line' stripped FIRST -- and the
 # stripping is the measurement rather than a tidying step.  A raw grep
