@@ -77,11 +77,30 @@
  * It is left here, disabled, because the wall it hits is the finding
  * and re-deriving it would cost another round.
  */
+/*
+ * ***AND THE TWO INSTANTIATE_* SETTINGS ARE NOT PART OF THAT
+ * EXPERIMENT, WHICH THIS BLOCK USED TO IMPLY.***  They were written
+ * inside `APEXP_TRY_CFRONT_ABI' below, so they read as needing
+ * `IA64_ABI 0' and went down with it when it was backed out.  **They
+ * do not**: IA64_ABI decides their DEFAULT -- it is what routes an
+ * extern inline entity to a COMDAT section rather than to the
+ * instantiation machinery -- and not what they may be SET to.  *A
+ * fact about a macro's default was read as a constraint on its
+ * value*, and the Cfront regeneration wall recorded below is not in
+ * the way of them.
+ *
+ * They are live settings now, in `src/target.c', because unrar's 49
+ * objects collided at the link on every `inline' entity they share:
+ * `_ZSt11memcpy_implPvPKvy' is a plain inline function and no
+ * template at all, so `--instantiate local' could never reach it.
+ * See that file for the mechanism and the cost.
+ */
+#define INSTANTIATE_EXTERN_INLINE                1
+#define INSTANTIATE_INLINE_VARIABLES             1
+
 #if defined(APEXP_TRY_CFRONT_ABI)
 #define IA64_ABI                                 0
 #define LINKER_CAN_DISCARD_DUPLICATE_DEFINITIONS 0
-#define INSTANTIATE_EXTERN_INLINE                1
-#define INSTANTIATE_INLINE_VARIABLES             1
 
 /*
  * targ_def.h:648 defaults this to GNU_EXTENSIONS_ALLOWED, and

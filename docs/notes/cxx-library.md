@@ -3358,3 +3358,81 @@ the finding is fixed, so the tree cannot show it. `--control`
 re-reads the header, *refuses to run if `lstat` is not currently
 const* — otherwise it could not distinguish anything — and then
 compares the pre-fix spelling against the oracle. It fires.
+
+## The link: no COMDAT, and `--instantiate local` could never have covered it
+
+All 49 unrar objects compiled, and `6l` then answered `redefinition`
+for every `inline` entity the objects share — `_ZNSaIwEC1ERKS_`,
+`_ZSt11memcpy_implPvPKvy`, `_ZNSt13string_helper19builtin_wcslen_implEPKw`,
+the `logic_error_impl` ctors and dtors, `bad_expected_access`'s — until
+`too many errors`.
+
+### One mechanism, and the collision list has two halves that prove it
+
+`_ZSt11memcpy_implPvPKvy` is `std::memcpy_impl(void*, void const*,
+unsigned long long)`, and `memory/generic/memcpy_impl.h:29` declares it
+`inline void *memcpy_impl(` — **a plain inline function, no template
+anywhere in it.** `--instantiate local` could never have reached it.
+`_ZNSaIwEC1ERKS_` is `std::allocator<wchar_t>::allocator(const&)`, a
+template member — but one *defined in-class* and therefore also inline.
+
+**Inline-ness is what chose the path for both.** With
+`instantiate_extern_inline` 0, every inline entity is emitted with
+EXTERNAL linkage in every TU that uses it and the duplicates are left
+for the linker to discard; Plan 9's loaders cannot.
+
+***AND `GCC_IS_GENERATED_CODE_TARGET` BEING BAKED 1 IS WHAT MADE IT
+SILENT.*** cpfe writes `__attribute__((__weak__))` on those
+definitions (`c_gen_be.c:57367`, `:59349`), and **kencc swallows the
+attribute whole** — so a weak definition becomes a strong one, with no
+diagnostic from either tool, and the collision surfaces only at the
+link in a different directory.
+
+### The lever was already named, and already misfiled
+
+`edgtarg-sweep.py` has been reporting it for rounds:
+`INSTANTIATE_EXTERN_INLINE`, header 1 / baked 0, *"a link-model change
+and needs its own round"*. This is that round. With it 1, an extern
+inline entity is routed through the **template instantiation
+machinery**, which `--instantiate local` then emits with internal
+linkage in each TU that needs it.
+
+***AND `kencc_targ.h` HAD PUT IT INSIDE `APEXP_TRY_CFRONT_ABI`***, so
+it read as needing `IA64_ABI 0` and went down with that experiment
+when it was backed out at the target-map regeneration wall. **It does
+not need it**: IA64_ABI decides the setting's *default* — it is what
+routes extern inline to COMDAT in the first place — and not what the
+setting may be *set to*. *A fact about a macro's default was read as a
+constraint on its value*, the same shape as the `~0UL` and
+`namespace std` corrections already in these notes. The two
+`INSTANTIATE_*` lines are outside that block now.
+
+`cmd_line.c:12094` sets the same variable to 0 and is **not** in the
+way: its enclosing function is `set_c_mode_flags`, a C-mode path, and
+`eccp` passes `--c++14`. *Two places assign it and only one runs* —
+which is worth checking before patching either, since patching the one
+that does not run produces a clean diff and no change.
+
+### The cost is the one `--instantiate local` already carries, widened
+
+Internal linkage means each object gets its own copy, so a static
+local inside an inline function stops being one object shared across
+the program. A program whose correctness rests on that identity is
+silently wrong rather than loudly broken. `eccp`'s header already says
+this of templates; it now covers inline functions too.
+
+### ***THE OBJECTS MUST BE DELETED BEFORE THE NEXT BUILD***
+
+This changes **cpfe**, not a header — and `sys/src/ape/c++/unrar`'s
+pattern rule depends on the `.cpp`, so `mk` sees 49 up-to-date objects
+and relinks the stale ones. `mk clean` there first, after
+`mk install` in `cmd/edg`. *This tree's rule that a libap fix does not
+reach a built binary, one level up: a COMPILER fix does not reach a
+built object either, and nothing in any mkfile here expresses that
+dependency.*
+
+**Prediction, with its refutation**: the `redefinition` list goes away
+and the link either succeeds or stops on something else — a genuinely
+undefined symbol, or exceptions. *Refuted by the same list*, which
+would say the setting is not read on this path rather than that it is
+the wrong setting.

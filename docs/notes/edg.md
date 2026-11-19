@@ -1915,3 +1915,60 @@ host by construction*, so no amount of constant repair makes the host
 run past the first `stat`. The script is still worth having -- it got
 far enough to name this function, which is how the bug was found --
 but its ceiling is now known and written into it.
+
+## No COMDAT: `INSTANTIATE_EXTERN_INLINE`, and why the lever was misfiled
+
+unrar's 49 objects compiled and `6l` answered `redefinition` for every
+`inline` entity they share, until `too many errors`.
+
+**The collision list has two halves and they prove one mechanism.**
+`_ZSt11memcpy_implPvPKvy` is `std::memcpy_impl(void*, void const*,
+unsigned long long)` and `memory/generic/memcpy_impl.h:29` declares it
+`inline void *memcpy_impl(` -- **a plain inline function with no
+template anywhere in it**, so `--instantiate local` could never have
+reached it. `_ZNSaIwEC1ERKS_` is `std::allocator<wchar_t>`'s copy
+constructor, a template member -- but one defined IN-CLASS and
+therefore also inline. *Inline-ness is what chose the COMDAT path for
+both.*
+
+***AND `GCC_IS_GENERATED_CODE_TARGET` BEING BAKED 1 IS WHAT MADE IT
+SILENT.*** cpfe writes `__attribute__((__weak__))` on those
+definitions (`c_gen_be.c:57367`, `:59349`) and **kencc swallows the
+attribute whole**, so a weak definition becomes a strong one with no
+diagnostic from either tool -- and the collision surfaces at the link,
+in another directory, as a bare `redefinition`.
+
+**The lever was already named and already misfiled.**
+`edgtarg-sweep.py` had been reporting `INSTANTIATE_EXTERN_INLINE` as
+header 1 / baked 0 for rounds, with the reason "a link-model change
+and needs its own round". With it 1, an extern inline entity is routed
+through the template instantiation machinery, which `--instantiate
+local` then emits with internal linkage per TU.
+
+***`kencc_targ.h` HAD PUT IT INSIDE `APEXP_TRY_CFRONT_ABI`***, so it
+read as needing `IA64_ABI 0` and went down with that experiment when
+it was backed out at the target-map regeneration wall. **It does not
+need it**: IA64_ABI decides the setting's DEFAULT -- it is what routes
+extern inline to COMDAT in the first place -- and not what the setting
+may be SET to. *A fact about a macro's default read as a constraint on
+its value*, the same shape as clisp's `~0UL` and the `namespace std`
+correction.
+
+**`cmd_line.c:12094` assigns the same variable and does not run**: its
+enclosing function is `set_c_mode_flags`, a C-mode path, against
+`eccp`'s `--c++14`. *Two places assign it and only one runs*, which is
+worth establishing before patching either -- patching the one that
+does not run gives a clean diff and no change at all.
+
+**The cost** is `--instantiate local`'s own, widened: internal linkage
+means each object gets its own copy, so a static local inside an
+inline function stops being one object shared across the program.
+Silently wrong rather than loudly broken, and one TU cannot show it.
+
+***THE OBJECTS MUST BE DELETED BEFORE THE NEXT BUILD.*** This changes
+**cpfe**, not a header, and `sys/src/ape/c++/unrar`'s pattern rule
+depends on the `.cpp` -- so `mk` sees 49 up-to-date objects and
+relinks the stale ones. `mk install` in `cmd/edg`, then `mk clean` in
+the package. *This tree's rule that a libap fix does not reach a built
+binary, one level up: a COMPILER fix does not reach a built object
+either, and nothing in any mkfile here expresses that dependency.*

@@ -2211,6 +2211,36 @@ silent:
   someone got tired of*. Control is EXTERNAL and REFUSES TO RUN if
   `lstat` is not currently const, because then it could not
   distinguish anything.
+  ***ALL 49 COMPILE AND THE LINK IS THE NEXT WALL: NO COMDAT.***
+  `6l` answers `redefinition` for every `inline` entity the objects
+  share, until `too many errors`. **The list has two halves and they
+  prove one mechanism**: `_ZSt11memcpy_implPvPKvy` is a plain `inline`
+  function with no template in it, so *`--instantiate local` could
+  never have reached it*, while `_ZNSaIwEC1ERKS_` is a template member
+  DEFINED IN-CLASS and therefore also inline — **inline-ness chose the
+  COMDAT path for both**. ***AND `GCC_IS_GENERATED_CODE_TARGET` BEING
+  BAKED 1 IS WHAT MADE IT SILENT***: cpfe writes
+  `__attribute__((__weak__))` and **kencc swallows the attribute
+  whole**, so a weak definition becomes a strong one with no
+  diagnostic from either tool. The lever is
+  **`INSTANTIATE_EXTERN_INLINE`**, which `edgtarg-sweep.py` had been
+  reporting for rounds as header 1 / baked 0, *"a link-model change
+  and needs its own round"* — extern inline entities route through the
+  template instantiation machinery, which `--instantiate local` then
+  emits INTERNAL. ***AND `kencc_targ.h` HAD MISFILED IT INSIDE
+  `APEXP_TRY_CFRONT_ABI`***, so it read as needing `IA64_ABI 0` and
+  went down with that experiment: **IA64_ABI decides its DEFAULT, not
+  what it may be SET to** — *a fact about a macro's default read as a
+  constraint on its value*, the `~0UL` shape again. `cmd_line.c:12094`
+  assigns the same variable and does NOT run (`set_c_mode_flags`, a C
+  path, against `--c++14`): *two places assign it and patching the one
+  that does not run gives a clean diff and no change*. The cost is
+  `--instantiate local`'s own, widened to inline functions.
+  ***AND THE OBJECTS MUST BE DELETED BEFORE THE NEXT BUILD***: this
+  changes **cpfe**, and the pattern rule depends on the `.cpp`, so `mk`
+  sees 49 up-to-date objects and relinks the stale ones. *A COMPILER
+  fix does not reach a built object, and no mkfile here expresses
+  that* — the libap rule one level up.
   **re2c has not moved** — ten missing headers and no `makefile` to
   read an object list from, both in 0.6's inventory with the missing
   `(char const *)` constructors.
