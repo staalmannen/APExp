@@ -1,0 +1,58 @@
+# $NHDT-Header: NetHack 5.0 bsd.501 2026/10/21_14:42:01 NetHack-5.0:1.6 $
+# Copyright 2026 by Anthony C Howe.
+# NetHack may be freely redistributed.  See license for details.
+#
+# This is a contributed file.  The NetHack Development Team makes this
+# file available so that others may benefit, but may not be able to
+# support or maintain it. Use at your own risk.
+#
+#-PRE
+# unix hints file
+# This hints file provides the legacy configuration that NetHack has shipped
+# with historically - this means you will most likely need to hand edit .h
+# and Makefiles.
+#
+
+WANT_WIN_CURSES=1
+WANT_WIN_TTY=0
+ARFLAGS=rv
+
+PREFIX=/
+
+# Binaries and supporting data.
+HACKDIR=/sys/libexec/nethackdir
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Careful, this directory is deleted on install.
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+INSTDIR=$(HACKDIR)
+
+# Save games
+VARDIR=/sys/games/nethackdir
+
+# Home for nethask.sh wrapper.  If undefined, no wrapper installed.
+# Suggest leaving /usr/games as-is from bsdgames.tgz.
+SHELLDIR=/rc/bin/ape
+
+CFLAGS=-O -I../include -I../nhlua/lua/src -USYSV -DBSD -DPLAN9 -DHACKDIR='"$(HACKDIR)"' -DVAR_PLAYGROUND='"$(VARDIR)"'
+LINK=$(CC)
+
+WINSRC = $(WINTTYSRC)
+WINOBJ = $(WINTTYOBJ)
+WINLIB = $(WINTTYLIB)
+
+CHOWN=chown
+CHGRP=chgrp
+
+GAMEUID  = games
+GAMEGRP  = games
+
+GAMEPERM = 04755
+VARFILEPERM = 0644
+VARDIRPERM = 0755
+
+MAKEDEFS = ../util/makedefs
+NEEDMAKEDEFS = $(MAKEDEFS)
+
+NROFF = /bin/nroff
+

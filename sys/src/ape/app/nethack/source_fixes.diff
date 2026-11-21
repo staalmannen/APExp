@@ -1,0 +1,77 @@
+diff a8aa665019e8a124ba2f07ca6dcc706ee5b1082c uncommitted
+--- a/include/unixconf.h
++++ b/include/unixconf.h
+@@ -331,7 +331,7 @@
+ #include <sys/wait.h>
+ #endif
+ 
+-#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
++#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(PLAN9)
+ #define tparm2(s, x) tparm(s,x,0,0,0,0,0,0,0,0)
+ #else
+ #define tparm2(s, x) tparm(s,x)
+--- a/src/explode.c
++++ b/src/explode.c
+@@ -206,7 +206,7 @@
+ {
+     int i, j, k, damu = dam;
+     boolean starting = 1;
+-    boolean visible, any_shield;
++    boolean Visible, any_shield;
+     int uhurt = 0, /* 0=unhurt, 1=items damaged, 2=you and items damaged */
+         do_hallu = 0;
+     const char *str = (const char *) 0, *unmorphed_str = (const char *) 0;
+@@ -367,7 +367,7 @@
+             str = adstr;
+     }
+ 
+-    any_shield = visible = FALSE;
++    any_shield = Visible = FALSE;
+     for (i = 0; i < 3; i++)
+         for (j = 0; j < 3; j++) {
+             xx = x + i - 1;
+@@ -396,12 +396,12 @@
+             else if (!mtmp)
+                 (void) unmap_invisible(xx, yy);
+             if (cansee(xx, yy))
+-                visible = TRUE;
++                Visible = TRUE;
+             if ((explmask[i][j] & (EXPL_MON | EXPL_HERO)) != 0)
+                 any_shield = TRUE;
+         }
+ 
+-    if (visible) {
++    if (Visible) {
+         /* Start the explosion */
+         for (i = 0; i < 3; i++)
+             for (j = 0; j < 3; j++) {
+--- a/src/objnam.c
++++ b/src/objnam.c
+@@ -942,7 +942,7 @@
+            obuf[] in front of buf to insert "buf[]="; strncpy(,,N) doesn't
+            add '\0' terminator unless fewer than N chars are copied, which
+            is what we want, but gcc complains about that so use memcpy() */
+-        paniclog("xname", (char *) memcpy(buf - 6, "buf[]=", 6));
++//        paniclog("xname", (char *) memcpy(buf - 6, "buf[]=", 6));
+         panic("xname: buffer overflow before appending name.");
+         /*NOTREACHED*/
+     }
+@@ -1019,7 +1019,7 @@
+            anticipated; since we aren't panicking here, this could happen
+            repeatedly and we don't want to spam the paniclog file */
+         if (!xname_full++) {
+-            paniclog("xname", (char *) memcpy(buf - 6, "buf[]=", 6));
++//            paniclog("xname", (char *) memcpy(buf - 6, "buf[]=", 6));
+             /* 'PREFIX' ought to be 'PREFIX+4' if we stripped leading "the" */
+             paniclog("xname", "used up entire obuf[PREFIX..BUFSX-1]");
+         }
+--- a/src/sfbase.c
++++ b/src/sfbase.c
+@@ -1,6 +1,7 @@
+ /* $NHDT-Header: NetHack 5.0 sfbase.c 2026/06/10_19:52:13 NetHack-5.0:1.19 $ */
+ /* Copyright (c) Michael Allison, 2025. */
+ /* NetHack may be freely redistributed.  See license for details. */
++#include <inttypes.h>
+ 
+ #include "hack.h"
+ #include "sfprocs.h"

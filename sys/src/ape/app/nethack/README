@@ -1,0 +1,16 @@
+NetHack 5.0 is building nearly completely unmodified.
+
+Step 1:
+copy plan9-apexp to sys/unix/hints in your NetHack source directory
+
+Step 2:
+in APExp, cd to your NetHack source directory
+cd sys/unix
+sh setup.sh hints/plan9-apexp
+
+Step 3:
+cd ../.. (to the root of NetHack)
+make all
+
+Source changes:
+Some minimal source changes needed (for now), see diff

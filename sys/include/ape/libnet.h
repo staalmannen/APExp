@@ -44,10 +44,12 @@
  * declared by <sys/socket.h>. `Plan9libnet.h' claimed both and was
  * deleted -- see CLAUDE.md.
  */
+#ifdef PLAN9_SOURCE
 extern	int	announce(char*, char*);
 extern	int	dial(char*, char*, char*, int*);
 extern	int	hangup(int);
 extern	char*	netmkaddr(char*, char*, char*);
+#endif
 
 extern char    dialerrstr[64];
 
