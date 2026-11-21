@@ -1,5 +1,5 @@
 </$objtype/mkfile
-APEXPROOT=../../../..
+APEXPROOT=../../../../..
 
 LIB=$APEXPROOT/$objtype/lib/libnpe_portmidi.a
 CFLAGS=$CFLAGS -p -I../include/npe -D__plan9__ -D__${objtype}__

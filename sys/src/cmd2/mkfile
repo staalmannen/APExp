@@ -4,7 +4,7 @@ DIRS=\
 	vts\
 	vts-attach\
 	vtwin\
-#	npe\
+	npe\
 	fontsrv
 
 none:V:
