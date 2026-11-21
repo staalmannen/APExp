@@ -12,7 +12,7 @@
 #
 </$objtype/mkfile
 APEXPROOT=../../../../..
-FTSRC=$APEXPROOT/sys/src/external/libfreetype
+FTSRC=$APEXPROOT/sys/src/external/freetype
 
 LIB=libfreetype.a$O
 
@@ -59,9 +59,66 @@ CFLAGS=-p -I$FTSRC/builds/plan9 -I$FTSRC/include \
 </sys/src/cmd/mklib
 
 %.$O: $FTSRC/%.c
-	$CC $CFLAGS -o $stem.$O $stem.c
-%.$O:	$FTSRC/src/*/%.c
 	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/*/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/autofit/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/base/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/bdf/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/bzip2/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/cache/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/cff/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/cid/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/dig/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/gxvalid/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/gzip/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/hvf/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/lzw/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/otvalid/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/pcf/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/pfr/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/psaux/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/pshinter/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/psnames/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/raster/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/sdf/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/sfnt/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/smooth/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/svg/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/tools/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/truetype/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/type1/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/type42/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+%.$O: $FTSRC/src/winfonts/%.c
+	$CC $CFLAGS -o $stem.$O $prereq
+
 
 $FTSRC/plan9/p9ftopt.h:D: $FTSRC/freetype/config/ftoption.h
 	sed '

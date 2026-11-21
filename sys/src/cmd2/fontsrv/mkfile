@@ -11,11 +11,12 @@ OFILES=\
 BIN=$APEXPROOT/$objtype/bin
 LIBDIR=libfreetype
 LIB=$LIBDIR/libfreetype.a$O
-LIBHFILES=$APEXPROOT/sys/src/external/libfreetype/builds/plan9/p9ftopt.h
+FTDIR=$APEXPROOT/sys/src/external/freetype
+LIBHFILES=$FTDIR/builds/plan9/p9ftopt.h
 HFILES=dat.h $LIBHFILES
 CLEANFILES=pax_global_header
 
-CFLAGS=$CFLAGS -p -I$LIBDIR/builds/plan9 -I$LIBDIR/include \
+CFLAGS=$CFLAGS -p -I$FTDIR/builds/plan9 -I$FTDIR/include \
 	-D'FT_CONFIG_OPTIONS_H=<p9ftopt.h>' \
 	-D'FT_CONFIG_STANDARD_LIBRARY_H=<p9lib.h>' \
 
@@ -28,6 +29,7 @@ install:V:	$BIN/$TARG $APEXPROOT/sys/lib/fontsrv.map $APEXPROOT/sys/man/4/fontsr
 $APEXPROOT/sys/lib/fontsrv.map:
 	cp lib/fontsrv $APEXPROOT/sys/lib/fontsrv.map
 $APEXPROOT/sys/man/4/fontsrv: man/4/fontsrv
+	mkdir -p $APEXPROOT/sys/man/4
 	cp man/4/fontsrv $APEXPROOT/sys/man/4/fontsrv
 
 clean nuke:V:
