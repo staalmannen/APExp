@@ -1,0 +1,58 @@
+X11=/sys/src/ape/X11
+<$X11/config
+
+LIB=$X11LIB/libXaw.a
+
+OFILES=\
+	Actions.$O\
+	AllWidgets.$O\
+	AsciiSink.$O\
+	AsciiSrc.$O\
+	AsciiText.$O\
+	Box.$O\
+	Command.$O\
+	Converters.$O\
+	Dialog.$O\
+	DisplayList.$O\
+	Form.$O\
+	Grip.$O\
+	Label.$O\
+	List.$O\
+	MenuButton.$O\
+	MultiSink.$O\
+	MultiSrc.$O\
+	OS.$O\
+	Paned.$O\
+	Panner.$O\
+	Pixmap.$O\
+	Porthole.$O\
+	Repeater.$O\
+	Scrollbar.$O\
+	Simple.$O\
+	SimpleMenu.$O\
+	Sme.$O\
+	SmeBSB.$O\
+	SmeLine.$O\
+	StripChart.$O\
+	Text.$O\
+	TextAction.$O\
+	TextPop.$O\
+	TextSink.$O\
+	TextSrc.$O\
+	TextTr.$O\
+	Toggle.$O\
+	Tree.$O\
+	Vendor.$O\
+	Viewport.$O\
+	XawI18n.$O\
+	XawIm.$O\
+	XawInit.$O\
+	PrintShell.$O\
+	Tip.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I. -I/sys/include/ape/X11/Xaw
+
+%.$O: $X11/lib/Xaw/%.c
+	pcc $CFLAGS -o $stem.$O $prereq

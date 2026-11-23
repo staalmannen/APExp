@@ -1,0 +1,45 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/liblbxutil.a
+
+OFILES=\
+# delta \
+	lbxdelta.$O\
+# image \
+	misc.$O\
+	dpackbits.$O\
+	epackbits.$O\
+	dfaxg42d.$O\
+	efaxg42d.$O\
+# lbx_zlib \
+	lbx_zlib_io.$O\
+	lbx_zlib.$O\
+	reqstats.$O\
+
+CLEANFILES=\
+	$O.mkg3states\
+	g3states.h\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I. -I$X11/lib/lbxutil
+
+%.$O: $X11/lib/lbxutil/delta/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+
+%.$O: $X11/lib/lbxutil/image/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+
+
+%.$O: $X11/lib/lbxutil/lbx_zlib/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+
+g3states.h: $O.mkg3states 
+	./$O.mkg3states -c > g3states.h
+
+$O.mkg3states: $X11/lib/lbxutil/image/mkg3states.c
+	pcc -B -D_POSIX_SOURCE -D_BSD_EXTENSION -o $target $prereq
+
+dfaxg42d.$O: g3states.h

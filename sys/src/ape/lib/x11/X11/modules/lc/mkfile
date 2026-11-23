@@ -1,0 +1,33 @@
+APEXPROOT=../../../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/libX11.a
+
+OFILES=\
+	lcUTF8Load.$O\
+	lcDefConv.$O\
+	lcGenConv.$O\
+	lcEuc.$O\
+	lcJis.$O\
+	lcSjis.$O\
+
+CLEANFILES=$OFILES
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I$X11/lib/x11/src -I$X11/lib/x11/src/xcms -I$X11/lib/x11/src/xkb -I$X11/lib/x11/src/xlibi18n  -I/sys/include/ape/X11
+
+%.$O: $X11/lib/x11/lc/Utf8/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+
+%.$O: $X11/lib/x11/lc/def/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+
+%.$O: $X11/lib/x11/lc/gen/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+
+%.$O: $X11/lib/x11/lc/xlocale/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+
+

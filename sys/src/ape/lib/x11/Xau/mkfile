@@ -1,0 +1,23 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/libXau.a
+
+OFILES=\
+	AuDispose.$O\
+	AuFileName.$O\
+	AuGetAddr.$O\
+	AuGetBest.$O\
+	AuLock.$O\
+	AuRead.$O\
+	AuUnlock.$O\
+	AuWrite.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I$X11/lib/Xau
+
+%.$O: $X11/lib/Xau/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+

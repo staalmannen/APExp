@@ -1,3 +1,4 @@
+/* $Xorg: cursorfont.h,v 1.4 2001/02/09 02:03:39 xorgcvs Exp $ */
 /*
 
 Copyright 1987, 1998  The Open Group
@@ -25,9 +26,6 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-
-#ifndef _X11_CURSORFONT_H_
-#define _X11_CURSORFONT_H_
 
 #define XC_num_glyphs 154
 #define XC_X_cursor 0
@@ -107,5 +105,3 @@ from The Open Group.
 #define XC_ur_angle 148
 #define XC_watch 150
 #define XC_xterm 152
-
-#endif /* _X11_CURSORFONT_H_ */

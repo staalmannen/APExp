@@ -1,0 +1,17 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/libfontenc.a
+
+OFILES=\
+	encparse.$O\
+	fontenc.$O\%.$O: $X11/lib/Xp/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I. -DFONTENC_NO_LIBFONT -D'FONT_ENCODINGS_DIRECTORY="/sys/lib/ape/X11/fonts/encodings/encodings.dir"'
+
+%.$O: $X11/lib/fontenc/%.c
+	pcc $CFLAGS -o $stem.$O $prereq

@@ -1,0 +1,22 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/libXrandr.a
+
+OFILES=\
+	Xrandr.$O\
+	XrrConfig.$O\
+	XrrCrtc.$O\
+	XrrMode.$O\
+	XrrOutput.$O\
+	XrrProperty.$O\
+	XrrScreen.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I$X11/lib/Xrandr -I/sys/include/ape/X11/extensions
+
+%.$O: $X11/lib/Xrandr/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+

@@ -1,0 +1,16 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/libxkbui.a
+
+OFILES=\
+	XKBui.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I$X11/lib/xkbui -I/sys/include/ape/X11/extensions
+
+%.$O: $X11/lib/xkbui/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+

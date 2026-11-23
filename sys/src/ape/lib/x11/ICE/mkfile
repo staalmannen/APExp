@@ -1,0 +1,33 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/libICE.a
+
+OFILES=\
+	accept.$O\
+	authutil.$O\
+	connect.$O\
+	error.$O\
+	getauth.$O\
+	iceauth.$O\
+	icetrans.$O\
+	listen.$O\
+	listenwk.$O\
+	locking.$O\
+	misc.$O\
+	ping.$O\
+	process.$O\
+	protosetup.$O\
+	register.$O\
+	replywait.$O\
+	setauth.$O\
+	shutdown.$O\
+	watch.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I$X11/lib/ICE -DTRANS_CLIENT -DTRANS_SERVER -DICE_t
+
+%.$O: $X11/lib/ICE/%.c
+	pcc $CFLAGS -o $stem.$O $prereq

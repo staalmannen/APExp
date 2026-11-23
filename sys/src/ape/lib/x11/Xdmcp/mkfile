@@ -1,0 +1,56 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/libXdmcp.a
+
+OFILES=\
+	A8Eq.$O\
+	AA16.$O\
+	AA32.$O\
+	AA8.$O\
+	Alloc.$O\
+	AofA8.$O\
+	CA8.$O\
+	CmpKey.$O\
+	DA16.$O\
+	DA32.$O\
+	DA8.$O\
+	DAofA8.$O\
+	DecKey.$O\
+	Fill.$O\
+	Flush.$O\
+	GenKey.$O\
+	IncKey.$O\
+	RA16.$O\
+	RA32.$O\
+	RA8.$O\
+	RAofA8.$O\
+	RC16.$O\
+	RC32.$O\
+	RC8.$O\
+	RHead.$O\
+	RR.$O\
+	RaA16.$O\
+	RaA32.$O\
+	RaA8.$O\
+	RaAoA8.$O\
+	Unwrap.$O\
+	WA16.$O\
+	WA32.$O\
+	WA8.$O\
+	WAofA8.$O\
+	WC16.$O\
+	WC32.$O\
+	WC8.$O\
+	Whead.$O\
+	Wrap.$O\
+	Wraphelp.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I$X11/lib/Xdmcp
+
+%.$O: $X11/lib/Xdmcp/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+

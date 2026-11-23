@@ -1,0 +1,19 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/libXfixes.a
+
+OFILES=\
+	Cursor.$O\
+	Region.$O\
+	SaveSet.$O\
+	Selection.$O\
+	Xfixes.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I$X11/lib/Xfixes -I/sys/include/ape/X11/extensions
+
+%.$O: $X11/lib/Xfixes/%.c
+	pcc $CFLAGS -o $stem.$O $prereq

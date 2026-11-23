@@ -1,0 +1,31 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/libXext.a
+
+OFILES=\
+	DPMS.$O\
+	MITMisc.$O\
+	XAppgroup.$O\
+	XEVI.$O\
+	XLbx.$O\
+	XMultibuf.$O\
+	XSecurity.$O\
+	XShape.$O\
+	XShm.$O\
+	XSync.$O\
+	XTestExt1.$O\
+	Xcup.$O\
+	Xdbe.$O\
+	extutil.$O\
+	globals.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I$X11/lib/Xext
+
+%.$O: $X11/lib/Xext/src/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+
+

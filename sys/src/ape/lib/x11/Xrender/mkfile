@@ -1,0 +1,29 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/libXrender.a
+
+OFILES=\
+	AddTrap.$O\
+	Color.$O\
+	Composite.$O\
+	Cursor.$O\
+	FillRect.$O\
+	FillRects.$O\
+	Filter.$O\
+	Glyph.$O\
+	Picture.$O\
+	Poly.$O\
+	Trap.$O\
+	Tri.$O\
+	Xrender.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I$X11/lib/Xrender -I/sys/include/ape/X11/extensions
+
+%.$O: $X11/lib/Xrender/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+
+

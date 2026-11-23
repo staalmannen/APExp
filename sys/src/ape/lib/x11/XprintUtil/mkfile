@@ -1,0 +1,17 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+LIB=$X11LIB/libXprintUtil.a
+
+OFILES=\
+	xprintutil.$O\
+	xprintutil_printtofile.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I$X11/lib/XprintUtil -I/sys/include/ape/X11/XprintUtil
+
+%.$O: $X11/lib/XprintUtil/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+

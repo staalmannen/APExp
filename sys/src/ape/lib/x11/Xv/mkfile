@@ -1,0 +1,15 @@
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/X11
+<$X11/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/X11/libXv.a
+
+OFILES=\
+	Xv.$O\
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-c $X11CFLAGS -I.
+
+%.$O: $X11/lib/Xv/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
