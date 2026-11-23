@@ -1,0 +1,9 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+OCAMLVER=4.06.1
+OCAMLSRC=$APEXPROOT/sys/src/external/ocaml/ocaml-$OCAMLVER
+
+all clean nuke install installall:V:
+		cd $OCAMLSRC
+		mk $target
+
