@@ -1,0 +1,20 @@
+APEXPROOT=../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+BIN=$X11BIN
+
+TARG=xclock
+
+OFILES=\
+	Clock.$O\
+	xclock.$O\
+
+LIB=/$objtype/lib/ape/X11/libXaw.a
+</sys/src/cmd/mkone
+
+CFLAGS=-c $X11CFLAGS
+
+%.$O: $X11/cmd/xclock/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+

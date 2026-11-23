@@ -1,0 +1,36 @@
+APEXPROOT=../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
+<$X11/config
+
+BIN=$X11BIN
+
+TARG=xev\
+	xset\
+
+DIRS=\
+#	X\
+	twm\
+	xclock\
+
+</sys/src/cmd/mkmany
+
+CFLAGS=-c $X11CFLAGS
+
+%.$O: $X11/cmd/%.c
+	pcc $CFLAGS -o $stem.$O $prereq
+
+all:V:	all.dir
+
+install:V:	install.dir
+
+installall:V:	installall.dir
+
+clean:V:	clean.dir
+
+nuke:V:		nuke.dir
+
+%.dir:V:
+	for (i in $DIRS) @{
+		cd $i
+		mk $stem
+	}

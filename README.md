@@ -112,6 +112,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - libpng (version 1.6.58)
 - libjpeg (version 10)
 - libwebp (version 1.6.0)
+- X11 (version 1.1.3-Equis, copied from /n/sources/contrib/fgb/fgb/root/sys/src/ape/X11)
 
 
 ***Utilities***

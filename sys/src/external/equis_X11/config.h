@@ -32,7 +32,7 @@ extern int _SLEEP(long);
 #define NO_XLOCALEDIR 1
 #define USE_XCB 0
 #define X11_DATADIR "/sys/lib/ape/X11"
-#define X11_LIBDIR "/386/lib/ape/X11"
+#define X11_LIBDIR "/$M/lib/ape/X11"
 #define XCMS 1
 #define XERRORDB "/sys/lib/ape/X11/XErrorDB"
 #define XF86BIGFONT 1
