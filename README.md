@@ -154,6 +154,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - sqlite (version 3.53.4)
 - Tcl (tclsh) & Tk (wish) (version 9.0.3)
 	Tcl/Tk extensions itcl (4.2.3)
+- javascript/typescript (quickts, git: 2026-11-24)
 
 
 
