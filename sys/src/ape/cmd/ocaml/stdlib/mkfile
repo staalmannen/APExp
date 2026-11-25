@@ -43,8 +43,4 @@ camlinternalBigarray.cmi camlinternalBigarray.cmo: $OCSRC/stdlib/camlinternalBig
 %.cmo: $OCSRC/stdlib/%.ml
 	$STDC $STDFLAGS `{$OCPLAN9/tools/Compflags.rc $stem.cmo} -o $target $prereq
 
-# a stdlib module with no interface: the .cmo compile writes the .cmi
-%.cmi:
-	$STDC $STDFLAGS `{$OCPLAN9/tools/Compflags.rc $stem.cmo} -o $stem.cmo $OCSRC/stdlib/$stem.ml
-
 <$OCSRC/stdlib/.depend
