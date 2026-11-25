@@ -223,7 +223,7 @@ extern void XtProcessUnlock(
 #if !defined(X_INCLUDE_PWD_H) || defined(_XOS_INCLUDED_PWD_H)
 /* Do nothing */
 
-#elif !defined(XTHREADS) && !defined(X_FORCE_USE_MTSAFE_API)
+#elif (!defined(XTHREADS) || defined(PLAN9)) && !defined(X_FORCE_USE_MTSAFE_API)  /* APE: no _r API */
 /* Use regular, unsafe API. */
 # if defined(X_NOT_POSIX) && !defined(__i386__) && !defined(SYSV)
 extern struct passwd *getpwuid(), *getpwnam();
@@ -392,7 +392,7 @@ typedef int _Xgetpwret;
 #if !defined(X_INCLUDE_NETDB_H) || defined(_XOS_INCLUDED_NETDB_H)
 /* Do nothing. */
 
-#elif !defined(XTHREADS) && !defined(X_FORCE_USE_MTSAFE_API)
+#elif (!defined(XTHREADS) || defined(PLAN9)) && !defined(X_FORCE_USE_MTSAFE_API)  /* APE: no _r API */
 /* Use regular, unsafe API. */
 typedef int _Xgethostbynameparams; /* dummy */
 typedef int _Xgetservbynameparams; /* dummy */
@@ -551,7 +551,7 @@ typedef int _Xgetservbynameparams; /* dummy */
 #if !defined(X_INCLUDE_DIRENT_H) || defined(_XOS_INCLUDED_DIRENT_H)
 /* Do nothing. */
 
-#elif !defined(XTHREADS) && !defined(X_FORCE_USE_MTSAFE_API)
+#elif (!defined(XTHREADS) || defined(PLAN9)) && !defined(X_FORCE_USE_MTSAFE_API)  /* APE: no _r API */
 /* Use regular, unsafe API. */
 typedef int _Xreaddirparams;	/* dummy */
 # define _XReaddir(d,p)	readdir(d)
@@ -647,7 +647,7 @@ typedef struct {
 #if !defined(X_INCLUDE_UNISTD_H) || defined(_XOS_INCLUDED_UNISTD_H)
 /* Do nothing. */
 
-#elif !defined(XTHREADS) && !defined(X_FORCE_USE_MTSAFE_API)
+#elif (!defined(XTHREADS) || defined(PLAN9)) && !defined(X_FORCE_USE_MTSAFE_API)  /* APE: no _r API */
 /* Use regular, unsafe API. */
 typedef int _Xgetloginparams;	/* dummy */
 typedef int _Xttynameparams;	/* dummy */
@@ -787,7 +787,7 @@ typedef struct {
 #if !defined(X_INCLUDE_STRING_H) || defined(_XOS_INCLUDED_STRING_H)
 /* Do nothing. */
 
-#elif !defined(XTHREADS) && !defined(X_FORCE_USE_MTSAFE_API)
+#elif (!defined(XTHREADS) || defined(PLAN9)) && !defined(X_FORCE_USE_MTSAFE_API)  /* APE: no _r API */
 /* Use regular, unsafe API. */
 typedef int _Xstrtokparams;	/* dummy */
 # define _XStrtok(s1,s2,p) \
@@ -839,7 +839,7 @@ typedef char * _Xstrtokparams;
 #if !defined(X_INCLUDE_TIME_H) || defined(_XOS_INCLUDED_TIME_H)
 /* Do nothing. */
 
-#elif !defined(XTHREADS) && !defined(X_FORCE_USE_MTSAFE_API)
+#elif (!defined(XTHREADS) || defined(PLAN9)) && !defined(X_FORCE_USE_MTSAFE_API)  /* APE: no _r API */
 /* Use regular, unsafe API. */
 typedef int _Xatimeparams;	/* dummy */
 # define _XAsctime(t,p)		asctime((t))
@@ -995,7 +995,7 @@ typedef struct tm _Xltimeparams;
 #if !defined(X_INCLUDE_GRP_H) || defined(_XOS_INCLUDED_GRP_H)
 /* Do nothing. */
 
-#elif !defined(XTHREADS) && !defined(X_FORCE_USE_MTSAFE_API)
+#elif (!defined(XTHREADS) || defined(PLAN9)) && !defined(X_FORCE_USE_MTSAFE_API)  /* APE: no _r API */
 /* Use regular, unsafe API. */
 typedef int _Xgetgrparams;	/* dummy */
 #define _XGetgrgid(g,p)	getgrgid((g))
