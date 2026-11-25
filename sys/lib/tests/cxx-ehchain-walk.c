@@ -97,7 +97,38 @@
  * leaving a member out is how a reader lands on the wrong offset.
  */
 
-typedef int eh_jmp_buf[20];
+/*
+ * ***THE BUFFER IS `int[39]' AND NOT `int[20]', AND THE FIRST RUN OF
+ * THIS FILE GOT IT WRONG AND NEARLY SHIPPED A FINDING.***
+ *
+ * `throw.c' spells the member `jmp_buf setjmp_buffer', and the
+ * corpus's own `typedef int jmp_buf[20]' cites `ape-sys/setjmp.h' --
+ * so reading the type name was enough to be confident and enough to
+ * be wrong.  **cpfe does not use the platform's `jmp_buf' for this
+ * member**: `lower_eh.c:12564' builds the type from
+ * `targ_jmp_buf_num_elements' and `targ_jmp_buf_element_int_kind',
+ * and `src/target.c:7127' sets the win64 arm -- which is the arm
+ * `eccp' selects -- to **39 elements of `ik_int'**, 156 bytes.
+ *
+ * With `int[20]' the walker printed
+ * `catch_entries 0xFEFEFEFEFEFEFEFE' and that was the MIDDLE OF THE
+ * BUFFER: APE's amd64 `setjmp' writes 64 bytes of it, so everything
+ * past that is untouched stack, which on this machine reads
+ * `0xfefefefe' (`lib/ap/plan9/callmain.c:14').  *A field that is
+ * uninitialised because nothing should have written it, read as a
+ * field that should have been written and was not.*  The raw hex
+ * dump is what caught it, which is why that is the primary output
+ * and these named fields are secondary.
+ *
+ * **Oversized is the SAFE direction and was checked**: EDG reserves
+ * 156 bytes where APE's `setjmp' writes 64, so nothing overruns.
+ * The reverse would have been a stack smash with no diagnostic, and
+ * it is the question `kencc_targ.h' asks about `long [25]' --
+ * which carries no `TARG_JMP_BUF_*' entry at all, so this is one of
+ * the 18 `edgtarg-sweep.py' reports as absent.
+ */
+#define EH_JMP_BUF_ELEMS 39	/* src/target.c:7127, the win64 arm */
+typedef int eh_jmp_buf[EH_JMP_BUF_ELEMS];
 
 struct eh_try_block {
 	eh_jmp_buf setjmp_buffer;
@@ -181,7 +212,7 @@ eh_dump(char *when)
 		 * right, so it goes first and a disagreement between the
 		 * two halves is the finding.
 		 */
-		for(w = 0; w < 15; w++){
+		for(w = 0; w < (int)(sizeof(struct eh_entry) / 8) + 1; w++){
 			if((w % 3) == 0)
 				printf("         +%-3d", w * 8);
 			/*
