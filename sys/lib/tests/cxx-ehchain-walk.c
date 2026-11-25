@@ -37,12 +37,105 @@
 
 #ifndef REFERENCE
 
+/*
+ * ---- THE FULL ENTRY, TRANSCRIBED FROM `lib_src/throw.c' -------------
+ *
+ * The first version of this file declared `{ next; kind; }' alone and
+ * walked the list, which was enough to show that the chain is PERFECT
+ * -- `[0] TRY_BLOCK, [1] function' -- and that is what moved the
+ * question inside the entry.
+ *
+ * **The marker's ABSENCE is what says the walk ran.**
+ * `__exception_started' pushes the kind 3 throw marker
+ * (`throw.c:1038') and `__exception_caught' pops it (`:1053'), and
+ * the no-handler path at `:1494' is
+ * `in_handler = 1; __exception_caught(); __call_terminate();' -- it
+ * pops the marker BEFORE terminating.  So a chain with no marker in
+ * it is the chain after a completed, failed search, and
+ * `destination_ehsep' came back 0.
+ *
+ * `throw.c:1322' is then the only arm that could have set it:
+ *
+ *	if (kind == 0 || kind == 5)
+ *	  if (try_block.catch_info == 0) {
+ *	    if (try_block.catch_entries != 0)
+ *	      result = check_exception_type_specifications(...);
+ *	    else
+ *	      result = 1;
+ *	    if (result != 0) destination = ehsep;
+ *	  }
+ *
+ * -- which gives exactly three ways to fail, and the two fields
+ * below separate them:
+ *
+ *   catch_info != 0   the arm is SKIPPED ENTIRELY, and `catch (...)'
+ *	cannot save it.  The field is garbage, and since it sits
+ *	immediately after an 80-byte `jmp_buf' in the same struct,
+ *	whatever wrote it is the bug.
+ *   catch_entries == 0 and terminate reached: impossible by the code
+ *	above, so the chain at throw time was not the chain printed.
+ *   both sane                the TYPE MATCH failed, and `throw.c:892' is
+ *	the whole rule -- `etsp->type_info == type_info ||
+ *	name(etsp->type_info) == name(type_info)', **pointer
+ *	identity on the object or on the NAME STRING, never
+ *	`strcmp'**.  Two copies of one type's `type_info' then fail
+ *	to match, which is a COMDAT question and puts `-C' back in
+ *	the frame.
+ *
+ * ***THE `jmp_buf' IS CLEARED AND WAS CHECKED RATHER THAN ASSUMED***:
+ * the corpus bakes `typedef int jmp_buf[20]' citing
+ * `ape-sys/setjmp.h', and `sys/include/ape/setjmp.h:10' is that same
+ * `int[20]' -- 80 bytes both sides, against the 64 amd64 writes.  *A
+ * struct whose first member is a buffer the platform fills is the
+ * `alloc_fe' shape exactly*, so it had to be asked; it just answers
+ * no.
+ *
+ * Transcribed, not guessed: `a_region_number' is `unsigned short'
+ * (`throw.c:101') and `an_ETS_flag_set' is `unsigned' (`:104').  The
+ * `function' arm is carried although nothing reads it, because the
+ * union's SIZE AND ALIGNMENT decide where `variant' begins and
+ * leaving a member out is how a reader lands on the wrong offset.
+ */
+
+typedef int eh_jmp_buf[20];
+
+struct eh_try_block {
+	eh_jmp_buf setjmp_buffer;
+	void *catch_entries;
+	void *catch_info;
+	unsigned short region_number;
+	char __dummy[6];
+};
+
+struct eh_function {
+	void *regions;
+	void *object_address_table;
+	void *array_table;
+	unsigned short saved_region_number;
+	char __dummy[6];
+};
+
+union eh_variant {
+	struct eh_try_block try_block;
+	struct eh_function function;
+	void *throw_specification;
+	void *array_alloc_eh_info;
+};
+
 struct eh_entry {
 	struct eh_entry *next;
 	unsigned char kind;
+	union eh_variant variant;
+};
+
+struct eh_ets {
+	void *type_info;
+	unsigned flags;
+	unsigned *ptr_flags;
 };
 
 extern struct eh_entry *__curr_eh_stack_entry;
+extern unsigned short __eh_curr_region;
 
 static char *
 kindname(unsigned char k)
@@ -65,11 +158,36 @@ eh_dump(char *when)
 	struct eh_entry *e;
 	int n;
 
-	printf("  chain at %s: head = %p\n", when, (void *)__curr_eh_stack_entry);
+	printf("  chain at %s: head = %p, __eh_curr_region = %u\n",
+		when, (void *)__curr_eh_stack_entry, (unsigned)__eh_curr_region);
 	n = 0;
-	for(e = __curr_eh_stack_entry; e != 0 && n < 64; e = e->next, n++)
+	for(e = __curr_eh_stack_entry; e != 0 && n < 64; e = e->next, n++){
 		printf("    [%2d] %p kind %u %s\n", n, (void *)e,
 			(unsigned)e->kind, kindname(e->kind));
+		if(e->kind == 0 || e->kind == 5){
+			struct eh_ets *ets;
+
+			printf("         catch_entries %p  catch_info %p  region %u\n",
+				e->variant.try_block.catch_entries,
+				e->variant.try_block.catch_info,
+				(unsigned)e->variant.try_block.region_number);
+			/*
+			 * One entry only.  The list's terminator is the
+			 * matcher's business and transcribing a loop
+			 * condition is how a reader walks off the end of a
+			 * table it does not own; the FIRST entry is enough
+			 * to say whether the pointer leads anywhere real.
+			 */
+			ets = (struct eh_ets *)e->variant.try_block.catch_entries;
+			if(ets != 0)
+				printf("         ets[0] type_info %p  flags 0x%x\n",
+					ets->type_info, ets->flags);
+		}
+		if(e->kind == 1)
+			printf("         regions %p  saved_region %u\n",
+				e->variant.function.regions,
+				(unsigned)e->variant.function.saved_region_number);
+	}
 	printf("  chain at %s: %d entr%s\n", when, n, n == 1 ? "y" : "ies");
 }
 
