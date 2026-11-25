@@ -183,6 +183,70 @@ kindname(unsigned char k)
 	return "???";
 }
 
+/*
+ * ***PLAUSIBILITY, NOT TRUST.***  The previous version followed
+ * `catch_entries' unconditionally and died on `0xFEFEFEFEFEFEFEFE'
+ * with every later section unreported.  The entry now reads sane
+ * (`catch_entries 0x407550', `catch_info 0'), but a probe that is
+ * safe only while the thing it measures is healthy is no use for the
+ * run where it is not.  Plan 9 amd64 puts TEXT at 0x200000 and the
+ * data above it, so anything below that, absurdly high, or
+ * misaligned is refused and SAID SO -- a silent skip and a table of
+ * zeroes would read alike.
+ */
+static int
+plausible(void *p)
+{
+	unsigned long long a = (unsigned long long)p;
+
+	return a >= 0x200000ULL && a < 0x40000000ULL && (a & 7) == 0;
+}
+
+/*
+ * The exception-type-specification table, which is what
+ * `check_exception_type_specifications' walks (`throw.c:854').
+ *
+ * **The terminator is a FLAG, not a null entry**: the loop ends
+ * `done = etsp->flags & 32; etsp++;' in a `do/while', so the last
+ * entry is MARKED rather than followed by a sentinel.  A reader that
+ * stopped on a null `type_info' would run off the end of a table it
+ * does not own.
+ *
+ * **Bit 16 with bits 1 and 128 clear is the ELLIPSIS** (`:888'), and
+ * it short-circuits the type comparison entirely -- so a
+ * `catch (...)' in the source MUST appear here as such an entry, and
+ * if it does the match cannot fail.  That is the most useful thing
+ * in this dump: the probe's own try block is `catch (Boom &)' then
+ * `catch (...)', so the table should be two entries with the second
+ * flagged 16 and 32.
+ */
+static void
+ets_dump(void *p)
+{
+	struct eh_ets *ets;
+	int i;
+
+	if(p == 0){
+		printf("         ets: catch_entries is null -- the match is then\n");
+		printf("              unconditional, so terminate is impossible\n");
+		return;
+	}
+	if(!plausible(p)){
+		printf("         ets: %p is not a plausible data address -- NOT followed\n", p);
+		return;
+	}
+	ets = (struct eh_ets *)p;
+	for(i = 0; i < 16; i++){
+		printf("         ets[%d] type_info %p  flags 0x%x  ptr_flags %p%s%s\n",
+			i, ets[i].type_info, ets[i].flags, (void *)ets[i].ptr_flags,
+			((ets[i].flags & 16) && (ets[i].flags & 129) == 0) ? "  <= ELLIPSIS" : "",
+			(ets[i].flags & 32) ? "  <= LAST" : "");
+		if(ets[i].flags & 32)
+			return;
+	}
+	printf("         ets: no entry flagged LAST in 16 -- the table is malformed\n");
+}
+
 void
 eh_dump(char *when)
 {
@@ -227,11 +291,13 @@ eh_dump(char *when)
 		}
 		printf("\n");
 
-		if(e->kind == 0 || e->kind == 5)
+		if(e->kind == 0 || e->kind == 5){
 			printf("         [by throw.c's layout] catch_entries %p  catch_info %p  region %u\n",
 				e->variant.try_block.catch_entries,
 				e->variant.try_block.catch_info,
 				(unsigned)e->variant.try_block.region_number);
+			ets_dump(e->variant.try_block.catch_entries);
+		}
 		if(e->kind == 1)
 			printf("         [by throw.c's layout] regions %p  saved_region %u\n",
 				e->variant.function.regions,
