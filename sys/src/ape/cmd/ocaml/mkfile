@@ -196,7 +196,7 @@ lex/ocamllex: $OCAMLRUN $STDLIB
 tools/make_opcodes.ml: $OCSRC/tools/make_opcodes.mll
 	$OCAMLLEX -o $target $prereq
 
-tools/make_opcodes: tools/make_opcodes.ml
+tools/make_opcodes: tools/make_opcodes.ml $OCAMLRUN
 	$OCAMLBOOT -I tools -o $target $prereq
 
 tools/ocamlmklibconfig.ml:
@@ -209,23 +209,25 @@ tools/ocamlmklibconfig.ml:
 		echo 'let mklib out files opts = Printf.sprintf "ar r %s %s %s" out opts files;;'
 	}
 
-tools/ocamlmklibconfig.cmo: tools/ocamlmklibconfig.ml
+tools/ocamlmklibconfig.cmo: tools/ocamlmklibconfig.ml $OCAMLRUN
 	$OCAMLBOOT -c -o $target $prereq
 
-tools/ocamlmklib: tools/ocamlmklibconfig.cmo utils/config.cmo utils/misc.cmo
+tools/ocamlmklib: tools/ocamlmklibconfig.cmo utils/config.cmo utils/misc.cmo $OCAMLRUN
 	$OCAMLBOOT -I utils -I tools -o $target tools/ocamlmklibconfig.cmo utils/config.cmo utils/misc.cmo $OCSRC/tools/ocamlmklib.ml
 
 tools/ocamldep: compilerlibs/ocamlbytecomp.cma
 	$OCAMLBOOT -I . -I utils -I parsing -I typing -I bytecomp -I driver -I toplevel -o $target compilerlibs/ocamlbytecomp.cma $OCSRC/tools/ocamldep.ml
 
+# every stage-0 compile runs boot/ocamlrun, so each rule names it as a
+# prerequisite: mk otherwise may run ocamlc before the link has happened.
 # ---- the compiler: .depend is the port's own, read as-is ----
 
 <$OCSRC/.depend
 
-%.cmi: $OCSRC/%.mli
+%.cmi: $OCSRC/%.mli $OCAMLRUN
 	$OCAMLC $OCAMLFLAGS -o $target $OCSRC/$stem.mli
 
-%.cmo: $OCSRC/%.ml
+%.cmo: $OCSRC/%.ml $OCAMLRUN
 	$OCAMLC $OCAMLFLAGS -o $target $OCSRC/$stem.ml
 
 # generated sources, built here
