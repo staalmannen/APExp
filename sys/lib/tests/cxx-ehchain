@@ -39,8 +39,24 @@ if(! test -f cxx-ehchain-walk.$O){
 echo 'cxx-ehchain: compiling and linking the probe with eccp -fexceptions'
 eccp -fexceptions -o cxx-ehchain-probe cxx-ehchain-probe.cpp cxx-ehchain-walk.$O || exit probe
 
+# ***EVERY CASE GETS ITS OWN PROCESS, AND THAT IS NOT TIDINESS.***
+# The terminate handler `exit's, so a single process running all the
+# throws reports the FIRST failure and nothing about the rest -- which
+# is how the ellipsis-only case went unmeasured for a round while
+# looking like it had passed.  `mmaptrim-probe' takes an argument for
+# the same reason.
+#
+# `-k' in spirit: a failing case does NOT stop the ones after it,
+# because the SHAPE of the matrix is the finding.  Case 0 is the
+# control and a run where it fails says nothing about the others.
 echo
-./cxx-ehchain-probe
-status=$status
-echo
-echo 'cxx-ehchain: exit status '^$status^' (0 PASS, 3 terminate handler reached)'
+for(c in 0 1 2 3 4){
+	echo '================ case '^$c^' ================'
+	./cxx-ehchain-probe $c
+	s=$status
+	if(~ $s '')
+		s=0
+	echo 'cxx-ehchain: case '^$c^' exit '^$s
+	echo
+}
+echo 'cxx-ehchain: 0 caught as intended, 3 terminate reached, 4 wrong handler'
