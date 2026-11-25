@@ -1,4 +1,5 @@
-X11=/sys/src/ape/X11
+APEXPROOT=../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
 <$X11/config
 
 LIB=$X11LIB/libXaw.a

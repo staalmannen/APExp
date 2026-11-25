@@ -1,4 +1,8 @@
-APEXPROOT=../../../../..
+# APEXPROOT is NOT set here. mk evaluates a relative value against the
+# directory the mkfile runs in, and the mkfiles that include this file
+# sit at different depths below the root, so a value assigned here
+# overrode each mkfile's own and pointed every -I path at the wrong tree.
+# Each mkfile sets APEXPROOT for its own depth before including this.
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 X11BIN=$APEXPROOT/$objtype/bin/ape/X11

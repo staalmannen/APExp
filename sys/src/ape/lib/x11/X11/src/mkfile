@@ -385,24 +385,24 @@ CLEANFILES=\
 
 </sys/src/cmd/mksyslib
 
-CFLAGS=-c $X11CFLAGS -I. -I$X11/lib/x11/src -I$X11/lib/x11/src/xcms -I$X11/lib/x11/src/xkb -I$X11/lib/x11/src/xlibi18n -I/sys/include/ape/X11
+CFLAGS=-c $X11CFLAGS -I. -I$X11/lib/X11/src -I$X11/lib/X11/src/xcms -I$X11/lib/X11/src/xkb -I$X11/lib/X11/src/xlibi18n -I/sys/include/ape/X11
 
-%.$O: $X11/lib/x11/src/%.c
+%.$O: $X11/lib/X11/src/%.c
 	pcc $CFLAGS -DX11_t -DTRANS_CLIENT -o $stem.$O $prereq
 
-%.$O: $X11/lib/x11/src/xcms/%.c
+%.$O: $X11/lib/X11/src/xcms/%.c
 	pcc $CFLAGS -o $stem.$O $prereq
 
-%.$O: $X11/lib/x11/src/xlibi18n/%.c
+%.$O: $X11/lib/X11/src/xlibi18n/%.c
 	pcc $CFLAGS -o $stem.$O $prereq
 
-%.$O: $X11/lib/x11/src/xkb/%.c
+%.$O: $X11/lib/X11/src/xkb/%.c
 	pcc $CFLAGS -o $stem.$O $prereq
 
 ks_tables.h: $O.makekeys 
 	./$O.makekeys < /sys/include/ape/X11/keysymdef.h > ks_tables.h
 
-$O.makekeys: $X11/lib/x11/src/util/makekeys.c
+$O.makekeys: $X11/lib/X11/src/util/makekeys.c
 	$CC -B -D_POSIX_SOURCE -D_BSD_EXTENSION -o $target $prereq
 
 StrKeysym.$O KeysymStr.$O: ks_tables.h

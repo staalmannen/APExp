@@ -54,6 +54,10 @@ extern char **environ;
 
 #if defined(__APPLE__) || defined(__FreeBSD__)
 typedef sig_t sighandler_t;
+#elif !defined(__linux__) && !defined(__GLIBC__)
+/* APE's <signal.h> has no sighandler_t (glibc's _GNU_SOURCE one is the
+ * only other source), so the type is spelled out for it. */
+typedef void (*sighandler_t)(int);
 #endif
 
 #if defined(__APPLE__)
@@ -3478,7 +3482,7 @@ typedef struct {
 
 typedef struct {
     int ref_count;
-    uint64_t buf[0];
+    uint64_t buf[];
 } JSSABHeader;
 
 static JSClassID js_worker_class_id;

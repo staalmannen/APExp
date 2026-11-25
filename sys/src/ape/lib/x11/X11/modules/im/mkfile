@@ -34,9 +34,9 @@ OFILES=\
 
 </sys/src/cmd/mksyslib
 
-CFLAGS=-c $X11CFLAGS -I$X11/lib/x11/src -I$X11/lib/x11/src/xcms -I$X11/lib/x11/src/xkb -I$X11/lib/x11/src/xlibi18n  -I/sys/include/ape/X11 -DXIM_t -DTRANS_CLIENT
+CFLAGS=-c $X11CFLAGS -I$X11/lib/X11/src -I$X11/lib/X11/src/xcms -I$X11/lib/X11/src/xkb -I$X11/lib/X11/src/xlibi18n  -I/sys/include/ape/X11 -DXIM_t -DTRANS_CLIENT
 
-%.$O: $X11/lib/x11/im/%.c
+%.$O: $X11/lib/X11/modules/im/%.c
 	pcc $CFLAGS -o $stem.$O $prereq
 
 

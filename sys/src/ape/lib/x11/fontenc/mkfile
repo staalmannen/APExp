@@ -6,8 +6,7 @@ LIB=$X11LIB/libfontenc.a
 
 OFILES=\
 	encparse.$O\
-	fontenc.$O\%.$O: $X11/lib/Xp/%.c
-	pcc $CFLAGS -o $stem.$O $prereq
+	fontenc.$O\
 
 </sys/src/cmd/mksyslib
 

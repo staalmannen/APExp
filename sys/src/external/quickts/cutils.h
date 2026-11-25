@@ -29,8 +29,15 @@
 #include <string.h>
 #include <inttypes.h>
 
+/* __builtin_expect exists only where the compiler is GNU-compatible;
+ * APExp's kencc is not, and the hint is an optimisation, not a rule. */
+#if defined(__GNUC__) || defined(__clang__)
 #define likely(x)       __builtin_expect(!!(x), 1)
 #define unlikely(x)     __builtin_expect(!!(x), 0)
+#else
+#define likely(x)       (x)
+#define unlikely(x)     (x)
+#endif
 #define force_inline inline __attribute__((always_inline))
 #define no_inline __attribute__((noinline))
 #define __maybe_unused __attribute__((unused))
@@ -125,6 +132,13 @@ static inline int64_t min_int64(int64_t a, int64_t b)
         return b;
 }
 
+/*
+ * The bit-count helpers have a builtin arm for GNU-compatible compilers
+ * and a portable arm for the rest.  The portable arm answers 32 or 64
+ * for a zero argument where the builtin is undefined; no caller relies
+ * on the value, and the loop must still terminate.
+ */
+#if defined(__GNUC__) || defined(__clang__)
 /* WARNING: undefined if a = 0 */
 static inline int clz32(unsigned int a)
 {
@@ -148,6 +162,55 @@ static inline int ctz64(uint64_t a)
 {
     return __builtin_ctzll(a);
 }
+#else
+static inline int clz32(unsigned int a)
+{
+    int n = 0;
+    if (a == 0)
+        return 32;
+    while (!(a & 0x80000000u)) {
+        a <<= 1;
+        n++;
+    }
+    return n;
+}
+
+static inline int clz64(uint64_t a)
+{
+    int n = 0;
+    if (a == 0)
+        return 64;
+    while (!(a & ((uint64_t)1 << 63))) {
+        a <<= 1;
+        n++;
+    }
+    return n;
+}
+
+static inline int ctz32(unsigned int a)
+{
+    int n = 0;
+    if (a == 0)
+        return 32;
+    while (!(a & 1)) {
+        a >>= 1;
+        n++;
+    }
+    return n;
+}
+
+static inline int ctz64(uint64_t a)
+{
+    int n = 0;
+    if (a == 0)
+        return 64;
+    while (!(a & 1)) {
+        a >>= 1;
+        n++;
+    }
+    return n;
+}
+#endif
 
 struct __attribute__((packed)) packed_u64 {
     uint64_t v;

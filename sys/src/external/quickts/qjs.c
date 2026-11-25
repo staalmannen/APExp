@@ -145,8 +145,8 @@ static size_t js_trace_malloc_usable_size(const void *ptr)
 #elif defined(__linux__) || defined(__GLIBC__)
     return malloc_usable_size((void *)ptr);
 #else
-    /* change this to `return 0;` if compilation fails */
-    return malloc_usable_size((void *)ptr);
+    /* APE has no malloc_usable_size; 0 only under-counts memory use. */
+    return 0;
 #endif
 }
 

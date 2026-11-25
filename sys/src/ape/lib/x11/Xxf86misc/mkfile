@@ -1,5 +1,5 @@
 APEXPROOT=../../../../../..
-X11=$APEXPROOT/sys/src/external/X11
+X11=$APEXPROOT/sys/src/external/equis_X11
 <$X11/config
 
 LIB=$APEXPROOT/$objtype/lib/ape/X11/libXxf86misc.a

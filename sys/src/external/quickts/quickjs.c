@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 #include <stdlib.h>
+#include <alloca.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <inttypes.h>
@@ -49,7 +50,10 @@
 
 #define OPTIMIZE         1
 #define SHORT_OPCODES    1
-#if defined(__EMSCRIPTEN__)
+/* Direct dispatch jumps through a table of label addresses (`&&label'),
+ * a GNU extension.  Without it the switch loop is used, which is what
+ * EMSCRIPTEN already gets. */
+#if defined(__EMSCRIPTEN__) || !(defined(__GNUC__) || defined(__clang__))
 #define DIRECT_DISPATCH  0
 #else
 #define DIRECT_DISPATCH  1
@@ -589,6 +593,16 @@ typedef enum {
 #define JS_ATOM_HASH_MASK  ((1 << 30) - 1)
 #define JS_ATOM_HASH_PRIVATE JS_ATOM_HASH_MASK
 
+/* A zero-length array is a GNU extension; ISO C does not have one.  GCC
+ * keeps [0].  Elsewhere the member is [1]: sizeof(JSString) grows by the
+ * union's size, and js_malloc_rt sizes a string as sizeof(JSString) +
+ * length + 1, so the extra bytes only over-allocate. */
+#if defined(__GNUC__) || defined(__clang__)
+#define JS_ZERO_LEN 0
+#else
+#define JS_ZERO_LEN 1
+#endif
+
 struct JSString {
     uint32_t len : 31;
     uint8_t is_wide_char : 1; /* 0 = 8 bits, 1 = 16 bits characters */
@@ -602,8 +616,8 @@ struct JSString {
     struct list_head link; /* string list */
 #endif
     union {
-        uint8_t str8[0]; /* 8 bit strings will get an extra null terminator */
-        uint16_t str16[0];
+        uint8_t str8[JS_ZERO_LEN]; /* 8 bit strings will get an extra null terminator */
+        uint16_t str16[JS_ZERO_LEN];
     } u;
 };
 
@@ -736,7 +750,7 @@ typedef struct JSBoundFunction {
     JSValue func_obj;
     JSValue this_val;
     int argc;
-    JSValue argv[0];
+    JSValue argv[];
 } JSBoundFunction;
 
 typedef enum JSIteratorKindEnum {
@@ -950,7 +964,7 @@ typedef struct JSJobEntry {
     JSContext *realm;
     JSJobFunc *job_func;
     int argc;
-    JSValue argv[0];
+    JSValue argv[];
 } JSJobEntry;
 
 typedef struct JSProperty {
@@ -2062,7 +2076,14 @@ static inline BOOL js_check_stack_overflow(JSRuntime *rt, size_t alloca_size)
 /* Note: OS and CPU dependent */
 static inline uintptr_t js_get_stack_pointer(void)
 {
+#if defined(__GNUC__) || defined(__clang__)
     return (uintptr_t)__builtin_frame_address(0);
+#else
+    /* No __builtin_frame_address: the address of a local is inside the
+     * current frame, which is close enough for a stack-depth check. */
+    volatile char marker;
+    return (uintptr_t)&marker;
+#endif
 }
 
 static inline BOOL js_check_stack_overflow(JSRuntime *rt, size_t alloca_size)
@@ -2157,8 +2178,8 @@ static size_t js_def_malloc_usable_size(const void *ptr)
     /* quickts: newlib has none (the ESP32) */
     return 0;
 #else
-    /* change this to `return 0;` if compilation fails */
-    return malloc_usable_size((void *)ptr);
+    /* APE has no malloc_usable_size; 0 only under-counts memory use. */
+    return 0;
 #endif
 }
 
@@ -6005,7 +6026,7 @@ typedef struct JSCFunctionDataRecord {
     uint8_t length;
     uint8_t data_len;
     uint16_t magic;
-    JSValue data[0];
+    JSValue data[];
 } JSCFunctionDataRecord;
 
 static void js_c_function_data_finalizer(JSRuntime *rt, JSValue val)
@@ -44928,9 +44949,9 @@ static const JSCFunctionListEntry js_number_funcs[] = {
     JS_CFUNC_DEF("isSafeInteger", 1, js_number_isSafeInteger ),
     JS_PROP_DOUBLE_DEF("MAX_VALUE", 1.7976931348623157e+308, 0 ),
     JS_PROP_DOUBLE_DEF("MIN_VALUE", 5e-324, 0 ),
-    JS_PROP_DOUBLE_DEF("NaN", NAN, 0 ),
-    JS_PROP_DOUBLE_DEF("NEGATIVE_INFINITY", -INFINITY, 0 ),
-    JS_PROP_DOUBLE_DEF("POSITIVE_INFINITY", INFINITY, 0 ),
+    /* NaN, NEGATIVE_INFINITY and POSITIVE_INFINITY are defined in the
+     * Number constructor setup below: APE's math.h makes them calls
+     * (NaN(), Inf(1)), and a static table can hold only constants. */
     JS_PROP_DOUBLE_DEF("EPSILON", 2.220446049250313e-16, 0 ), /* ES6 */
     JS_PROP_DOUBLE_DEF("MAX_SAFE_INTEGER", 9007199254740991.0, 0 ), /* ES6 */
     JS_PROP_DOUBLE_DEF("MIN_SAFE_INTEGER", -9007199254740991.0, 0 ), /* ES6 */
@@ -55042,8 +55063,8 @@ static const JSCFunctionListEntry js_global_funcs[] = {
     JS_CFUNC_MAGIC_DEF("encodeURIComponent", 1, js_global_encodeURI, 1 ),
     JS_CFUNC_DEF("escape", 1, js_global_escape ),
     JS_CFUNC_DEF("unescape", 1, js_global_unescape ),
-    JS_PROP_DOUBLE_DEF("Infinity", 1.0 / 0.0, 0 ),
-    JS_PROP_DOUBLE_DEF("NaN", NAN, 0 ),
+    /* Infinity and NaN: see the global setup, which defines them at run
+     * time, because 1.0 / 0.0 and NAN are not constants here. */
     JS_PROP_UNDEFINED_DEF("undefined", 0 ),
     JS_PROP_STRING_DEF("[Symbol.toStringTag]", "global", JS_PROP_CONFIGURABLE ),
     JS_CFUNC_DEF("eval", 1, js_global_eval ),
@@ -56660,6 +56681,11 @@ int JS_AddIntrinsicBaseObjects(JSContext *ctx)
     if (JS_SetPropertyFunctionList(ctx, ctx->global_obj, js_global_funcs,
                                    countof(js_global_funcs)))
         return -1;
+    /* Infinity and NaN, with the attributes JS_PROP_DOUBLE_DEF(..., 0) gave. */
+    if (JS_DefinePropertyValueStr(ctx, ctx->global_obj, "Infinity", __JS_NewFloat64(ctx, 1.0 / 0.0), 0) < 0)
+        return -1;
+    if (JS_DefinePropertyValueStr(ctx, ctx->global_obj, "NaN", __JS_NewFloat64(ctx, NAN), 0) < 0)
+        return -1;
 
     /* Number */
     obj1 = JS_NewCConstructor(ctx, JS_CLASS_NUMBER, "Number",
@@ -56669,6 +56695,14 @@ int JS_AddIntrinsicBaseObjects(JSContext *ctx)
                                      js_number_proto_funcs, countof(js_number_proto_funcs),
                                      JS_NEW_CTOR_PROTO_CLASS);
     if (JS_IsException(obj1))
+        return -1;
+    /* The three properties the static table cannot hold.  The flags are
+     * the 0 that JS_PROP_DOUBLE_DEF(..., 0) gave them. */
+    if (JS_DefinePropertyValueStr(ctx, obj1, "NaN", __JS_NewFloat64(ctx, NAN), 0) < 0)
+        return -1;
+    if (JS_DefinePropertyValueStr(ctx, obj1, "NEGATIVE_INFINITY", __JS_NewFloat64(ctx, -INFINITY), 0) < 0)
+        return -1;
+    if (JS_DefinePropertyValueStr(ctx, obj1, "POSITIVE_INFINITY", __JS_NewFloat64(ctx, INFINITY), 0) < 0)
         return -1;
     JS_FreeValue(ctx, obj1);
     if (JS_SetObjectData(ctx, ctx->class_proto[JS_CLASS_NUMBER], JS_NewInt32(ctx, 0)))
