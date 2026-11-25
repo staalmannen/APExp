@@ -2428,6 +2428,19 @@ silent:
   environment, which is why it reads `OBJEXT` from `/$objtype/mkfile`:
   `null list in concatenation`, `mkone`'s unset `BIN` again, *in the
   file carrying the explanation.*
+  ***AND unrar EXTRACTS: `All OK`, EVERY CRC VERIFIED.*** A real
+  archive, downloaded, decompressed, checksummed — **the first C++
+  application on this machine doing WORK rather than printing a
+  banner**, with cpfe, the C++ library, EH, static constructors, the
+  RAR decompressor and file I/O end to end.
+  ***And it retires one of the two explanations the ARCHIVERS' open
+  item rests on***: `unxz xz_sample_file_1MB.xz` and
+  `unlz4 sample.txt.lz4` are unseparated because each file "was
+  produced ELSEWHERE", so a bad download and a real decode bug look
+  alike — and **unrar verifying a downloaded archive's CRCs is a
+  checksum over the whole download path**. *So `hget` is not
+  corrupting files*, and those two are a port bug or a genuinely bad
+  source file, which is one hypothesis rather than two.
   **re2c has not moved** — ten missing headers and no `makefile` to
   read an object list from, both in 0.6's inventory with the missing
   `(char const *)` constructors.
