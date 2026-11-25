@@ -24,6 +24,10 @@
 #define HAVE_UNISTD_H 1
 #define RETSIGTYPE void
 #define STDC_HEADERS 1
+/* kencc's cpp does not define __STDC__, so the sources' ANSI token-paste
+ * branches (e.g. UnGetReq in PutImage.c, which pastes x##name##Req) would
+ * not be chosen.  APE is ANSI C: select them. */
+#define ANSICPP 1
 
 
 /* libXaw */

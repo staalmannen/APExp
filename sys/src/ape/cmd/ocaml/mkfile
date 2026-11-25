@@ -155,7 +155,7 @@ byterun/caml/jumptbl.h: $OCSRC/byterun/caml/instruct.h
 # the generated headers and primitives must exist before any byterun object
 byterun/prims.$O: byterun/caml/version.h byterun/caml/jumptbl.h
 
-RUNCFLAGS=-I$OCBLD/byterun -I$OCBLD/byterun/caml -I$OCSRC/byterun -I$OCPLAN9/byterun/$objtype -I$OCPLAN9/byterun/caml -D_PLAN9_SOURCE -D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION -D_POSIX_SOURCE -DCAML_NAME_SPACE -Bc
+RUNCFLAGS=-I$OCBLD/byterun -I$OCBLD/byterun/caml -I$OCSRC/byterun -I$OCSRC/byterun/caml -I$OCPLAN9/byterun/$objtype -I$OCPLAN9/byterun/caml -D_PLAN9_SOURCE -D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION -D_POSIX_SOURCE -DCAML_NAME_SPACE -Bc
 
 # ---- stage 0: ocamlyacc (C), installed into boot/ ----
 
