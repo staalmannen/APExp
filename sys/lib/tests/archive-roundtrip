@@ -1,0 +1,215 @@
+#!/bin/rc
+# archive-roundtrip -- does xz/lz4 survive a LOCAL round trip at size?
+#
+#	./archive-roundtrip [samplefile ...]
+#
+# No arguments needed: it builds its own corpus and looks for the two
+# shipped samples in `.', `/tmp' and `$home/download'.  Any paths given
+# are tried as samples too, so a file somewhere else needs no editing.
+#
+# ---- WHAT IT COMES FROM --------------------------------------------
+#
+# Two decode failures are recorded as OPEN and UNSEPARATED:
+#
+#	unxz xz_sample_file_1MB.xz   -> Compressed data is corrupt
+#	unlz4 sample.txt.lz4         -> Error 26 : LZ4F frame decoding
+#	                                could not complete: invalid frame
+#
+# and the reason they are unseparated is that **both files were
+# produced ELSEWHERE**, so a bad download and a real decode bug look
+# exactly alike.
+#
+# ***ONE OF THOSE TWO EXPLANATIONS IS NOW DEAD.***  `unrar x' on a
+# downloaded archive answers `All OK', and unrar verifies a CRC32 over
+# every header and over the extracted data -- which is a checksum over
+# the whole download path.  *So `hget' is not corrupting files*, and
+# what is left is a port bug or a genuinely bad source file.
+#
+# **A LOCAL round trip is what separates THOSE two**, because it never
+# touches the network: this tree compresses its own bytes and reads
+# them back.
+#
+# ---- THE THREE-WAY READING, WRITTEN DOWN BEFORE THE RUN ------------
+#
+#   -T1 passes, -T0 FAILS
+#	The THREADED encoder.  That is ground nothing has covered --
+#	`pthread_create' was broken until this release and every xz
+#	run before it either hung or never reached a worker, so a fix
+#	that lets a process reach code it never reached before can
+#	expose anything on that path.
+#   BOTH pass
+#	The port is fine at size and the shipped sample files are the
+#	problem.  *Then the open item closes as "not ours".*
+#   BOTH fail
+#	The codec is broken at size, and the small file passing was
+#	luck -- `xz -c <sample.txt' is 72 bytes, one block, one
+#	thread, no multi-block framing at all.
+#
+# A `lz4' column beside them, because the two failures were always
+# described as one open item and have never been shown to share a
+# mechanism.  *A grep that finds nothing has ruled out what you
+# grepped for and nothing else*, and the `pthread_create' round
+# already refuted one "they share no mechanism" claim here.
+#
+# ---- HOW IT IS BUILT, AND WHY IN THIS ORDER ------------------------
+#
+# **Each case announces itself BEFORE it runs**, because a fault, a
+# kill and a clean finish all just give the prompt back, and the
+# threaded arm is the one with a recorded history of HANGING.  The
+# `-T1' case therefore runs first: *every case expected to return
+# comes before every case expected to hang*, so a freeze names itself
+# by what printed last.  **The completion marker at the end is what
+# says the run reached it** -- read that before reading any count.
+#
+# **The corpus is this tree's own `lib/ap' sources**, about 1.8MB of
+# varied C -- varied rather than repeated on purpose, since eight
+# copies of one file compress to almost nothing and would exercise
+# neither multi-block framing nor the worker split, which is the whole
+# question.
+#
+# **`cmp' is read by its STATUS and not by its silence.**  APE's `cmp'
+# prints nothing when two files are the same, and it also printed
+# nothing for years when it wrongly believed its own stdout was
+# `/dev/null' -- *indistinguishable from the prompt*.  The status is
+# correct either way.
+
+# **The failure count is a LIST and not arithmetic.**  rc has no
+# integer arithmetic, so a counter means shelling out to `dc' or `awk'
+# for every case; `$#list' is the language's own answer and cannot
+# mis-parse.
+failed = ()
+tmp = /tmp/archive-roundtrip.$pid
+big = $tmp/big
+
+fn note {
+	echo $*
+}
+
+fn check {
+	# $1 the label, $2 and $3 the two files
+	cmp $2 $3 >[2]/dev/null
+	s = $status
+	if(~ $s ''){
+		note '  PASS: '^$1
+	}
+	if not {
+		note '  FAIL: '^$1
+		failed = ($failed $1)
+	}
+}
+
+note 'archive-roundtrip: starting'
+
+# ---- gate --------------------------------------------------------
+# A missing tool and a failing tool are different results, and a run
+# that silently skips the case it was built for is the shape this
+# tree's notes call a check that cannot fail.
+havexz = yes
+havelz4 = yes
+if(! test -x /bin/xz && ! test -x /bin/ape/xz){
+	note 'archive-roundtrip: no xz in the path -- its sections are SKIPPED,'
+	note 'archive-roundtrip: which is not the same as passing.'
+	havexz = no
+}
+if(! test -x /bin/lz4 && ! test -x /bin/ape/lz4){
+	note 'archive-roundtrip: no lz4 in the path -- its section is SKIPPED,'
+	note 'archive-roundtrip: which is not the same as passing.'
+	havelz4 = no
+}
+
+mkdir -p $tmp
+src = /sys/src/ape/lib/ap
+if(! test -d $src){
+	note 'archive-roundtrip: no '^$src^' -- cannot build a corpus'
+	exit nosrc
+}
+cat $src/*/*.c >$big >[2]/dev/null
+if(! test -s $big){
+	note 'archive-roundtrip: corpus is empty'
+	exit nocorpus
+}
+# `wc -c' and NOT `ls -l | awk {print $6}'.  Plan 9's `ls -l' puts the
+# size in field 6 and GNU coreutils' puts it in field 5 -- and inside
+# `apexp-sh' the union resolves `ls' to **GNU's**, which is this tree's
+# own recorded trap (`basename -d' answering `invalid option').  `wc -c'
+# has one field and no opinion.
+note 'corpus: '^`{wc -c <$big}^' bytes from '^$src
+
+# ---- section 1: xz -T1, the single-threaded encoder ---------------
+if(~ $havexz yes){
+	note 'section 1: xz -T1 (single thread) round trip'
+	note '  compressing'
+	xz -T1 -c <$big >$tmp/t1.xz
+	note '  decompressing'
+	unxz -c <$tmp/t1.xz >$tmp/t1.out
+	check 'xz -T1 round trip' $big $tmp/t1.out
+}
+
+# ---- section 2: xz -T0, the threaded encoder ----------------------
+# ***THIS IS THE ONE THAT CAN HANG***, which is why it is second and
+# why the line before it prints first.
+if(~ $havexz yes){
+	note 'section 2: xz -T0 (threaded, the default) round trip'
+	note '  compressing -- THIS IS THE ARM WITH A HISTORY OF HANGING'
+	xz -T0 -c <$big >$tmp/t0.xz
+	note '  decompressing'
+	unxz -c <$tmp/t0.xz >$tmp/t0.out
+	check 'xz -T0 round trip' $big $tmp/t0.out
+}
+
+# ---- section 3: lz4 ------------------------------------------------
+if(~ $havelz4 yes){
+	note 'section 3: lz4 round trip'
+	note '  compressing'
+	lz4 -c <$big >$tmp/t.lz4
+	note '  decompressing'
+	unlz4 -c <$tmp/t.lz4 >$tmp/t.lz4.out
+	check 'lz4 round trip' $big $tmp/t.lz4.out
+}
+
+# ---- section 4: the shipped samples, if they are here --------------
+# **Reported and NOT counted.**  These are the files the open item is
+# about, and whether they decode is the question the local round trip
+# exists to put a background under -- it is not an assertion about
+# this tree.  *A sample that fails while the round trip passes says
+# the file is bad; one that fails while the round trip also fails says
+# nothing by itself.*
+note 'section 4: the shipped sample files (reported, not counted)'
+# `$home' is guarded and concatenated with `^' EXPLICITLY.  An unset
+# variable inside a concatenation is a null LIST in rc, which is an
+# error and not an empty string -- `null list in concatenation', the
+# same shape as `mkone''s unset `BIN' and as `eccp''s `$O' an hour ago.
+xzsamples = (./xz_sample_file_1MB.xz /tmp/xz_sample_file_1MB.xz $*)
+lz4samples = (./sample.txt.lz4 /tmp/sample.txt.lz4 $*)
+if(! ~ $#home 0){
+	xzsamples = ($xzsamples $home^/download/xz_sample_file_1MB.xz)
+	lz4samples = ($lz4samples $home^/download/sample.txt.lz4)
+}
+for(f in $xzsamples){
+	if(test -f $f){
+		note '  trying '^$f
+		unxz -c <$f >/dev/null
+		if(~ $status '')
+			note '  sample xz: decodes'
+		if not
+			note '  sample xz: FAILS'
+	}
+}
+for(f in $lz4samples){
+	if(test -f $f){
+		note '  trying '^$f
+		unlz4 -c <$f >/dev/null
+		if(~ $status '')
+			note '  sample lz4: decodes'
+		if not
+			note '  sample lz4: FAILS'
+	}
+}
+
+rm -rf $tmp
+note ''
+note 'archive-roundtrip: COMPLETE, '^$#failed^' failure(s)'
+note 'archive-roundtrip: -T1 pass + -T0 fail = the threaded encoder;'
+note 'archive-roundtrip: both pass = the shipped samples are the problem;'
+note 'archive-roundtrip: both fail = the codec is broken at size.'
+exit $#failed
