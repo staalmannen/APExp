@@ -237,10 +237,22 @@
  * which Plan 9's setjmp does not do either way, so the distinction has
  * no content on this target and the plain name is the one that links.
  *
- * What the miss costs today: `lib_src/eh_util.c' and
- * `lib_src/newnothrow.c' each declare `extern int _setjmp(long [25]);'
- * and call it, so both are undefined at a link that needs them.  The
- * BUFFER is adequate either way and was checked rather than assumed --
+ * ***AND THE "WHAT IT COSTS TODAY" BELOW IS STALE, WHICH A LINK
+ * PROVED BEFORE ANYONE RE-READ IT.***  This note used to say
+ * `lib_src/eh_util.c' and `lib_src/newnothrow.c' each declare
+ * `extern int _setjmp(long [25]);' and call it, so both are undefined
+ * at a link that needs them.  **`_setjmp' occurs ZERO times in
+ * `lib_src/*.c'** -- the corpus was regenerated from a pristine base
+ * for the `alloc_fe' fix and uses the plain name -- and the
+ * confirmation is behavioural rather than textual: `unrar' and
+ * `cxx-stdexcept-test' both LINK, with `eh_util.$O' certainly pulled
+ * in, since its `__default_terminate' is what prints at the end of
+ * each run.  libap has no `_setjmp' at all, so had the call survived
+ * the link could not have.  *A claim about generated code outlives
+ * the generation it was made about.*
+ *
+ * What the miss cost: the BUFFER is adequate either way and was
+ * checked rather than assumed --
  * `long [25]' is 100 bytes under kencc's 4-byte long, against
  * `jmp_buf''s `int[20]' = 80 and the 64 amd64 actually writes.  *That
  * is the half that would have been silent*: a buffer EDG sized from
