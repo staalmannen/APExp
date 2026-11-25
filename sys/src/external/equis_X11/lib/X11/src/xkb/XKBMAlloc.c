@@ -646,17 +646,18 @@ _ExtendRange(	unsigned int 	old_flags,
     return old_flags;
 }
 
-/* changes->names.num_keys is an int in the installed XKBlib.h, but
- * _ExtendRange takes an unsigned char (the width this source was written
- * for).  Pass a byte through and store it back, so the field keeps its
- * declared type. */
+/* changes->names.first_key and num_keys are unsigned char in the shared
+ * XKBstr.h (XkbNameChangesRec), which is what this TU sees.  _ExtendRange
+ * takes KeyCode * for the first key, so widen it through a temporary and
+ * store it back; the count is already unsigned char.  X keycodes are
+ * 8-bit, so the store back loses nothing. */
 static unsigned
 _ExtendRangeInt(unsigned int old_flags, unsigned int flag, KeyCode newKC,
-		KeyCode *old_min, int *old_num)
+		unsigned char *old_min, unsigned char *old_num)
 {
-    unsigned char n = (unsigned char) *old_num;
-    unsigned r = _ExtendRange(old_flags, flag, newKC, old_min, &n);
-    *old_num = n;
+    KeyCode min = *old_min;
+    unsigned r = _ExtendRange(old_flags, flag, newKC, &min, old_num);
+    *old_min = (unsigned char) min;
     return r;
 }
 
