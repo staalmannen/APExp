@@ -2,7 +2,6 @@
 #include <libc.h>
 #include <draw.h>
 #include <event.h>
-#include <mouse.h>
 #include "xshim_p.h"
 
 /*
