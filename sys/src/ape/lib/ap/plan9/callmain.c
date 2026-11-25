@@ -38,6 +38,7 @@ char *argv0 = NULL;
 
 extern	void _envsetup(void);
 extern	void _malloc_watchinit(void);
+extern	void _cxxinit(void);
 extern	char **environ;
 extern	int *_errnoloc;
 
@@ -84,6 +85,38 @@ _callmain(int (*f)(int, char**), int argc, char *arg0)
 	 * own.
 	 */
 	argv0 = arg0;
+
+	/*
+	 * C++ STATIC CONSTRUCTORS, and this is the only place they can
+	 * be run from.
+	 *
+	 * EDG's model is that the target's crt calls `_main', which
+	 * calls `__call_ctors'.  This target's crt is main9.s ->
+	 * _callmain -> _apemain -> main and called nothing of EDG's, so
+	 * **no C++ static constructor had ever run in any program built
+	 * here** -- unrar's `crc.cpp:75' is
+	 * `struct CallInitCRC {CallInitCRC() {InitTables();}} static
+	 * CallInit32;', the only thing that fills its CRC tables, so
+	 * every checksum in every archive failed and read exactly like
+	 * a corrupt download.  `sys/lib/tests/cxx-staticinit-test.cpp'
+	 * is the five-line case.
+	 *
+	 * `_cxxinit' IS A HOOK AND NOT A C++ DEPENDENCY.  libap defines
+	 * its own empty one in `plan9/cxxinit.c', which is what every C
+	 * program links; `eccp' generates an OBJECT defining both
+	 * `_ctors[]' and a `_cxxinit' that calls EDG's `__edg_main',
+	 * and an object named on the link line is always included while
+	 * an archive member is pulled only if something is still
+	 * undefined -- so the generated one wins and libap's is never
+	 * reached.  *That is the same first-archive-wins rule that made
+	 * EDG's `_main' capture the entry point, used deliberately
+	 * instead of by accident.*
+	 *
+	 * It goes AFTER argv0 and the privates and BEFORE main, because
+	 * a constructor may legitimately call anything libap offers,
+	 * and `exit' from one must find a working `atexit' chain.
+	 */
+	_cxxinit();
 
 	exit(f(argc, &arg0));
 }

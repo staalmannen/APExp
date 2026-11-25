@@ -21,6 +21,7 @@ OFILES=\
 	callmain.$O\
 	convM2D.$O\
 	convD2M.$O\
+	cxxinit.$O\
 	dirread.$O\
 	dirstat.$O\
 	dirtostat.$O\
