@@ -1,7 +1,0 @@
-X11=/sys/src/ape/X11
-<$X11/config
-BIN=$X11BIN
-TARG=sxpm
-OFILES=sxpm.$O
-</sys/src/cmd/mkone
-CFLAGS=-c $X11CFLAGS -B

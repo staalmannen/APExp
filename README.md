@@ -81,6 +81,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - wchar.h/wctype.h provided by the thin "libwtf" [12]
 - readline headers provided by GNU readline
 - curses.h, term.h, panel.h provided by PDCursesMod
+- x11 : for the new shim library
 
 ***Libraries***
 
@@ -92,6 +93,9 @@ Install paths have been modified so that libraries and binaries are installed in
 - migrated from APE stdio to musl stdio (with some major porting, using pthreads)
 - fchown/fchmod stubs introduced
 - minimal (shim and stub) functions for common gnulib functions included
+
+**other libs**
+- X11: new shim over /dev/draw and /dev/kbd
 
 **3rd party**
 - libressl (version 4.3.2)
@@ -112,8 +116,6 @@ Install paths have been modified so that libraries and binaries are installed in
 - libpng (version 1.6.58)
 - libjpeg (version 10)
 - libwebp (version 1.6.0)
-- X11 (version 1.1.3-Equis, copied from /n/sources/contrib/fgb/fgb/root/sys/src/ape/X11). 
-- To be replaced with a /dev/draw port of xorg-server 21.1.26
 
 
 ***Utilities***
