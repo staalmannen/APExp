@@ -1,0 +1,32 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libxshim.a
+
+OFILES=\
+	display.$O\
+	window.$O\
+	gc.$O\
+	draw.$O\
+	event.$O\
+
+# the public header is sys/include/ape/xshim.h (with xshim_types.h); both are
+# installed by hand for now, like draw.h, until the X11 headers are cleaned up
+HFILES=\
+	$APEXPROOT/sys/include/ape/xshim.h\
+	$APEXPROOT/sys/include/ape/xshim_types.h\
+
+UPDATE=\
+	mkfile\
+	$HFILES\
+	${OFILES:%.$O=%.c}\
+	xshim_p.h\
+	${LIB:/$objtype/%=/386/%}\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE -I$APEXPROOT/sys/include/ape
+
+%.$O: %.c xshim_p.h
+	$CC $CFLAGS $stem.c
