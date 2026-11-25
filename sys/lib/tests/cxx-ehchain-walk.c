@@ -156,7 +156,7 @@ void
 eh_dump(char *when)
 {
 	struct eh_entry *e;
-	int n;
+	int n, w;
 
 	printf("  chain at %s: head = %p, __eh_curr_region = %u\n",
 		when, (void *)__curr_eh_stack_entry, (unsigned)__eh_curr_region);
@@ -164,29 +164,54 @@ eh_dump(char *when)
 	for(e = __curr_eh_stack_entry; e != 0 && n < 64; e = e->next, n++){
 		printf("    [%2d] %p kind %u %s\n", n, (void *)e,
 			(unsigned)e->kind, kindname(e->kind));
-		if(e->kind == 0 || e->kind == 5){
-			struct eh_ets *ets;
+		/*
+		 * ***THE RAW DUMP IS THE PRIMARY READING AND THE NAMED
+		 * FIELDS ARE SECONDARY, WHICH IS THE WRONG WAY ROUND FROM
+		 * HOW THIS FILE STARTED.***  The first run printed
+		 * `catch_entries 0xFEFEFEFEFEFEFEFE' -- and `0xfefefefe' is
+		 * *stack garbage on this machine*, named as such in
+		 * `lib/ap/plan9/callmain.c:14', so those words were never
+		 * written.  **But "never written" and "written somewhere
+		 * I am not looking" print the same thing**, and the layout
+		 * here is TRANSCRIBED from `lib_src/throw.c' while the
+		 * entry is built by the CLIENT's generated C.  They are not
+		 * guaranteed to agree: `eh_util.c''s own try-block push
+		 * writes a member called `rtinfo' that `throw.c''s struct
+		 * does not have.  A hex dump needs no transcription to be
+		 * right, so it goes first and a disagreement between the
+		 * two halves is the finding.
+		 */
+		for(w = 0; w < 15; w++){
+			if((w % 3) == 0)
+				printf("         +%-3d", w * 8);
+			/*
+			 * `%016llx' and NOT `%016llux': the latter is Plan 9
+			 * `fmt' syntax and this is APE's C stdio, where it
+			 * parses as `%llu' followed by a literal `x' -- a
+			 * decimal dump that looks deliberate.
+			 */
+			printf(" %016llx", ((unsigned long long *)e)[w]);
+			if((w % 3) == 2)
+				printf("\n");
+		}
+		printf("\n");
 
-			printf("         catch_entries %p  catch_info %p  region %u\n",
+		if(e->kind == 0 || e->kind == 5)
+			printf("         [by throw.c's layout] catch_entries %p  catch_info %p  region %u\n",
 				e->variant.try_block.catch_entries,
 				e->variant.try_block.catch_info,
 				(unsigned)e->variant.try_block.region_number);
-			/*
-			 * One entry only.  The list's terminator is the
-			 * matcher's business and transcribing a loop
-			 * condition is how a reader walks off the end of a
-			 * table it does not own; the FIRST entry is enough
-			 * to say whether the pointer leads anywhere real.
-			 */
-			ets = (struct eh_ets *)e->variant.try_block.catch_entries;
-			if(ets != 0)
-				printf("         ets[0] type_info %p  flags 0x%x\n",
-					ets->type_info, ets->flags);
-		}
 		if(e->kind == 1)
-			printf("         regions %p  saved_region %u\n",
+			printf("         [by throw.c's layout] regions %p  saved_region %u\n",
 				e->variant.function.regions,
 				(unsigned)e->variant.function.saved_region_number);
+		/*
+		 * `catch_entries' is NOT dereferenced.  The first run did,
+		 * and the probe died on `0xFEFEFEFEFEFEFEFE' with every
+		 * later section unreported -- this tree's own rule about a
+		 * case that can kill the process hiding the ones after it,
+		 * arriving inside an instrument written to survive a crash.
+		 */
 	}
 	printf("  chain at %s: %d entr%s\n", when, n, n == 1 ? "y" : "ies");
 }
