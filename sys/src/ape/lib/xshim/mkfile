@@ -28,5 +28,6 @@ UPDATE=\
 
 CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE -I$APEXPROOT/sys/include/ape
 
-%.$O: %.c xshim_p.h
-	$CC $CFLAGS $stem.c
+# every object includes the private header, so it is a prerequisite;
+# the recipe is mksyslib's own %.$O rule, not a second one
+$OFILES: xshim_p.h
