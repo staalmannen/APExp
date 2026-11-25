@@ -1984,3 +1984,106 @@ relinks the stale ones. `mk install` in `cmd/edg`, then `mk clean` in
 the package. *This tree's rule that a libap fix does not reach a built
 binary, one level up: a COMPILER fix does not reach a built object
 either, and nothing in any mkfile here expresses that dependency.*
+
+## Exceptions: `TARG_JMP_BUF_NUM_ELEMENTS`, and why nothing could be caught
+
+**Symptom.** `unrar -V` and `cxx-stdexcept-test` both ended with
+`C++ runtime abort: terminate() called by the exception handling
+mechanism` (`lib_src/eh_util.c:214`), on the FIRST throw, with the
+`try` and the `catch` in the same function -- so the reproducer was
+one translation unit and the cross-TU reading, with `-C` as its named
+suspect, was dead from the first measurement.
+
+**Cause.** The EH stack entry's try-block variant begins with the
+setjmp buffer:
+
+	struct { jmp_buf setjmp_buffer; catch_entries; catch_info;
+	         region_number; }
+
+so the buffer's size decides where the two fields that matter sit --
+and the two halves of the runtime got that size from different
+authorities.  `lib_src/throw.c:87` is `typedef int jmp_buf[20]` under
+a `#line` naming `ape-sys/setjmp.h`, so **EDG's own runtime was
+translated against APE's real 80-byte `jmp_buf`**.  A client
+translation unit does not use the header at all: `lower_eh.c:12564`'s
+`make_jmp_buf_type` builds the type from `targ_jmp_buf_num_elements`,
+which `src/target.c:7127` sets to **39** on the win64 arm -- the arm
+`eccp` selects -- for 156 bytes.
+
+So the client wrote `catch_entries` at +176 and `catch_info` at +184,
+while `throw.c` read them at +96 and +104, which is the middle of the
+client's buffer.
+
+**Two symptoms, one offset.**  Measured from `cxx-ehchain`'s hex dump
+of the live entry:
+
+| case | +104 as read by throw.c | outcome |
+|---|---|---|
+| `throw 42; catch (...)` | `0x00000000020088d9` | non-null `catch_info` |
+| `throw Boom(7); catch (Boom &)` | `0` | null `catch_info` |
+
+A non-null `catch_info` makes `throw.c:1322` **skip the whole arm
+before any type is compared**, so `destination_ehsep` stays null and
+`:1494` terminates.  *That is why `catch (...)` did not catch either,
+and why the type-specification table being perfectly correct --
+`ets[1] flags 0x30`, the ellipsis, bit 16 set with bits 1 and 128
+clear -- was irrelevant.*  When the junk happens to read null, the
+arm IS entered, `catch_entries` reads 0 so the match is
+unconditional, the destination is set, and the transfer longjmps
+through a buffer at the wrong offset: `fault read addr=0x5074f8`.
+**The fault looked like a separate bug and was the same one.**
+
+**Fix.** `targ_jmp_buf_num_elements` 39 -> 20 in the baked
+`src/target.c`, because a value named only in `kencc_targ.h` is not a
+value the generated code reads -- the lesson
+`GCC_IS_GENERATED_CODE_TARGET` already paid for.  The pair is in
+`kencc_targ.h` too, so `edgtarg-sweep.py` reports it as comparable
+and gates rather than listing it among the absent.
+
+**It changes cpfe**, so every C++ object must be deleted before the
+rebuild; `libedg.a` is untouched, `throw.c` not having moved.
+
+### What this cost, and the four readings it killed on the way
+
+**Bigger is not safer, and that is the trap.**  The round before had
+looked straight at this buffer and asked the obvious question -- can
+`setjmp` overrun it? -- and correctly answered no: 156 reserved, 64
+written.  *The buffer was never the question; the offset of what
+follows it was.*
+
+**It is the `ino_t`/`dev_t` family a third time**, after
+`struct stat` 88 against 104 and the baked `alloc_fe(32)` against 48:
+a size taken from one authority while the other side uses the
+platform's own type.  Like those, invisible to every compile -- both
+layouts are self-consistent and nothing is undefined.
+
+**The instrument's own history is the transferable part.**
+
+- *The walk cannot live in the C++ TU.*  A TU that uses exceptions
+  already has cpfe's `struct __C8 *__curr_eh_stack_entry;` with a
+  per-TU generated tag, so any redeclaration conflicts and no
+  spelling would agree.  `cxx-ehchain-walk.c` is a plain C file,
+  which cpfe never sees.
+- *The marker's ABSENCE is what proved the walk ran.*
+  `__exception_started` pushes the kind 3 marker and
+  `__exception_caught` pops it, and `:1494` pops BEFORE terminating
+  -- so a chain with no marker is a completed, failed search.
+- *A second, independent reading of the same run agreed.*
+  The cleanup loop at `:1426` is `while (ehsep != destination_ehsep)`,
+  so a null destination walks the whole chain and takes
+  `saved_region_number` from each function entry.  `__eh_curr_region`
+  going 65535 inside the try and 0 at terminate says the destination
+  was null, from a global printed for another reason entirely.
+- ***The named fields were transcribed from `throw.c` and so carried
+  the very error under investigation.***  With `int[20]` the walker
+  printed `catch_entries 0xFEFEFEFEFEFEFEFE` -- the middle of the
+  client's buffer, and `0xfefefefe` is this machine's stack garbage
+  (`lib/ap/plan9/callmain.c:14`), not a poison -- which was nearly
+  shipped as "the stores never happened".  **The raw hex dump is what
+  caught it**: *a reader derived from one side of a disagreement
+  cannot see the disagreement.*
+- *One terminate hid every case after it.*  The handler exits, so a
+  single process reported the first failure and nothing else; the
+  ellipsis-only case went unrun for a round while reading as a pass.
+  Five shapes, one process each, and case 0 throws nothing so that a
+  matrix where everything fails can be told from a broken probe.

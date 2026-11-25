@@ -2325,14 +2325,42 @@ silent:
   *and a right answer reached through a wrong reading is still a wrong
   reading* — the next question asked of that arm would have got a
   wrong answer.
-  **Reading stops here and the measurement is `eccp -F`**: one command
-  on the generated C, `grep -c __curr_eh_stack_entry` and
-  `grep -c setjmp`. Both zero means no EH code was emitted after all
-  and `--exceptions` must be passed positively; non-zero means the
-  region IS pushed and the fault is at run time in the
-  push/`setjmp`/throw path — **with the generated C of a ONE-FILE
-  reproducer in hand to read**, which this port has never had for an
-  EH question.
+  ***AND IT IS FOUND, AND IT IS THE BAKED-SIZE FAMILY A THIRD TIME:
+  `TARG_JMP_BUF_NUM_ELEMENTS` WAS win64's 39 AND APE's `jmp_buf` IS
+  `int[20]`.*** The EH stack entry's try-block variant BEGINS with
+  the buffer, so the count decides where `catch_entries` and
+  `catch_info` sit — and the two sides get it from different places.
+  `lib_src/throw.c:87` is `typedef int jmp_buf[20]` with a `#line`
+  naming `ape-sys/setjmp.h`, so **EDG's own runtime was translated
+  against APE's real 80-byte buffer**, while a client TU builds the
+  type from `targ_jmp_buf_num_elements` (`lower_eh.c:12564`), 156
+  bytes. *The client wrote `catch_entries` at +176 and `throw.c` read
+  it at +96.* **One offset error, two different failures**: a
+  non-null junk `catch_info` makes `:1322` SKIP the arm before any
+  type is compared, so the destination stays null and `:1494`
+  terminates — *which is why `catch (...)` did not catch and why the
+  table's perfectly correct ellipsis entry was irrelevant* — and when
+  the junk reads null instead, the arm is entered, `catch_entries`
+  reads 0, the match is unconditional, and the transfer longjmps
+  through a buffer at the wrong offset: `fault read addr=0x5074f8`.
+  **Bigger is NOT safer and that is the trap**: the round before had
+  asked whether `setjmp` would overrun 156 bytes and correctly
+  answered no. *The buffer was never the question; the offset of what
+  follows it was.* `src/target.c` is patched as
+  `GCC_IS_GENERATED_CODE_TARGET` taught, and the pair is in
+  `kencc_targ.h` so `edgtarg-sweep.py` gates on it instead of
+  reporting it absent. **This changes cpfe, so every C++ object must
+  be deleted before the rebuild**; `libedg.a` is untouched.
+  ***The instrument is `sys/lib/tests/cxx-ehchain`***, and the shape
+  of it is the lesson: five throw shapes, **one process each**,
+  because the terminate handler exits and one failure had hidden
+  every case after it for a round. Its raw hex dump is what found
+  this — **the named fields were transcribed from `throw.c` and so
+  carried the very error under investigation**, printing
+  `catch_entries 0xFEFEFEFEFEFEFEFE` (the middle of the client's
+  buffer) which was nearly shipped as "the stores never happened".
+  *A reader derived from one side of a disagreement cannot see the
+  disagreement.*
   **re2c has not moved** — ten missing headers and no `makefile` to
   read an object list from, both in 0.6's inventory with the missing
   `(char const *)` constructors.
