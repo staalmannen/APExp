@@ -1,0 +1,15 @@
+# Shared by every mkfile under cmd/ocaml.  The including mkfile sets
+# APEXPROOT for its own depth below the repository root first, the way the
+# X11 mkfiles do.  Nothing here is written into the source tree.
+OCSRC=$APEXPROOT/sys/src/external/ocaml/ocaml-4.06.1
+OCPLAN9=$APEXPROOT/sys/src/external/ocaml/plan9
+OCBLD=$APEXPROOT/sys/src/ape/cmd/ocaml
+OCAMLRUN=$OCBLD/boot/ocamlrun
+BOOTC=$OCSRC/boot/ocamlc
+BOOTLEX=$OCSRC/boot/ocamllex
+PRIMS=$OCBLD/byterun/primitives
+# the stage-0 compiler from the tarball, run with the runtime built here
+OCAMLBOOT=$OCAMLRUN $BOOTC -nostdlib -I $OCBLD/boot -use-prims $PRIMS
+OCAMLC=$OCAMLBOOT -g
+OCAMLLEX=$OCAMLRUN $BOOTLEX
+OCAMLYACC=$OCBLD/boot/ocamlyacc

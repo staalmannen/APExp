@@ -15,7 +15,7 @@
 #error unknown byte order: add this $objtype to the arms in config.h
 #endif
 
-#define EWOULDBLOCK EAGAIN
+/* EWOULDBLOCK comes from APE's <errno.h> (3); redefining it here clashed. */
 #define HAVE_INTTYPES_H 1
 #define HAVE_STDLIB_H 1
 #define HAVE_STRING_H 1
@@ -27,8 +27,7 @@
 
 
 /* libXaw */
-extern int _SLEEP(long);
-#define usleep(x)	_SLEEP((x)/1000)
+/* usleep is APE's (libap); the old _SLEEP macro clashed with its prototype. */
 #define USE_XWCHAR_STRING 1
 
 /* libX11 */

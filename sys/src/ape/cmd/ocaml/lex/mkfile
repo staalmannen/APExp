@@ -1,0 +1,36 @@
+APEXPROOT=../../../../../..
+<$APEXPROOT/sys/src/ape/cmd/ocaml/occonfig
+
+OCAMLC=$OCAMLRUN $BOOTC -strict-sequence -nostdlib -I $OCBLD/boot -use-prims $PRIMS
+OCAMLFLAGS=-absname -w +a-4-9-41-42-44-45-48 -warn-error A -safe-string -strict-sequence -strict-formats -bin-annot
+
+OFILES=cset.cmo syntax.cmo parser.cmo lexer.cmo table.cmo lexgen.cmo compact.cmo common.cmo output.cmo outputbis.cmo main.cmo
+
+ocamllex: $OFILES
+	$OCAMLC -compat-32 -o ocamllex $OFILES
+
+parser.ml parser.mli: $OCSRC/lex/parser.mly
+	$OCAMLYACC -v -b parser $OCSRC/lex/parser.mly
+
+lexer.ml: $OCSRC/lex/lexer.mll
+	$OCAMLLEX -o lexer.ml $OCSRC/lex/lexer.mll
+
+%.cmi: $OCSRC/lex/%.mli
+	$OCAMLC $OCAMLFLAGS -c -o $target $prereq
+
+%.cmo: $OCSRC/lex/%.ml
+	$OCAMLC $OCAMLFLAGS -c -o $target $prereq
+
+parser.cmi: parser.mli
+	$OCAMLC $OCAMLFLAGS -c -o $target parser.mli
+
+parser.cmo: parser.ml parser.cmi
+	$OCAMLC $OCAMLFLAGS -c -o $target parser.ml
+
+lexer.cmo: lexer.ml lexer.cmi
+	$OCAMLC $OCAMLFLAGS -c -o $target lexer.ml
+
+lexer.cmi: $OCSRC/lex/lexer.mli
+	$OCAMLC $OCAMLFLAGS -c -o $target $prereq
+
+<$OCSRC/lex/.depend
