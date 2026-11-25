@@ -2361,6 +2361,30 @@ silent:
   buffer) which was nearly shipped as "the stores never happened".
   *A reader derived from one side of a disagreement cannot see the
   disagreement.*
+  ***AND IT IS CONFIRMED BEHAVIOURALLY: ALL FIVE CASES EXIT 0.***
+  `throw 42` and `throw Boom(7)`, each caught by `...` and by its own
+  type, and **case 4 — the one that FAULTED at `0x5074f8` rather than
+  terminating — now returns `v = 7`**, so the longjmp transfer reads
+  the buffer at the right place too. `unrar -V` prints its banner with
+  no runtime abort. **EDG's setjmp EH runs on this machine**, which is
+  what `c++/unrar/mkfile` said it was waiting on.
+  ***And the walker being WRONG is what made it positive rather than
+  an absence***: left at 39 for one run, it read `catch_entries` at
+  +176 and printed junk while the hex dump showed case 1's real
+  `0x407818` at **+96** — *the same value moving between two runs*,
+  which no "it stopped crashing" could have said. It is 20 now.
+  ***AND `edgtarg-sweep.py` COULD NOT HAVE CAUGHT THIS, WHICH IS NOW
+  FIXED***: it walks the HEADER's names and asks `target.c`, so a
+  setting the baked target assigns and the header never mentions
+  cannot DISAGREE — only one side has an opinion. **83 of the win64
+  arm's settings are in that bucket**, `--baked` lists them, and it
+  reports rather than gates. *Naming why they are mostly fine is the
+  point*: win64 is the only stock arm that is LLP64 like kencc, which
+  is why `eccp` selects it — so it agrees about `long` and pointers,
+  and **what it gets wrong is whatever has nothing to do with the data
+  model**. Read `reuse_tail_padding`, the `*_field_alignment` family,
+  `bit_field_container_size`, `minimum_struct_alignment` and the
+  `*_int_kind` typedefs first.
   **re2c has not moved** — ten missing headers and no `makefile` to
   read an object list from, both in 0.6's inventory with the missing
   `(char const *)` constructors.
