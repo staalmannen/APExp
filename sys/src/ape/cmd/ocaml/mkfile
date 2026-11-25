@@ -152,8 +152,11 @@ byterun/caml/version.h: $OCSRC/VERSION
 byterun/caml/jumptbl.h: $OCSRC/byterun/caml/instruct.h
 	sed -n '/^enum instructions {/,/^};/p' $prereq | grep -o '[A-Z][A-Z0-9_]*' | sed 's/.*/\&\&lbl_&,/' > $target
 
-# the generated headers and primitives must exist before any byterun object
+# the generated headers and primitives must exist before any byterun object:
+# sys.c, interp.c and the rest include caml/version.h and caml/jumptbl.h, not
+# only prims.c, so every object takes them as prerequisites
 byterun/prims.$O: byterun/caml/version.h byterun/caml/jumptbl.h
+$BYTEOBJS: byterun/caml/version.h byterun/caml/jumptbl.h
 
 RUNCFLAGS=-I$OCBLD/byterun -I$OCBLD/byterun/caml -I$OCSRC/byterun -I$OCSRC/byterun/caml -I$OCPLAN9/byterun/$objtype -I$OCPLAN9/byterun/caml -D_PLAN9_SOURCE -D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION -D_POSIX_SOURCE -DCAML_NAME_SPACE -Bc
 
