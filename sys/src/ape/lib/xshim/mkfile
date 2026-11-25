@@ -26,7 +26,7 @@ UPDATE=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE -I$APEXPROOT/sys/include/ape
+CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../ap/include
 
 # every object includes the private header, so it is a prerequisite;
 # the recipe is mksyslib's own %.$O rule, not a second one
