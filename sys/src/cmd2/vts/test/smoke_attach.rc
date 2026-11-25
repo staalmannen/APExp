@@ -20,10 +20,10 @@ sleep 1
 echo step4: dump output
 ls -l /tmp/attach.out
 echo
-echo === xd ===
+echo '=== xd ==='
 xd -b /tmp/attach.out > /tmp/attach.xd
 wc -l /tmp/attach.xd
-echo === first 20 hex lines ===
+echo '=== first 20 hex lines ==='
 sed 20q /tmp/attach.xd
 
 # Copy out for Mac decoding

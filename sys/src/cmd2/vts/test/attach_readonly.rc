@@ -8,7 +8,7 @@ awk 'BEGIN{printf "READONLY_OK"}' > /n/vts/1/cons
 sleep 2
 echo kill > /proc/$APID/note >[2]/dev/null
 sleep 1
-echo === sizes ===
+echo '=== sizes ==='
 ls -l /tmp/attach.out /tmp/attach.err
-echo === found R ===
+echo '=== found R ==='
 xd -c /tmp/attach.out | grep -c R

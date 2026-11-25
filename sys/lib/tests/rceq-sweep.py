@@ -46,8 +46,18 @@
 # LIMITS, so the next reader does not over-read a clean run.  This does not
 # parse rc; it is a lexical approximation of one rule.  It cannot see a `='
 # that arrives through a variable this mkfile itself sets to a literal, and
-# it does not check `rc/bin/*' scripts -- only mkfile recipes, which are
-# where mk's own invocation of rc happens.
+# it NOW ALSO CHECKS rc SCRIPTS, which it did not for two rounds -- this
+# sentence used to read "it does not check `rc/bin/*' scripts -- only
+# mkfile recipes, which are where mk's own invocation of rc happens".
+# ***THAT DOCUMENTED LIMIT COST TWO ROUNDS***: `fdwatch' first, and then
+# `sys/lib/tests/archive-roundtrip', where `xz -T0 --block-size=65536'
+# answered `token '=': syntax error' AFTER section 1 had run -- in a file
+# whose own header quotes this very rule.  *A limit named in a comment is
+# still a limit.*  A file is taken for rc by its SHEBANG and nothing else:
+# a directory name cannot say it (`sys/lib/tests' holds rc, python, C, tcl
+# and bash side by side) and nor can an extension, since this tree's rc
+# scripts mostly have none (`apexp-sh', `go-ladder', `archive-roundtrip').
+# `sys/src/external' is skipped -- vendored rc is not this tree's to fix.
 
 import os
 import re
@@ -61,6 +71,7 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                     '..', '..', '..')
 ROOT = os.path.normpath(ROOT)
 TREE = os.path.join(ROOT, 'sys', 'src')
+EXTERNAL = os.path.join(ROOT, 'sys', 'src', 'external')
 
 # ***THIS USED TO BE `^[^=#]*:[A-Z]*:' AND SO REQUIRED TWO COLONS.***
 # That matches an ATTRIBUTE rule -- `install:V:', `test:QV:' -- and
@@ -80,7 +91,13 @@ TREE = os.path.join(ROOT, 'sys', 'src')
 RULE = re.compile(r'^[^=#\t]*:')
 ASSIGN = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*\s*=')
 # an `=' is legal only at the start of a command; these end one
-LEADING = re.compile(r"(^|[;&|{}()]|\|\||&&)\s*[A-Za-z_][A-Za-z0-9_]*\s*=")
+# `*' is a legal variable name (`rc/bin/ape/install:34's `*=($1 $2)',
+# which these notes already call the working precedent for the () form),
+# and a `!' can sit between the opener and the assignment, as in
+# `rc/bin/ape/ar89:6's `if(! ifs=() eval ...)'.  Both read as findings
+# without this, and both are correct rc.
+LEADING = re.compile(
+    r"(^|[;&|{}()]|\|\||&&)\s*!?\s*[A-Za-z_*][A-Za-z0-9_]*\s*=")
 
 
 BACKQ = re.compile(r'`\{([^}]*)\}')
@@ -169,6 +186,111 @@ ok:V:
 """
 
 
+# ***rc's OWN REDIRECTION SYNTAX CONTAINS AN `='.***  `>[1=2]', `>[2=1]'
+# and `<[0=1]' are dup-and-redirect.  They are the commonest `=' in this
+# tree's scripts by a wide margin -- 30-odd lines of the first script
+# sweep -- and they are neither an assignment nor an argument.
+REDIR = re.compile(r'\[\s*\d+\s*=\s*\d+\s*\]')
+
+SHEBANG = re.compile(r'^#!\s*\S*/rc\b')
+
+
+def rc_blank(src):
+    """
+    Blank rc comments and QUOTED TEXT, keeping the line structure.
+
+    ***A SINGLE QUOTE IN rc SPANS LINES, AND THAT IS WHY THIS EXISTS.***
+    `bare_eq' strips `'...'` pairs within ONE line, which is all a mkfile
+    recipe line ever needed; a SCRIPT hands multi-line programs to other
+    languages inside one quoted word -- `cxx-vecacid' does it with acid,
+    `bash-runtests' and `fdwatch' with awk -- and every line after the
+    opening quote then reads as rc source.  The first script sweep
+    reported 102 lines of which about a hundred were awk's
+    `for(i = 1; i <= n; i++)' and acid's `print(..., i\D, ...)'.
+    *A sweep that cries wolf a hundred times gets switched off*, which is
+    this file's own recorded failure.
+
+    ***AND THE COMMENT MUST BE HANDLED IN THIS LOOP, NOT AFTER IT.***
+    The first version blanked quotes and then stripped `#' comments in a
+    second pass, which is backwards: rc's lexer drops a comment BEFORE
+    any quote can begin, so an apostrophe in prose opens nothing.
+    `fdwatch' line 2 is `# fdwatch -- sample a process's open
+    descriptors', and that one apostrophe desynchronised the machine for
+    the whole file, so every awk line below it read as rc.  *Each pass
+    was right and their ORDER was the bug*, which no amount of staring
+    at either one on its own would show.
+
+    rc has no double quotes and no backslash escape; `''` inside a
+    quoted string is a literal quote, which the state machine gets free.
+    """
+    out = []
+    inq = False
+    incomment = False
+    for ch in src:
+        if ch == '\n':
+            out.append(ch)
+            incomment = False
+            continue
+        if incomment:
+            out.append(' ')
+            continue
+        if inq:
+            out.append(' ' if ch != "'" else ch)
+            if ch == "'":
+                inq = False
+            continue
+        if ch == "'":
+            inq = True
+            out.append(ch)
+            continue
+        if ch == '#':
+            incomment = True
+            out.append(' ')
+            continue
+        out.append(ch)
+    return ''.join(out)
+
+
+def rc_script_lines(path):
+    """
+    Every line of an rc SCRIPT, if the file is one, blanked and with
+    rc's redirection brackets removed.
+
+    **There is no recipe/not-recipe question here**: in a mkfile only the
+    tab-indented body is rc source, which is why `recipe_lines' exists,
+    while in a script every line is.  See the header for the shebang.
+    """
+    try:
+        src = open(path, encoding='utf-8', errors='replace').read()
+    except OSError:
+        return
+    if not src or not SHEBANG.match(src.split('\n', 1)[0]):
+        return
+    for lineno, line in enumerate(rc_blank(src).split('\n'), 1):
+        yield lineno, REDIR.sub(' ', line)
+
+
+SCRIPT_CONTROL = """\
+#!/bin/rc
+# a comment holding key=value and an apostrophe in a process's name,
+# neither of which rc sees -- the second desynchronised the quote
+# machine for a whole file and must NOT be reported.
+name = archive
+echo 'quoted=fine'
+FOO=bar echo leading is legal
+if(~ $1 x) j=_seek
+echo 'oops' >[1=2]
+*=($1 $2)
+if(! ifs=() eval `{aux/getflags $*}) exit usage
+awk '
+\tBEGIN { for(i = 0; i <= 9; i++) n = i }
+\t/^x/  { k[j++] = $0 }
+'
+xz -T0 --block-size=65536 -c
+awk -v name=$name
+"""
+
+
 def control():
     """***THREE SHAPES, BECAUSE PLANTING THE BREAK IN ONE PLACE PASSED.***
 
@@ -211,6 +333,58 @@ def control():
             ok = False
         if not extra:
             print('control: quoted and leading `=\' correctly ignored -- ok')
+
+        # ***THE SCRIPT ARM IS A SEPARATE CONTROL AND HAS TO BE.***  The
+        # mkfile arm above passes for a sweep that reads no scripts at
+        # all, which is the state this file was in for two rounds --
+        # *a control that cannot distinguish the bug it is named for is
+        # not a control.*  Lines 15 and 16 are the two real shapes: an
+        # option spelled `--name=value' (archive-roundtrip) and
+        # `awk -v name=$value' (fdwatch).  Everything above them is a
+        # legal form that must NOT fire, and each one of those was a
+        # false positive in a real run of this sweep.
+        sp = os.path.join(d, 'ctl-script')
+        open(sp, 'w').write(SCRIPT_CONTROL)
+        # ***DERIVED FROM THE CONTROL TEXT, NOT TRANSCRIBED.***  Two
+        # edits to the comment above it moved these numbers twice and
+        # the control reported its own staleness as a failure both
+        # times.  A results table keyed on a LINE rots when the file is
+        # edited above it -- this tree's own rule, from the kencc hunt.
+        swant = {}
+        for ln, txt in enumerate(SCRIPT_CONTROL.split('\n'), 1):
+            if '--block-size' in txt:
+                swant[ln] = '--opt=value'
+            elif txt.startswith('awk -v'):
+                swant[ln] = 'awk -v name=$x'
+        assert len(swant) == 2, 'control lost one of its two real shapes'
+        sgot = set()
+        for lineno, line in rc_script_lines(sp):
+            if bare_eq(line):
+                sgot.add(lineno)
+        for ln, what in sorted(swant.items()):
+            hit = ln in sgot
+            print('control: script %-16s line %2d -- %s'
+                  % (what, ln, 'ok' if hit else 'FAILED, not reported'))
+            if not hit:
+                ok = False
+        sextra = sgot - set(swant)
+        for ln in sorted(sextra):
+            print('control: script line %d reported and must NOT be '
+                  '-- FAILED' % ln)
+            ok = False
+        if not sextra:
+            print('control: script comment/apostrophe/quoted/leading/'
+                  'redirect/multi-line awk correctly ignored -- ok')
+
+        # A file that is NOT rc must yield nothing, or the sweep reports
+        # every Makefile and shell script in the tree.
+        np = os.path.join(d, 'not-rc')
+        open(np, 'w').write('#!/bin/sh\nxz --block-size=65536\n')
+        if list(rc_script_lines(np)):
+            print('control: a non-rc shebang was scanned -- FAILED')
+            ok = False
+        else:
+            print('control: non-rc shebang correctly skipped -- ok')
     return 0 if ok else 1
 
 
@@ -249,10 +423,32 @@ def main():
                 if bare_eq(rc):
                     hits.append((rel, lineno, line.strip()))
 
+    # rc SCRIPTS, over the whole repository and not just `sys/src':
+    # `apexp-sh' and `mount-include' are at the root, the harnesses in
+    # `sys/lib/tests', the drivers in `rc/bin'.
+    nscripts = 0
+    for dirpath, dirs, names in os.walk(ROOT):
+        dirs[:] = [x for x in dirs if x != '.git'
+                   and os.path.join(dirpath, x) != EXTERNAL]
+        for name in names:
+            path = os.path.join(dirpath, name)
+            if os.path.islink(path):
+                continue
+            lines = list(rc_script_lines(path))
+            if not lines:
+                continue
+            nscripts += 1
+            rel = os.path.relpath(path, ROOT)
+            for lineno, line in lines:
+                nlines += 1
+                if bare_eq(line):
+                    hits.append((rel, lineno, line.strip()))
+
     for rel, lineno, line in hits:
         print('%s:%d: %s' % (rel, lineno, line))
-    print('---- %d recipe lines, %d with a bare `=\' rc cannot parse'
-          % (nlines, len(hits)))
+    print('---- %d lines (mkfile recipes + %d rc scripts), '
+          '%d with a bare `=\' rc cannot parse'
+          % (nlines, nscripts, len(hits)))
     if hits:
         print("fix: write `'name='^$value', or build the word by")
         print("concatenation.  Do NOT leave it: the recipe cannot run at all,")

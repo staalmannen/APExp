@@ -8,9 +8,9 @@ awk 'BEGIN{printf "VTS_WORKS"}' > /n/vts/1/cons
 sleep 2
 echo kill > /proc/$APID/note >[2]/dev/null
 sleep 1
-echo === stderr ===
+echo '=== stderr ==='
 cat /tmp/attach.err | head -10
-echo === look for VTS_WORKS chars in output ===
+echo '=== look for VTS_WORKS chars in output ==='
 # Look for the rune bytes V (56), T (54), S (53)
 xd /tmp/attach.out > /tmp/attach.xd
 # V is 0x56, T is 0x54, S is 0x53, _ is 0x5f, W is 0x57
