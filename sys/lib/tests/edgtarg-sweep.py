@@ -154,6 +154,57 @@ def baked(text):
     return out
 
 
+# ***THE OTHER DIRECTION, WHICH IS WHERE THE jmp_buf BUG LIVED.***
+#
+# This sweep walks the HEADER's names and asks target.c about each, so a
+# setting the baked target assigns and `kencc_targ.h' never mentions is
+# invisible to it -- it cannot DISAGREE, because only one side has an
+# opinion.  `targ_jmp_buf_num_elements' was exactly that: baked 39 on
+# the win64 arm, absent from the header, and it is why no C++ exception
+# could be caught (see kencc_targ.h's TARG_JMP_BUF note).
+#
+# **99 of the win64 arm's 126 settings are in that bucket**, so this
+# REPORTS and does not gate -- a gate on 99 unexamined names is one
+# somebody switches off.  Most are right by luck rather than by
+# choice, and the luck is real: win64 is the only stock arm that is
+# LLP64 like kencc, which is why `eccp' selects it.  *That is also
+# exactly why the bucket is dangerous* -- the arm agrees about `long'
+# and about pointers, so the ones it gets WRONG are the ones that have
+# nothing to do with the data model, which is what a buffer element
+# count is.
+#
+# `--baked' prints the list.  The ones to read first are those naming a
+# LAYOUT or a platform TYPE, since those are the ones a disagreement
+# makes silently wrong rather than loudly broken: `reuse_tail_padding'
+# (this tree moved to `-J'), the `*_field_alignment' family,
+# `bit_field_container_size', `minimum_struct_alignment',
+# `sizeof_ptr_to_member_function' and the `*_int_kind' typedefs.
+# **There is deliberately no "reviewed" COUNT here.**  The first
+# version kept one, and it could only ever print 0: reviewing a
+# setting means giving it a `kencc_targ.h' entry, which takes it OUT
+# of this list.  *A count that can only be zero is not a count* --
+# the list shrinking IS the progress measure, and 83 is the number to
+# compare against.
+
+
+def baked_only(hdr_text, targ_text):
+    """Settings the baked target assigns that the header never names.
+
+    These cannot be compared and so cannot gate; the point is that
+    `absent' in the other direction is a different and harmless thing
+    (a header name target.c does not set), while THIS direction is
+    where a win64 default silently survives."""
+    have = set()
+    for name, _ in DEFINE.findall(hdr_text) + KIND.findall(hdr_text):
+        have.add(name.lower())
+    out = []
+    for name in sorted(baked(targ_text)):
+        low = name[len('targ_'):] if name.startswith('targ_') else name
+        if low not in have and name not in have:
+            out.append(low)
+    return out
+
+
 def sweep(hdr_text, targ_text, quiet=False):
     bake = baked(targ_text)
     agree, disagree, absent, ambiguous = [], [], [], []
@@ -185,6 +236,15 @@ def sweep(hdr_text, targ_text, quiet=False):
                 print('    %-44s header %-4s baked %-4s  %s' % (name, want, got, tag))
                 if name in KNOWN:
                     print('      %s' % KNOWN[name])
+        only = baked_only(hdr_text, targ_text)
+        print('\n  %d settings are baked in the active arm and NOT named in '
+              'kencc_targ.h,' % len(only))
+        print('  so they cannot disagree and this gate cannot see them.  That '
+              'is where')
+        print('  targ_jmp_buf_num_elements hid -- giving one a header entry is '
+              'what')
+        print('  takes it off this list, so the NUMBER falling is the progress.'
+              '  `--baked\'.')
     return disagree
 
 
@@ -203,6 +263,17 @@ def main():
                  'driver names a target the corpus does not define' % target)
     print('active target, from %s: %s' % (os.path.basename(ECCP), target))
     targ_text = body
+
+    if '--baked' in sys.argv[1:]:
+        only = baked_only(hdr_text, targ_text)
+        print('\n%d settings baked in the %s arm with no kencc_targ.h entry.\n'
+              % (len(only), target))
+        for n in only:
+            print('  %s' % n)
+        print('\nThese cannot disagree, so the gate above cannot see them --\n'
+              'which is where targ_jmp_buf_num_elements hid.  Read the ones\n'
+              'naming a LAYOUT or a platform TYPE first.')
+        return 0
 
     if '--control' in sys.argv[1:]:
         # ***A DELIBERATE BREAK, BECAUSE THERE IS NO ORACLE.***  Flip one
