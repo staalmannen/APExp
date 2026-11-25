@@ -1,0 +1,46 @@
+#!/bin/rc
+# cxx-ehchain -- build and run cxx-ehchain-probe, both halves.
+#
+#	./cxx-ehchain
+#
+# ***IT IS A SCRIPT BECAUSE THE INVOCATION WAS GOT WRONG BY HAND, AND
+# THE FAILURE READ LIKE A BUG IN THE PROBE.***  The walk lives in a
+# separate C file (see `cxx-ehchain-walk.c' for why it MUST), so the
+# object has to be on the `eccp' line -- and leaving it off answers
+#
+#	_ZN39_INTERNAL_21_cxx_ehchain_probe_cpp_main9dumpchainEPKc:
+#		undefined: eh_dump
+#
+# which names the C++ caller and reads like a mangling problem.  *It
+# is not*: the undefined name is `eh_dump', UNMANGLED, so the
+# `extern "C"' worked and the object was simply absent.
+#
+# **And the suffix is not `.o'.**  `pcc.c:75' is
+# `objext = (strcmp(prog, "cc") == 0) ? "o" : ot->o', so `pcc -c'
+# writes `.6' on amd64 and the arch letter everywhere else -- which
+# is why this uses `$O' from the environment rather than a literal,
+# and why `eccp' has a `*.[1-9kqv]' case at all.
+#
+# The probe's own header has what the four possible chains mean.
+
+if(~ $O ''){
+	echo 'cxx-ehchain: $O is not set -- run this inside apexp-sh' >[1=2]
+	exit noO
+}
+
+echo 'cxx-ehchain: compiling the walker with pcc'
+pcc -c cxx-ehchain-walk.c || exit walk
+
+if(! test -f cxx-ehchain-walk.$O){
+	echo 'cxx-ehchain: pcc made no cxx-ehchain-walk.'^$O >[1=2]
+	exit noobj
+}
+
+echo 'cxx-ehchain: compiling and linking the probe with eccp -fexceptions'
+eccp -fexceptions -o cxx-ehchain-probe cxx-ehchain-probe.cpp cxx-ehchain-walk.$O || exit probe
+
+echo
+./cxx-ehchain-probe
+status=$status
+echo
+echo 'cxx-ehchain: exit status '^$status^' (0 PASS, 3 terminate handler reached)'
