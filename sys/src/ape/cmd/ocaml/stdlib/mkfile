@@ -1,0 +1,50 @@
+APEXPROOT=../../../../../..
+<$APEXPROOT/sys/src/ape/cmd/ocaml/occonfig
+
+TARG=stdlib.cma
+OFILES=\
+	list.cmo char.cmo uchar.cmo bytes.cmo string.cmo sys.cmo sort.cmo\
+	marshal.cmo obj.cmo array.cmo int32.cmo int64.cmo nativeint.cmo\
+	lexing.cmo parsing.cmo set.cmo map.cmo stack.cmo queue.cmo\
+	camlinternalLazy.cmo lazy.cmo stream.cmo buffer.cmo\
+	camlinternalFormat.cmo printf.cmo arg.cmo printexc.cmo gc.cmo\
+	digest.cmo random.cmo hashtbl.cmo weak.cmo format.cmo scanf.cmo\
+	callback.cmo camlinternalOO.cmo oo.cmo camlinternalMod.cmo genlex.cmo\
+	ephemeron.cmo filename.cmo complex.cmo arrayLabels.cmo listLabels.cmo\
+	bytesLabels.cmo stringLabels.cmo moreLabels.cmo stdLabels.cmo\
+	spacetime.cmo camlinternalBigarray.cmo
+
+IFILES=${OFILES:%.cmo=%.cmi}
+STDC=$OCAMLRUN $BOOTC
+STDFLAGS=-use-prims $PRIMS -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error A -bin-annot -safe-string -strict-formats -c
+
+all:V: $TARG std_exit.cmo $IFILES
+
+$TARG: camlinternalFormatBasics.cmo pervasives.cmo $OFILES
+	$STDC -use-prims $PRIMS -a -o $target camlinternalFormatBasics.cmo pervasives.cmo $OFILES
+
+install: all
+	cp stdlib.cma std_exit.cmo $OCPLAN9/stdlib/camlheader $OCPLAN9/stdlib/camlheader_ur *.cmi $OCBLD/boot
+
+$IFILES std_exit.cmo: pervasives.cmi
+
+sys.ml: $OCSRC/stdlib/sys.mlp $OCSRC/VERSION
+	sed 's|%%VERSION%%|'^`{sed -e 1q $OCSRC/VERSION | tr -d '\r'}^'|' $OCSRC/stdlib/sys.mlp > $target
+
+sys.cmo: sys.ml sys.cmi
+	$STDC $STDFLAGS `{$OCPLAN9/tools/Compflags.rc sys.cmo} -o $target sys.ml
+
+camlinternalBigarray.cmi camlinternalBigarray.cmo: $OCSRC/stdlib/camlinternalBigarray.ml
+	$STDC $STDFLAGS `{$OCPLAN9/tools/Compflags.rc camlinternalBigarray.cmi} -o camlinternalBigarray.cmo $prereq
+
+%.cmi: $OCSRC/stdlib/%.mli
+	$STDC $STDFLAGS `{$OCPLAN9/tools/Compflags.rc $stem.cmi} -o $target $prereq
+
+%.cmo: $OCSRC/stdlib/%.ml
+	$STDC $STDFLAGS `{$OCPLAN9/tools/Compflags.rc $stem.cmo} -o $target $prereq
+
+# a stdlib module with no interface: the .cmo compile writes the .cmi
+%.cmi:
+	$STDC $STDFLAGS `{$OCPLAN9/tools/Compflags.rc $stem.cmo} -o $stem.cmo $OCSRC/stdlib/$stem.ml
+
+<$OCSRC/stdlib/.depend
