@@ -193,7 +193,7 @@ lex/ocamllex: $OCAMLRUN $STDLIB
 
 # ---- tools ----
 
-tools/make_opcodes.ml: $OCSRC/tools/make_opcodes.mll
+tools/make_opcodes.ml: $OCSRC/tools/make_opcodes.mll $OCAMLRUN
 	$OCAMLLEX -o $target $prereq
 
 tools/make_opcodes: tools/make_opcodes.ml $OCAMLRUN
@@ -237,7 +237,7 @@ utils/config.ml: $OCSRC/utils/config.mlp
 utils/config.cmo: utils/config.ml utils/config.cmi
 	$OCAMLC $OCAMLFLAGS -o $target utils/config.ml
 
-parsing/parser.ml parsing/parser.mli: $OCSRC/parsing/parser.mly
+parsing/parser.ml parsing/parser.mli: $OCSRC/parsing/parser.mly $OCAMLYACC
 	$OCAMLYACC $YACCFLAGS -b parsing/parser $OCSRC/parsing/parser.mly
 
 parsing/parser.cmi: parsing/parser.mli
@@ -246,7 +246,7 @@ parsing/parser.cmi: parsing/parser.mli
 parsing/parser.cmo: parsing/parser.ml parsing/parser.cmi
 	$OCAMLC $OCAMLFLAGS -o $target parsing/parser.ml
 
-parsing/lexer.ml: $OCSRC/parsing/lexer.mll
+parsing/lexer.ml: $OCSRC/parsing/lexer.mll $OCAMLRUN
 	$OCAMLLEX -o $target $prereq
 
 parsing/lexer.cmi: $OCSRC/parsing/lexer.mli

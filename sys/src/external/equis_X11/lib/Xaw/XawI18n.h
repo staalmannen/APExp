@@ -61,8 +61,12 @@ int _Xaw_iswspace
 #endif
 #endif
 
+/* APE's <ctype.h> defines toascii with different whitespace; pcc reports
+   the second definition as a redefinition, so define it only if absent. */
 #if defined(QNX4) || defined(PLAN9)
+#ifndef toascii
 #define toascii( c ) ((unsigned)(c) & 0x007f)
+#endif
 #endif
 
 #include <stdlib.h>
