@@ -121,7 +121,7 @@ main(int argc, char *argv[])
     printf("/* Do not edit. */\n");
     printf("\n");
 
-    best_max_rehash = ksnum;
+    best_max_rehash = KTNUM;
     num_found = 0;
     for (z = ksnum; z < KTNUM; z++) {
 	max_rehash = 0;
@@ -144,11 +144,11 @@ main(int argc, char *argv[])
 	    if (k > max_rehash)
 		max_rehash = k;
 	}
+	if (max_rehash < best_max_rehash) {
+	    best_max_rehash = max_rehash;
+	    best_z = z;
+	}
 	if (max_rehash < MIN_REHASH) {
-	    if (max_rehash < best_max_rehash) {
-		best_max_rehash = max_rehash;
-		best_z = z;
-	    }
 	    num_found++;
 	    if (num_found >= MATCHES)
 		break;
@@ -200,7 +200,7 @@ next1:	;
     printf("};\n");
     printf("#endif /* NEEDKTABLE */\n");
 
-    best_max_rehash = ksnum;
+    best_max_rehash = KTNUM;
     num_found = 0;
     for (z = ksnum; z < KTNUM; z++) {
 	max_rehash = 0;
@@ -224,11 +224,11 @@ next1:	;
 		max_rehash = k;
 skip1:	;
 	}
+	if (max_rehash < best_max_rehash) {
+	    best_max_rehash = max_rehash;
+	    best_z = z;
+	}
 	if (max_rehash < MIN_REHASH) {
-	    if (max_rehash < best_max_rehash) {
-		best_max_rehash = max_rehash;
-		best_z = z;
-	    }
 	    num_found++;
 	    if (num_found >= MATCHES)
 		break;

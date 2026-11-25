@@ -41,10 +41,12 @@ case *
 	exit usage
 }
 
-major=`{echo $version | sed -n -e '1s/^([0-9]*)\..*/\1/p'}
-minor=`{echo $version | sed -n -e '1s/^[0-9]*\.([0-9]*).*/\1/p'}
-patchlvl=`{echo $version | sed -n -e '1s/^[0-9]*\.[0-9]*\.([0-9]*).*/\1/p'}
-suffix=`{echo $version | sed -n -e '1s/^[^+]*+(.*)/\1/p'}
+# Basic regular expressions: ( ) and + are literal in BRE and a group is \( \),
+# so the first version of these lines captured nothing and every field came back empty.
+major=`{echo $version | sed -n -e '1s/^\([0-9]*\)\..*/\1/p'}
+minor=`{echo $version | sed -n -e '1s/^[0-9]*\.\([0-9]*\).*/\1/p'}
+patchlvl=`{echo $version | sed -n -e '1s/^[0-9]*\.[0-9]*\.\([0-9]*\).*/\1/p'}
+suffix=`{echo $version | sed -n -e '1s/^[^+]*+\(.*\)/\1/p'}
 
 echo '#define OCAML_VERSION_MAJOR '^$major
 awk 'BEGIN{printf("#define OCAML_VERSION_MINOR %d\n", '$minor')}'

@@ -122,6 +122,14 @@ all:V: dirs $OCAMLRUN $STDLIB $OCAMLYACC lex/ocamllex tools/ocamldep tools/ocaml
 dirs:V:
 	for (i in $DIRS) mkdir -p $i
 
+# clean empties the build directories rather than removing them: apexp-sh
+# binds some of them, and a removed bound directory falls through to the host.
+# Products are matched by extension, because the subdirectories hold tracked
+# mkfiles (stdlib, lex, otherlibs/*) that must survive.
+clean:V:
+	for (i in $DIRS byterun) rm -f $i/*.cm* $i/*.$O $i/*.a $i/*.c $i/*.ml $i/*.mli $i/*.h $i/*.output
+	rm -f ocaml ocamlc boot/ocamlrun boot/ocamlyacc boot/camlheader boot/camlheader_ur tools/ocamldep tools/ocamlmklib lex/ocamllex byterun/primitives
+
 # ---- the runtime: byterun, ocamlrun, and the unix/str stubs it links ----
 
 $OCAMLRUN: byterun/main.$O byterun/libcamlrun.a otherlibs/unix/libunix.a otherlibs/str/libstr.a
