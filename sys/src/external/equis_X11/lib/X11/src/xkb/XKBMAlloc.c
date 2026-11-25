@@ -646,6 +646,20 @@ _ExtendRange(	unsigned int 	old_flags,
     return old_flags;
 }
 
+/* changes->names.num_keys is an int in the installed XKBlib.h, but
+ * _ExtendRange takes an unsigned char (the width this source was written
+ * for).  Pass a byte through and store it back, so the field keeps its
+ * declared type. */
+static unsigned
+_ExtendRangeInt(unsigned int old_flags, unsigned int flag, KeyCode newKC,
+		KeyCode *old_min, int *old_num)
+{
+    unsigned char n = (unsigned char) *old_num;
+    unsigned r = _ExtendRange(old_flags, flag, newKC, old_min, &n);
+    *old_num = n;
+    return r;
+}
+
 Status
 XkbChangeKeycodeRange(	XkbDescPtr	xkb,
 			int 		minKC,
@@ -718,7 +732,7 @@ int	tmp;
 	if ((xkb->names)&&(xkb->names->keys)) {
 	    bzero((char *)&xkb->names->keys[minKC],tmp*sizeof(XkbKeyNameRec));
 	    if (changes) {
-		changes->names.changed= _ExtendRange(changes->names.changed,
+		changes->names.changed= _ExtendRangeInt(changes->names.changed,
 					XkbKeyNamesMask,minKC,
 					&changes->names.first_key,
     					&changes->names.num_keys);
@@ -835,7 +849,7 @@ int	tmp;
 	    bzero((char *)&xkb->names->keys[xkb->max_key_code],
 	    					tmp*sizeof(XkbKeyNameRec));
 	    if (changes) {
-		changes->names.changed= _ExtendRange(changes->names.changed,
+		changes->names.changed= _ExtendRangeInt(changes->names.changed,
 					XkbKeyNamesMask,maxKC,
 					&changes->names.first_key,
     					&changes->names.num_keys);
