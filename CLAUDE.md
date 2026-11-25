@@ -2385,9 +2385,88 @@ silent:
   model**. Read `reuse_tail_padding`, the `*_field_alignment` family,
   `bit_field_container_size`, `minimum_struct_alignment` and the
   `*_int_kind` typedefs first.
-  **re2c has not moved** — ten missing headers and no `makefile` to
-  read an object list from, both in 0.6's inventory with the missing
-  `(char const *)` constructors.
+  ***AND THE FIRST APPLICATION BUG FOUND BY RUNNING ONE WAS THAT NO
+  C++ STATIC CONSTRUCTOR HAD EVER RUN.*** `unrar x` on a downloaded
+  archive reported a corrupt main header, a corrupt file header,
+  extraction to 100%, a checksum error and 7 errors — which reads as
+  a bad download and is not. **The PATTERN is free to read**: every
+  structural field parsed and every CHECKSUM failed, so everything
+  that is a LENGTH worked — *one mechanism, not seven, and a
+  corrupted file does not parse cleanly and fail every CRC, it fails
+  to parse.* `crc.cpp:75` is six words,
+  `struct CallInitCRC {CallInitCRC() {InitTables();}} static
+  CallInit32;`, the only thing that fills `crc_tables`.
+  **Three things were missing and any one was sufficient**: no munch
+  pass, so `munch_ctors.c`'s placeholder `_ctors[1] = {0}` was never
+  regenerated; nothing called `_Z12__call_ctorsv`, since `_main`
+  would and `lib/edg/mkfile` renames it `__edg_main` because `_main`
+  is `6l`'s default entry while APE's startup is `main9.s` →
+  `_callmain` → `_apemain` → `main`; and **no cpfe option emits the
+  call from `main`** — `call_ctors`/`init_before_main` occur nowhere
+  in 2.9M lines. **`eccp` munches now** (scan the objects for
+  `__sti__<tu>`, generate `_ctors[]` and a `_cxxinit`, name it on the
+  link line) and libap's `_callmain` calls the hook; *both
+  placeholders fall to one rule — an object on the link line is
+  always included, an archive member only on demand — which is the
+  first-archive-wins rule that let `_main` capture the entry point,
+  used deliberately.* `cxx-staticinit-test` 3 failures → **0**, both
+  controls passing, `0xCBF43926`.
+  ***And cpfe's own build had the same gap, which is the
+  corroboration***: `__sti___9_fe_init_c_2cbd8fba` is defined in
+  `src/fe_init.c` and referenced nowhere. **cpfe is NOT munched and
+  does not need to be, measured**: that is the ONLY real `__sti__` in
+  2.9M lines (the other three hits are the emitter's own string
+  literal, so a count of files matching the name is not a count of
+  initialisers), and all it does is zero `diagnostic_counters` —
+  which the loader already does for a namespace-scope global. *Not
+  changing a working compiler on the strength of "the machinery
+  exists now".* **The old note excused the
+  gap by saying cpfe has "no dynamic initialisation that reaches this
+  path — it runs, which is the measurement"**, and that was reading a
+  working program as evidence its initialisers had run. *The first
+  thing to NEED one is the first thing that shows it.*
+  **`nm` and not the generated C**, because the common case is
+  `eccp -c` per file then a separate link, where the C is gone and the
+  objects are the only thing present at both times; ` T ` is required,
+  since a `U` line is cpfe's own extern of the same name and matching
+  the bare name would emit a reference nothing defines — *a link error
+  manufactured by the fixer.* **And my first version wrote `$O`**
+  where `eccp`'s own line 182 says `$O` is mk's variable and not in the
+  environment, which is why it reads `OBJEXT` from `/$objtype/mkfile`:
+  `null list in concatenation`, `mkone`'s unset `BIN` again, *in the
+  file carrying the explanation.*
+  ***AND unrar EXTRACTS: `All OK`, EVERY CRC VERIFIED.*** A real
+  archive, downloaded, decompressed, checksummed — **the first C++
+  application on this machine doing WORK rather than printing a
+  banner**, with cpfe, the C++ library, EH, static constructors, the
+  RAR decompressor and file I/O end to end.
+  ***And it retires one of the two explanations the ARCHIVERS' open
+  item rests on***: `unxz xz_sample_file_1MB.xz` and
+  `unlz4 sample.txt.lz4` are unseparated because each file "was
+  produced ELSEWHERE", so a bad download and a real decode bug look
+  alike — and **unrar verifying a downloaded archive's CRCs is a
+  checksum over the whole download path**. *So `hget` is not
+  corrupting files*, and those two are a port bug or a genuinely bad
+  source file, which is one hypothesis rather than two.
+  ***re2c IS GATED ON IOSTREAMS, AND "ten missing headers"
+  UNDERSTATED IT.*** Measured against the 50 public entrypoints in
+  `sys/include/ape/c++`: **five of the ten are the whole iostreams
+  stack** — `iostream`, `ostream`, `fstream`, `sstream`, `iomanip`,
+  i.e. streambuf, the locale and facet machinery and
+  `num_put`/`num_get` — which portable_stl omits *deliberately*,
+  being exception-free and embedded-oriented. For a code generator
+  that reads and writes through streams that is core use, not
+  incidental. **The other five split**: `cassert` is a one-line
+  wrapper, `stack` and `queue` are ADAPTORS (over `vector`, though
+  both default to `deque` and *the library has no `deque`* — the
+  entry below records it being fixed in unrar rather than added),
+  and `unordered_set` and `valarray` are self-contained containers.
+  *So this is a campaign and not a round*, and the live choice is a
+  minimal iostreams, a second C++ application that does not need
+  them, or deferring re2c — **not** "add ten headers". Also no
+  `makefile` for `cxxapp-host.sh` to read an object list from, which
+  given the `OBJECTS=` trap is the part to get right first. Both in
+  0.6's inventory with the missing `(char const *)` constructors.
   ***AND `--control` EXPIRED A SECOND TIME, EXACTLY AS ITS OWN COMMENT
   SAID***: with no gap left to require it printed its "this may be good
   news" branch and exited 1. It asserts the MEASURED STATE now — 44

@@ -335,13 +335,32 @@ c99ord.$O: c99ord.c
 # in the reserved double-underscore space, inside an archive and not a
 # public header, so the `reject' hazard does not apply.
 #
-# **THE STATIC-INIT GAP IS REAL AND IS RECORDED, NOT FIXED**: with
-# `_main' no longer the entry, NOTHING CALLS `_Z12__call_ctorsv', so a
-# C++ program cpfe translates would not run its static constructors.
-# That costs cpfe nothing (it is translated C++ with no dynamic
+# ***THE STATIC-INIT GAP IS CLOSED***, and what this paragraph used to
+# say was "REAL AND RECORDED, NOT FIXED": with `_main' no longer the
+# entry, nothing called `_Z12__call_ctorsv', so a C++ program cpfe
+# translates did not run its static constructors.
+#
+# **`eccp' munches now** -- it scans the objects for cpfe's
+# `__sti__<tu>' functions, generates an object defining `_ctors[]' and
+# a `_cxxinit' calling `__edg_main', and names it on the link line,
+# where it beats both `munch_ctors.c''s placeholder array and libap's
+# empty `_cxxinit' hook (`plan9/cxxinit.c'), since an archive member
+# is pulled only to satisfy something still undefined.  libap's
+# `_callmain' calls that hook between the privates and `main'.
+# `sys/lib/tests/cxx-staticinit-test.cpp' is 0 failures on the VM with
+# both its controls passing, and CRC32("123456789") is 0xCBF43926.
+#
+# ***AND THE OLD PARAGRAPH'S EXCUSE WAS WRONG***: it said the gap
+# "costs cpfe nothing (it is translated C++ with no dynamic
 # initialisation that reaches this path -- it runs, which is the
-# measurement) and it is the next thing to answer for translated
-# programs.  cpfe does not emit a call to `_main' either: the name
+# measurement)".  `src/fe_init.c' defines
+# `__sti___9_fe_init_c_2cbd8fba' and nothing in `src/', `lib_src/' or
+# `util/' references it, so **cpfe has dynamic initialisation and it
+# never ran**.  *That cpfe works was read as evidence that it had none*
+# -- a program running is not a program whose initialisers ran, and the
+# first thing to NEED one is the first thing that shows it: unrar
+# reported a corrupt archive on a good file, because `crc.cpp:75' fills
+# its CRC tables from a static constructor.  cpfe does not emit a call to `_main' either: the name
 # occurs in the whole 133-file corpus exactly twice, both in
 # `lib_src/main.c', with no string literal of it in the emitter -- so
 # upstream's convention here is a crt that calls it, and this target's
