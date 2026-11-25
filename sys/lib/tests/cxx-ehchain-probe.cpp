@@ -217,7 +217,14 @@ static int run_case(int c) {
       printf("  caught by ellipsis\n");
       return 0;
     }
-    return 4;
+    /*
+     * No `return 4' here, and cpfe is right to have warned.  With
+     * `catch (...)' as the ONLY handler there is no wrong-handler
+     * outcome to report: the try either returns or the throw is
+     * caught by the ellipsis, so a fallthrough is unreachable rather
+     * than merely unlikely.  Cases 2 and 4 keep theirs, where a
+     * typed catch CAN be passed over.
+     */
 
   case 2:
     printf("  case 2: throw 42, catch (int)\n");
@@ -241,7 +248,6 @@ static int run_case(int c) {
       printf("  caught by ellipsis\n");
       return 0;
     }
-    return 4;
 
   case 4:
     printf("  case 4: throw Boom(7), catch (Boom &)\n");
