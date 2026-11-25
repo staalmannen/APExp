@@ -2413,7 +2413,14 @@ silent:
   controls passing, `0xCBF43926`.
   ***And cpfe's own build had the same gap, which is the
   corroboration***: `__sti___9_fe_init_c_2cbd8fba` is defined in
-  `src/fe_init.c` and referenced nowhere. **The old note excused the
+  `src/fe_init.c` and referenced nowhere. **cpfe is NOT munched and
+  does not need to be, measured**: that is the ONLY real `__sti__` in
+  2.9M lines (the other three hits are the emitter's own string
+  literal, so a count of files matching the name is not a count of
+  initialisers), and all it does is zero `diagnostic_counters` —
+  which the loader already does for a namespace-scope global. *Not
+  changing a working compiler on the strength of "the machinery
+  exists now".* **The old note excused the
   gap by saying cpfe has "no dynamic initialisation that reaches this
   path — it runs, which is the measurement"**, and that was reading a
   working program as evidence its initialisers had run. *The first
