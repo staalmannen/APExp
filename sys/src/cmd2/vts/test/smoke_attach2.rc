@@ -16,11 +16,11 @@ sleep 1
 echo kill > /proc/$APID/note >[2]/dev/null
 
 sleep 1
-echo === size ===
+echo '=== size ==='
 ls -l /tmp/attach.out
-echo === count m bytes ===
+echo '=== count m bytes ==='
 xd /tmp/attach.out > /tmp/attach.hex
 m_count=`{grep -c 6d /tmp/attach.hex}
 echo 'm bytes lines: '$m_count
-echo === any printable embedded ===
+echo '=== any printable embedded ==='
 grep -c 'T\|E\|S' /tmp/attach.hex

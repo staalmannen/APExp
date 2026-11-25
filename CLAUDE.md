@@ -3250,6 +3250,26 @@ in the topic file.
   `LC_ALL = C.UTF-8` in `apexp-sh` is valid and always has been, so
   "no spaces" is a sh rule, not an rc one. A checker written from the
   sh habit flags those eight lines and is wrong.
+  ***AND THE SWEEP READS rc SCRIPTS NOW, NOT ONLY MKFILE RECIPES.***
+  Its own header named that limit, and the limit then cost a SECOND
+  round: `archive-roundtrip`'s `xz -T0 --block-size=65536` answered
+  `token '=': syntax error` after section 1 had run, *in a file whose
+  header quotes this rule.* **A limit named in a comment is still a
+  limit.** A file is taken for rc by its SHEBANG — a directory name
+  cannot say it and nor can an extension, this tree's rc scripts
+  mostly having none. ***Three lexing gaps the recipe arm never had
+  to face, 102 findings of which ~100 were false***: rc's own
+  `>[1=2]` redirection, `*=(...)` and `if(! ifs=() ...)` (both legal
+  and both the notes' own precedents), and above all **a single quote
+  that SPANS LINES**, so every embedded `awk`/`acid` program read as
+  rc source. ***And the last fix was an ORDER, not a rule***: comments
+  were stripped in a second pass, where rc's lexer drops them BEFORE
+  any quote begins — `fdwatch:2`'s `a process's` opened a quote that
+  desynchronised the whole file. *Each pass was right and their order
+  was the bug.* 0 findings over 8026 lines and 61 scripts; the
+  control carries all six legal shapes **and derives its own line
+  numbers from the control text**, having twice reported its own
+  staleness after the comment above them grew.
   **IT IS MEASURED NOW AND IT IS SWEPT FOR: `sys/lib/tests/rceq-sweep.py`,
   and it GATES.** clisp's `if (test $name = lispbibl)` answered
   `/rc/lib/rcmain:24 *eval*:4: token '=': syntax error` on the VM, which

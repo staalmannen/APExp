@@ -243,7 +243,13 @@ if(~ $havexz yes){
 if(~ $havexz yes){
 	note 'section 2: xz -T0 --block-size=65536 (really threaded)'
 	note '  compressing -- THIS IS THE ARM WITH A HISTORY OF HANGING'
-	xz -T0 --block-size=65536 -c <$big >$tmp/t0.xz
+	# ***QUOTED, AND THE BARE FORM IS A PARSE ERROR.***  `=' is a
+	# syntax character in rc, legal only as a leading assignment or
+	# inside quotes, so `--block-size=65536' as an ARGUMENT answers
+	# `token '=': syntax error' -- which this file's own header
+	# quotes as a rule and which I then wrote anyway, in the file
+	# that quotes it.  *A rule written down is not a rule applied.*
+	xz -T0 '--block-size=65536' -c <$big >$tmp/t0.xz
 	tookay 'xz -T0 compress' $"status
 	note '  decompressing'
 	unxz -c <$tmp/t0.xz >$tmp/t0.out
