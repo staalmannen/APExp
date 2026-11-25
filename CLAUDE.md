@@ -2567,7 +2567,36 @@ silent:
   answering `S_ISREG` with `FD_ISTTY` unset makes a fully buffered
   stdout a live explanation for the silence**, which is why the
   `setvbuf` is the first statement.
-  **WHAT IS LEFT IS TWO DECODE FAILURES, AND NEITHER IS SEPARATED**:
+  ***AND lz4 IS SEPARATED NOW, BY A SCRIPT WHOSE OWN FAULT ANSWERED
+  IT.*** `sys/lib/tests/archive-roundtrip` compresses this tree's own
+  sources and reads them back, and its first run printed
+  `Error 26 ... invalid frame` and `PASS: lz4 round trip` **in two
+  adjacent lines** -- v1 compared the BYTES and ignored the tools'
+  exit STATUS, this tree's own *check that can pass for the wrong
+  reason*, with the run printing the evidence against itself. *The
+  contradiction is the finding*: the payload is byte-identical and
+  `lz4io.c:2074`'s `lastStatus` is the decoder's "how much more input
+  do I need", so nonzero at EOF with complete output means every block
+  decoded and **the EndMark never arrived** -- the FRAME, not the
+  data, and a LOCAL file, so not a download either.
+  **And the threadpool is ON in this port where upstream leaves it
+  OFF**: `cmd/lz4/mkfile` passes `-DLZ4IO_MULTITHREAD` against
+  `lz4conf.h:45`'s non-Windows default of 0 ("Requires `<pthread>`
+  support. Can't be reliably and portably tested at source code
+  level"), so lz4 runs its threaded paths on the pthreads this release
+  fixed. ***The host clears upstream's logic for one command***: the
+  same sources under `gcc -DLZ4IO_MULTITHREAD=1` round-trip 1.8MB both
+  ways, status 0 -- and hand over the **reference tail**,
+  `00 00 00 00 ea 08 55 0a`, which is what separates writer from
+  reader with no rebuild. `-T1` is **compression only** (the decode
+  path calls `TPool_create(1,1)` unconditionally), so it is a
+  one-sided switch and therefore the discriminator. Three faults in
+  v1, all mine, and **one of the three diagnoses was wrong too**: the
+  short corpus is not a hidden failure, it is that **nothing binds
+  this repo's `sys/src` over `/sys/src`**, so the VM's
+  `/sys/src/ape/lib/ap` is **stock 9front's** -- *two trees with one
+  path, compared as though they were one.*
+  **WHAT IS LEFT IS TWO DECODE FAILURES, AND ONE IS STILL UNSEPARATED**:
   `unxz xz_sample_file_1MB.xz` says `Compressed data is corrupt` and
   `unlz4 sample.txt.lz4` says `Error 26 : LZ4F frame decoding could
   not complete: invalid frame`, `Decompressed : 0 MiB`. **Both files
