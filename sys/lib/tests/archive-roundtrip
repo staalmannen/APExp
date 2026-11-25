@@ -312,13 +312,22 @@ if(~ $havelz4 yes){
 	# Reported, not counted: this is the discriminator above and it
 	# is a question, not a rule -- two compressors may legitimately
 	# differ.  *What it is READ for is which side to look at next.*
+	# ***BRACES, BECAUSE rc's `if' TAKES EXACTLY ONE COMMAND.***  Two
+	# unbraced `note' lines mean the second is a command in its own
+	# right, so the `if not' no longer FOLLOWS the `if(...)' and rc
+	# answers `'if not' does not follow 'if(...)''.  It killed this
+	# script at line 323 and sections 4 to 7 never ran -- *the same
+	# family as `} if not {' on one line*, which this tree already
+	# has a probe for, arrived at from the other side.
 	cmp $tmp/p.lz4 $tmp/s.lz4 >[2]/dev/null
-	if(~ $status '')
+	if(~ $status ''){
 		note '  NOTE: threaded and -T1 streams are IDENTICAL -- the'
 		note '  NOTE: compressor is cleared, look at the DECODER pool.'
-	if not
+	}
+	if not {
 		note '  NOTE: threaded and -T1 streams DIFFER -- look at the'
 		note '  NOTE: threaded COMPRESSOR and its worker split.'
+	}
 }
 
 # ---- section 5: lz4 file to file ----------------------------------
