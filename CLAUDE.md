@@ -2448,9 +2448,25 @@ silent:
   checksum over the whole download path**. *So `hget` is not
   corrupting files*, and those two are a port bug or a genuinely bad
   source file, which is one hypothesis rather than two.
-  **re2c has not moved** — ten missing headers and no `makefile` to
-  read an object list from, both in 0.6's inventory with the missing
-  `(char const *)` constructors.
+  ***re2c IS GATED ON IOSTREAMS, AND "ten missing headers"
+  UNDERSTATED IT.*** Measured against the 50 public entrypoints in
+  `sys/include/ape/c++`: **five of the ten are the whole iostreams
+  stack** — `iostream`, `ostream`, `fstream`, `sstream`, `iomanip`,
+  i.e. streambuf, the locale and facet machinery and
+  `num_put`/`num_get` — which portable_stl omits *deliberately*,
+  being exception-free and embedded-oriented. For a code generator
+  that reads and writes through streams that is core use, not
+  incidental. **The other five split**: `cassert` is a one-line
+  wrapper, `stack` and `queue` are ADAPTORS (over `vector`, though
+  both default to `deque` and *the library has no `deque`* — the
+  entry below records it being fixed in unrar rather than added),
+  and `unordered_set` and `valarray` are self-contained containers.
+  *So this is a campaign and not a round*, and the live choice is a
+  minimal iostreams, a second C++ application that does not need
+  them, or deferring re2c — **not** "add ten headers". Also no
+  `makefile` for `cxxapp-host.sh` to read an object list from, which
+  given the `OBJECTS=` trap is the part to get right first. Both in
+  0.6's inventory with the missing `(char const *)` constructors.
   ***AND `--control` EXPIRED A SECOND TIME, EXACTLY AS ITS OWN COMMENT
   SAID***: with no gap left to require it printed its "this may be good
   news" branch and exited 1. It asserts the MEASURED STATE now — 44
