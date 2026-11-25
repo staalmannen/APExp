@@ -2715,12 +2715,17 @@ typedef enum {
 
 typedef union {
     uint8_t *ptr;
-    intptr_t val; /* for bp, the low BP_SHIFT bits store REExecStateEnum */
-    struct {
-        uintptr_t val : sizeof(uintptr_t) * 8 - BP_TYPE_BITS;
-        uintptr_t type : BP_TYPE_BITS;
-    } bp;
+    intptr_t val; /* for bp, the low BP_TYPE_BITS store REExecStateEnum */
 } StackElem;
+
+/* A split or lookahead slot packs its saved position and its state into
+ * the one word: the state in the low BP_TYPE_BITS, the position above.
+ * This was a pair of bit-fields, and kencc's bit-fields stop at 32 bits
+ * ("field width larger than field unit" for a 62-bit field), so the
+ * packing is written out with shifts. */
+#define BP_TYPE(e)      ((int)((uintptr_t)(e).val & ((1u << BP_TYPE_BITS) - 1)))
+#define BP_VAL(e)       ((intptr_t)((uintptr_t)(e).val >> BP_TYPE_BITS))
+#define BP_SET(e, v, t) ((e).val = (intptr_t)((((uintptr_t)(v)) << BP_TYPE_BITS) | (uintptr_t)(t)))
 
 typedef struct {
     const uint8_t *cbuf;
@@ -2862,8 +2867,8 @@ static intptr_t lre_exec_backtrack(REExecContext *s, uint8_t **capture,
                 
                 pc = sp[-3].ptr;
                 cptr = sp[-2].ptr;
-                type = sp[-1].bp.type;
-                bp = s->stack_buf + sp[-1].bp.val;
+                type = BP_TYPE(sp[-1]);
+                bp = s->stack_buf + BP_VAL(sp[-1]);
                 sp -= 3;
                 if (type != RE_EXEC_STATE_LOOKAHEAD)
                     break;
@@ -2885,8 +2890,8 @@ static intptr_t lre_exec_backtrack(REExecContext *s, uint8_t **capture,
                     sp = bp;
                     pc = sp[-3].ptr;
                     cptr = sp[-2].ptr;
-                    type = sp[-1].bp.type;
-                    bp = s->stack_buf + sp[-1].bp.val;
+                    type = BP_TYPE(sp[-1]);
+                    bp = s->stack_buf + BP_VAL(sp[-1]);
                     sp[-1].ptr = (void *)sp1; /* save the next value for the copy step */
                     sp -= 3;
                     if (type == RE_EXEC_STATE_LOOKAHEAD)
@@ -2908,7 +2913,7 @@ static intptr_t lre_exec_backtrack(REExecContext *s, uint8_t **capture,
             /* pop all the saved states until reaching start of the negative lookahead */
             for(;;) {
                 REExecStateEnum type;
-                type = bp[-1].bp.type;
+                type = BP_TYPE(bp[-1]);
                 /* undo the modifications to capture[] */
                 while (sp > bp) {
                     capture[sp[-2].val] = sp[-1].ptr;
@@ -2916,8 +2921,8 @@ static intptr_t lre_exec_backtrack(REExecContext *s, uint8_t **capture,
                 }
                 pc = sp[-3].ptr;
                 cptr = sp[-2].ptr;
-                type = sp[-1].bp.type;
-                bp = s->stack_buf + sp[-1].bp.val;
+                type = BP_TYPE(sp[-1]);
+                bp = s->stack_buf + BP_VAL(sp[-1]);
                 sp -= 3;
                 if (type == RE_EXEC_STATE_NEGATIVE_LOOKAHEAD)
                     break;
@@ -2958,8 +2963,7 @@ static intptr_t lre_exec_backtrack(REExecContext *s, uint8_t **capture,
                 CHECK_STACK_SPACE(3);
                 sp[0].ptr = (uint8_t *)pc1;
                 sp[1].ptr = (uint8_t *)cptr;
-                sp[2].bp.val = bp - s->stack_buf;
-                sp[2].bp.type = RE_EXEC_STATE_SPLIT;
+                BP_SET(sp[2], bp - s->stack_buf, RE_EXEC_STATE_SPLIT);
                 sp += 3;
                 bp = sp;
             }
@@ -2971,8 +2975,7 @@ static intptr_t lre_exec_backtrack(REExecContext *s, uint8_t **capture,
             CHECK_STACK_SPACE(3);
             sp[0].ptr = (uint8_t *)(pc + (int)val);
             sp[1].ptr = (uint8_t *)cptr;
-            sp[2].bp.val = bp - s->stack_buf;
-            sp[2].bp.type = RE_EXEC_STATE_LOOKAHEAD + opcode - REOP_lookahead;
+            BP_SET(sp[2], bp - s->stack_buf, RE_EXEC_STATE_LOOKAHEAD + opcode - REOP_lookahead);
             sp += 3;
             bp = sp;
             break;
@@ -3116,8 +3119,7 @@ static intptr_t lre_exec_backtrack(REExecContext *s, uint8_t **capture,
                         CHECK_STACK_SPACE(3);
                         sp[0].ptr = (uint8_t *)pc1;
                         sp[1].ptr = (uint8_t *)cptr;
-                        sp[2].bp.val = bp - s->stack_buf;
-                        sp[2].bp.type = RE_EXEC_STATE_SPLIT;
+                        BP_SET(sp[2], bp - s->stack_buf, RE_EXEC_STATE_SPLIT);
                         sp += 3;
                         bp = sp;
                     }

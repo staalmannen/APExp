@@ -1,7 +1,13 @@
-X11=/sys/src/ape/X11
+APEXPROOT=../../../../../../..
+X11=$APEXPROOT/sys/src/external/equis_X11
 <$X11/config
 BIN=$X11BIN
 TARG=cxpm
 OFILES=cxpm.$O
 </sys/src/cmd/mkone
-CFLAGS=-c $X11CFLAGS -B -I../src -I/sys/include/ape/X11
+CFLAGS=-c $X11CFLAGS -B -I$X11/lib/Xpm/src -I/sys/include/ape/X11
+
+# mkone's own %.$O rule reads %.c from THIS directory, and the source is
+# in the import, so the source directory is named here.
+%.$O: $X11/lib/Xpm/cxpm/%.c
+	pcc $CFLAGS -o $stem.$O $prereq

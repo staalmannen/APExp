@@ -21,8 +21,8 @@ OFILES=\
 
 </sys/src/cmd/mksyslib
 
-CFLAGS=-c $X11CFLAGS -I$X11/lib/xbfile -I/sys/include/ape/X11/extensions
+CFLAGS=-c $X11CFLAGS -I$X11/lib/xkbfile -I/sys/include/ape/X11/extensions
 
-%.$O: $X11/lib/xbfile/%.c
+%.$O: $X11/lib/xkbfile/%.c
 	pcc $CFLAGS -o $stem.$O $prereq
 

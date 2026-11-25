@@ -36,8 +36,8 @@ OFILES=\
 
 </sys/src/cmd/mksyslib
 
-CFLAGS=-c $X11CFLAGS -I$X11/lib/xpm/src -I/sys/include/ape/X11
+CFLAGS=-c $X11CFLAGS -I$X11/lib/Xpm/src -I/sys/include/ape/X11
 
-%.$O: $X11/lib/xpm/src/%.c
+%.$O: $X11/lib/Xpm/src/%.c
 	pcc $CFLAGS -o $stem.$O $prereq
 

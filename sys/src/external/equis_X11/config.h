@@ -1,13 +1,18 @@
 #define PACKAGE	"Equis"
 
-#if defined(T386) || defined(Talpha) || defined(Tarm)
+/*
+ * The arm list must name every architecture the build can target.
+ * amd64 was missing, so every compile on it reached the #else and
+ * died: this is the first thing an amd64 build of X11 hits.
+ */
+#if defined(T386) || defined(Tamd64) || defined(Talpha) || defined(Tarm) || defined(Tarm64)
 #undef WORDS_BIGENDIAN
 #define BYTE_ORDER	LITTLE_ENDIAN
-#elif defined(Tmips) || defined(Tsparc)
-#define WORDS_BIGENDIAN || defined(Tpower)
+#elif defined(Tmips) || defined(Tsparc) || defined(Tpower) || defined(Tpower64)
+#define WORDS_BIGENDIAN 1
 #define BYTE_ORDER	BIG_ENDIAN
 #else
-Error unknown byte order
+#error unknown byte order: add this $objtype to the arms in config.h
 #endif
 
 #define EWOULDBLOCK EAGAIN
@@ -58,9 +63,13 @@ extern int _SLEEP(long);
 #define X_GZIP_FONT_COMPRESSION 1
 
 extern double hypot(double, double);
-#define INT32_MIN INT_MIN
-#define INT32_MAX INT_MAX
-#include <limits.h>
+/*
+ * INT32_MIN and INT32_MAX used to be defined here as INT_MIN/INT_MAX,
+ * for a compiler without <stdint.h>.  APE has <stdint.h>, which defines
+ * them, and the two definitions differ (INT_MIN is not even visible at
+ * this point), so every pixman and xkbfile TU that reached <inttypes.h>
+ * after this file got "Macro redefinition of INT32_MIN".
+ */
 
 /* libXmu */
 #define HAS_SNPRINTF 1

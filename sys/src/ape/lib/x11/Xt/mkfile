@@ -72,8 +72,14 @@ CFLAGS=-c $X11CFLAGS -I$X11/lib/Xt -I/sys/include/ape/X11
 %.$O: $X11/lib/Xt/%.c
 	pcc $CFLAGS -o $stem.$O $prereq
 
+# StringDefs.c is GENERATED, so it is not in $X11/lib/Xt and the pattern
+# rule above cannot make StringDefs.$O.  This explicit rule names the
+# generated file in the build directory, and it is what builds it.
+StringDefs.$O: StringDefs.c
+	pcc $CFLAGS -o $target StringDefs.c
+
 StringDefs.c: $O.makestrs
-	./$O.makestrs -i . < $X11/lib/Xt/util/string.list > StringDefs.c
+	./$O.makestrs -i $X11/lib/Xt < $X11/lib/Xt/util/string.list > StringDefs.c
 
 $O.makestrs: $X11/lib/Xt/util/makestrs.c
 	$CC -D_POSIX_SOURCE -D_BSD_EXTENSION -o $target $prereq

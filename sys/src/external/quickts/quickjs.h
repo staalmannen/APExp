@@ -249,7 +249,11 @@ typedef struct JSValue {
 
 #define JS_TAG_IS_FLOAT64(tag) ((unsigned)(tag) == JS_TAG_FLOAT64)
 
-#define JS_NAN (JSValue){ .u.float64 = JS_FLOAT64_NAN, JS_TAG_FLOAT64 }
+/* The double is reached through the union's braces, not a dotted designator:
+ * kencc rejects `.u.float64 = <double>' in a compound literal with
+ * "incompatible types: IND VOID and INT", for any double, and accepts the
+ * braced spelling with the same meaning. */
+#define JS_NAN (JSValue){ .u = { .float64 = JS_FLOAT64_NAN }, JS_TAG_FLOAT64 }
 
 static inline JSValue __JS_NewFloat64(JSContext *ctx, double d)
 {

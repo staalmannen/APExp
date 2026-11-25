@@ -1,0 +1,85 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+# QuickTS, a patched fork of QuickJS, is built from the imported sources
+# in sys/src/external/quickts.  Nothing is written there: every object,
+# and repl.c, is made in THIS directory, which is the build directory.
+QJS=../../../external/quickts
+
+VERSION=`{cat $QJS/VERSION}
+
+TARG=\
+	qjs\
+	qjsc\
+
+BIN=$APEXPROOT/$objtype/bin/ape
+LIB=$APEXPROOT/$objtype/lib/ape/libquickjs.a
+
+# The objects that make up libquickjs.  qjs and qjsc are linked from
+# these directly, so they do not depend on the archive's member order.
+OFILES=\
+	quickjs.$O\
+	dtoa.$O\
+	libregexp.$O\
+	libunicode.$O\
+	cutils.$O\
+	quickjs-libc.$O\
+
+# qjs also needs the REPL, which is compiled from repl.c.  That file is
+# generated: qjsc turns repl.js into C at build time.
+REPLOBJ=repl.$O
+
+# qjsc RUNS during the build (to write repl.c), so it is built for the
+# build host with hostcc, not with the target's compiler.  See the
+# hostcc note in rc/bin/ape/hostcc.  The helper's objects are named
+# host-*, so they cannot be confused with the target's.
+HOSTOBJS=\
+	host-quickjs.$O\
+	host-dtoa.$O\
+	host-libregexp.$O\
+	host-libunicode.$O\
+	host-cutils.$O\
+	host-quickjs-libc.$O\
+	host-qjsc.$O\
+
+CFLAGS=-c -I$QJS -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_C99_SNPRINTF_EXTENSION -D_BSD_EXTENSION
+
+CLEANFILES=\
+	repl.c\
+	hqjsc\
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+# The two programs.  Explicit names beat mkmany's $O.% pattern, which
+# would link qjsc against repl.$O and the REPL it does not use.
+$O.qjs: qjs.$O $REPLOBJ $OFILES
+	$LD $LDFLAGS -o $target $prereq
+
+$O.qjsc: qjsc.$O $OFILES
+	$LD $LDFLAGS -o $target $prereq
+
+all:V: $LIB
+
+# Objects in the build directory, compiled from the source tree.  The
+# pattern rules are the ones mkone and lua use; they go after mkmany's
+# own, which looks for %.c in THIS directory and fails over to these.
+%.$O: $QJS/%.c
+	$CC $CFLAGS '-DCONFIG_VERSION='^'"'^$VERSION^'"' $QJS/$stem.c
+
+# qjsc is also a target program, so it gets the same version string.
+qjsc.$O: $QJS/qjsc.c
+	$CC $CFLAGS '-DCONFIG_VERSION='^'"'^$VERSION^'"' $QJS/qjsc.c
+
+host-%.$O: $QJS/%.c
+	hostcc $CFLAGS '-DCONFIG_VERSION='^'"'^$VERSION^'"' -o $target $QJS/$stem.c
+
+hqjsc: $HOSTOBJS
+	hostcc -o $target $prereq
+
+repl.c: hqjsc $QJS/repl.js
+	./hqjsc -s -c -o $target -m $QJS/repl.js
+
+$LIB: $OFILES
+	$AR vu $target $newprereq
+	$RANLIB $target
