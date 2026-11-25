@@ -148,8 +148,8 @@ struct _FSServer {
     int         ext_number;
     Bool        (*event_vec[132]) (FSServer *, FSEvent *, fsEvent *);
     Status	(*wire_vec[132]) (FSServer *, FSEvent *, fsEvent *);
-    void         *unused_1; /* previously scratch_buffer */
-    unsigned long unused_2; /* previously scratch_length */
+    void         *scratch_buffer; /* the FS sources of this import use these names */
+    unsigned long scratch_length;
     FSSyncHandler synchandler;
     unsigned long flags;
     struct _XtransConnInfo *trans_conn; /* transport connection object */

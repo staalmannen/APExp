@@ -96,7 +96,16 @@ typedef struct fd_set {
 
 # define Select(n,r,w,e,t) select(n,(fd_set*)r,(fd_set*)w,(fd_set*)e,(struct timeval*)t)
 
+#ifdef PLAN9
+/* APE's fd_set (sys/select.h, fdset_generic.h) is struct fd_set { long
+ * fds_bits[]; }: the mask is a long, and the array is called fds_bits
+ * (there is no __fds_bits and no fd_mask in APE's headers).  Without this
+ * arm every XFD_ANYSET in the FS, Xlib and ICE sources is undeclared. */
+typedef long fd_mask;
+#define __X_FDS_BITS fds_bits
+#else
 #define __X_FDS_BITS __fds_bits
+#endif
 
 #ifndef __FDS_BITS
 # define __FDS_BITS(p)  ((p)->__X_FDS_BITS)
