@@ -3635,3 +3635,114 @@ pass `--exceptions` positively rather than rely on a mode arm.
 the push/`setjmp`/throw path — and then the generated C of a
 *one-file* reproducer is in hand to read, which is the first time this
 port has had that for an EH question.
+
+## A minimal iostreams
+
+portable_stl omits iostreams **deliberately** — it is exception-free and
+embedded-oriented, and iostreams drag in streambuf, the locale and facet
+machinery and `num_put`/`num_get`. That omission is what gated re2c:
+five of the ten headers it wants (`iostream`, `ostream`, `fstream`,
+`sstream`, `iomanip`) are this one stack.
+
+`sys/include/ape/c++/io/` is a minimal iostreams written for this tree
+rather than lifted from libc++, with the nine `.stdh` entrypoints beside
+the other fifty. No `<locale>` and no facets: formatting goes through
+`snprintf` and parsing through `strtoll`/`strtoull`/`strtold`, which is
+the same C library function `num_put` and `num_get` reach anyway, got to
+directly instead of through three virtual dispatches and a facet lookup.
+`get_money`, `put_money`, `get_time` and `put_time` are **absent rather
+than stubbed**, being defined purely in terms of facets — a version
+ignoring the locale would answer plausibly and wrongly, which is this
+tree's commonest bug shape.
+
+### Three design points, each forced rather than chosen
+
+**Header-only, and that is measured.** `rc/bin/ape/eccp`'s munch pass
+finds static constructors by running `nm` over the OBJECT FILES on the
+link line, and an archive member is pulled only on demand — *so a
+constructor inside a `libc++.a` would never be scanned, never land in
+`_ctors[]`, and never run*, leaving the stream objects as raw storage at
+the first `<<`. The standard's own `ios_base::Init` exists for the same
+ordering problem and solves it by putting the initialiser in the USER's
+translation unit, which munch does see. `cin`/`cout`/`cerr`/`clog` are
+references to function-local statics, which reaches the same place with
+less machinery and is already measured to work — `cxx-staticinit-test`
+section 3. **A `libc++` becomes possible the day `eccp` also scans the
+archives it links**, and is not needed before then.
+
+**The stringbuf owns a raw buffer.** This library reports failure in the
+RETURN VALUE — `vector::push_back` answers `expected<void, ...>` — and a
+`stringbuf` whose every `sputc` had to inspect an `expected` would
+either drop those results (the bug the convention exists to prevent) or
+thread an error channel through `overflow`, which has nowhere to put one
+but `eof()`. So the buffer is `malloc`/`realloc` and the `expected`
+question is met exactly ONCE, in `str()`, where a failure has somewhere
+to go. *The conversion is at the boundary instead of in the inner loop.*
+
+**The filebuf is a `FILE *` and not a descriptor.** libap's stdio is
+musl's: it already buffers, picks a block size, and knows this
+platform's quirks — `/dev/cons` answering `S_ISREG` with `FD_ISTTY`
+unset among them. A `filebuf` over `read`/`write` would reimplement all
+of that and get the second one wrong, which is how the `select()`
+regression started. `sync()` calls `fflush` and **not** `fsync`: those
+are different questions, and `fsync` answering failure is what made `xz`
+delete every file it wrote.
+
+### The reference arm paid for itself on its first run
+
+`cxx-iostream-test.cpp` has eleven sections and a `-DREFERENCE` arm,
+because **every assertion is a standard rule and libstdc++ can be asked
+the identical file**. That is worth more here than almost anywhere else
+in this tree: most instruments have no oracle, and a reimplementation of
+a standard component has one sitting on the build host.
+
+***It disagreed immediately.*** The test asserted that a failed
+extraction leaves the caller's value alone; libstdc++ said otherwise and
+was right, because **C++11 changed the rule** —
+[facet.num.get.virtuals] sets the value to ZERO when the conversion
+fails. *The test was wrong and the library then had the same bug*, which
+is precisely the pair a single arm cannot separate. `scan_token` returns
+three outcomes now rather than two, since a failed SENTRY (no conversion
+attempted, value untouched) and a failed CONVERSION (value zeroed) part
+company exactly here.
+
+**And the second draft of one case was wrong the other way.** It
+asserted that a failed `>>` into a string EMPTIES it, which
+[istream.extractors] does say — `str.erase()` comes first. libstdc++
+left the old value and is right: on empty input the SENTRY fails, so
+nothing in the extractor body runs, and *the erase is unreachable for
+`operator>>`* because a successful sentry has already found a character.
+It is reachable for `getline`, whose sentry does not skip whitespace, so
+that is where it is asserted.
+
+Reference arm **67 checks, 0 failures**; APExp arm **73 of 73**, the six
+extra being section 10, the standard streams, which only the APExp arm
+can be asked about. `cxxlib-host.sh --iostream` runs both and then
+breaks the library twice: `width()` not consumed gives exactly **2**
+failures (`left` and `width applies once`, and not the other sixty,
+which is what says the breakage is located rather than general) and
+dropping the `internal` prefix length gives **1**. Each `sed` is checked
+for having matched, since a control whose pattern silently misses
+reports the unbroken tree as proof.
+
+### Two faults in the work itself, both found by building
+
+`basic_ios` has a private member `m_buf`, so the filebuf holder's member
+of the same name was **ambiguous between two bases** — and the base's
+being private does not help, since access is checked after lookup. The
+string streams escape it only because their buffer is a MEMBER, which
+hides the base's name instead of competing with it.
+
+The new harness mode inherited `-fsyntax-only` from `CXXFL`, so the
+compile succeeded, emitted no file, and the mode then failed to execute
+a binary that had never been written — reporting
+`APExp headers -- FAILURES:` with an **empty list** under it. *A missing
+binary and a failing test are not the same result*, and the empty list
+was the only thing that said so.
+
+### What is still missing for re2c
+
+`cassert` (a one-line wrapper), `stack` and `queue` (adaptors, but both
+default to `deque`, which the library has not got), `unordered_set` and
+`valarray`. None of them is this stack, so the campaign's expensive half
+is done.
