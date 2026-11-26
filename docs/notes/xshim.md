@@ -35,8 +35,9 @@ region and input-method functions.
 
 Every phase has the same gate: Tk builds with `mk install` on 9front, and
 the Tk suite (`sys/lib/tests/tk-runall.tcl`) reports the same per-file
-failures as before the phase.  Baseline, recorded in `CLAUDE.md`:
-`Total 10027 Passed 8926 Skipped 924 Failed 177`, 97 files.  A phase that
+failures as before the phase.  Baseline: `tmp/tk-runall-baseline.out` on `main` (matches `CLAUDE.md`):
+`Total 10027 Passed 8926 Skipped 924 Failed 177`, 97 files.  The 177 failing
+test names are in `docs/notes/tk-baseline-failing.txt`.  A phase that
 moves any failing test name is a regression even if the total is unchanged.
 
 1. **Move, do not change.**  Copy Tk's `xlib/*.c` and the X-API files of
