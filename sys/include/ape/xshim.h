@@ -20,7 +20,6 @@
 #pragma lib "/$M/lib/ape/libdraw.a"
 
 typedef struct _XDisplay Display;
-typedef struct _XGC *GC;
 
 /* display */
 extern Display	*XOpenDisplay(char *name);
@@ -45,7 +44,20 @@ extern int	XDestroyWindow(Display *dpy, Window w);
 extern int	XClearWindow(Display *dpy, Window w);
 extern int	XSelectInput(Display *dpy, Window w, long mask);
 
-/* graphics contexts */
+/* graphics contexts: a GC is an XGCValues record, as in Tk's port */
+extern int	XChangeGC(Display *dpy, GC gc, unsigned long mask, XGCValues *values);
+extern int	XSetDashes(Display *dpy, GC gc, int dash_offset, char *dash_list, int n);
+extern int	XSetFunction(Display *dpy, GC gc, int function);
+extern int	XSetFillRule(Display *dpy, GC gc, int fill_rule);
+extern int	XSetFillStyle(Display *dpy, GC gc, int fill_style);
+extern int	XSetTSOrigin(Display *dpy, GC gc, int x, int y);
+extern int	XSetFont(Display *dpy, GC gc, Font font);
+extern int	XSetArcMode(Display *dpy, GC gc, int arc_mode);
+extern int	XSetStipple(Display *dpy, GC gc, Pixmap stipple);
+extern int	XSetClipOrigin(Display *dpy, GC gc, int x, int y);
+extern int	XSetClipMask(Display *dpy, GC gc, Pixmap pixmap);
+extern int	XSetClipRectangles(Display *dpy, GC gc, int x, int y, XRectangle *rects, int n, int ordering);
+extern int	XSetRegion(Display *dpy, GC gc, Region r);
 extern GC	XCreateGC(Display *dpy, Drawable d, unsigned long mask, XGCValues *values);
 extern int	XFreeGC(Display *dpy, GC gc);
 extern int	XSetForeground(Display *dpy, GC gc, unsigned long fg);
@@ -62,6 +74,9 @@ extern int	XDrawRectangle(Display *dpy, Drawable d, GC gc,
 			int x, int y, unsigned int width, unsigned int height);
 extern int	XDrawLine(Display *dpy, Drawable d, GC gc,
 			int x1, int y1, int x2, int y2);
+
+/* fonts: a resource id; the shared header types it XID, see xshim_types.h */
+typedef XID Font;
 
 /* regions */
 extern Region	XCreateRegion(void);

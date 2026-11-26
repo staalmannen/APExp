@@ -4,21 +4,18 @@
  */
 #include <xshim_types.h>
 
-typedef struct _XGC *GC;
-
 /* the one display, set by XOpenDisplay */
 extern Display	*xs_dpy;
 
 /* set by eresized when rio resizes the window; cleared when reported */
 extern int	xs_expose;
 
-/* a graphics context: foreground and background are 1x1 replicated images */
-struct _XGC {
-	Image	*fg;
-	Image	*bg;
-	int	function;
-	int	line_width;
-};
-
 /* the window's rectangle on the screen, so X coordinates are relative to it */
 #define xs_origin()	(xs_dpy->image->r.min)
+
+/* the region and clip functions the GC code calls (xs_region.c, xs_gc.c) */
+extern Region	XCreateRegion(void);
+extern int	XDestroyRegion(Region rgn);
+extern int	XUnionRectWithRegion(XRectangle *rect, Region src, Region dst);
+extern int	XCopyRegion(Region src, Region dst);
+extern int	XSetClipMask(Display *d, GC gc, Pixmap pixmap);

@@ -11,6 +11,7 @@ typedef XID Window;
 typedef XID Drawable;
 typedef unsigned long Time;
 typedef unsigned long Atom;
+typedef XID Pixmap;
 
 /* regions: a bounding box, see xs_region.c */
 typedef struct _XRegion *Region;
@@ -36,9 +37,28 @@ typedef int Status;
 
 /* GC value mask bits, as in Xlib */
 #define GCFunction	(1L<<0)
+#define GCPlaneMask	(1L<<1)
 #define GCForeground	(1L<<2)
 #define GCBackground	(1L<<3)
 #define GCLineWidth	(1L<<4)
+#define GCLineStyle	(1L<<5)
+#define GCCapStyle	(1L<<6)
+#define GCJoinStyle	(1L<<7)
+#define GCFillStyle	(1L<<8)
+#define GCFillRule	(1L<<9)
+#define GCTile	(1L<<10)
+#define GCStipple	(1L<<11)
+#define GCTileStipXOrigin	(1L<<12)
+#define GCTileStipYOrigin	(1L<<13)
+#define GCFont	(1L<<14)
+#define GCSubwindowMode	(1L<<15)
+#define GCGraphicsExposures	(1L<<16)
+#define GCClipXOrigin	(1L<<17)
+#define GCClipYOrigin	(1L<<18)
+#define GCClipMask	(1L<<19)
+#define GCDashOffset	(1L<<20)
+#define GCDashList	(1L<<21)
+#define GCArcMode	(1L<<22)
 
 /* event masks, accepted and ignored: the shim delivers every event it has */
 #define KeyPressMask		(1L<<0)
@@ -58,12 +78,57 @@ typedef struct { short x, y; } XPoint;
 typedef struct { short x, y; unsigned short width, height; } XRectangle;
 typedef struct { short x1, y1, x2, y2; } XSegment;
 
+/* Tk's layout, copied verbatim: a GC is this record, and Tk reads its fields. */
 typedef struct {
-	int function;
-	unsigned long foreground;
-	unsigned long background;
-	int line_width;
+	int function;		/* logical operation */
+	unsigned long plane_mask;/* plane mask */
+	unsigned long foreground;/* foreground pixel */
+	unsigned long background;/* background pixel */
+	int line_width;		/* line width */
+	int line_style;	 	/* LineSolid, LineOnOffDash, LineDoubleDash */
+	int cap_style;	  	/* CapNotLast, CapButt,
+				   CapRound, CapProjecting */
+	int join_style;	 	/* JoinMiter, JoinRound, JoinBevel */
+	int fill_style;	 	/* FillSolid, FillTiled,
+				   FillStippled, FillOpaqueStippled */
+	int fill_rule;	  	/* EvenOddRule, WindingRule */
+	int arc_mode;		/* ArcChord, ArcPieSlice */
+	Pixmap tile;		/* tile pixmap for tiling operations */
+	Pixmap stipple;		/* stipple 1 plane pixmap for stippling */
+	int ts_x_origin;	/* offset for tile or stipple operations */
+	int ts_y_origin;
+        XID font;	/* an X Font; typed XID here because libdraw owns the name Font */        /* default text font for text operations */
+	int subwindow_mode;     /* ClipByChildren, IncludeInferiors */
+	Bool graphics_exposures;/* boolean, should exposures be generated */
+	int clip_x_origin;	/* origin for clipping */
+	int clip_y_origin;
+	Pixmap clip_mask;	/* bitmap clipping; other calls for rects */
+	int dash_offset;	/* patterned/dashed line information */
+	char dashes;
 } XGCValues;
+typedef XGCValues *GC;
+
+#define Success	0
+#define LineSolid	0
+#define LineOnOffDash	1
+#define LineDoubleDash	2
+#define CapNotLast	0
+#define CapButt	1
+#define CapRound	2
+#define CapProjecting	3
+#define JoinMiter	0
+#define JoinRound	1
+#define JoinBevel	2
+#define FillSolid	0
+#define FillTiled	1
+#define FillStippled	2
+#define FillOpaqueStippled	3
+#define EvenOddRule	0
+#define WindingRule	1
+#define ArcChord	0
+#define ArcPieSlice	1
+#define ClipByChildren	0
+#define IncludeInferiors	1
 
 typedef struct {
 	int type;
