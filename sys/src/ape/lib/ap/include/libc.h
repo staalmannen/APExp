@@ -238,12 +238,18 @@ static inline pthread_t __pthread_self(void)
     return pthread_self();
 }
 
+/* pcc reports an unused parameter unless it is read in a condition, and a
+   cast such as (void)p does not count as a read.  USED is the native idiom. */
+#ifndef USED
+#define USED(x)	if(x){}else{}
+#endif
+
 /* ------------------------------
    TLS (no real TLS used)
    ------------------------------ */
 
-static inline int __init_tp(void *p)      { return 0; }
-static inline void *__copy_tls(unsigned char *p) { return NULL; }
+static inline int __init_tp(void *p)      { USED(p); return 0; }
+static inline void *__copy_tls(unsigned char *p) { USED(p); return NULL; }
 static inline void __reset_tls(void)      { }
 
 /* ------------------------------
@@ -253,15 +259,15 @@ static inline void __reset_tls(void)      { }
 struct __ptcb { void *unused; };
 
 static inline void __testcancel(void) { }
-static inline void __do_cleanup_push(struct __ptcb *cb) { }
-static inline void __do_cleanup_pop(struct __ptcb *cb) { }
+static inline void __do_cleanup_push(struct __ptcb *cb) { USED(cb); }
+static inline void __do_cleanup_pop(struct __ptcb *cb) { USED(cb); }
 static inline void __pthread_tsd_run_dtors(void) { }
 
 /* ------------------------------
    Key deletion shim
    ------------------------------ */
 
-static inline void __pthread_key_delete_synccall(void (*f)(void *), void *p) { }
+static inline void __pthread_key_delete_synccall(void (*f)(void *), void *p) { USED(f); USED(p); }
 static inline int __pthread_key_delete_impl(pthread_key_t k)
 {
     return pthread_key_delete(k);
@@ -276,7 +282,7 @@ static volatile int __abort_lock[1] = {0};
 
 static inline void __tl_lock(void)  { }
 static inline void __tl_unlock(void){ }
-static inline void __tl_sync(pthread_t t) { }
+static inline void __tl_sync(pthread_t t) { USED(t); }
 
 /* ------------------------------
    Synchronization: wait/wake
@@ -299,7 +305,7 @@ static inline void __wait(volatile int *addr,
                           int val,
                           int priv)
 {
-    (void)cond; (void)priv;
+    USED(cond); USED(priv);
 
     pthread_mutex_lock(&__shim_waiter.m);
     while (*addr == val)
@@ -312,7 +318,7 @@ static inline void __wake(volatile void *addr,
                           int cnt,
                           int priv)
 {
-    (void)addr; (void)priv;
+    USED(addr); USED(priv);
 
     pthread_mutex_lock(&__shim_waiter.m);
     if (cnt <= 1)
@@ -329,7 +335,7 @@ static inline int __timedwait(volatile int *addr,
                               const struct timespec *ts,
                               int priv)
 {
-    (void)clk; (void)ts; (void)priv;
+    USED(clk); USED(ts); USED(priv);
     __wait(addr, NULL, val, priv);
     return 0;
 }
@@ -353,6 +359,7 @@ static inline void __dl_thread_cleanup(void) { }
 static inline void __unmapself(void *a, size_t s)
 {
     /* unsupported — no-op */
+    USED(a); USED(s);
 }
 
 static inline int __libc_sigaction(int s,

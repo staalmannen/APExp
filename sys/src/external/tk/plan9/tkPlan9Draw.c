@@ -1003,31 +1003,6 @@ XGetImage(
     return image;
 }
 
-/* Region operations — minimal implementations */
-Region
-XPolygonRegion(XPoint *pts, int n, int rule)
-{
-    (void)pts; (void)n; (void)rule;
-    return NULL;
-}
-
-int
-XPointInRegion(Region rgn, int x, int y)
-{
-    (void)rgn; (void)x; (void)y;
-    return 0;
-}
-
-/* XOffsetRegion: real implementation in tkPlan9Stubs.c */
-
-int
-XUnionRegion(Region srca, Region srcb, Region dst)
-{
-    (void)srca; (void)srcb; (void)dst;
-    return 0;
-}
-
-
 /* Selection (clipboard) stubs */
 int
 XSetSelectionOwner(Display *d, Atom a, Window w, Time t)

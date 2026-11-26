@@ -12,6 +12,7 @@ _CORE_LIBS=\
 _CORE_APP_DEPENDENCIES=\
 	flex\
 
+# xshim is upstream of Tk: Tk links it, and it depends only on libdraw.
 _OPTIONAL_LIBS=\
 	bz2\
 	chicken\
@@ -36,6 +37,7 @@ _OPTIONAL_LIBS=\
 		history\
 	sqlite\
 	tcl\
+	xshim\
 		tk\
 		itcl\
 	xml2\

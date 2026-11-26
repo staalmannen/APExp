@@ -3430,6 +3430,7 @@ to attribute rather than two. Turning it on in gd is the obvious next
 step and wants its own round, because gd's webp code is then compiled
 for the first time.
 
+
 ## QuickTS (qjs): an enum bit-field that kencc reads signed
 
 `qjs -h` printed its usage and every script with a `var`, a function
@@ -3475,3 +3476,124 @@ in `cmd/quickts`): all 34 `qjs-ladder` probes answer exactly what the
 gcc-built qjs does, byte counts and error text included --
 `ReferenceError: 'xyz' is not defined` and its stack line, `--std`,
 `std.out`/`std.err`, every native call, and `hello from QuickJS`.
+
+## The archivers: a local round trip, and lz4's threadpool
+
+`sys/lib/tests/archive-roundtrip` exists because the two open decode
+failures could not be read:
+
+	unxz xz_sample_file_1MB.xz   -> Compressed data is corrupt
+	unlz4 sample.txt.lz4         -> Error 26 : LZ4F frame decoding
+	                                could not complete: invalid frame
+
+**Both sample files were produced elsewhere**, so a bad download and a
+real decode bug look exactly alike. `unrar x` on a downloaded archive
+answering `All OK` is a CRC32 over the whole download path and kills
+the first explanation; a LOCAL round trip is what kills the second,
+since it never touches the network.
+
+### The script's first run answered for lz4, through a fault in the script
+
+It printed, in two adjacent lines:
+
+	Error 26 : LZ4F frame decoding could not complete: invalid frame
+	PASS: lz4 round trip
+
+**v1 compared the bytes and ignored every tool's exit status**, so a
+tool that reports failure while producing correct output passed — this
+tree's own *a check that can pass for the wrong reason*, with the run
+printing the evidence against itself.
+
+*What it means is worth more than the fault.* The payload came back
+byte-identical, so **lz4 round-trips the DATA and the decoder rejects
+the FRAME**. `lz4io.c:2074` sets `*lastStatus = nextToLoad` — the
+decoder's "how much more input do I need" — and `:2178` fails the run
+when that is nonzero at EOF. Nonzero there WITH complete output can
+only mean every data block decoded and the **EndMark never arrived**.
+
+### Three faults in v1, all mine, and one of the three diagnoses was wrong too
+
+1. **Status ignored**, above. Every compress and decompress is checked
+   now, separately from the byte comparison, because *the bytes match
+   but the tool said no* is a third outcome and the most informative
+   one.
+
+2. **The corpus was short, the reason was hidden, and my reading of
+   WHY was wrong.** `cat` had its stderr sent to `/dev/null`, so a
+   failure would have been invisible — a redirection added for
+   tidiness deleting the only evidence — and the VM's 342880 bytes
+   against the host's 1053 files and 1.8MB for the same glob read as
+   exactly that. ***It is not.*** **Nothing binds this repository's
+   `sys/src` over `/sys/src`** — `mount-include` binds headers and
+   libraries and no sources at all — so `/sys/src/ape/lib/ap` on the
+   VM is **9front's own stock APE libap**, a different and much
+   smaller tree than the checkout the host number came from. *Two
+   trees with one path, compared as though they were one.* The repair
+   is kept because it is right for its own reasons.
+
+3. ***SECTION 2 COULD NOT FAIL.*** xz's threaded encoder splits the
+   input into BLOCKS and gives one block to each worker, and the
+   default block size is about three times the dictionary — ~24MB at
+   `-6`. A 342KB input is therefore ONE block and ONE worker however
+   many `-T0` asks for, so `-T0 passed` said nothing about the
+   threaded path, which is the only thing that section exists to ask
+   about. `--block-size=65536` is what makes it able to fail.
+
+### The threadpool is on in this port and upstream leaves it off
+
+`cmd/lz4/mkfile` passes `-DLZ4IO_MULTITHREAD`, while
+`programs/lz4conf.h:45` defaults it to **0** on every non-Windows
+target, with the comment *"Requires `<pthread>` support. Can't be
+reliably and portably tested at source code level"*. So this port runs
+lz4's threaded paths on the pthreads **this release fixed**, which is
+ground nothing has covered.
+
+**The host clears upstream's logic**, which is the cheap half: the same
+sources built with `gcc -DLZ4IO_MULTITHREAD=1` round-trip 1804488
+bytes through a pipe and file-to-file, status 0 each way. *So the
+question is this platform's and not lz4's.* It also hands over a
+**reference tail**, which is the observation that separates writer from
+reader without a rebuild:
+
+	... 00 00 00 00 ea 08 55 0a
+	    `--- EndMark   `--- content checksum
+
+eight bytes, the first four zero.
+
+### `-T1` is compression only, and that is what makes it a discriminator
+
+The decode path calls `TPool_create(1, 1)` unconditionally
+(`lz4io.c:2113`), so **decompression is threaded whatever `-T` says**.
+A one-sided switch is exactly what is wanted here:
+
+  * `-T1` and the default produce the **same bytes** — the compressor
+    is cleared and the fault is the DECODER's pool. `lastStatus` is a
+    parent STACK variable written by a worker through a pointer and
+    read after `TPool_jobsCompleted`.
+  * they **differ** — the threaded compressor writes a different frame
+    and the worker split is the suspect.
+
+`TPool_jobsCompleted` waits on `queuePushCond` until
+`queueEmpty && numThreadsBusy == 0`, re-reading both under the mutex,
+so **the predicate is airtight given working primitives** and a
+premature return needs a broken mutex or condvar. *Reading stopped
+there on purpose*: the tail dump answers "is the mark there" in one
+run and section 4 says which side to open, where another round of
+reasoning would answer neither.
+
+### Two rc hazards in the repair itself
+
+**There is no generic `run this and check its status` helper, and that
+is deliberate.** In rc the redirections on
+`step label xz -c <in >out` apply to **`step`**, so the helper's own
+`echo` would land in the output FILE. `$status` is read on the line
+after each command instead — *a helper that corrupts the data it is
+checking is worse than no helper.*
+
+And `$status` is passed as **`$"status`**, not `$status`: `$"var` is
+the whole value as ONE word, where a bare expansion of an empty value
+risks the null-list family that has already cost this tree `mkone`'s
+unset `BIN` and `eccp`'s `$O`. `tail -c 16` went the same way — Plan 9
+spells it `-16c` and the union may resolve `tail` to GNU's — so the
+tail dump is `xd -1x $f | tail -2`.
+

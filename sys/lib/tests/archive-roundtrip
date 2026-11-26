@@ -1,0 +1,426 @@
+#!/bin/rc
+# archive-roundtrip -- does xz/lz4 survive a LOCAL round trip at size?
+#
+#	./archive-roundtrip [samplefile ...]
+#
+# No arguments needed: it builds its own corpus and looks for the two
+# shipped samples in `.', `/tmp' and `$home/download'.  Any paths given
+# are tried as samples too, so a file somewhere else needs no editing.
+#
+# ---- WHAT IT COMES FROM --------------------------------------------
+#
+# Two decode failures are recorded as OPEN and UNSEPARATED:
+#
+#	unxz xz_sample_file_1MB.xz   -> Compressed data is corrupt
+#	unlz4 sample.txt.lz4         -> Error 26 : LZ4F frame decoding
+#	                                could not complete: invalid frame
+#
+# and the reason they are unseparated is that **both files were
+# produced ELSEWHERE**, so a bad download and a real decode bug look
+# exactly alike.
+#
+# ***ONE OF THOSE TWO EXPLANATIONS IS NOW DEAD.***  `unrar x' on a
+# downloaded archive answers `All OK', and unrar verifies a CRC32 over
+# every header and over the extracted data -- which is a checksum over
+# the whole download path.  *So `hget' is not corrupting files*, and
+# what is left is a port bug or a genuinely bad source file.
+#
+# **A LOCAL round trip is what separates THOSE two**, because it never
+# touches the network: this tree compresses its own bytes and reads
+# them back.
+#
+# ---- THE THREE-WAY READING, WRITTEN DOWN BEFORE THE RUN ------------
+#
+#   -T1 passes, -T0 FAILS
+#	The THREADED encoder.  That is ground nothing has covered --
+#	`pthread_create' was broken until this release and every xz
+#	run before it either hung or never reached a worker, so a fix
+#	that lets a process reach code it never reached before can
+#	expose anything on that path.
+#   BOTH pass
+#	The port is fine at size and the shipped sample files are the
+#	problem.  *Then the open item closes as "not ours".*
+#   BOTH fail
+#	The codec is broken at size, and the small file passing was
+#	luck -- `xz -c <sample.txt' is 72 bytes, one block, one
+#	thread, no multi-block framing at all.
+#   bytes MATCH and the tool reports an ERROR
+#	The FRAME and not the payload.  **This is lz4's answer and v1
+#	could not say it** -- see the three faults below.
+#
+# ---- v1 RAN AND HAD THREE FAULTS, ALL MINE -------------------------
+#
+# The first run printed, in two adjacent lines:
+#
+#	Error 26 : LZ4F frame decoding could not complete: invalid frame
+#	PASS: lz4 round trip
+#
+# **A contradiction the script reported as a pass**, because `check'
+# compared the BYTES and ignored every tool's exit STATUS.  *This
+# tree's own "a check that can pass for the wrong reason", and the run
+# printed the evidence against itself.*
+#
+# What it means is worth more than the fault: the payload came back
+# byte-identical, so **lz4 round-trips the DATA and the decoder
+# rejects the FRAME** -- an end mark or a content checksum, not the
+# compressed stream.  And the file was made HERE, so the shipped
+# sample's identical message is not a download at all.
+#
+#   1. **Status ignored.**  Every compress and decompress is checked
+#      now, SEPARATELY from the byte comparison, because `the bytes
+#      match but the tool said no' is a third outcome and the most
+#      informative one.
+#
+#   2. **The corpus was short, the reason was hidden, and my first
+#      reading of WHY was wrong.**  `cat' had its stderr sent to
+#      `/dev/null', so a failure would have been invisible -- *a
+#      redirection added for tidiness deleting the only evidence* --
+#      and the VM's 342880 bytes against the host's 1053 files and
+#      1.8MB for the same glob read as exactly that.
+#      ***IT IS NOT.***  **Nothing binds this repository's `sys/src'
+#      over `/sys/src'** -- `mount-include' binds HEADERS and
+#      LIBRARIES and no sources at all -- so `/sys/src/ape/lib/ap' on
+#      the VM is **9front's own stock APE libap**, a different and
+#      much smaller tree than the checkout the host number came from.
+#      *Two trees with one path, compared as though they were one.*
+#      The repair is kept because it is right for its own reasons: it
+#      appends per directory, leaves stderr alone, and prints the
+#      count -- so a corpus that really is short says so instead of
+#      being inferred.  **And the corpus takes more than one source
+#      now**, since 342KB was thin for the question whatever its
+#      cause.
+#
+#   3. ***SECTION 2 COULD NOT FAIL.***  xz's threaded encoder splits
+#      the input into BLOCKS and gives one block to each worker, and
+#      the default block size is about three times the dictionary --
+#      ~24MB at `-6'.  A 342KB input is therefore ONE block and ONE
+#      worker however many `-T0' asks for, so `-T0 passed' said
+#      nothing about the threaded path, which is the only thing that
+#      section exists to ask about.  `--block-size=65536' is what
+#      makes it able to fail.
+#
+# ---- HOW IT IS BUILT, AND WHY IN THIS ORDER ------------------------
+#
+# **Each case announces itself BEFORE it runs**, because a fault, a
+# kill and a clean finish all just give the prompt back, and the
+# threaded arm is the one with a recorded history of HANGING.  The
+# `-T1' case therefore runs first: *every case expected to return
+# comes before every case expected to hang*, so a freeze names itself
+# by what printed last.  **The completion marker at the end is what
+# says the run reached it** -- read that before reading any count.
+#
+# **The corpus is this tree's own `lib/ap' sources**, varied C rather
+# than a repeated file on purpose, since eight copies of one file
+# compress to almost nothing and would exercise neither multi-block
+# framing nor the worker split, which is the whole question.
+#
+# **`cmp' is read by its STATUS and not by its silence.**  APE's `cmp'
+# prints nothing when two files are the same, and it also printed
+# nothing for years when it wrongly believed its own stdout was
+# `/dev/null' -- *indistinguishable from the prompt*.  The status is
+# correct either way.
+#
+# **The pipe and the file cases are separate for lz4**, and that is
+# not a tidier spelling of one case: a frame that is whole file-to-file
+# and short through a pipe is a stdio FINALISATION bug in libap, and
+# one that is short both ways is lz4's own frame writer.  Different
+# repairs, so they are asked separately.
+#
+# ***AND THERE IS NO GENERIC `run this and check its status' HELPER,
+# WHICH IS DELIBERATE.***  In rc the redirections on
+# `step label xz -c <in >out' apply to **`step'**, so the function's
+# own `echo' would land in the output FILE.  `$status' is read on the
+# line after each command instead; *a helper that corrupts the data it
+# is checking is worse than no helper.*
+
+# **The failure count is a LIST and not arithmetic.**  rc has no
+# integer arithmetic, so a counter means shelling out to `dc' or `awk'
+# for every case; `$#list' is the language's own answer and cannot
+# mis-parse.
+failed = ()
+tmp = /tmp/archive-roundtrip.$pid
+big = $tmp/big
+
+fn note {
+	echo $*
+}
+
+fn fail {
+	note '  FAIL: '^$1
+	failed = ($failed $1)
+}
+
+# $1 the label, $2 the `$status' of the command on the line above.
+fn tookay {
+	if(~ $2 '')
+		note '    ok: '^$1
+	if not
+		fail $1^' -- THE TOOL REPORTED AN ERROR (status '^$2^')'
+}
+
+fn cmpfiles {
+	# $1 the label, $2 and $3 the two files
+	cmp $2 $3 >[2]/dev/null
+	if(~ $status '')
+		note '  PASS: '^$1^' -- bytes identical'
+	if not
+		fail $1^' -- BYTES DIFFER'
+}
+
+note 'archive-roundtrip: starting'
+
+# ---- gate --------------------------------------------------------
+# A missing tool and a failing tool are different results, and a run
+# that silently skips the case it was built for is the shape this
+# tree's notes call a check that cannot fail.
+havexz = yes
+havelz4 = yes
+if(! test -x /bin/xz && ! test -x /bin/ape/xz){
+	note 'archive-roundtrip: no xz in the path -- its sections are SKIPPED,'
+	note 'archive-roundtrip: which is not the same as passing.'
+	havexz = no
+}
+if(! test -x /bin/lz4 && ! test -x /bin/ape/lz4){
+	note 'archive-roundtrip: no lz4 in the path -- its sections are SKIPPED,'
+	note 'archive-roundtrip: which is not the same as passing.'
+	havelz4 = no
+}
+
+mkdir -p $tmp
+# **Several sources, because ONE of them is smaller than it looks.**
+# `/sys/src/ape/lib/ap' on the VM is stock 9front's APE libap and not
+# this repository -- nothing binds the repo's sources anywhere -- so
+# it is about 340KB rather than the 1.8MB the checkout holds.  The
+# extra roots are there to get the corpus into the megabytes, and each
+# is reported separately so a missing one is visible rather than
+# inferred.
+>$big
+nfiles = ()
+for(d in /sys/src/ape/lib/ap/* /sys/src/libc/port /sys/src/cmd /sys/src/cmd/aux /sys/src/cmd/ip){
+	if(test -d $d){
+		n = ()
+		for(f in $d/*.c){
+			if(test -f $f){
+				cat $f >>$big
+				n = ($n x)
+				nfiles = ($nfiles x)
+			}
+		}
+		if(! ~ $#n 0)
+			note '  '^$#n^' files from '^$d
+	}
+}
+if(! test -s $big){
+	note 'archive-roundtrip: corpus is empty -- no C sources found under'
+	note 'archive-roundtrip: /sys/src.  Nothing below can run.'
+	exit nocorpus
+}
+# `wc -c' and NOT `ls -l | awk {print $6}'.  Plan 9's `ls -l' puts the
+# size in field 6 and GNU coreutils' puts it in field 5 -- and inside
+# `apexp-sh' the union resolves `ls' to **GNU's**, which is this tree's
+# own recorded trap (`basename -d' answering `invalid option').  `wc -c'
+# has one field and no opinion.
+note 'corpus: '^`{wc -c <$big}^' bytes from '^$#nfiles^' files'
+note 'corpus: under ~400KB means only stock APE''s libap was found, which'
+note 'corpus: still gives several blocks at --block-size=65536.'
+
+# ---- section 1: xz -T1, the single-threaded encoder ---------------
+if(~ $havexz yes){
+	note 'section 1: xz -T1 (single thread) round trip'
+	note '  compressing'
+	xz -T1 -c <$big >$tmp/t1.xz
+	tookay 'xz -T1 compress' $"status
+	note '  decompressing'
+	unxz -c <$tmp/t1.xz >$tmp/t1.out
+	tookay 'unxz -T1 output' $"status
+	cmpfiles 'xz -T1 round trip' $big $tmp/t1.out
+}
+
+# ---- section 2: xz -T0, the threaded encoder, REALLY threaded -----
+# ***THIS IS THE ONE THAT CAN HANG***, which is why it is second and
+# why the line before it prints first.  `--block-size' is what makes
+# it able to fail at all; see fault 3 in the header.
+if(~ $havexz yes){
+	note 'section 2: xz -T0 --block-size=65536 (really threaded)'
+	note '  compressing -- THIS IS THE ARM WITH A HISTORY OF HANGING'
+	# ***QUOTED, AND THE BARE FORM IS A PARSE ERROR.***  `=' is a
+	# syntax character in rc, legal only as a leading assignment or
+	# inside quotes, so `--block-size=65536' as an ARGUMENT answers
+	# `token '=': syntax error' -- which this file's own header
+	# quotes as a rule and which I then wrote anyway, in the file
+	# that quotes it.  *A rule written down is not a rule applied.*
+	xz -T0 '--block-size=65536' -c <$big >$tmp/t0.xz
+	tookay 'xz -T0 compress' $"status
+	note '  decompressing'
+	unxz -c <$tmp/t0.xz >$tmp/t0.out
+	tookay 'unxz -T0 output' $"status
+	cmpfiles 'xz -T0 blocked round trip' $big $tmp/t0.out
+}
+
+# ---- section 3: lz4 through a pipe, THREADED compressor -----------
+# ***THE THREADPOOL IS ON IN THIS PORT AND UPSTREAM LEAVES IT OFF.***
+# `cmd/lz4/mkfile' passes `-DLZ4IO_MULTITHREAD', while
+# `programs/lz4conf.h:45' defaults it to **0** on every non-Windows
+# target with the comment "Requires <pthread> support.  Can't be
+# reliably and portably tested at source code level" -- so this port
+# runs lz4's threaded paths on the pthreads THIS RELEASE fixed, which
+# is ground nothing has covered.
+#
+# **The host clears upstream's logic**: the same sources built with
+# gcc and `-DLZ4IO_MULTITHREAD=1' round-trip 1804488 bytes both
+# through a pipe and file-to-file, status 0 each way.  *So the
+# question is this platform's and not lz4's.*
+if(~ $havelz4 yes){
+	note 'section 3: lz4 through a PIPE, default (threaded) compressor'
+	note '  compressing'
+	lz4 -c <$big >$tmp/p.lz4
+	tookay 'lz4 compress (pipe, threaded)' $"status
+	note '  decompressing'
+	unlz4 -c <$tmp/p.lz4 >$tmp/p.out
+	tookay 'unlz4 decompress (pipe)' $"status
+	cmpfiles 'lz4 pipe round trip' $big $tmp/p.out
+}
+
+# ---- section 4: lz4 -T1, the UNthreaded compressor ----------------
+# ***`-T1' IS COMPRESSION ONLY AND THAT IS THE POINT.***  The decode
+# path calls `TPool_create(1, 1)' unconditionally
+# (`lz4io.c:2113'), so **decompression is threaded whatever `-T'
+# says** -- which makes this a one-sided switch and therefore a
+# discriminator:
+#
+#   -T1 and the default produce the SAME bytes
+#	The compressor is cleared, and the error belongs to the
+#	DECODER's threadpool.  `lastStatus' is a parent STACK
+#	variable written by the worker through a pointer
+#	(`lz4io.c:2074') and read after `TPool_jobsCompleted'
+#	(`:2178'), so a job that has not run, or a write the parent
+#	does not see, reads the initial 1 -- *and nonzero there means
+#	exactly "the decoder still wants more input", which with
+#	complete output is a missing END MARK and not bad data.*
+#   they DIFFER
+#	The threaded compressor is writing a different frame, and
+#	the worker split is the suspect.
+if(~ $havelz4 yes){
+	note 'section 4: lz4 -T1 (single-threaded compressor) through a pipe'
+	note '  compressing'
+	lz4 -T1 -c <$big >$tmp/s.lz4
+	tookay 'lz4 compress (pipe, -T1)' $"status
+	note '  decompressing'
+	unlz4 -c <$tmp/s.lz4 >$tmp/s.out
+	tookay 'unlz4 decompress (-T1 stream)' $"status
+	cmpfiles 'lz4 -T1 pipe round trip' $big $tmp/s.out
+	# Reported, not counted: this is the discriminator above and it
+	# is a question, not a rule -- two compressors may legitimately
+	# differ.  *What it is READ for is which side to look at next.*
+	# ***BRACES, BECAUSE rc's `if' TAKES EXACTLY ONE COMMAND.***  Two
+	# unbraced `note' lines mean the second is a command in its own
+	# right, so the `if not' no longer FOLLOWS the `if(...)' and rc
+	# answers `'if not' does not follow 'if(...)''.  It killed this
+	# script at line 323 and sections 4 to 7 never ran -- *the same
+	# family as `} if not {' on one line*, which this tree already
+	# has a probe for, arrived at from the other side.
+	cmp $tmp/p.lz4 $tmp/s.lz4 >[2]/dev/null
+	if(~ $status ''){
+		note '  NOTE: threaded and -T1 streams are IDENTICAL -- the'
+		note '  NOTE: compressor is cleared, look at the DECODER pool.'
+	}
+	if not {
+		note '  NOTE: threaded and -T1 streams DIFFER -- look at the'
+		note '  NOTE: threaded COMPRESSOR and its worker split.'
+	}
+}
+
+# ---- section 5: lz4 file to file ----------------------------------
+# **A separate case and not a tidier spelling of section 3.**  With
+# `-c' the destination is stdout, which `lz4io.c:1464' deliberately
+# does NOT `fclose' -- so a frame that is whole file-to-file and short
+# through a pipe would be a stdio finalisation bug, and one that is
+# short both ways is lz4's own frame writer.  Different repairs.
+# (libap's `exit' does call `__stdio_exit', which flushes stdout, so
+# that reading is already weak -- *the case is here to make it
+# measured rather than argued.*)
+if(~ $havelz4 yes){
+	note 'section 5: lz4 FILE to FILE'
+	note '  compressing'
+	lz4 -f $big $tmp/f.lz4
+	tookay 'lz4 compress (file)' $"status
+	note '  decompressing'
+	unlz4 -f $tmp/f.lz4 $tmp/f.out
+	tookay 'unlz4 decompress (file)' $"status
+	cmpfiles 'lz4 file round trip' $big $tmp/f.out
+}
+
+# ---- section 6: the tail of each lz4 stream -----------------------
+# **Reported and NOT counted**, and there is a REFERENCE for it: an
+# lz4 frame ends with the EndMark, four zero bytes, and then the
+# content checksum, which the CLI writes by default.  The host build
+# of these same sources ends
+#
+#	... 00 00 00 00 ea 08 55 0a
+#	    `--- EndMark   `--- content checksum
+#
+# so **eight bytes, the first four zero**.  A stream here that ends
+# on compressed data instead has lost its mark and the WRITER is at
+# fault; one that ends correctly convicts the reader.  *This is the
+# one observation that separates those without a rebuild.*
+if(~ $havelz4 yes){
+	note 'section 6: the tail of each lz4 stream (reported, not counted)'
+	note '  want: 4 zero bytes (EndMark) then 4 checksum bytes.'
+	note '  the host reference ends 00 00 00 00 ea 08 55 0a'
+	for(f in $tmp/p.lz4 $tmp/s.lz4 $tmp/f.lz4){
+		if(test -f $f){
+			note '  '^$f^', '^`{wc -c <$f}^' bytes, last 16:'
+			xd -1x $f | tail -2
+		}
+	}
+}
+
+# ---- section 7: the shipped samples, if they are here -------------
+# **Reported and NOT counted.**  These are the files the open item is
+# about, and whether they decode is the question the local round trip
+# exists to put a background under -- it is not an assertion about
+# this tree.  *A sample that fails while the round trip passes says
+# the file is bad; one that fails while the round trip also fails says
+# nothing by itself.*
+note 'section 7: the shipped sample files (reported, not counted)'
+# `$home' is guarded and concatenated with `^' EXPLICITLY.  An unset
+# variable inside a concatenation is a null LIST in rc, which is an
+# error and not an empty string -- `null list in concatenation', the
+# same shape as `mkone''s unset `BIN' and as `eccp''s `$O'.
+xzsamples = (./xz_sample_file_1MB.xz /tmp/xz_sample_file_1MB.xz $*)
+lz4samples = (./sample.txt.lz4 /tmp/sample.txt.lz4 $*)
+if(! ~ $#home 0){
+	xzsamples = ($xzsamples $home^/download/xz_sample_file_1MB.xz)
+	lz4samples = ($lz4samples $home^/download/sample.txt.lz4)
+}
+for(f in $xzsamples){
+	if(test -f $f){
+		note '  trying '^$f
+		unxz -c <$f >/dev/null
+		if(~ $status '')
+			note '  sample xz: decodes'
+		if not
+			note '  sample xz: FAILS'
+	}
+}
+for(f in $lz4samples){
+	if(test -f $f){
+		note '  trying '^$f
+		unlz4 -c <$f >/dev/null
+		if(~ $status '')
+			note '  sample lz4: decodes'
+		if not
+			note '  sample lz4: FAILS'
+	}
+}
+
+rm -rf $tmp
+note ''
+note 'archive-roundtrip: COMPLETE, '^$#failed^' failure(s)'
+if(! ~ $#failed 0)
+	note 'archive-roundtrip: failed: '^$"failed
+note 'archive-roundtrip: -T1 pass + -T0 fail = the threaded encoder;'
+note 'archive-roundtrip: both pass = the shipped samples are the problem;'
+note 'archive-roundtrip: both fail = the codec is broken at size;'
+note 'archive-roundtrip: bytes identical + tool error = the FRAME, not the data.'
+exit $#failed

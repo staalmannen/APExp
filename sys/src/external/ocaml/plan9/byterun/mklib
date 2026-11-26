@@ -57,7 +57,7 @@ caml/version.h: ../VERSION
 	../tools/make-version-header.rc ../VERSION > caml/version.h
 
 caml/jumptbl.h: caml/instruct.h
-	sed -n -e '/^  /s/ ([A-Z])/ \&\&lbl_\1/gp' -e '/^}/q' caml/instruct.h > caml/jumptbl.h
+	sed -n '/^enum instructions {/,/^};/p' caml/instruct.h | grep -o '[A-Z][A-Z0-9_]*' | sed 's/.*/\&\&lbl_&,/' > caml/jumptbl.h
 
 PRIMS=\
 	alloc.c array.c compare.c extern.c floats.c gc_ctrl.c hash.c\
@@ -66,7 +66,7 @@ PRIMS=\
 	dynlink.c backtrace_prim.c backtrace.c spacetime.c afl.c
 
 primitives: $PRIMS
-	sed -n -e 's/CAMLprim value ([a-z_][a-z0-9_]*).*/\1/p' -e 's/^#define [A-Z_]+ (caml_unix_[a-z0-9_]+).*/\1/p' $PRIMS ../otherlibs/unix/*.c ../otherlibs/str/*.c |
+	sed -n -e 's/CAMLprim value \([a-z_][a-z0-9_]*\).*/\1/p' -e 's/^#define [A-Z_]* \(caml_unix_[a-z0-9_]*\).*/\1/p' $PRIMS ../otherlibs/unix/*.c ../otherlibs/str/*.c |
 	sort | uniq > primitives
 
 prims.c: primitives

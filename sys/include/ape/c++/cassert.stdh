@@ -1,0 +1,15 @@
+#ifndef APEXP_STD_CASSERT_STDH
+#define APEXP_STD_CASSERT_STDH
+
+/*
+ * `<cassert>' is the one header the standard REQUIRES to have no include
+ * guard of its own: `assert' is redefined on every inclusion according to
+ * `NDEBUG' as it stands at that moment.  The guard above is this file's,
+ * and the `#include <assert.h>' below is deliberately OUTSIDE anything
+ * that would stop it happening twice -- so a second `#include <cassert>'
+ * after `#define NDEBUG' still changes `assert', as [cassert.syn] says it
+ * must.
+ */
+#endif
+
+#include <assert.h>

@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_STACK_STDH
+#define APEXP_STD_STACK_STDH
+
+#include "containers/stack.h"
+
+#endif

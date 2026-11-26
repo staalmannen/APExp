@@ -269,5 +269,70 @@
  */
 #define TARG_SETJMP_FUNC        "setjmp"
 
+/*
+ * ***THE SETJMP BUFFER'S ELEMENT COUNT, AND IT IS WHY NO C++
+ * EXCEPTION COULD EVER BE CAUGHT.***
+ *
+ * This is NOT a performance or spare-capacity question, which is how
+ * it was first read and dismissed.  The EH stack entry's try-block
+ * variant BEGINS with the buffer:
+ *
+ *	struct { jmp_buf setjmp_buffer; catch_entries; catch_info;
+ *	         region_number; }
+ *
+ * so the count decides where `catch_entries' and `catch_info' sit --
+ * and **the two sides of the runtime get it from different places.**
+ * `lib_src/throw.c:87' is `typedef int jmp_buf[20]' with a `#line'
+ * naming `ape-sys/setjmp.h', so EDG's own runtime was translated
+ * against APE's REAL `jmp_buf', 80 bytes.  A client translation unit
+ * gets the type from `lower_eh.c:12564''s `make_jmp_buf_type', built
+ * from `targ_jmp_buf_num_elements' -- **39 on the win64 arm
+ * (`src/target.c:7127'), which is 156 bytes.**
+ *
+ * So the CLIENT wrote `catch_entries' at +176 and `catch_info' at
+ * +184 while `throw.c' READ them at +96 and +104, which is the
+ * middle of the client's buffer.  Measured, not inferred, from
+ * `cxx-ehchain''s hex dump of the live entry:
+ *
+ *	case 1   +104 = 0x00000000020088d9   catch_info NON-NULL
+ *	case 4   +104 = 0                    catch_info null
+ *
+ * and those are the two symptoms exactly.  A non-null `catch_info'
+ * makes `throw.c:1322' SKIP the whole arm before any type is
+ * compared, so the destination stays null and `:1494' terminates --
+ * *which is why `catch (...)' did not catch either, and why the
+ * perfectly correct ellipsis entry in the table was irrelevant.*
+ * When the junk happens to read null instead, the arm is entered,
+ * `catch_entries' reads 0 so the match is unconditional, the
+ * destination IS set, and the transfer longjmps through a buffer at
+ * the wrong offset: `fault read addr=0x5074f8'.  **One offset error,
+ * two different failures, and the second looked like a separate
+ * bug.**
+ *
+ * **It is the `ino_t'/`dev_t' family a third time** -- after
+ * `struct stat' 88 against 104 and `alloc_fe(32)' against 48 -- a
+ * size taken from one authority while the other side uses the
+ * platform's own type.  And like those it was INVISIBLE to every
+ * compile: both layouts are self-consistent, nothing is undefined,
+ * and the only symptom is at run time.
+ *
+ * 20, because that is what `sys/include/ape/setjmp.h:10' declares
+ * and therefore what `throw.c' was translated with.  **Bigger is NOT
+ * safer here**, which is the trap: for the BUFFER alone, 39 is
+ * generous and harmless, and that is the reading under
+ * `TARG_SETJMP_FUNC' above, which asked whether `setjmp' would
+ * overrun and correctly answered no.  *The buffer was never the
+ * question; the OFFSET OF WHAT FOLLOWS IT was.*
+ *
+ * The baked `src/target.c' is patched to match, as with
+ * `GCC_IS_GENERATED_CODE_TARGET' -- a value named only in this
+ * header is not a value the generated code reads.  `edgtarg-sweep.py'
+ * compares the two and this pair is now comparable rather than
+ * absent, so a regeneration that reverts one of them gates.
+ */
+#define TARG_JMP_BUF_NUM_ELEMENTS       20
+#define TARG_JMP_BUF_ELEMENT_INT_KIND   ((an_integer_kind)ik_int)
+#define TARG_JMP_BUF_ELEMENTS_ARE_FLOAT 0
+
 #endif /* defined(USE_CMAKE_DEFINES) */
 #endif /* APEXP_KENCC_TARG_H */

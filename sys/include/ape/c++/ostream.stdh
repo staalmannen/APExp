@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_OSTREAM_STDH
+#define APEXP_STD_OSTREAM_STDH
+
+#include "io/ostream.h"
+
+#endif

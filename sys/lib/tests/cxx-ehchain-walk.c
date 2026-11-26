@@ -127,7 +127,20 @@
  * which carries no `TARG_JMP_BUF_*' entry at all, so this is one of
  * the 18 `edgtarg-sweep.py' reports as absent.
  */
-#define EH_JMP_BUF_ELEMS 39	/* src/target.c:7127, the win64 arm */
+/*
+ * ***AND IT IS 20 NOW, BECAUSE THE BUG IS FIXED -- AND THE ROUND THIS
+ * FILE SPENT AT 39 IS WHAT CONFIRMED IT.***  With the target patched
+ * the client writes `catch_entries' at +96 while this walker, still
+ * carrying 39, read +176 and printed garbage: case 1's real
+ * `0x407818' appeared at +96 in the hex dump and the named field
+ * read `0x212A8B'.  *The same value moving from +176 to +96 between
+ * two runs is the fix, stated positively* -- not an absence of
+ * crashes.  20 agrees with `throw.c' and with the client at last,
+ * which is the whole point of the change.
+ */
+#define EH_JMP_BUF_ELEMS 20	/* sys/include/ape/setjmp.h:10, and
+				 * src/target.c's win64 arm, patched to
+				 * match it */
 typedef int eh_jmp_buf[EH_JMP_BUF_ELEMS];
 
 struct eh_try_block {
