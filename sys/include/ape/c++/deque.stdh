@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_DEQUE_STDH
+#define APEXP_STD_DEQUE_STDH
+
+#include "containers/deque.h"
+
+#endif

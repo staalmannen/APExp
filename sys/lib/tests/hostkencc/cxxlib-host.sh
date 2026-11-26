@@ -116,6 +116,133 @@ done
 #
 # Each `sed' is checked for having matched, since a control whose
 # pattern silently misses reports the unbroken tree as proof.
+# ***AND THE REFERENCE ARM MUST BE BUILT `-DREFERENCE', WHICH BOTH
+# MODES FIRST FORGOT.***  Without it libstdc++ compiles the APExp-ONLY
+# section too.  For `--iostream' that section happens to hold for
+# libstdc++ as well (`cerr' really is unitbuf, `cin' really is tied to
+# `cout'), **so the arm passed and was not the arm it claimed to be** --
+# a check passing for the wrong reason, invisible for as long as the two
+# agreed.  `--deque' is what found it: its APExp-only section calls
+# `make_deque' and `clone', which libstdc++ has not got, so the build
+# failed outright instead of quietly succeeding.  *The loud case is the
+# lucky one.*
+
+# ---- --deque: build and run the container test, both arms --------
+#
+# Same two-arm shape as `--iostream': every assertion in sections 0 to 7
+# of `cxx-deque-test.cpp' is a standard rule, so libstdc++ runs the
+# identical file.  The ONE mechanical difference is hidden in the test's
+# `PUSH()' macro, because APExp's `push_back' returns
+# `expected<void, std_error>' where the standard returns `void' -- so
+# both arms run the same statements rather than two sets believed to
+# correspond.
+#
+# ***THE CONTROL READS THE EXIT STATUS AND NOT THE FAILURE COUNT, AND
+# THAT IS THE LESSON OF ITS FIRST RUN.***  Two of the three breaks
+# corrupt memory, so the test SEGFAULTS before printing a count -- and
+# `grep -c FAIL' then answers **0**, which is exactly what a clean run
+# prints.  *A control that crashes the thing it is testing reports the
+# same number as a control that did not fire.*  So each break records
+# what it should do:
+#
+#   raw() ignores m_start      -> CRASH (139), the index base is wrong
+#   grow_map leaves m_start    -> CRASH (139), the map moves and the
+#                                 offset does not
+#   queue::pop takes the back  -> 1 countable failure, no crash
+#
+# The third is there so the COUNTING path is exercised too: three
+# crashing controls would leave "the test can report a failure at all"
+# untested.
+deque_mode() {
+	T=$ROOT/sys/lib/tests/cxx-deque-test.cpp
+	if [ ! -f "$T" ]; then
+		echo "cxxlib-host: no $T" >&2
+		return 2
+	fi
+	rc=0
+	if ! g++ -std=c++14 -DREFERENCE -o "$OUT/dqref" "$T" > "$OUT/err.dqref" 2>&1; then
+		echo "cxxlib-host: deque REFERENCE arm did not build"
+		sed -n '1,20p' "$OUT/err.dqref"
+		return 1
+	fi
+	if "$OUT/dqref" > "$OUT/dqref.out" 2>&1; then
+		echo "cxxlib-host: deque reference (libstdc++) -- 0 failures"
+	else
+		echo "cxxlib-host: deque reference (libstdc++) -- FAILURES:"
+		grep FAIL "$OUT/dqref.out"
+		rc=1
+	fi
+	if ! g++ $CXXFL -o "$OUT/dqape" "$T" > "$OUT/err.dqape" 2>&1; then
+		echo "cxxlib-host: deque APExp arm did not build"
+		sed -n '1,20p' "$OUT/err.dqape"
+		return 1
+	fi
+	if "$OUT/dqape" > "$OUT/dqape.out" 2>&1; then
+		echo "cxxlib-host: deque APExp headers -- 0 failures"
+	else
+		echo "cxxlib-host: deque APExp headers -- FAILURES:"
+		grep FAIL "$OUT/dqape.out"
+		rc=1
+	fi
+	return $rc
+}
+
+deque_control() {
+	T=$ROOT/sys/lib/tests/cxx-deque-test.cpp
+	DQ=$CXXDIR/containers/deque.h
+	QU=$CXXDIR/containers/queue.h
+	ok=0
+
+	for which in rawbase mapstart queuepop; do
+		case $which in
+		rawbase)
+			SRC=$DQ
+			expr='s|return this->slot(m_start + i);|return this->slot(i);|'
+			want=crash
+			name='raw() ignores m_start' ;;
+		mapstart)
+			SRC=$DQ
+			expr='s|    m_start += front_blocks \* block_size;||'
+			want=crash
+			name='grow_map leaves m_start' ;;
+		queuepop)
+			SRC=$QU
+			expr='s|  void pop() { m_c.pop_front(); }|  void pop() { m_c.pop_back(); }|'
+			want=1
+			name='queue::pop takes the back' ;;
+		esac
+		cp "$SRC" "$OUT/ctl.orig" || return 2
+		sed -i "$expr" "$SRC"
+		if cmp -s "$SRC" "$OUT/ctl.orig"; then
+			echo "control: the $which sed matched NOTHING -- FAILED"
+			cp "$OUT/ctl.orig" "$SRC"
+			ok=1
+			continue
+		fi
+		got=build-failed
+		if g++ $CXXFL -o "$OUT/dqctl" "$T" > "$OUT/err.dqctl" 2>&1; then
+			if "$OUT/dqctl" > "$OUT/dqctl.out" 2>&1; then
+				got=0
+			else
+				st=$?
+				if [ "$st" -gt 128 ]; then
+					got=crash
+				else
+					got=$(grep -c FAIL "$OUT/dqctl.out")
+				fi
+			fi
+		fi
+		cp "$OUT/ctl.orig" "$SRC"
+		if [ "$got" = "$want" ]; then
+			echo "control: $name -- $got, as recorded -- ok"
+		else
+			echo "control: $name -- $got, want $want -- FAILED"
+			ok=1
+		fi
+	done
+	return $ok
+}
+
 iostream_mode() {
 	T=$ROOT/sys/lib/tests/cxx-iostream-test.cpp
 	if [ ! -f "$T" ]; then
@@ -125,7 +252,7 @@ iostream_mode() {
 	rc=0
 
 	# the reference arm: the host's own standard library
-	if ! g++ -std=c++14 -o "$OUT/ioref" "$T" > "$OUT/err.ioref" 2>&1; then
+	if ! g++ -std=c++14 -DREFERENCE -o "$OUT/ioref" "$T" > "$OUT/err.ioref" 2>&1; then
 		echo "cxxlib-host: iostream REFERENCE arm did not build"
 		sed -n '1,20p' "$OUT/err.ioref"
 		return 1
@@ -201,7 +328,7 @@ PORT=""
 for a in "$@"; do
 	case "$a" in
 	--portable) PORT="-DPSTL_NO_COMPILER_BUILTINS=1" ;;
-	--headers|--control|--run|--vecsplit|--instantiate|--iostream) mode=$a ;;
+	--headers|--control|--run|--vecsplit|--instantiate|--iostream|--deque) mode=$a ;;
 	*) echo "cxxlib-host: unknown argument $a" >&2; exit 2 ;;
 	esac
 done
@@ -232,7 +359,7 @@ SYN="-fsyntax-only"
 # the same result*, and the empty list under the heading is the only
 # thing that said so.
 case "$mode" in
---run|--iostream) SYN="" ;;
+--run|--iostream|--deque) SYN="" ;;
 esac
 CXXFL="-std=c++14 -nostdinc++ -fno-exceptions -fno-rtti $SYN"
 CXXFL="$CXXFL -I$SHIM -I$CXXDIR $EDGDEF $PORT"
@@ -254,6 +381,12 @@ case "$mode" in
 	iostream_mode
 	rc=$?
 	iostream_control || rc=1
+	exit $rc
+	;;
+--deque)
+	deque_mode
+	rc=$?
+	deque_control || rc=1
 	exit $rc
 	;;
 --instantiate)
