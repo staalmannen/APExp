@@ -804,8 +804,13 @@ split because *a linker can emit a file that is not a working
 program* -- `miniperl`'s gap -- and rung 7 is the first that measures
 CORRECTNESS rather than plumbing. `$GOROOT/src/run.bash` is the real
 suite and is deliberately NOT a rung, because it can hang and a ladder
-whose last rung hangs cannot be read for position). **They are rc on
-purpose**: a harness written in the shell under test dies with it.
+whose last rung hangs cannot be read for position), and **`qjs-ladder`**
+(**does NOT gate**: the QuickTS port printed `-h` and nothing else, not
+even a `throw`'s stderr, so every probe sends stdout/stderr to FILES and
+reports byte counts beside the answer a gcc-built qjs gives, and the
+native-call probes turn "which call threw" into an EXIT STATUS, which
+survives broken printing). **They are rc on purpose**: a harness
+written in the shell under test dies with it.
 
 `sys/src/ape/lib/libressl/test/` is separate — upstream's own ML-KEM and
 SHA-3 vectors, run by `mk test` there.
