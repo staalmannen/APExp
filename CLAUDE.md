@@ -3434,6 +3434,10 @@ the index, so that nothing here is a surprise.
   `docs/notes/kencc.md` has the measurement, the trade and the control
   set to run if anyone takes it.
 - A variadic sentinel must be a pointer, never `0`.
+- **An enum-typed bit-field is SIGNED under kencc** (every enum is the
+  shared `int` type) and unsigned under gcc when no enumerator is
+  negative, so `E f : 3` over 0..7 reads 4..7 back negative. It was
+  QuickTS's every-script `abort()`; declare such a field `uint8_t`.
 - `free()` needs exactly the pointer `malloc()` returned.
 - `longjmp` must never write to the stack; `main9.s` must use only
   caller-saved registers.

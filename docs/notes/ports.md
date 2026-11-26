@@ -3430,6 +3430,47 @@ to attribute rather than two. Turning it on in gd is the obvious next
 step and wants its own round, because gd's webp code is then compiled
 for the first time.
 
+
+## QuickTS (qjs): an enum bit-field that kencc reads signed
+
+`qjs -h` printed its usage and every script with a `var`, a function
+call or an exception printed NOTHING -- not even the error of a
+deliberate throw. `qjs -e 1` and `qjs -e 'throw 7'` worked.
+
+**How it was found** (`sys/lib/tests/qjs-ladder`): first, every
+host-side check came back clean -- the sources with every non-GNU arm
+forced build and run under gcc, all 99 comparable structs in
+`quickjs.c` have the same offsets under host `6c -J -a` as under gcc,
+and the 32-bit-limb BigInt arm works. *That comparison could not see
+bit-fields*, because gcc refuses `offsetof` on one, and the bug was in
+one. Then the ladder sent stdout/stderr to files and reported rc's
+`$status`: every failure was `abort` with an EMPTY stderr. A failed
+`assert` prints, so it was one of QuickJS's 66 bare `default: abort();`
+arms, and APE turns the note into an exit, so there was no broken
+process for acid. `cutils.h` now makes `abort()` print its file and
+line outside gcc/clang, and the next run named one line for every
+failure: `quickjs.c:17386`, the `default:` of `js_closure2`'s switch on
+`cv->closure_type`.
+
+**The mechanism**: `JSClosureTypeEnum closure_type : 3`, over an enum
+of eight values 0..7. gcc gives an enum with no negative enumerators an
+UNSIGNED underlying type, so 4..7 read back as written; kencc makes
+every enum `types[TINT]` (`cc.y`'s `en.tenum`, `dcl.c:doenum`), and a
+signed 3-bit field holds -4..3. Host `6c -S` on the five-line case:
+`SALL $29; SARL $29`, an arithmetic shift, where gcc answers 4.
+`JS_CLOSURE_GLOBAL_DECL` is 4 and every global `var` produces one,
+including the `std`/`os` setup and everything `console.log` needs.
+
+**Fixed in QuickTS** as `uint8_t closure_type : 3`, the type of its
+three neighbours; `JSClosureVar` stays 8 bytes and the access becomes
+`ANDL $7`. The other enum bit-fields in the sources are 8 bits wide
+over enums of at most ~10 values, so they fit signed. **The compiler
+deviation is recorded and not taken**: kencc cannot tell an enum
+bit-field from an `int` one at the declaration, because the enum's type
+IS the shared `int` type, so matching gcc means giving enums a type of
+their own -- tree-wide, and it would also make enum-typed VARIABLES
+unsigned in arithmetic, as they are under gcc. In 0.6's inventory.
+=======
 ## The archivers: a local round trip, and lz4's threadpool
 
 `sys/lib/tests/archive-roundtrip` exists because the two open decode
@@ -3549,3 +3590,4 @@ risks the null-list family that has already cost this tree `mkone`'s
 unset `BIN` and `eccp`'s `$O`. `tail -c 16` went the same way — Plan 9
 spells it `-16c` and the union may resolve `tail` to GNU's — so the
 tail dump is `xd -1x $f | tail -2`.
+
