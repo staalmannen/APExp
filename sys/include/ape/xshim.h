@@ -63,6 +63,9 @@ extern int	XDrawRectangle(Display *dpy, Drawable d, GC gc,
 extern int	XDrawLine(Display *dpy, Drawable d, GC gc,
 			int x1, int y1, int x2, int y2);
 
+/* atoms */
+extern Atom	XInternAtom(Display *dpy, char *name, Bool only_if_exists);
+
 /* events */
 extern int	XPending(Display *dpy);
 extern int	XNextEvent(Display *dpy, XEvent *event);

@@ -10,6 +10,10 @@ typedef unsigned long XID;
 typedef XID Window;
 typedef XID Drawable;
 typedef unsigned long Time;
+typedef unsigned long Atom;
+
+/* the predefined atoms are 1..68, as in X11 */
+#define XA_LAST_PREDEFINED	((Atom)68)
 typedef int Bool;
 typedef int Status;
 
