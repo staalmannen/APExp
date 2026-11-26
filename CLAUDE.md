@@ -2502,9 +2502,42 @@ silent:
   own APExp-only section calls `make_deque`, which libstdc++ has not
   got, so the build failed outright. *The loud case is the lucky
   one.*
-  **What re2c still wants is `unordered_set` and `valarray`** -- and
-  **there is no `std::hash` anywhere in the library**, measured, so
-  the first is a bigger job than "a self-contained container".
+  ***AND `std::hash` + `unordered_set` LANDED, 78 OF 78 ON THE VM
+  FIRST ATTEMPT*** (reference 68). **There was no `std::hash` anywhere
+  in the library**, measured, which is why this was bigger than "a
+  self-contained container": the whole unordered half rests on it.
+  Integers hash to themselves and the rest is FNV-1a, **safe only
+  because the bucket index is modulo a PRIME** -- the two are a pair
+  and neither is sound alone. ***ITS CONTROL DID NOT FIRE AND THE DATA
+  WAS WHY***: the break is `rehash` using the OLD bucket count, and the
+  keys were `0..size-1` while a rehash happens at
+  `size == bucket_count`, so every key was smaller than the old modulus
+  and `h % old == h % new == h`. *The wrong modulus was not wrong for
+  that data.* Section 2b uses multiples of a large prime and it fires
+  with 4. **A dense `0..N` run is the shape that makes a hash container
+  look right**; it tests the chain and not the index.
+  ***AND `valarray` CLOSED THE LIST, 39 OF 39 ON THE HOST*** (reference
+  30), **sized by a measurement rather than by the synopsis**:
+  `<valarray>` is in five re2c files and the only name used from it in
+  2,900 is `std::valarray<bool> loops(n)`, a DFS visited bitmap. So it
+  is a contiguous array with IN-PLACE arithmetic; the binary operators
+  are **absent with a named substitute** (`clone()` then `+=` -- two
+  lines, one allocation instead of one per operator, same failure
+  reported), since under this library's convention they would answer
+  `expected` and an operator whose result cannot be an operand does not
+  chain. Slices and the transcendentals are absent too. ***Its control
+  was predicted to CRASH and does not***: `m_data[(size_type)-2]` wraps
+  to `m_data - 2`, a read just below the block, so the assertion
+  catches it -- 1, deterministic. *The recorded value is the measured
+  one, not the guessed mechanism.* **And correcting that number with an
+  unanchored `sed` retuned the two DEQUE controls** to expect a count
+  they cannot produce; a substitution written for one occurrence needs
+  an anchor, which is the rule the controls already follow with `cmp`.
+  ***SO re2c's HEADER GAP IS CLOSED: 20 of its standard includes, 20
+  present, 0 missing.*** **That is not "re2c builds"** -- a header that
+  exists is not a header that has what is used -- and the instrument
+  for the real question is `cxxapp-host.sh`, which needs an object list
+  re2c has no makefile for.
   ***re2c WAS GATED ON IOSTREAMS, AND "ten missing headers"
   UNDERSTATED IT.*** Measured against the 50 public entrypoints in
   `sys/include/ape/c++`: **five of the ten are the whole iostreams
