@@ -1,0 +1,275 @@
+qjs-ladder: starting (nothing here gates; compare got with want)
+qjs-ladder: objtype=amd64 cputype=amd64
+
+=== A: qjs output with no JS
+
+--- A1-help
+    run:  qjs -h
+    want: status=1 (non-empty), stdout = the usage text, starting QuickJS version
+    got:  status=qjs 14049: 1  stdout=916 bytes  stderr=0 bytes
+    [stdout]
+QuickJS version 2026-06-04-quickts.2
+usage: qjs [options] [file [args]]
+-h  --help         list options
+-e  --eval EXPR    evaluate EXPR
+-i  --interactive  go to interactive mode
+-m  --module       load as ES6 module (default=autodetect)
+    --script       load as ES6 script (default=autodetect)
+    --strict       force strict mode
+-I  --include file include an additional file
+    --std          make 'std' and 'os' available to the loaded script
+-T  --trace        trace memory allocation
+-d  --dump         dump the memory usage stats
+    --memory-limit n  limit the memory usage to 'n' bytes (SI suffixes allowed)
+    --stack-size n    limit the stack size to 'n' bytes (SI suffixes allowed)
+    --no-unhandled-rejection  ignore unhandled promise rejections
+-s                    strip all the debug info
+    --strip-source    strip the source code
+-q  --quit         just instantiate the interpreter and quit
+
+--- A2-nofile
+    run:  qjs /nonexistent.js
+    want: status=1, stderr 43 bytes: /nonexistent.js: No such file or directory
+    got:  status=qjs 14063: 1  stdout=0 bytes  stderr=43 bytes
+    [stderr]
+/nonexistent.js: No such file or directory
+
+=== B: JS evaluation, no native call
+
+--- B1-quit
+    run:  qjs -q
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- B2-one
+    run:  qjs -e 1
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- B3-add
+    run:  qjs -e var a = 1 + 1; a
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- B4-dump
+    run:  qjs -d -e 1
+    want: status=, stdout = the memory usage table
+    got:  status=  stdout=899 bytes  stderr=0 bytes
+    [stdout]
+QuickJS memory usage -- 2026-06-04-quickts.2 version, 64-bit, malloc limit: -1
+
+  472 + 0   JSContext
+   64 + 0   JSObject
+   16 + 0   JSString
+  128 + 8   JSFunctionBytecode
+
+JSObject classes
+     57   1 Object
+      2   2 Array
+      1   4 Number
+      1   5 String
+      1   6 Boolean
+    107  12 Function
+      1  15 Function
+      1  49 Object
+
+NAME                    COUNT     SIZE
+memory allocated           52      416  (8.0 per block)
+memory used              1089    77431  (8 overhead, -70.7 average slack)
+atoms                     617    23639  (38.3 per atom)
+objects                   171    10944  (64.0 per object)
+  properties              893    16144  (5.2 per object)
+  shapes                  117    18696  (159.8 per shape)
+C functions               107
+arrays                      2
+  fast arrays               2
+  elements                  0        0  (0.0 per fast array)
+
+--- B5-addonly
+    run:  qjs -e 1 + 1
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- B6-bool
+    run:  qjs -e true
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- B7-float
+    run:  qjs -e 1.5
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- B8-string
+    run:  qjs -e "s"
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- B9-object
+    run:  qjs -e ({})
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- B10-array
+    run:  qjs -e []
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- B11-var
+    run:  qjs -e var a
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- B12-varset
+    run:  qjs -e var a = 2
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- B13-let
+    run:  qjs -e let b = 2; b
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+=== C: the error printer (stderr through JS_PrintValue)
+
+--- C1-throw7
+    run:  qjs -e throw 7
+    want: status=1, stderr 2 bytes: 7
+    got:  status=qjs 14212: 1  stdout=0 bytes  stderr=2 bytes
+    [stderr]
+7
+
+--- C2-refer
+    run:  qjs -e xyz
+    want: status=1, stderr 67 bytes: ReferenceError: xyz is not defined (in quotes) + a stack line
+    got:  status=qjs 14224: 1  stdout=0 bytes  stderr=67 bytes
+    [stderr]
+ReferenceError: 'xyz' is not defined
+    at <eval> (<cmdline>:1:1)
+
+--- C3-error
+    run:  qjs -e throw new Error("boom")
+    want: status=1, stderr: Error: boom + a stack line
+    got:  status=qjs 14236: 1  stdout=0 bytes  stderr=43 bytes
+    [stderr]
+Error: boom
+    at <eval> (<cmdline>:1:16)
+
+=== D: --std (module evaluation) and std.out / std.err
+
+--- D1-std
+    run:  qjs --std -e 1
+    want: status=, nothing printed
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- D2-stdout
+    run:  qjs --std -e std.out.puts("std.out works\n")
+    want: status=, stdout 14 bytes: std.out works
+    got:  status=  stdout=14 bytes  stderr=0 bytes
+    [stdout]
+std.out works
+
+--- D3-stderr
+    run:  qjs --std -e std.err.puts("std.err works\n")
+    want: status=, stderr 14 bytes: std.err works
+    got:  status=  stdout=0 bytes  stderr=14 bytes
+    [stderr]
+std.err works
+
+--- D4-types
+    run:  qjs --std -e std.out.puts(typeof console + " " + typeof console.log + " " + typeof print + "\n")
+    want: status=, stdout: object function function
+    got:  status=  stdout=25 bytes  stderr=0 bytes
+    [stdout]
+object function function
+
+=== E: native calls; a non-empty status NAMES the call that threw
+
+--- E1-mathabs
+    run:  qjs --std -e try { Math.abs(-1) } catch (e) { std.exit(11) }
+    want: status=, nothing printed (11 = Math.abs threw)
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- E2-mapfunc
+    run:  qjs --std -e try { [1].map(function (x) { return x }) } catch (e) { std.exit(12) }
+    want: status=, nothing printed (12 = map with a function threw)
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- E3-maparrow
+    run:  qjs --std -e try { [1].map(x => x) } catch (e) { std.exit(13) }
+    want: status=, nothing printed (13 = map with an arrow threw)
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- E4-json
+    run:  qjs --std -e try { JSON.stringify({a: 1}) } catch (e) { std.exit(14) }
+    want: status=, nothing printed (14 = JSON.stringify threw)
+    got:  status=  stdout=0 bytes  stderr=0 bytes
+
+--- E5-print
+    run:  qjs --std -e try { print(1) } catch (e) { std.exit(15) }
+    want: status=, stdout 2 bytes: 1 (15 = print threw)
+    got:  status=  stdout=2 bytes  stderr=0 bytes
+    [stdout]
+1
+
+--- E6-conslog
+    run:  qjs --std -e try { console.log(1) } catch (e) { std.exit(16) }
+    want: status=, stdout 2 bytes: 1 (16 = console.log threw)
+    got:  status=  stdout=2 bytes  stderr=0 bytes
+    [stdout]
+1
+
+--- E7-strout
+    run:  qjs --std -e try { std.out.puts("x\n") } catch (e) { std.exit(17) }
+    want: status=, stdout 2 bytes: x (17 = std.out.puts threw)
+    got:  status=  stdout=2 bytes  stderr=0 bytes
+    [stdout]
+x
+
+=== F: what console.log throws
+
+--- F1-text
+    run:  qjs --std -e try { console.log(1) } catch (e) { std.out.puts("caught: " + e + "\n") }
+    want: status=, stdout 2 bytes: 1 (else: caught: <the error>)
+    got:  status=  stdout=2 bytes  stderr=0 bytes
+    [stdout]
+1
+
+--- F2-name
+    run:  qjs --std -e try { console.log(1) } catch (e) { std.exit(String(e.name).length) }
+    want: status=, stdout 2 bytes: 1 (else status = length of the error NAME)
+    got:  status=  stdout=2 bytes  stderr=0 bytes
+    [stdout]
+1
+
+--- F3-msglen
+    run:  qjs --std -e try { console.log(1) } catch (e) { std.exit(String(e.message).length) }
+    want: status=, stdout 2 bytes: 1 (else status = length of the MESSAGE)
+    got:  status=  stdout=2 bytes  stderr=0 bytes
+    [stdout]
+1
+
+--- F4-char0
+    run:  qjs --std -e try { console.log(1) } catch (e) { std.exit(String(e.message).charCodeAt(0)) }
+    want: status=, stdout 2 bytes: 1 (else status = char code of the first character of the message)
+    got:  status=  stdout=2 bytes  stderr=0 bytes
+    [stdout]
+1
+
+=== G: the original symptom
+
+--- G1-print
+    run:  qjs -e print("plain print")
+    want: status=, stdout 12 bytes: plain print
+    got:  status=  stdout=12 bytes  stderr=0 bytes
+    [stdout]
+plain print
+
+--- G2-conslog
+    run:  qjs -e console.log("hello from QuickJS")
+    want: status=, stdout 19 bytes: hello from QuickJS
+    got:  status=  stdout=19 bytes  stderr=0 bytes
+    [stdout]
+hello from QuickJS
+
+qjs-ladder: done
