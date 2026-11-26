@@ -28,6 +28,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#include <stdio.h>
+
+/* APExp: every abort() in QuickJS is a bare `default: abort();', "never
+ * reached", and on Plan 9 the process then exits with the status
+ * `abort' and no trace -- APE turns the note into an exit, so there is
+ * no broken process for acid.  The first kencc build of qjs did exactly
+ * that for any script touching an object, with nothing on stderr.  So
+ * outside gcc/clang an abort names its own file and line first.  The
+ * parenthesised `(abort)' is the real function: a function-like macro
+ * is not expanded when its name is not followed by `('. */
+#if !(defined(__GNUC__) || defined(__clang__))
+#define abort() (fprintf(stderr, "qjs: abort() at %s:%d\n", __FILE__, __LINE__), \
+                 fflush(stderr), (abort)())
+#endif
 
 /* __builtin_expect exists only where the compiler is GNU-compatible;
  * APExp's kencc is not, and the hint is an optimisation, not a rule. */

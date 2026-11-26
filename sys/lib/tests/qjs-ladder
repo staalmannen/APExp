@@ -89,6 +89,21 @@ probe B2-one 'status=, nothing printed' -e '1'
 probe B3-add 'status=, nothing printed' -e 'var a = 1 + 1; a'
 probe B4-dump 'status=, stdout = the memory usage table' -d -e '1'
 
+# First VM run: B1, B2, B4 and C1 (throw 7) pass and everything else
+# ends `abort' with nothing on stderr.  These split B3, smallest first:
+# only INT and BOOL tags are non-negative, so the ones that pass and
+# the ones that abort say whether a value WITH a pointer (string,
+# object; negative tags) is what it takes.
+probe B5-addonly 'status=, nothing printed' -e '1 + 1'
+probe B6-bool 'status=, nothing printed' -e 'true'
+probe B7-float 'status=, nothing printed' -e '1.5'
+probe B8-string 'status=, nothing printed' -e '"s"'
+probe B9-object 'status=, nothing printed' -e '({})'
+probe B10-array 'status=, nothing printed' -e '[]'
+probe B11-var 'status=, nothing printed' -e 'var a'
+probe B12-varset 'status=, nothing printed' -e 'var a = 2'
+probe B13-let 'status=, nothing printed' -e 'let b = 2; b'
+
 echo
 echo '=== C: the error printer (stderr through JS_PrintValue)'
 probe C1-throw7 'status=1, stderr 2 bytes: 7' -e 'throw 7'
