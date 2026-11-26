@@ -145,3 +145,10 @@ moves any failing test name is a regression even if the total is unchanged.
   (`sizeof` and `offsetof` against a reference compiled from both headers).
 - The gate needs 9front.  The host can check headers and link shape but
   cannot run Tk.
+
+## Gate record
+
+- **Step 1a, XInternAtom moved into libxshim** (`tmp/tk-runall-xshim1.out` on
+  `main`, run 03:55): Total 10027, Passed 8926, Skipped 924, Failed 177.  The
+  177 failing names are identical to `docs/notes/tk-baseline-failing.txt`: no
+  new failures, no fixes.  The request-counter deviation did not move any test.
