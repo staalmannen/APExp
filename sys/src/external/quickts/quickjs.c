@@ -645,7 +645,17 @@ typedef enum {
 } JSClosureTypeEnum;
 
 typedef struct JSClosureVar {
-    JSClosureTypeEnum closure_type : 3;
+    /* APExp: uint8_t, not JSClosureTypeEnum.  The enum has eight
+       values, 0..7, in a 3-bit field.  gcc gives an enum with no
+       negative values an UNSIGNED underlying type, so 4..7 read back
+       as written; kencc makes every enum `int', and a signed 3-bit
+       field holds -4..3 -- so JS_CLOSURE_GLOBAL_DECL (4), which every
+       global `var' produces, read back as -4 and js_closure2's switch
+       took `default: abort()'.  Every script with a var, a function
+       call or an exception died with no message.  The other enum
+       bit-fields here are 8 bits wide over enums of at most ~10
+       values, so they fit either way. */
+    uint8_t closure_type : 3;
     uint8_t is_lexical : 1; /* lexical variable */
     uint8_t is_const : 1; /* const variable (is_lexical = 1 if is_const = 1 */
     uint8_t var_kind : 4; /* see JSVarKindEnum */
