@@ -31,6 +31,36 @@ XCreateWindow, XReparentWindow, XRaiseWindow, XMoveResizeWindow,
 XCreatePixmap, XCopyArea, XPutImage, XAllocColor, XSetInputFocus and the
 region and input-method functions.
 
+## Phase 1 finding: the move is not self-contained
+
+Attempted, then stopped before changing any file.  All 13 Tk X-layer files
+(`xlib/*.c` and the X-API files of `plan9/`) include Tk-internal headers
+(`tk.h`, `tkInt.h`, `tkPlan9Int.h`, `tkPort.h`, Tcl headers), and they call
+Tk-internal symbols: `TkRegion`, `TkCreateRegion`, `TkSetRegion`,
+`TkDestroyRegion`, `TkpClipMask`, `TkpGetPixel`, `TkpCopyRegion`,
+`Tk_GetPixmap`, `Tk_FreePixmap`, `Tk_Uid`, `ckalloc`, `ckfree`.  Moving the
+files as they are would make `libxshim` depend on Tk's headers and on Tcl's
+allocator, which defeats a thin general library.
+
+Also, `plan9/tkPlan9Init.c`, `tkPlan9Draw.c` and `tkPlan9Wm.c` mix X-API
+functions with Tk glue (`Tkp*` hooks, window manager policy), so they cannot
+be split into "X" and "Tk" by file.
+
+Revised phase 1, to be approved before any code moves:
+
+1. Give the library its own allocator and region type (`xs_alloc`, `xs_free`,
+   and a bounding-box region as in `tkPlan9Stubs.c`).  Replace `ckalloc`,
+   `ckfree` and `Tk*Region` in the X-layer files with these.  This is a
+   source change, so it is gated by the suite.
+2. Replace each Tk hook (`TkpClipMask`, `TkpGetPixel`, `Tk_GetPixmap`,
+   `Tk_FreePixmap`, `Tk_Uid`) with a callback the library exposes, which Tk
+   registers at startup.  The library then never names a Tk symbol.
+3. Only after 1 and 2 build with no Tk include, move the files.  Tk keeps the
+   glue (`Tkp*` policy, window manager) in `plan9/`, and calls into the library.
+
+Each of these steps is a behaviour-neutral edit, so it has to pass the same
+suite gate as a move would.
+
 ## Plan
 
 Every phase has the same gate: Tk builds with `mk install` on 9front, and
