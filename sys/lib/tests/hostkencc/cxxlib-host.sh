@@ -256,6 +256,113 @@ uset_control() {
 	return $ok
 }
 
+# ---- --valarray: `valarray', both arms ----------------------------
+#
+# The subject is small on purpose: re2c includes `<valarray>' in five
+# files and USES it in one line, a DFS visited bitmap, so the numeric
+# half of the standard's `valarray' has zero demand in this tree and the
+# header is the container plus in-place arithmetic.  Section 1 of the
+# test is re2c's line and nothing else.
+#
+# ***ITS THIRD CONTROL WAS PREDICTED TO CRASH AND DOES NOT, AND THE
+# ARITHMETIC IS WHY.***  Dropping the negative-index normalisation in
+# `cshift' leaves `src' at `-2' for the first element, and
+# `m_data[static_cast<size_type>(-2)]' is not a wild address: unsigned
+# pointer arithmetic wraps it to `m_data - 2', a read just BELOW the
+# block.  So it is deterministic, it lands in the allocator's own
+# bookkeeping, and the assertion catches it -- 1 failure, not a fault.
+#
+# *The expected value is what it was measured to be and not what the
+# mechanism was guessed to be.*  The comparison is still against the
+# exit status rather than `grep -c FAIL', because that is free and
+# because the deque controls showed what a crashing break reports: 0,
+# which is what a CLEAN run prints.
+valarray_mode() {
+	T=$ROOT/sys/lib/tests/cxx-valarray-test.cpp
+	if [ ! -f "$T" ]; then
+		echo "cxxlib-host: no $T" >&2
+		return 2
+	fi
+	rc=0
+	if ! g++ -std=c++14 -DREFERENCE -o "$OUT/varef" "$T" > "$OUT/err.varef" 2>&1; then
+		echo "cxxlib-host: valarray REFERENCE arm did not build"
+		sed -n '1,20p' "$OUT/err.varef"
+		return 1
+	fi
+	if "$OUT/varef" > "$OUT/varef.out" 2>&1; then
+		echo "cxxlib-host: valarray reference (libstdc++) -- 0 failures"
+	else
+		echo "cxxlib-host: valarray reference (libstdc++) -- FAILURES:"
+		grep FAIL "$OUT/varef.out"
+		rc=1
+	fi
+	if ! g++ $CXXFL -o "$OUT/vaape" "$T" > "$OUT/err.vaape" 2>&1; then
+		echo "cxxlib-host: valarray APExp arm did not build"
+		sed -n '1,20p' "$OUT/err.vaape"
+		return 1
+	fi
+	if "$OUT/vaape" > "$OUT/vaape.out" 2>&1; then
+		echo "cxxlib-host: valarray APExp headers -- 0 failures"
+	else
+		echo "cxxlib-host: valarray APExp headers -- FAILURES:"
+		grep FAIL "$OUT/vaape.out"
+		rc=1
+	fi
+	return $rc
+}
+
+valarray_control() {
+	T=$ROOT/sys/lib/tests/cxx-valarray-test.cpp
+	VA=$CXXDIR/numeric/valarray.h
+	ok=0
+
+	for which in shiftdir mismatch cshiftneg; do
+		case $which in
+		shiftdir)
+			expr='s|static_cast<::std::ptrdiff_t>(i) + in_n};|static_cast<::std::ptrdiff_t>(i) - in_n};|'
+			want=2
+			name='shift moves the wrong way' ;;
+		mismatch)
+			expr='s|if (m_size == in_o.m_size) {|if (1) {|'
+			want=1
+			name='a mismatched-size compound op is not a no-op' ;;
+		cshiftneg)
+			expr='s|      if (src < 0) {|      if (0) {|'
+			want=1
+			name='cshift drops the negative-index normalisation' ;;
+		esac
+		cp "$VA" "$OUT/ctl.orig" || return 2
+		sed -i "$expr" "$VA"
+		if cmp -s "$VA" "$OUT/ctl.orig"; then
+			echo "control: the $which sed matched NOTHING -- FAILED"
+			cp "$OUT/ctl.orig" "$VA"
+			ok=1
+			continue
+		fi
+		got=build-failed
+		if g++ $CXXFL -o "$OUT/vactl" "$T" > "$OUT/err.vactl" 2>&1; then
+			if "$OUT/vactl" > "$OUT/vactl.out" 2>&1; then
+				got=0
+			else
+				st=$?
+				if [ "$st" -gt 128 ]; then
+					got=crash
+				else
+					got=$(grep -c FAIL "$OUT/vactl.out")
+				fi
+			fi
+		fi
+		cp "$OUT/ctl.orig" "$VA"
+		if [ "$got" = "$want" ]; then
+			echo "control: $name -- $got, as recorded -- ok"
+		else
+			echo "control: $name -- $got, want $want -- FAILED"
+			ok=1
+		fi
+	done
+	return $ok
+}
+
 deque_mode() {
 	T=$ROOT/sys/lib/tests/cxx-deque-test.cpp
 	if [ ! -f "$T" ]; then
@@ -431,7 +538,7 @@ PORT=""
 for a in "$@"; do
 	case "$a" in
 	--portable) PORT="-DPSTL_NO_COMPILER_BUILTINS=1" ;;
-	--headers|--control|--run|--vecsplit|--instantiate|--iostream|--deque|--uset) mode=$a ;;
+	--headers|--control|--run|--vecsplit|--instantiate|--iostream|--deque|--uset|--valarray) mode=$a ;;
 	*) echo "cxxlib-host: unknown argument $a" >&2; exit 2 ;;
 	esac
 done
@@ -462,7 +569,7 @@ SYN="-fsyntax-only"
 # the same result*, and the empty list under the heading is the only
 # thing that said so.
 case "$mode" in
---run|--iostream|--deque|--uset) SYN="" ;;
+--run|--iostream|--deque|--uset|--valarray) SYN="" ;;
 esac
 CXXFL="-std=c++14 -nostdinc++ -fno-exceptions -fno-rtti $SYN"
 CXXFL="$CXXFL -I$SHIM -I$CXXDIR $EDGDEF $PORT"
@@ -496,6 +603,12 @@ case "$mode" in
 	uset_mode
 	rc=$?
 	uset_control || rc=1
+	exit $rc
+	;;
+--valarray)
+	valarray_mode
+	rc=$?
+	valarray_control || rc=1
 	exit $rc
 	;;
 --instantiate)

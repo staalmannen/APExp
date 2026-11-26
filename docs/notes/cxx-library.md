@@ -3740,9 +3740,168 @@ a binary that had never been written — reporting
 binary and a failing test are not the same result*, and the empty list
 was the only thing that said so.
 
-### What is still missing for re2c
+### What was still missing for re2c
 
 `cassert` (a one-line wrapper), `stack` and `queue` (adaptors, but both
 default to `deque`, which the library has not got), `unordered_set` and
 `valarray`. None of them is this stack, so the campaign's expensive half
-is done.
+is done. *All four rounds are below, and the list is now empty.*
+
+## `deque`, `stack`, `queue`, `cassert`
+
+`stack` and `queue` default to `deque` and there was none, so the two
+adaptors could not be written at all. The storage is a map of
+512-byte blocks, as every deque is, and **the iterator holds
+(container, index) rather than the classic four pointers** — a divide
+per dereference, against a great deal of the delicate code. *The
+invalidation rules come out the same*: `push_front` shifts every index,
+so an iterator held across one names a different element, which is
+exactly what the standard says about a four-pointer iterator by a
+different mechanism.
+
+The convention was **read out of `vector/vector.h` rather than
+chosen**: a default constructor that cannot fail, static `make_deque`
+factories returning `expected`, and mutators returning
+`expected<void, std_error>`. A `void push_back` could only report an
+allocation failure by discarding it, and generic code written against
+`vector::push_back` — which already answers `expected` — would break on
+a `deque::push_back` that did not. *A second convention inside one
+library is worse than one deviation.*
+
+`cassert` puts its `#include <assert.h>` **outside its own include
+guard**, which looks like a mistake and is [cassert.syn]: the header
+must be re-readable so that `NDEBUG` can change between two includes.
+
+### The control reported a clean run for two breaks that crashed
+
+Reference arm 55, APExp arm **65 of 65**, and then the controls said
+something the count could not. Two of the three deliberate breaks
+corrupt the block map, so the test **segfaults before printing a
+total** — and `grep -c FAIL` over its output answers **0**, which is
+exactly what a clean run prints. *A control that crashes the thing it
+tests reports the same number as one that did not fire.* The harness
+reads the exit status now and expects the literal `crash` for those
+two; the third break (`queue::pop` taking the back) is countable on
+purpose, so the mode still proves it can count.
+
+### And the reference arm was not the arm it claimed to be
+
+`--iostream` and `--deque` were both building their reference arm
+**without `-DREFERENCE`**. The iostream mode passed anyway, because
+libstdc++ happens to satisfy that file's APExp-only section too — so
+the arm passed, and was not the arm it said it was. `--deque` is what
+exposed it, its own APExp-only section calling `make_deque`, which
+libstdc++ has not got, so the build failed outright. *The loud case is
+the lucky one.*
+
+## `std::hash` and `unordered_set`
+
+**There was no `std::hash` anywhere in the library**, measured rather
+than assumed, which is why `unordered_set` was a bigger job than "a
+self-contained container": the whole unordered half of the standard
+library rests on that one template.
+
+Integers hash to themselves and everything else is FNV-1a over the
+object's bytes. **That is only safe because the bucket index is taken
+modulo a PRIME** rather than a power of two — the two decisions are a
+pair and neither is sound alone. Two cases are not just bytes:
+floating point must map `-0.0` onto `+0.0` first, since the two compare
+EQUAL and have different bit patterns, so hashing the bytes stores
+under one key and looks up under another — *a silent wrong answer, not
+a crash*; and `bool` hashes as 0 or 1 rather than as its byte, any
+nonzero byte being a valid `true`. NaN is left alone deliberately: it
+compares equal to nothing, including itself, so no container can find
+it again whatever it hashes to.
+
+### ***THE CONTROL DID NOT FIRE, AND THE DATA WAS WHY***
+
+The break is `rehash` relinking nodes with the OLD bucket count instead
+of the new one, and the first version of the test answered **0 failures
+against it** — a provably broken rehash that nothing noticed.
+
+My first reading was that the `sed` had missed, the deque control
+having a `cmp` guard that this one lacked. *The pattern was present.*
+The cause was the DATA: `hash<int>` is the identity, a rehash happens
+exactly when `size == bucket_count`, and the keys were `0 .. size-1` —
+so every stored key was SMALLER than the old bucket count, making
+`h % old` and `h % new` both `h` for every node at every rehash. **The
+wrong modulus was not wrong for that data.** Section 2b uses multiples
+of a large prime, which exceed every bucket count the table reaches,
+and the control then fires with 4.
+
+*A dense `0..N` run is the shape that makes a hash container look
+right.* It is the first thing anyone writes, and it tests the chain
+rather than the index.
+
+## `valarray`, sized by what asked for it
+
+**The demand was measured and it is one line.** `<valarray>` is
+included by five re2c files and the only name used from it anywhere in
+2,900 files is
+
+    std::valarray<bool> loops(skel.nodes_count);   // control_flow.cc:61
+
+a depth-first-search visited bitmap, read and written with
+`operator[]`. The other four includes use nothing.
+
+That decided the shape rather than a guess about it. A `valarray`
+written from the standard's synopsis is slices, generalised slices,
+mask and indirect arrays, expression templates and twenty
+transcendental free functions; this one is a contiguous array with
+in-place arithmetic, and **every omission is named with its
+substitute**. The binary operators are absent because they allocate, so
+under this library's convention they would answer
+`expected<valarray, std_error>` — an operator whose result cannot be an
+operand, so `a + b + c` would not chain and every use site would unwrap
+anyway. The substitute is `a.clone()` then `+=`: two lines, one
+allocation instead of one per operator, and it reports the same
+failure. The compound operators are present and **cannot fail**, since
+they write into storage that already exists.
+
+Section 1 of the test is re2c's line and nothing else, including the
+part it silently depends on — a DFS that starts with a dirty visited
+map terminates early and drops paths, so the zero fill is load-bearing
+and is asserted separately from the size.
+
+### The control was predicted to crash and does not
+
+Dropping the negative-index normalisation in `cshift` leaves `src` at
+`-2` for the first element, and `m_data[static_cast<size_type>(-2)]` is
+not a wild address: unsigned pointer arithmetic wraps it to
+`m_data - 2`, a read just BELOW the block, in the allocator's own
+bookkeeping. So it is deterministic and the assertion catches it — **1
+failure, not a fault**. *The recorded value is what it was measured to
+be and not what the mechanism was guessed to be*; the comparison is
+still against the exit status, because the deque controls showed what a
+crashing break reports.
+
+Reference arm **30 of 30**, APExp arm **39 of 39**. The reference arm
+earned its place again here: it confirmed the two directions the names
+do not tell you — a POSITIVE `shift`/`cshift` count moves elements
+towards the FRONT — which were the assertions most likely to be the
+test's own bug.
+
+### A sed with no anchor clobbered another mode's controls
+
+Correcting this file's own control from `want=crash` to the measured
+`want=1` was done with `sed -i 's|want=crash|want=1|'`, which matched
+**every** such line in the harness and silently retuned the two deque
+controls to expect a count they cannot produce. They reported
+`crash, want 1` on the next run. *A substitution written for one
+occurrence needs an anchor or a check that it changed one line*, which
+is the same rule the controls themselves already follow with `cmp`.
+
+### What re2c asks for now
+
+Every standard header re2c includes — 20 of them — is present:
+**20 present, 0 missing.** That closes the gap list this section opened
+with.
+
+**It does not say re2c builds.** A header that exists is not a header
+that has what is used, which is this tree's own rule in another form;
+what re2c wants *from* `<map>`, `<set>` and `<algorithm>` is a separate
+question, and the instrument for it is `cxxapp-host.sh`. That needs an
+object list, and re2c has autotools and CMake rather than a makefile
+with an `OBJECTS=` line — **which given the `OBJECTS=` trap is the part
+to get right first**, the link rule being the only place that cannot
+lie.

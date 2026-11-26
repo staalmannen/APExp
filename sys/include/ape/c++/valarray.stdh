@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_VALARRAY_STDH
+#define APEXP_STD_VALARRAY_STDH
+
+#include "numeric/valarray.h"
+
+#endif
