@@ -153,6 +153,109 @@ done
 # The third is there so the COUNTING path is exercised too: three
 # crashing controls would leave "the test can report a failure at all"
 # untested.
+# ---- --uset: unordered_set and std::hash, both arms ---------------
+#
+# ***ITS SECOND CONTROL IS WHY SECTION 2b OF THE TEST EXISTS.***  The
+# break is `rehash' relinking nodes with the OLD bucket count instead of
+# the new one, and the first version of the test answered **0 failures
+# against it** -- a provably broken rehash that nothing noticed.
+#
+# The reason was the DATA, not the assertions.  `hash<int>' is the
+# identity, a rehash happens exactly when `size == bucket_count', and
+# the test's keys were `0 .. size-1' -- so every stored key was SMALLER
+# than the old bucket count, making `h % old' and `h % new' both `h' for
+# every node at every rehash.  *The wrong modulus was not wrong for that
+# data.*  Section 2b uses multiples of a large prime, which exceed every
+# bucket count in the table, and the control then fires with 4.
+#
+# A dense `0..N' run is the shape that makes a hash container look
+# right; it is the first thing anyone writes and it tests the chain
+# rather than the index.
+uset_mode() {
+	T=$ROOT/sys/lib/tests/cxx-uset-test.cpp
+	if [ ! -f "$T" ]; then
+		echo "cxxlib-host: no $T" >&2
+		return 2
+	fi
+	rc=0
+	if ! g++ -std=c++14 -DREFERENCE -o "$OUT/usref" "$T" > "$OUT/err.usref" 2>&1; then
+		echo "cxxlib-host: uset REFERENCE arm did not build"
+		sed -n '1,20p' "$OUT/err.usref"
+		return 1
+	fi
+	if "$OUT/usref" > "$OUT/usref.out" 2>&1; then
+		echo "cxxlib-host: uset reference (libstdc++) -- 0 failures"
+	else
+		echo "cxxlib-host: uset reference (libstdc++) -- FAILURES:"
+		grep FAIL "$OUT/usref.out"
+		rc=1
+	fi
+	if ! g++ $CXXFL -o "$OUT/usape" "$T" > "$OUT/err.usape" 2>&1; then
+		echo "cxxlib-host: uset APExp arm did not build"
+		sed -n '1,20p' "$OUT/err.usape"
+		return 1
+	fi
+	if "$OUT/usape" > "$OUT/usape.out" 2>&1; then
+		echo "cxxlib-host: uset APExp headers -- 0 failures"
+	else
+		echo "cxxlib-host: uset APExp headers -- FAILURES:"
+		grep FAIL "$OUT/usape.out"
+		rc=1
+	fi
+	return $rc
+}
+
+uset_control() {
+	T=$ROOT/sys/lib/tests/cxx-uset-test.cpp
+	HS=$CXXDIR/functional/hash.h
+	US=$CXXDIR/containers/unordered_set.h
+	ok=0
+
+	for which in negzero rehashmod; do
+		case $which in
+		negzero)
+			SRC=$HS
+			expr='s|    if (in_v == static_cast<t_float>(0)) {|    if (0) {|'
+			want=5
+			name='hash drops the -0.0 rule' ;;
+		rehashmod)
+			SRC=$US
+			expr='s|n->m_hash % want|n->m_hash % m_nbuckets|'
+			want=4
+			name='rehash uses the old modulus' ;;
+		esac
+		cp "$SRC" "$OUT/ctl.orig" || return 2
+		sed -i "$expr" "$SRC"
+		if cmp -s "$SRC" "$OUT/ctl.orig"; then
+			echo "control: the $which sed matched NOTHING -- FAILED"
+			cp "$OUT/ctl.orig" "$SRC"
+			ok=1
+			continue
+		fi
+		got=build-failed
+		if g++ $CXXFL -o "$OUT/usctl" "$T" > "$OUT/err.usctl" 2>&1; then
+			if "$OUT/usctl" > "$OUT/usctl.out" 2>&1; then
+				got=0
+			else
+				st=$?
+				if [ "$st" -gt 128 ]; then
+					got=crash
+				else
+					got=$(grep -c FAIL "$OUT/usctl.out")
+				fi
+			fi
+		fi
+		cp "$OUT/ctl.orig" "$SRC"
+		if [ "$got" = "$want" ]; then
+			echo "control: $name -- $got, as recorded -- ok"
+		else
+			echo "control: $name -- $got, want $want -- FAILED"
+			ok=1
+		fi
+	done
+	return $ok
+}
+
 deque_mode() {
 	T=$ROOT/sys/lib/tests/cxx-deque-test.cpp
 	if [ ! -f "$T" ]; then
@@ -328,7 +431,7 @@ PORT=""
 for a in "$@"; do
 	case "$a" in
 	--portable) PORT="-DPSTL_NO_COMPILER_BUILTINS=1" ;;
-	--headers|--control|--run|--vecsplit|--instantiate|--iostream|--deque) mode=$a ;;
+	--headers|--control|--run|--vecsplit|--instantiate|--iostream|--deque|--uset) mode=$a ;;
 	*) echo "cxxlib-host: unknown argument $a" >&2; exit 2 ;;
 	esac
 done
@@ -359,7 +462,7 @@ SYN="-fsyntax-only"
 # the same result*, and the empty list under the heading is the only
 # thing that said so.
 case "$mode" in
---run|--iostream|--deque) SYN="" ;;
+--run|--iostream|--deque|--uset) SYN="" ;;
 esac
 CXXFL="-std=c++14 -nostdinc++ -fno-exceptions -fno-rtti $SYN"
 CXXFL="$CXXFL -I$SHIM -I$CXXDIR $EDGDEF $PORT"
@@ -387,6 +490,12 @@ case "$mode" in
 	deque_mode
 	rc=$?
 	deque_control || rc=1
+	exit $rc
+	;;
+--uset)
+	uset_mode
+	rc=$?
+	uset_control || rc=1
 	exit $rc
 	;;
 --instantiate)
