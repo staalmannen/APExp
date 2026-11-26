@@ -5,14 +5,19 @@
  * and the one top-level window are the only windows; subwindows are not
  * supported yet.  Colours are X TrueColor 0xRRGGBB pixels.
  *
- * Xlib's names and field types are kept so that simple X programs compile
- * against it unchanged.  The implementation lives in sys/src/ape/lib/xshim
+ * Programs include this header directly.  Xlib's names and field types are
+ * kept so that simple X programs compile against it unchanged.  The old X11
+ * headers stay in place for the Tk Plan 9 backend, which needs the full
+ * multi-window API that the single-window shim does not provide.  The implementation lives in sys/src/ape/lib/xshim
  * and does not include this file, because it uses libdraw's Display type.
  */
 #ifndef _XSHIM_H_
 #define _XSHIM_H_
 
 #include <xshim_types.h>
+
+#pragma lib "/$M/lib/ape/libxshim.a"
+#pragma lib "/$M/lib/ape/libdraw.a"
 
 typedef struct _XDisplay Display;
 typedef struct _XGC *GC;
