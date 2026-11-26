@@ -14,6 +14,9 @@
 
 #include <xshim_types.h>
 
+#pragma lib "/$M/lib/ape/libxshim.a"
+#pragma lib "/$M/lib/ape/libdraw.a"
+
 typedef struct _XDisplay Display;
 typedef struct _XGC *GC;
 
