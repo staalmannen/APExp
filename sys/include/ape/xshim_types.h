@@ -77,6 +77,14 @@ typedef int Status;
 typedef struct { short x, y; } XPoint;
 typedef struct { short x, y; unsigned short width, height; } XRectangle;
 typedef struct { short x1, y1, x2, y2; } XSegment;
+typedef struct { short x, y; unsigned short width, height; short angle1, angle2; } XArc;
+
+/* a font: its resource id and metrics (the id names a libdraw Font) */
+typedef struct {
+	XID fid;
+	int ascent;
+	int descent;
+} XFontStruct;
 
 /* Tk's layout, copied verbatim: a GC is this record, and Tk reads its fields. */
 typedef struct {

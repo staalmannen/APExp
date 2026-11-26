@@ -27,8 +27,8 @@ drawable_ok(Drawable d)
 }
 
 /* a 1x1 replicated image of a TrueColor pixel */
-static Image*
-colour(unsigned long pixel)
+Image*
+xs_colour(unsigned long pixel)
 {
 	return allocimage(xs_dpy, Rect(0, 0, 1, 1), RGBA32, 1, (pixel << 8) | 0xFF);
 }
@@ -42,7 +42,7 @@ XFillRectangle(Display *dpy, Drawable d, GC gc, int x, int y,
 	USED(dpy);
 	if(!drawable_ok(d))
 		return 0;
-	c = colour(gc->foreground);
+	c = xs_colour(gc->foreground);
 	if(c == nil)
 		return 0;
 	draw(xs_dpy->image, xrect(x, y, width, height), c, nil, ZP);
@@ -87,7 +87,7 @@ XDrawLine(Display *dpy, Drawable d, GC gc, int x1, int y1, int x2, int y2)
 	USED(dpy);
 	if(!drawable_ok(d))
 		return 0;
-	c = colour(gc->foreground);
+	c = xs_colour(gc->foreground);
 	if(c == nil)
 		return 0;
 	/* X's width 1 is a one-pixel line: radius 0 */

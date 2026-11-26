@@ -1,0 +1,19 @@
+# xshimclock -- a proof-of-concept Xlib program on libxshim.
+#
+# Not in the default build.  Build it by hand, after libxshim.a is installed:
+#	cd sys/src/ape/cmd/xshimclock
+#	mk install
+# The Xlib and libdraw link libraries come from the #pragma lib lines in
+# sys/include/ape/xshim.h, so this mkfile names none.
+
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+BIN=$APEXPROOT/$objtype/bin/ape
+TARG=xshimclock
+OFILES=xshimclock.$O
+
+</sys/src/cmd/mkone
+
+CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../../lib/ap/include
