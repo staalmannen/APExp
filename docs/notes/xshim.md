@@ -174,3 +174,26 @@ moves any failing test name is a regression even if the total is unchanged.
   `main`, run 04:09): Total 10027, Passed 8926, Skipped 924, Failed 177.  The
   177 failing names are identical to the baseline and to the step 1a run.  No
   test touches the region code's out-of-memory path.
+
+## Step 1c (GC and clip mask), applied, awaiting the 9front gate
+
+- The GC is `XGCValues *`, as in Tk's port: the library's `XGCValues` is Tk's
+  copied verbatim, with the GC mask and value constants.  A host check
+  compares the layout and all 69 constants against Tk's own `Xlib.h`: identical.
+- Moved into `libxshim` (`xs_gc.c`): `XCreateGC`, `XChangeGC`, `XFreeGC`, the
+  `XSet*` family, `XSetClipMask`, `XSetClipRectangles`, and `XSetRegion`
+  (Tk's `TkSetRegion`).  Removed from Tk's `xlib/xgc.c`; the rest of that file
+  is `#if 0` code that was already dead.
+- The library's thin `gc.c` is retired.  `draw.c` now draws from the GC's
+  pixel and makes a 1x1 image per call.
+- `Font` is typed `XID` inside the shared header, because libdraw owns the name
+  `Font`.  The public header declares `typedef XID Font`.
+- Faults carried over unchanged, to fix in their own gated steps:
+  - `XSetRegion` stores the caller's region and then overwrites the pointer, so
+    the region is not kept.
+  - The clip mask is a heap pointer stored in a `Pixmap`, which is an
+    `unsigned long`.  On kencc, `long` is 32 bits and pointers are 64, so the
+    clip mask pointer is truncated.  The Tk code has the same cast.
+  - `draw.c` does not apply the GC's clip mask yet.
+- The `XSetDashes` Windows-only `TkWin*` calls are dropped; they were under an
+  `#ifdef` that never holds on Plan 9.

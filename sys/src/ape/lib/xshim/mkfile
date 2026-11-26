@@ -7,7 +7,7 @@ LIB=$APEXPROOT/$objtype/lib/ape/libxshim.a
 OFILES=\
 	display.$O\
 	window.$O\
-	gc.$O\
+	xs_gc.$O\
 	draw.$O\
 	event.$O\
 	xs_atom.$O\
