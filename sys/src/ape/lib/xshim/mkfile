@@ -13,6 +13,8 @@ OFILES=\
 	event.$O\
 	xs_atom.$O\
 	xs_region.$O\
+	xs_arc.$O\
+	xs_font.$O\
 
 # the public header is sys/include/ape/xshim.h (with xshim_types.h); both are
 # installed by hand for now, like draw.h, until the X11 headers are cleaned up

@@ -44,6 +44,9 @@ extern int	XDestroyWindow(Display *dpy, Window w);
 extern int	XClearWindow(Display *dpy, Window w);
 extern int	XSelectInput(Display *dpy, Window w, long mask);
 
+/* fonts: a resource id; the shared header types it XID, see xshim_types.h */
+typedef XID Font;
+
 /* graphics contexts: a GC is an XGCValues record, as in Tk's port */
 extern int	XChangeGC(Display *dpy, GC gc, unsigned long mask, XGCValues *values);
 extern int	XSetDashes(Display *dpy, GC gc, int dash_offset, char *dash_list, int n);
@@ -75,9 +78,6 @@ extern int	XDrawRectangle(Display *dpy, Drawable d, GC gc,
 extern int	XDrawLine(Display *dpy, Drawable d, GC gc,
 			int x1, int y1, int x2, int y2);
 
-/* fonts: a resource id; the shared header types it XID, see xshim_types.h */
-typedef XID Font;
-
 /* regions */
 extern Region	XCreateRegion(void);
 extern int	XDestroyRegion(Region rgn);
@@ -92,6 +92,25 @@ extern int	XPointInRegion(Region rgn, int x, int y);
 extern int	XOffsetRegion(Region rgn, int dx, int dy);
 extern Region	XPolygonRegion(XPoint *pts, int n, int rule);
 extern int	XCopyRegion(Region src, Region dst);
+
+/* arcs: angles in 1/64 degree, counter-clockwise from 3 o'clock */
+extern int	XDrawArc(Display *dpy, Drawable d, GC gc, int x, int y,
+			unsigned int width, unsigned int height, int angle1, int angle2);
+extern int	XFillArc(Display *dpy, Drawable d, GC gc, int x, int y,
+			unsigned int width, unsigned int height, int angle1, int angle2);
+extern int	XDrawArcs(Display *dpy, Drawable d, GC gc, XArc *arcs, int n);
+extern int	XFillArcs(Display *dpy, Drawable d, GC gc, XArc *arcs, int n);
+
+/* fonts: an X font name that libdraw cannot open falls back to libdraw's default */
+extern Font	XLoadFont(Display *dpy, char *name);
+extern XFontStruct *XLoadQueryFont(Display *dpy, char *name);
+extern int	XFreeFont(Display *dpy, XFontStruct *fs);
+extern int	XDrawString(Display *dpy, Drawable d, GC gc, int x, int y, char *s, int n);
+extern int	XTextWidth(XFontStruct *fs, char *s, int n);
+
+/* pointer: the last position the event loop has seen */
+extern Bool	XQueryPointer(Display *dpy, Window w, Window *root, Window *child,
+			int *root_x, int *root_y, int *win_x, int *win_y, unsigned int *mask);
 
 /* atoms */
 extern Atom	XInternAtom(Display *dpy, char *name, Bool only_if_exists);

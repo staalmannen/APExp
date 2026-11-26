@@ -10,6 +10,9 @@ extern Display	*xs_dpy;
 /* set by eresized when rio resizes the window; cleared when reported */
 extern int	xs_expose;
 
+/* a 1x1 image of a TrueColor pixel, from draw.c; the caller frees it */
+extern Image	*xs_colour(unsigned long pixel);
+
 /* the window's rectangle on the screen, so X coordinates are relative to it */
 #define xs_origin()	(xs_dpy->image->r.min)
 

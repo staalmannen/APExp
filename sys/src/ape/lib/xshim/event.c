@@ -110,3 +110,25 @@ XNextEvent(Display *dpy, XEvent *e)
 		pump();
 	}
 }
+
+/* The position the event loop saw last; it is not read from the device here,
+ * so it is only as fresh as the last event the program has taken. */
+Bool
+XQueryPointer(Display *dpy, Window w, Window *root, Window *child,
+	int *root_x, int *root_y, int *win_x, int *win_y, unsigned int *mask)
+{
+	Point p;
+
+	USED(dpy);
+	USED(w);
+	p = lastmouse.xy;
+	if(root != nil) *root = XSHIM_ROOT;
+	if(child != nil) *child = None;
+	if(root_x != nil) *root_x = p.x;
+	if(root_y != nil) *root_y = p.y;
+	p = subpt(p, xs_origin());
+	if(win_x != nil) *win_x = p.x;
+	if(win_y != nil) *win_y = p.y;
+	if(mask != nil) *mask = lastmouse.buttons;
+	return True;
+}

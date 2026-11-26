@@ -218,3 +218,20 @@ moves any failing test name is a regression even if the total is unchanged.
 - The pointer-to-integer warning at `xs_gc.c:56` is gone, since the cast is gone.
 - Not changed: `XSetRegion` still does not keep the region (its own fault), and
   `draw.c` still ignores the clip mask.
+
+## Proof of concept: arcs, fonts, a clock (applied, not yet run on 9front)
+
+- Arcs (`xs_arc.c`): `XDrawArc`, `XFillArc`, `XDrawArcs`, `XFillArcs`.  An arc
+  is sampled into a polyline on its ellipse and drawn with libdraw's `poly` or
+  `fillpoly`.  Angles are X's: 1/64 degree, counter-clockwise from 3 o'clock.
+- Fonts (`xs_font.c`): `XLoadFont`, `XLoadQueryFont`, `XFreeFont`,
+  `XDrawString`, `XTextWidth`, on libdraw's font support.  An X font name is
+  passed to `openfont`; names libdraw cannot open (for example "fixed" and the
+  X-style names) fall back to libdraw's default font.  The names are not
+  translated, so every X font gets the native one.  X's baseline is converted to
+  libdraw's top-of-text point.
+- Pointer (`event.c`): `XQueryPointer` reports the last position the event loop
+  has seen, so it is only as fresh as the last event the program has taken.
+- Demo: `sys/src/ape/cmd/xshimclock`, an analogue clock that uses only the Xlib
+  API.  It is not in the default build; build it by hand after `libxshim.a`.
+- `xshim-test.c` gains checks for the arc, font and text calls.

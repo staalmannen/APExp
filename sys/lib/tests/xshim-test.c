@@ -67,6 +67,19 @@ main(void)
 	check(!XFillRectangle(dpy, 99L, gc, 0, 0, 1, 1),
 		"a drawable other than the window is refused");
 
+	check(XDrawArc(dpy, w, gc, 10, 10, 60, 40, 0, 360*64), "XDrawArc (a full ellipse) succeeds");
+	check(XFillArc(dpy, w, gc, 10, 10, 60, 40, 0, 90*64), "XFillArc (a pie quarter) succeeds");
+	check(!XFillArc(dpy, 99L, gc, 0, 0, 1, 1, 0, 64), "XFillArc refuses a non-window drawable");
+
+	{
+		XFontStruct *fs = XLoadQueryFont(dpy, "fixed");
+		check(fs != nil && fs->ascent > 0, "XLoadQueryFont gives a font with a positive ascent");
+		check(fs != nil && XTextWidth(fs, "clock", 5) > 0, "XTextWidth of a word is positive");
+		check(XDrawString(dpy, w, gc, 10, 50, "12", 2), "XDrawString succeeds");
+		if(fs != nil)
+			XFreeFont(dpy, fs);
+	}
+
 	check(XFlush(dpy) && XSync(dpy, False), "XFlush and XSync succeed");
 
 	/* nothing has been typed or moved yet, so nothing should be queued;
