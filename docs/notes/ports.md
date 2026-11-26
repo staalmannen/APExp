@@ -3469,3 +3469,9 @@ bit-field from an `int` one at the declaration, because the enum's type
 IS the shared `int` type, so matching gcc means giving enums a type of
 their own -- tree-wide, and it would also make enum-typed VARIABLES
 unsigned in arithmetic, as they are under gcc. In 0.6's inventory.
+
+**Confirmed on the VM** (`tmp/ql` on main, after `mk clean; mk install`
+in `cmd/quickts`): all 34 `qjs-ladder` probes answer exactly what the
+gcc-built qjs does, byte counts and error text included --
+`ReferenceError: 'xyz' is not defined` and its stack line, `--std`,
+`std.out`/`std.err`, every native call, and `hello from QuickJS`.
