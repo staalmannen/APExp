@@ -197,3 +197,11 @@ moves any failing test name is a regression even if the total is unchanged.
   - `draw.c` does not apply the GC's clip mask yet.
 - The `XSetDashes` Windows-only `TkWin*` calls are dropped; they were under an
   `#ifdef` that never holds on Plan 9.
+- **Step 1c, GC and clip mask moved into libxshim** (`tmp/tk-runall-xshim3.out`
+  on `main`, run 05:44): Total 10027, Passed 8926, Skipped 924, Failed 177.
+  The 177 failing names are identical to the baseline.  Against run 2 the only
+  differences are the two timestamp lines, which is why the byte count is the
+  same across runs.
+- Build warnings to clear in a later step: `xs_gc.c:56` converts a pointer to a
+  shorter integer (the clip-mask truncation above, now visible to the compiler),
+  and `xs_region.c` has unused parameters in the three stubs.
