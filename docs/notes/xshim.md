@@ -152,3 +152,21 @@ moves any failing test name is a regression even if the total is unchanged.
   `main`, run 03:55): Total 10027, Passed 8926, Skipped 924, Failed 177.  The
   177 failing names are identical to `docs/notes/tk-baseline-failing.txt`: no
   new failures, no fixes.  The request-counter deviation did not move any test.
+
+## Step 1b (regions), applied, awaiting the 9front gate
+
+- Moved into `libxshim` (`xs_region.c`): the region struct and the X region
+  API from `plan9/tkPlan9Stubs.c`, and the three region stubs that were in
+  effect from `plan9/tkPlan9Draw.c` (`XPointInRegion`, `XUnionRegion`,
+  `XPolygonRegion`).  Those three are still stubs; moving them unchanged keeps
+  behaviour, and implementing them is a separate gated step.
+- New library function `XCopyRegion`, which Tk's `TkpCopyRegion` now calls in
+  place of a struct copy, so Tk no longer reads region fields.
+- Removed from Tk: the moved definitions in `tkPlan9Stubs.c` and
+  `tkPlan9Draw.c`, and the dead duplicates in `xlib/xgc.c`.  `TkpBuildRegionFromAlphaData`
+  stays in Tk; it only calls `XUnionRectWithRegion`.
+- `ckalloc`/`ckfree` in the region code become `malloc`/`free`.  The one
+  behaviour difference: `XCreateRegion` returns NULL on allocation failure,
+  where `ckalloc` panicked.
+- Checks: `xs_region.c` compiles with APE headers only (no libdraw); the three
+  edited Tk files pass a `gcc -fsyntax-only` with the Tk include order.

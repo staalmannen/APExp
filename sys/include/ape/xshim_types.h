@@ -12,6 +12,12 @@ typedef XID Drawable;
 typedef unsigned long Time;
 typedef unsigned long Atom;
 
+/* regions: a bounding box, see xs_region.c */
+typedef struct _XRegion *Region;
+#define RectangleOut	0
+#define RectangleIn	1
+#define RectanglePart	2
+
 /* the predefined atoms are 1..68, as in X11 */
 #define XA_LAST_PREDEFINED	((Atom)68)
 typedef int Bool;

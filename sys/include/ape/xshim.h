@@ -63,6 +63,21 @@ extern int	XDrawRectangle(Display *dpy, Drawable d, GC gc,
 extern int	XDrawLine(Display *dpy, Drawable d, GC gc,
 			int x1, int y1, int x2, int y2);
 
+/* regions */
+extern Region	XCreateRegion(void);
+extern int	XDestroyRegion(Region rgn);
+extern int	XClipBox(Region rgn, XRectangle *rect_return);
+extern int	XEmptyRegion(Region rgn);
+extern int	XUnionRectWithRegion(XRectangle *rect, Region src, Region dst);
+extern int	XUnionRegion(Region sra, Region srcb, Region dr_return);
+extern int	XIntersectRegion(Region sra, Region srcb, Region dr_return);
+extern int	XSubtractRegion(Region sra, Region srcb, Region dr_return);
+extern int	XRectInRegion(Region rgn, int x, int y, unsigned int w, unsigned int h);
+extern int	XPointInRegion(Region rgn, int x, int y);
+extern int	XOffsetRegion(Region rgn, int dx, int dy);
+extern Region	XPolygonRegion(XPoint *pts, int n, int rule);
+extern int	XCopyRegion(Region src, Region dst);
+
 /* atoms */
 extern Atom	XInternAtom(Display *dpy, char *name, Bool only_if_exists);
 
