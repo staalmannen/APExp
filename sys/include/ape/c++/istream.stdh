@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_ISTREAM_STDH
+#define APEXP_STD_ISTREAM_STDH
+
+#include "io/istream.h"
+
+#endif

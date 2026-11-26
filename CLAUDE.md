@@ -2448,7 +2448,32 @@ silent:
   checksum over the whole download path**. *So `hget` is not
   corrupting files*, and those two are a port bug or a genuinely bad
   source file, which is one hypothesis rather than two.
-  ***re2c IS GATED ON IOSTREAMS, AND "ten missing headers"
+  ***AND THE IOSTREAMS EXIST NOW: `sys/include/ape/c++/io/`, NINE
+  HEADERS, HEADER-ONLY.*** No `<locale>` and no facets -- formatting
+  through `snprintf`, parsing through `strtoll`/`strtold`, which is
+  the C function `num_put`/`num_get` reach anyway; the four
+  money/time manipulators are **absent rather than stubbed**.
+  **Header-only is FORCED and measured**: `eccp`'s munch scans the
+  OBJECT FILES on the link line and an archive member is pulled only
+  on demand, *so a constructor in a `libc++.a` would never run* --
+  which is exactly why the standard puts `ios_base::Init` in the
+  user's TU, and `cout` is a reference to a function-local static
+  here for the same reason. The `stringbuf` owns a RAW buffer because
+  this library returns `expected` from every growing operation and
+  `overflow` has nowhere to put one but `eof()`; the `filebuf` is a
+  `FILE *` so libap's stdio answers the platform questions once, and
+  its `sync` is `fflush` and **not** `fsync`. ***THE `-DREFERENCE`
+  ARM PAID FOR ITSELF ON ITS FIRST RUN***: the test asserted the
+  C++98 rule that a failed extraction leaves the value alone,
+  libstdc++ disagreed, and C++11 zeroes it -- *the test was wrong and
+  the library had the same bug*, which one arm cannot separate.
+  **67 reference / 73 of 73 APExp**, `cxxlib-host.sh --iostream`,
+  two controls at 2 and 1 failures. `docs/notes/cxx-library.md` has
+  the rest, including the second draft that was wrong the OTHER way.
+  **What re2c still wants is `cassert`, `stack`, `queue`,
+  `unordered_set`, `valarray` and a `deque`** -- none of them this
+  stack, so the expensive half is done.
+  ***re2c WAS GATED ON IOSTREAMS, AND "ten missing headers"
   UNDERSTATED IT.*** Measured against the 50 public entrypoints in
   `sys/include/ape/c++`: **five of the ten are the whole iostreams
   stack** — `iostream`, `ostream`, `fstream`, `sstream`, `iomanip`,
