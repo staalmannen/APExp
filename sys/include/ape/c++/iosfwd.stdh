@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_IOSFWD_STDH
+#define APEXP_STD_IOSFWD_STDH
+
+#include "io/iosfwd.h"
+
+#endif

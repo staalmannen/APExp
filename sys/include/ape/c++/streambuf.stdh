@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_STREAMBUF_STDH
+#define APEXP_STD_STREAMBUF_STDH
+
+#include "io/streambuf.h"
+
+#endif

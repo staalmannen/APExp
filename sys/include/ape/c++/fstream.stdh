@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_FSTREAM_STDH
+#define APEXP_STD_FSTREAM_STDH
+
+#include "io/fstream.h"
+
+#endif
