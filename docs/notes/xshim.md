@@ -170,3 +170,7 @@ moves any failing test name is a regression even if the total is unchanged.
   where `ckalloc` panicked.
 - Checks: `xs_region.c` compiles with APE headers only (no libdraw); the three
   edited Tk files pass a `gcc -fsyntax-only` with the Tk include order.
+- **Step 1b, regions moved into libxshim** (`tmp/tk-runall-xshim2.out` on
+  `main`, run 04:09): Total 10027, Passed 8926, Skipped 924, Failed 177.  The
+  177 failing names are identical to the baseline and to the step 1a run.  No
+  test touches the region code's out-of-memory path.
