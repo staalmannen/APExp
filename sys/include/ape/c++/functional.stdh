@@ -3,6 +3,7 @@
 
 #include "functional/equal_to.h"
 #include "functional/function.h"
+#include "functional/hash.h"
 #include "functional/identity.h"
 #include "functional/less.h"
 #include "utility/general/functional/invoke.h"

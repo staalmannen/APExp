@@ -2479,9 +2479,32 @@ silent:
   predicted the VM exactly*, which is the whole case for writing the
   test against an oracle before the VM sees it. `docs/notes/cxx-library.md` has
   the rest, including the second draft that was wrong the OTHER way.
-  **What re2c still wants is `cassert`, `stack`, `queue`,
-  `unordered_set`, `valarray` and a `deque`** -- none of them this
-  stack, so the expensive half is done.
+  ***AND `deque`, `stack`, `queue` AND `cassert` LANDED NEXT, 65 OF
+  65 ON THE VM FIRST ATTEMPT*** (reference 55), with the same two-arm
+  shape. **They follow the LIBRARY's convention and not the
+  standard's**, read out of `vector/vector.h` rather than chosen: a
+  default ctor that cannot fail, static `make_deque` factories
+  returning `expected`, and mutators returning
+  `expected<void, std_error>` -- *a second convention inside one
+  library is worse than one deviation*, and a `void push_back` could
+  only report an allocation failure by discarding it. No copy
+  constructor, so the copy is `clone()` and can say no.
+  ***THE CONTROL MUST READ THE EXIT STATUS AND NOT THE FAILURE
+  COUNT***: two of three deliberate breaks corrupt memory, so the
+  test SEGFAULTS before printing a count and `grep -c FAIL` answers
+  **0**, which is what a clean run prints -- *a control that crashes
+  the thing it tests reports the same number as one that did not
+  fire.* The third break is countable on purpose. **And the
+  reference arm was not being built `-DREFERENCE`, in BOTH modes**:
+  for `--iostream` it passed anyway because libstdc++ happens to
+  satisfy that APExp-only section too, so *the arm passed and was not
+  the arm it claimed to be* -- `--deque` found it only because its
+  own APExp-only section calls `make_deque`, which libstdc++ has not
+  got, so the build failed outright. *The loud case is the lucky
+  one.*
+  **What re2c still wants is `unordered_set` and `valarray`** -- and
+  **there is no `std::hash` anywhere in the library**, measured, so
+  the first is a bigger job than "a self-contained container".
   ***re2c WAS GATED ON IOSTREAMS, AND "ten missing headers"
   UNDERSTATED IT.*** Measured against the 50 public entrypoints in
   `sys/include/ape/c++`: **five of the ten are the whole iostreams
