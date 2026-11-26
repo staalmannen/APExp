@@ -2330,17 +2330,177 @@ silent:
   *and a right answer reached through a wrong reading is still a wrong
   reading* — the next question asked of that arm would have got a
   wrong answer.
-  **Reading stops here and the measurement is `eccp -F`**: one command
-  on the generated C, `grep -c __curr_eh_stack_entry` and
-  `grep -c setjmp`. Both zero means no EH code was emitted after all
-  and `--exceptions` must be passed positively; non-zero means the
-  region IS pushed and the fault is at run time in the
-  push/`setjmp`/throw path — **with the generated C of a ONE-FILE
-  reproducer in hand to read**, which this port has never had for an
-  EH question.
-  **re2c has not moved** — ten missing headers and no `makefile` to
-  read an object list from, both in 0.6's inventory with the missing
-  `(char const *)` constructors.
+  ***AND IT IS FOUND, AND IT IS THE BAKED-SIZE FAMILY A THIRD TIME:
+  `TARG_JMP_BUF_NUM_ELEMENTS` WAS win64's 39 AND APE's `jmp_buf` IS
+  `int[20]`.*** The EH stack entry's try-block variant BEGINS with
+  the buffer, so the count decides where `catch_entries` and
+  `catch_info` sit — and the two sides get it from different places.
+  `lib_src/throw.c:87` is `typedef int jmp_buf[20]` with a `#line`
+  naming `ape-sys/setjmp.h`, so **EDG's own runtime was translated
+  against APE's real 80-byte buffer**, while a client TU builds the
+  type from `targ_jmp_buf_num_elements` (`lower_eh.c:12564`), 156
+  bytes. *The client wrote `catch_entries` at +176 and `throw.c` read
+  it at +96.* **One offset error, two different failures**: a
+  non-null junk `catch_info` makes `:1322` SKIP the arm before any
+  type is compared, so the destination stays null and `:1494`
+  terminates — *which is why `catch (...)` did not catch and why the
+  table's perfectly correct ellipsis entry was irrelevant* — and when
+  the junk reads null instead, the arm is entered, `catch_entries`
+  reads 0, the match is unconditional, and the transfer longjmps
+  through a buffer at the wrong offset: `fault read addr=0x5074f8`.
+  **Bigger is NOT safer and that is the trap**: the round before had
+  asked whether `setjmp` would overrun 156 bytes and correctly
+  answered no. *The buffer was never the question; the offset of what
+  follows it was.* `src/target.c` is patched as
+  `GCC_IS_GENERATED_CODE_TARGET` taught, and the pair is in
+  `kencc_targ.h` so `edgtarg-sweep.py` gates on it instead of
+  reporting it absent. **This changes cpfe, so every C++ object must
+  be deleted before the rebuild**; `libedg.a` is untouched.
+  ***The instrument is `sys/lib/tests/cxx-ehchain`***, and the shape
+  of it is the lesson: five throw shapes, **one process each**,
+  because the terminate handler exits and one failure had hidden
+  every case after it for a round. Its raw hex dump is what found
+  this — **the named fields were transcribed from `throw.c` and so
+  carried the very error under investigation**, printing
+  `catch_entries 0xFEFEFEFEFEFEFEFE` (the middle of the client's
+  buffer) which was nearly shipped as "the stores never happened".
+  *A reader derived from one side of a disagreement cannot see the
+  disagreement.*
+  ***AND IT IS CONFIRMED BEHAVIOURALLY: ALL FIVE CASES EXIT 0.***
+  `throw 42` and `throw Boom(7)`, each caught by `...` and by its own
+  type, and **case 4 — the one that FAULTED at `0x5074f8` rather than
+  terminating — now returns `v = 7`**, so the longjmp transfer reads
+  the buffer at the right place too. `unrar -V` prints its banner with
+  no runtime abort. **EDG's setjmp EH runs on this machine**, which is
+  what `c++/unrar/mkfile` said it was waiting on.
+  ***And the walker being WRONG is what made it positive rather than
+  an absence***: left at 39 for one run, it read `catch_entries` at
+  +176 and printed junk while the hex dump showed case 1's real
+  `0x407818` at **+96** — *the same value moving between two runs*,
+  which no "it stopped crashing" could have said. It is 20 now.
+  ***AND `edgtarg-sweep.py` COULD NOT HAVE CAUGHT THIS, WHICH IS NOW
+  FIXED***: it walks the HEADER's names and asks `target.c`, so a
+  setting the baked target assigns and the header never mentions
+  cannot DISAGREE — only one side has an opinion. **83 of the win64
+  arm's settings are in that bucket**, `--baked` lists them, and it
+  reports rather than gates. *Naming why they are mostly fine is the
+  point*: win64 is the only stock arm that is LLP64 like kencc, which
+  is why `eccp` selects it — so it agrees about `long` and pointers,
+  and **what it gets wrong is whatever has nothing to do with the data
+  model**. Read `reuse_tail_padding`, the `*_field_alignment` family,
+  `bit_field_container_size`, `minimum_struct_alignment` and the
+  `*_int_kind` typedefs first.
+  ***AND THE FIRST APPLICATION BUG FOUND BY RUNNING ONE WAS THAT NO
+  C++ STATIC CONSTRUCTOR HAD EVER RUN.*** `unrar x` on a downloaded
+  archive reported a corrupt main header, a corrupt file header,
+  extraction to 100%, a checksum error and 7 errors — which reads as
+  a bad download and is not. **The PATTERN is free to read**: every
+  structural field parsed and every CHECKSUM failed, so everything
+  that is a LENGTH worked — *one mechanism, not seven, and a
+  corrupted file does not parse cleanly and fail every CRC, it fails
+  to parse.* `crc.cpp:75` is six words,
+  `struct CallInitCRC {CallInitCRC() {InitTables();}} static
+  CallInit32;`, the only thing that fills `crc_tables`.
+  **Three things were missing and any one was sufficient**: no munch
+  pass, so `munch_ctors.c`'s placeholder `_ctors[1] = {0}` was never
+  regenerated; nothing called `_Z12__call_ctorsv`, since `_main`
+  would and `lib/edg/mkfile` renames it `__edg_main` because `_main`
+  is `6l`'s default entry while APE's startup is `main9.s` →
+  `_callmain` → `_apemain` → `main`; and **no cpfe option emits the
+  call from `main`** — `call_ctors`/`init_before_main` occur nowhere
+  in 2.9M lines. **`eccp` munches now** (scan the objects for
+  `__sti__<tu>`, generate `_ctors[]` and a `_cxxinit`, name it on the
+  link line) and libap's `_callmain` calls the hook; *both
+  placeholders fall to one rule — an object on the link line is
+  always included, an archive member only on demand — which is the
+  first-archive-wins rule that let `_main` capture the entry point,
+  used deliberately.* `cxx-staticinit-test` 3 failures → **0**, both
+  controls passing, `0xCBF43926`.
+  ***And cpfe's own build had the same gap, which is the
+  corroboration***: `__sti___9_fe_init_c_2cbd8fba` is defined in
+  `src/fe_init.c` and referenced nowhere. **cpfe is NOT munched and
+  does not need to be, measured**: that is the ONLY real `__sti__` in
+  2.9M lines (the other three hits are the emitter's own string
+  literal, so a count of files matching the name is not a count of
+  initialisers), and all it does is zero `diagnostic_counters` —
+  which the loader already does for a namespace-scope global. *Not
+  changing a working compiler on the strength of "the machinery
+  exists now".* **The old note excused the
+  gap by saying cpfe has "no dynamic initialisation that reaches this
+  path — it runs, which is the measurement"**, and that was reading a
+  working program as evidence its initialisers had run. *The first
+  thing to NEED one is the first thing that shows it.*
+  **`nm` and not the generated C**, because the common case is
+  `eccp -c` per file then a separate link, where the C is gone and the
+  objects are the only thing present at both times; ` T ` is required,
+  since a `U` line is cpfe's own extern of the same name and matching
+  the bare name would emit a reference nothing defines — *a link error
+  manufactured by the fixer.* **And my first version wrote `$O`**
+  where `eccp`'s own line 182 says `$O` is mk's variable and not in the
+  environment, which is why it reads `OBJEXT` from `/$objtype/mkfile`:
+  `null list in concatenation`, `mkone`'s unset `BIN` again, *in the
+  file carrying the explanation.*
+  ***AND unrar EXTRACTS: `All OK`, EVERY CRC VERIFIED.*** A real
+  archive, downloaded, decompressed, checksummed — **the first C++
+  application on this machine doing WORK rather than printing a
+  banner**, with cpfe, the C++ library, EH, static constructors, the
+  RAR decompressor and file I/O end to end.
+  ***And it retires one of the two explanations the ARCHIVERS' open
+  item rests on***: `unxz xz_sample_file_1MB.xz` and
+  `unlz4 sample.txt.lz4` are unseparated because each file "was
+  produced ELSEWHERE", so a bad download and a real decode bug look
+  alike — and **unrar verifying a downloaded archive's CRCs is a
+  checksum over the whole download path**. *So `hget` is not
+  corrupting files*, and those two are a port bug or a genuinely bad
+  source file, which is one hypothesis rather than two.
+  ***AND THE IOSTREAMS EXIST NOW: `sys/include/ape/c++/io/`, NINE
+  HEADERS, HEADER-ONLY.*** No `<locale>` and no facets -- formatting
+  through `snprintf`, parsing through `strtoll`/`strtold`, which is
+  the C function `num_put`/`num_get` reach anyway; the four
+  money/time manipulators are **absent rather than stubbed**.
+  **Header-only is FORCED and measured**: `eccp`'s munch scans the
+  OBJECT FILES on the link line and an archive member is pulled only
+  on demand, *so a constructor in a `libc++.a` would never run* --
+  which is exactly why the standard puts `ios_base::Init` in the
+  user's TU, and `cout` is a reference to a function-local static
+  here for the same reason. The `stringbuf` owns a RAW buffer because
+  this library returns `expected` from every growing operation and
+  `overflow` has nowhere to put one but `eof()`; the `filebuf` is a
+  `FILE *` so libap's stdio answers the platform questions once, and
+  its `sync` is `fflush` and **not** `fsync`. ***THE `-DREFERENCE`
+  ARM PAID FOR ITSELF ON ITS FIRST RUN***: the test asserted the
+  C++98 rule that a failed extraction leaves the value alone,
+  libstdc++ disagreed, and C++11 zeroes it -- *the test was wrong and
+  the library had the same bug*, which one arm cannot separate.
+  **67 reference / 73 of 73 APExp**, `cxxlib-host.sh --iostream`,
+  two controls at 2 and 1 failures. ***AND THE VM AGREES: `eccp -o
+  cxx-iostream-test` BUILT AND RAN 73 OF 73 ON THE FIRST ATTEMPT***,
+  so cpfe and g++ disagree about none of it -- *the host arm
+  predicted the VM exactly*, which is the whole case for writing the
+  test against an oracle before the VM sees it. `docs/notes/cxx-library.md` has
+  the rest, including the second draft that was wrong the OTHER way.
+  **What re2c still wants is `cassert`, `stack`, `queue`,
+  `unordered_set`, `valarray` and a `deque`** -- none of them this
+  stack, so the expensive half is done.
+  ***re2c WAS GATED ON IOSTREAMS, AND "ten missing headers"
+  UNDERSTATED IT.*** Measured against the 50 public entrypoints in
+  `sys/include/ape/c++`: **five of the ten are the whole iostreams
+  stack** — `iostream`, `ostream`, `fstream`, `sstream`, `iomanip`,
+  i.e. streambuf, the locale and facet machinery and
+  `num_put`/`num_get` — which portable_stl omits *deliberately*,
+  being exception-free and embedded-oriented. For a code generator
+  that reads and writes through streams that is core use, not
+  incidental. **The other five split**: `cassert` is a one-line
+  wrapper, `stack` and `queue` are ADAPTORS (over `vector`, though
+  both default to `deque` and *the library has no `deque`* — the
+  entry below records it being fixed in unrar rather than added),
+  and `unordered_set` and `valarray` are self-contained containers.
+  *So this is a campaign and not a round*, and the live choice is a
+  minimal iostreams, a second C++ application that does not need
+  them, or deferring re2c — **not** "add ten headers". Also no
+  `makefile` for `cxxapp-host.sh` to read an object list from, which
+  given the `OBJECTS=` trap is the part to get right first. Both in
+  0.6's inventory with the missing `(char const *)` constructors.
   ***AND `--control` EXPIRED A SECOND TIME, EXACTLY AS ITS OWN COMMENT
   SAID***: with no gap left to require it printed its "this may be good
   news" branch and exited 1. It asserts the MEASURED STATE now — 44
@@ -2441,7 +2601,36 @@ silent:
   answering `S_ISREG` with `FD_ISTTY` unset makes a fully buffered
   stdout a live explanation for the silence**, which is why the
   `setvbuf` is the first statement.
-  **WHAT IS LEFT IS TWO DECODE FAILURES, AND NEITHER IS SEPARATED**:
+  ***AND lz4 IS SEPARATED NOW, BY A SCRIPT WHOSE OWN FAULT ANSWERED
+  IT.*** `sys/lib/tests/archive-roundtrip` compresses this tree's own
+  sources and reads them back, and its first run printed
+  `Error 26 ... invalid frame` and `PASS: lz4 round trip` **in two
+  adjacent lines** -- v1 compared the BYTES and ignored the tools'
+  exit STATUS, this tree's own *check that can pass for the wrong
+  reason*, with the run printing the evidence against itself. *The
+  contradiction is the finding*: the payload is byte-identical and
+  `lz4io.c:2074`'s `lastStatus` is the decoder's "how much more input
+  do I need", so nonzero at EOF with complete output means every block
+  decoded and **the EndMark never arrived** -- the FRAME, not the
+  data, and a LOCAL file, so not a download either.
+  **And the threadpool is ON in this port where upstream leaves it
+  OFF**: `cmd/lz4/mkfile` passes `-DLZ4IO_MULTITHREAD` against
+  `lz4conf.h:45`'s non-Windows default of 0 ("Requires `<pthread>`
+  support. Can't be reliably and portably tested at source code
+  level"), so lz4 runs its threaded paths on the pthreads this release
+  fixed. ***The host clears upstream's logic for one command***: the
+  same sources under `gcc -DLZ4IO_MULTITHREAD=1` round-trip 1.8MB both
+  ways, status 0 -- and hand over the **reference tail**,
+  `00 00 00 00 ea 08 55 0a`, which is what separates writer from
+  reader with no rebuild. `-T1` is **compression only** (the decode
+  path calls `TPool_create(1,1)` unconditionally), so it is a
+  one-sided switch and therefore the discriminator. Three faults in
+  v1, all mine, and **one of the three diagnoses was wrong too**: the
+  short corpus is not a hidden failure, it is that **nothing binds
+  this repo's `sys/src` over `/sys/src`**, so the VM's
+  `/sys/src/ape/lib/ap` is **stock 9front's** -- *two trees with one
+  path, compared as though they were one.*
+  **WHAT IS LEFT IS TWO DECODE FAILURES, AND ONE IS STILL UNSEPARATED**:
   `unxz xz_sample_file_1MB.xz` says `Compressed data is corrupt` and
   `unlz4 sample.txt.lz4` says `Error 26 : LZ4F frame decoding could
   not complete: invalid frame`, `Decompressed : 0 MiB`. **Both files
@@ -3095,6 +3284,26 @@ in the topic file.
   `LC_ALL = C.UTF-8` in `apexp-sh` is valid and always has been, so
   "no spaces" is a sh rule, not an rc one. A checker written from the
   sh habit flags those eight lines and is wrong.
+  ***AND THE SWEEP READS rc SCRIPTS NOW, NOT ONLY MKFILE RECIPES.***
+  Its own header named that limit, and the limit then cost a SECOND
+  round: `archive-roundtrip`'s `xz -T0 --block-size=65536` answered
+  `token '=': syntax error` after section 1 had run, *in a file whose
+  header quotes this rule.* **A limit named in a comment is still a
+  limit.** A file is taken for rc by its SHEBANG — a directory name
+  cannot say it and nor can an extension, this tree's rc scripts
+  mostly having none. ***Three lexing gaps the recipe arm never had
+  to face, 102 findings of which ~100 were false***: rc's own
+  `>[1=2]` redirection, `*=(...)` and `if(! ifs=() ...)` (both legal
+  and both the notes' own precedents), and above all **a single quote
+  that SPANS LINES**, so every embedded `awk`/`acid` program read as
+  rc source. ***And the last fix was an ORDER, not a rule***: comments
+  were stripped in a second pass, where rc's lexer drops them BEFORE
+  any quote begins — `fdwatch:2`'s `a process's` opened a quote that
+  desynchronised the whole file. *Each pass was right and their order
+  was the bug.* 0 findings over 8026 lines and 61 scripts; the
+  control carries all six legal shapes **and derives its own line
+  numbers from the control text**, having twice reported its own
+  staleness after the comment above them grew.
   **IT IS MEASURED NOW AND IT IS SWEPT FOR: `sys/lib/tests/rceq-sweep.py`,
   and it GATES.** clisp's `if (test $name = lispbibl)` answered
   `/rc/lib/rcmain:24 *eval*:4: token '=': syntax error` on the VM, which

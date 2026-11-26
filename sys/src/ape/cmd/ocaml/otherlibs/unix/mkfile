@@ -1,0 +1,49 @@
+APEXPROOT=../../../../../../..
+<$APEXPROOT/sys/src/ape/cmd/ocaml/occonfig
+
+OCAMLFLAGS=-use-prims $PRIMS -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error A -bin-annot -safe-string -strict-formats -c
+CFLAGS=-I$OCBLD/byterun -I$OCSRC/byterun -I$OCSRC/byterun/caml -I$OCPLAN9/byterun/$objtype -I$OCPLAN9/byterun/caml -D_PLAN9_SOURCE -D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION -D_POSIX_SOURCE -DCAML_NAME_SPACE -Bc
+
+CMOFILES=unix.cmo
+OFILES=\
+	accept.$O access.$O addrofstr.$O alarm.$O bind.$O chdir.$O chmod.$O\
+	chown.$O chroot.$O close.$O closedir.$O connect.$O cst2constr.$O\
+	cstringv.$O dup.$O dup2.$O envir.$O errmsg.$O execv.$O execve.$O\
+	execvp.$O exit.$O fchmod.$O fchown.$O fcntl.$O fork.$O ftruncate.$O\
+	getaddrinfo.$O getcwd.$O getegid.$O geteuid.$O getgid.$O getgr.$O\
+	getgroups.$O gethost.$O gethostname.$O getlogin.$O getnameinfo.$O\
+	getpeername.$O getpid.$O getppid.$O getproto.$O getpw.$O getserv.$O\
+	getsockname.$O gettimeofday.$O getuid.$O gmtime.$O initgroups.$O\
+	isatty.$O itimer.$O kill.$O link.$O listen.$O lockf.$O lseek.$O\
+	mkdir.$O mkfifo.$O mmap.$O mmap_ba.$O nice.$O open.$O opendir.$O\
+	pipe.$O putenv.$O read.$O readdir.$O readlink.$O rename.$O\
+	rewinddir.$O rmdir.$O select.$O sendrecv.$O setgid.$O setgroups.$O\
+	setsid.$O setuid.$O shutdown.$O signals.$O sleep.$O socket.$O\
+	socketaddr.$O socketpair.$O sockopt.$O stat.$O strofaddr.$O symlink.$O\
+	termios.$O time.$O times.$O truncate.$O umask.$O unixsupport.$O\
+	unlink.$O utimes.$O wait.$O write.$O
+
+SYSOFILES=getprotobynumber.$O
+
+all:V: unix.cma libunix.a
+
+unix.cma: $CMOFILES
+	$OCAMLBOOT -a -o $target $CMOFILES
+
+libunix.a: $OFILES $SYSOFILES
+	$AR vu $target $newprereq
+	$RANLIB $target
+
+%.$O: $OCSRC/otherlibs/unix/%.c
+	$CC -c -o $target $CFLAGS $OCSRC/otherlibs/unix/$stem.c
+
+getprotobynumber.$O: $OCPLAN9/otherlibs/unix/libc/getprotobynumber.c
+	$CC -c -o $target $CFLAGS $prereq
+
+%.cmi: $OCSRC/otherlibs/unix/%.mli
+	$OCAMLBOOT $OCAMLFLAGS -o $target $prereq
+
+%.cmo: $OCSRC/otherlibs/unix/%.ml
+	$OCAMLBOOT $OCAMLFLAGS -o $target $prereq
+
+<$OCSRC/otherlibs/unix/.depend

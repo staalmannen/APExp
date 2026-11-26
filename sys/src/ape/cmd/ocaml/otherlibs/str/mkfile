@@ -1,0 +1,28 @@
+APEXPROOT=../../../../../../..
+<$APEXPROOT/sys/src/ape/cmd/ocaml/occonfig
+
+OCAMLFLAGS=-use-prims $PRIMS -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error A -bin-annot -safe-string -strict-formats -c
+CFLAGS=-I$OCBLD/byterun -I$OCSRC/byterun -I$OCSRC/byterun/caml -I$OCPLAN9/byterun/$objtype -I$OCPLAN9/byterun/caml -D_PLAN9_SOURCE -D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION -D_POSIX_SOURCE -DCAML_NAME_SPACE -Bc
+
+CMOFILES=str.cmo
+OFILES=strstubs.$O
+
+all:V: str.cma libstr.a
+
+str.cma: $CMOFILES
+	$OCAMLBOOT -a -o $target $CMOFILES
+
+libstr.a: $OFILES
+	$AR vu $target $newprereq
+	$RANLIB $target
+
+%.$O: $OCSRC/otherlibs/str/%.c
+	$CC -c -o $target $CFLAGS $OCSRC/otherlibs/str/$stem.c
+
+%.cmi: $OCSRC/otherlibs/str/%.mli
+	$OCAMLBOOT $OCAMLFLAGS -o $target $prereq
+
+%.cmo: $OCSRC/otherlibs/str/%.ml
+	$OCAMLBOOT $OCAMLFLAGS -o $target $prereq
+
+<$OCSRC/otherlibs/str/.depend

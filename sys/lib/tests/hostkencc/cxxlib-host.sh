@@ -88,12 +88,247 @@ done
 # arms are the ones cpfe takes, so "every header, portable arms" is the
 # run that answers the VM's question.  A `$1'-only parser silently ran
 # the first word and dropped the second.
+# ---- --iostream: build and run the iostreams test, both arms ------
+#
+# ***THE REFERENCE ARM IS THE POINT OF THIS MODE.***  Every assertion in
+# `cxx-iostream-test.cpp' is a STANDARD rule, so libstdc++ must pass the
+# identical file -- which means a failure can be attributed to the
+# library rather than argued about.  It earned itself on its first run:
+# the test asserted the C++98 rule that a failed extraction leaves the
+# caller's value alone, libstdc++ disagreed, and C++11 is why --
+# [facet.num.get.virtuals] zeroes it.  *The test was wrong and the
+# library had the same bug*, which only a second opinion separates.
+#
+# A second draft of one case was wrong the OTHER way, asserting that a
+# failed `>>' into a string empties it: the erase is real but
+# unreachable, because the sentry fails first on empty input.  Both are
+# written down in the test.
+#
+# **The control breaks the library on purpose, twice**, because one
+# break exercises one rule and a green run proves nothing by itself:
+#
+#   * `width()' not consumed      -> 2 failures (`left', `width applies
+#                                    once'), and NOT the other sixty,
+#                                    which is what says the breakage is
+#                                    located rather than general.
+#   * no `internal' prefix length -> 1 failure (`internal puts the sign
+#                                    first').
+#
+# Each `sed' is checked for having matched, since a control whose
+# pattern silently misses reports the unbroken tree as proof.
+# ***AND THE REFERENCE ARM MUST BE BUILT `-DREFERENCE', WHICH BOTH
+# MODES FIRST FORGOT.***  Without it libstdc++ compiles the APExp-ONLY
+# section too.  For `--iostream' that section happens to hold for
+# libstdc++ as well (`cerr' really is unitbuf, `cin' really is tied to
+# `cout'), **so the arm passed and was not the arm it claimed to be** --
+# a check passing for the wrong reason, invisible for as long as the two
+# agreed.  `--deque' is what found it: its APExp-only section calls
+# `make_deque' and `clone', which libstdc++ has not got, so the build
+# failed outright instead of quietly succeeding.  *The loud case is the
+# lucky one.*
+
+# ---- --deque: build and run the container test, both arms --------
+#
+# Same two-arm shape as `--iostream': every assertion in sections 0 to 7
+# of `cxx-deque-test.cpp' is a standard rule, so libstdc++ runs the
+# identical file.  The ONE mechanical difference is hidden in the test's
+# `PUSH()' macro, because APExp's `push_back' returns
+# `expected<void, std_error>' where the standard returns `void' -- so
+# both arms run the same statements rather than two sets believed to
+# correspond.
+#
+# ***THE CONTROL READS THE EXIT STATUS AND NOT THE FAILURE COUNT, AND
+# THAT IS THE LESSON OF ITS FIRST RUN.***  Two of the three breaks
+# corrupt memory, so the test SEGFAULTS before printing a count -- and
+# `grep -c FAIL' then answers **0**, which is exactly what a clean run
+# prints.  *A control that crashes the thing it is testing reports the
+# same number as a control that did not fire.*  So each break records
+# what it should do:
+#
+#   raw() ignores m_start      -> CRASH (139), the index base is wrong
+#   grow_map leaves m_start    -> CRASH (139), the map moves and the
+#                                 offset does not
+#   queue::pop takes the back  -> 1 countable failure, no crash
+#
+# The third is there so the COUNTING path is exercised too: three
+# crashing controls would leave "the test can report a failure at all"
+# untested.
+deque_mode() {
+	T=$ROOT/sys/lib/tests/cxx-deque-test.cpp
+	if [ ! -f "$T" ]; then
+		echo "cxxlib-host: no $T" >&2
+		return 2
+	fi
+	rc=0
+	if ! g++ -std=c++14 -DREFERENCE -o "$OUT/dqref" "$T" > "$OUT/err.dqref" 2>&1; then
+		echo "cxxlib-host: deque REFERENCE arm did not build"
+		sed -n '1,20p' "$OUT/err.dqref"
+		return 1
+	fi
+	if "$OUT/dqref" > "$OUT/dqref.out" 2>&1; then
+		echo "cxxlib-host: deque reference (libstdc++) -- 0 failures"
+	else
+		echo "cxxlib-host: deque reference (libstdc++) -- FAILURES:"
+		grep FAIL "$OUT/dqref.out"
+		rc=1
+	fi
+	if ! g++ $CXXFL -o "$OUT/dqape" "$T" > "$OUT/err.dqape" 2>&1; then
+		echo "cxxlib-host: deque APExp arm did not build"
+		sed -n '1,20p' "$OUT/err.dqape"
+		return 1
+	fi
+	if "$OUT/dqape" > "$OUT/dqape.out" 2>&1; then
+		echo "cxxlib-host: deque APExp headers -- 0 failures"
+	else
+		echo "cxxlib-host: deque APExp headers -- FAILURES:"
+		grep FAIL "$OUT/dqape.out"
+		rc=1
+	fi
+	return $rc
+}
+
+deque_control() {
+	T=$ROOT/sys/lib/tests/cxx-deque-test.cpp
+	DQ=$CXXDIR/containers/deque.h
+	QU=$CXXDIR/containers/queue.h
+	ok=0
+
+	for which in rawbase mapstart queuepop; do
+		case $which in
+		rawbase)
+			SRC=$DQ
+			expr='s|return this->slot(m_start + i);|return this->slot(i);|'
+			want=crash
+			name='raw() ignores m_start' ;;
+		mapstart)
+			SRC=$DQ
+			expr='s|    m_start += front_blocks \* block_size;||'
+			want=crash
+			name='grow_map leaves m_start' ;;
+		queuepop)
+			SRC=$QU
+			expr='s|  void pop() { m_c.pop_front(); }|  void pop() { m_c.pop_back(); }|'
+			want=1
+			name='queue::pop takes the back' ;;
+		esac
+		cp "$SRC" "$OUT/ctl.orig" || return 2
+		sed -i "$expr" "$SRC"
+		if cmp -s "$SRC" "$OUT/ctl.orig"; then
+			echo "control: the $which sed matched NOTHING -- FAILED"
+			cp "$OUT/ctl.orig" "$SRC"
+			ok=1
+			continue
+		fi
+		got=build-failed
+		if g++ $CXXFL -o "$OUT/dqctl" "$T" > "$OUT/err.dqctl" 2>&1; then
+			if "$OUT/dqctl" > "$OUT/dqctl.out" 2>&1; then
+				got=0
+			else
+				st=$?
+				if [ "$st" -gt 128 ]; then
+					got=crash
+				else
+					got=$(grep -c FAIL "$OUT/dqctl.out")
+				fi
+			fi
+		fi
+		cp "$OUT/ctl.orig" "$SRC"
+		if [ "$got" = "$want" ]; then
+			echo "control: $name -- $got, as recorded -- ok"
+		else
+			echo "control: $name -- $got, want $want -- FAILED"
+			ok=1
+		fi
+	done
+	return $ok
+}
+
+iostream_mode() {
+	T=$ROOT/sys/lib/tests/cxx-iostream-test.cpp
+	if [ ! -f "$T" ]; then
+		echo "cxxlib-host: no $T" >&2
+		return 2
+	fi
+	rc=0
+
+	# the reference arm: the host's own standard library
+	if ! g++ -std=c++14 -DREFERENCE -o "$OUT/ioref" "$T" > "$OUT/err.ioref" 2>&1; then
+		echo "cxxlib-host: iostream REFERENCE arm did not build"
+		sed -n '1,20p' "$OUT/err.ioref"
+		return 1
+	fi
+	if "$OUT/ioref" > "$OUT/ioref.out" 2>&1; then
+		echo "cxxlib-host: iostream reference (libstdc++) -- 0 failures"
+	else
+		echo "cxxlib-host: iostream reference (libstdc++) -- FAILURES:"
+		grep FAIL "$OUT/ioref.out"
+		rc=1
+	fi
+
+	# the subject arm: APExp's headers, cpfe's flags
+	if ! g++ $CXXFL -o "$OUT/ioape" "$T" > "$OUT/err.ioape" 2>&1; then
+		echo "cxxlib-host: iostream APExp arm did not build"
+		sed -n '1,20p' "$OUT/err.ioape"
+		return 1
+	fi
+	if "$OUT/ioape" > "$OUT/ioape.out" 2>&1; then
+		echo "cxxlib-host: iostream APExp headers -- 0 failures"
+	else
+		echo "cxxlib-host: iostream APExp headers -- FAILURES:"
+		grep FAIL "$OUT/ioape.out"
+		rc=1
+	fi
+	return $rc
+}
+
+iostream_control() {
+	T=$ROOT/sys/lib/tests/cxx-iostream-test.cpp
+	SRC=$CXXDIR/io/ostream.h
+	ok=0
+
+	for which in width internal; do
+		cp "$SRC" "$OUT/ostream.h.orig" || return 2
+		if [ "$which" = width ]; then
+			sed -i 's|^    this->width(0);$|    /* control */|' "$SRC"
+			pat='this->width(0);'
+			want=2
+			name='width not consumed'
+		else
+			sed -i 's|put_ascii(buf, prefix_len(buf))|put_ascii(buf, 0)|g' "$SRC"
+			pat='prefix_len(buf)'
+			want=1
+			name='no internal prefix'
+		fi
+		if cmp -s "$SRC" "$OUT/ostream.h.orig"; then
+			echo "control: the $which sed matched NOTHING ($pat) -- FAILED"
+			cp "$OUT/ostream.h.orig" "$SRC"
+			ok=1
+			continue
+		fi
+		if g++ $CXXFL -o "$OUT/ioctl" "$T" > "$OUT/err.ioctl" 2>&1; then
+			"$OUT/ioctl" > "$OUT/ioctl.out" 2>&1
+			n=$(grep -c FAIL "$OUT/ioctl.out")
+		else
+			n=-1
+		fi
+		cp "$OUT/ostream.h.orig" "$SRC"
+		if [ "$n" = "$want" ]; then
+			echo "control: $name -- $n failure(s), as recorded -- ok"
+		else
+			echo "control: $name -- $n failure(s), want $want -- FAILED"
+			ok=1
+		fi
+	done
+	return $ok
+}
+
+
 mode=""
 PORT=""
 for a in "$@"; do
 	case "$a" in
 	--portable) PORT="-DPSTL_NO_COMPILER_BUILTINS=1" ;;
-	--headers|--control|--run|--vecsplit|--instantiate) mode=$a ;;
+	--headers|--control|--run|--vecsplit|--instantiate|--iostream|--deque) mode=$a ;;
 	*) echo "cxxlib-host: unknown argument $a" >&2; exit 2 ;;
 	esac
 done
@@ -116,7 +351,16 @@ EDGDEF="$EDGDEF -D__EDG_SIZE_TYPE__=decltype(sizeof(0))"
 # exercised.  `-fpermissive' is NOT passed: a diagnostic gcc gives here
 # is the point of the instrument.
 SYN="-fsyntax-only"
-[ "$mode" = "--run" ] && SYN=""
+# ***`--iostream' BUILDS AND RUNS, SO IT MUST CLEAR THIS TOO.***  With
+# `-fsyntax-only' still in `CXXFL' the compile SUCCEEDS and emits no
+# file, so the mode then fails to execute a binary that was never
+# written -- and reported that as "APExp headers -- FAILURES:" with no
+# failure lines under it.  *A missing binary and a failing test are not
+# the same result*, and the empty list under the heading is the only
+# thing that said so.
+case "$mode" in
+--run|--iostream|--deque) SYN="" ;;
+esac
 CXXFL="-std=c++14 -nostdinc++ -fno-exceptions -fno-rtti $SYN"
 CXXFL="$CXXFL -I$SHIM -I$CXXDIR $EDGDEF $PORT"
 
@@ -131,6 +375,20 @@ run_one() {	# $1 = source, $2 = label
 }
 
 case "$mode" in
+--iostream)
+	# Both arms, then the two deliberate breaks.  See `iostream_mode'
+	# and `iostream_control' above for what each one is for.
+	iostream_mode
+	rc=$?
+	iostream_control || rc=1
+	exit $rc
+	;;
+--deque)
+	deque_mode
+	rc=$?
+	deque_control || rc=1
+	exit $rc
+	;;
 --instantiate)
 	# ***A HEADER THAT COMPILES IS NOT A TEMPLATE THAT INSTANTIATES,
 	# AND THIS MODE EXISTS BECAUSE THAT COST A ROUND.***

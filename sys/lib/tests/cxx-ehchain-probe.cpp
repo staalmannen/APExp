@@ -157,32 +157,130 @@ struct Boom {
   Boom(int x) : v(x) {}
 };
 
-int main(void) {
+/*
+ * ---- WHY THIS TAKES A CASE NUMBER ------------------------------------
+ *
+ * ***ONE TERMINATE HIDES EVERY CASE AFTER IT.***  The first version
+ * ran all the throws in one process, and the handler `exit's -- so
+ * the ellipsis-only case never ran, and its silence looked like
+ * nothing rather than like a case that was never reached.  That is
+ * this tree's rule about a section that can kill the process, which
+ * `mmaptrim-probe' already takes an argument for.
+ *
+ * **The cases are chosen to separate four things the single case
+ * could not**, because the data now says the impossible: the
+ * type-specification table is CORRECT -- `ets[1] flags 0x30', bit 16
+ * set with bits 1 and 128 clear, which is the ellipsis -- so
+ * `check_exception_type_specifications' must return non-zero and the
+ * destination must be set.  `__eh_curr_region' going 65535 -> 0 says
+ * independently that it was not: the cleanup loop at `throw.c:1426'
+ * is `while (ehsep != destination_ehsep)', so a null destination
+ * walks the WHOLE chain and takes `saved_region_number' (0) from the
+ * function entry.  Two readings of the same run agreeing on
+ * something the source forbids is why these cases exist.
+ *
+ *   0  no throw at all.  The control, and it must PASS -- a matrix
+ *      where every case fails cannot tell a broken throw from a
+ *      broken probe.
+ *   1  `throw 42' caught by `...'.  No constructor, no destructor, a
+ *      fundamental type_info: the shortest path through the runtime
+ *      there is.
+ *   2  `throw 42' caught by `catch (int)'.  Same object, but now the
+ *      match is a real type comparison -- `throw.c:892' is pointer
+ *      identity on the type_info OR on its NAME STRING, never
+ *      `strcmp', so 1 passing and 2 failing would name duplicate
+ *      type_info and put `-C' back in the frame.
+ *   3  `throw Boom(7)' caught by `...'.  Adds a CONSTRUCTOR, which
+ *      is what makes `__throw' read `object_evaluation_complete' and
+ *      decide whether to call `__exception_started' itself
+ *      (`throw.c:1082').  1 passing and 3 failing puts the fault in
+ *      the object-construction path and not in the unwinder.
+ *   4  `throw Boom(7)' caught by `catch (Boom &)', with an ellipsis
+ *      fallback: the original failing case, kept last.
+ *
+ * Exit status is the finding: 0 caught as intended, 3 terminate
+ * reached, 4 caught by the WRONG handler -- which is a different bug
+ * from both and would otherwise print as a pass.
+ */
+static int run_case(int c) {
+  switch (c) {
+  case 0:
+    printf("  case 0: no throw (control)\n");
+    return 0;
+
+  case 1:
+    printf("  case 1: throw 42, catch (...)\n");
+    try {
+      dumpchain("inside try");
+      throw 42;
+    } catch (...) {
+      printf("  caught by ellipsis\n");
+      return 0;
+    }
+    /*
+     * No `return 4' here, and cpfe is right to have warned.  With
+     * `catch (...)' as the ONLY handler there is no wrong-handler
+     * outcome to report: the try either returns or the throw is
+     * caught by the ellipsis, so a fallthrough is unreachable rather
+     * than merely unlikely.  Cases 2 and 4 keep theirs, where a
+     * typed catch CAN be passed over.
+     */
+
+  case 2:
+    printf("  case 2: throw 42, catch (int)\n");
+    try {
+      dumpchain("inside try");
+      throw 42;
+    } catch (int v) {
+      printf("  caught int, v = %d\n", v);
+      return 0;
+    } catch (...) {
+      printf("  caught by ELLIPSIS -- the int match failed\n");
+      return 4;
+    }
+
+  case 3:
+    printf("  case 3: throw Boom(7), catch (...)\n");
+    try {
+      dumpchain("inside try");
+      throw Boom(7);
+    } catch (...) {
+      printf("  caught by ellipsis\n");
+      return 0;
+    }
+
+  case 4:
+    printf("  case 4: throw Boom(7), catch (Boom &)\n");
+    try {
+      dumpchain("inside try");
+      throw Boom(7);
+    } catch (Boom &b) {
+      printf("  caught Boom, v = %d\n", b.v);
+      return 0;
+    } catch (...) {
+      printf("  caught by ELLIPSIS -- the Boom match failed\n");
+      return 4;
+    }
+  }
+  printf("  no such case %d\n", c);
+  return 2;
+}
+
+int main(int argc, char **argv) {
+  int c, rc;
+
   setvbuf(stdout, 0, _IOLBF, 0);
-  printf("cxx-ehchain-probe: starting\n");
+  c = argc > 1 ? atoi(argv[1]) : 0;
+  printf("cxx-ehchain-probe: starting, case %d\n", c);
 
   std::set_terminate(on_terminate);
 
-  printf("section 1: chain before any try\n");
+  printf("chain before any try\n");
   dumpchain("entry");
 
-  printf("section 2: throw and catch by type, same function\n");
-  try {
-    printf("  inside try, about to throw\n");
-    dumpchain("inside try");
-    throw Boom(7);
-  } catch (Boom &b) {
-    printf("  caught Boom, v = %d\n", b.v);
-  } catch (...) {
-    printf("  caught by ellipsis -- the type match failed\n");
-  }
-
-  printf("section 3: throw and catch by ellipsis only\n");
-  try {
-    throw Boom(9);
-  } catch (...) {
-    printf("  caught by ellipsis\n");
-  }
+  rc = run_case(c);
+  if (rc != 0)
+    return rc;
 
   printf("\ncxx-ehchain-probe: terminate handler reached = %d\n", reached);
   printf("cxx-ehchain-probe: %s\n",

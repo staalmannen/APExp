@@ -11,35 +11,6 @@
 
 #include "tkInt.h"
 
-/*
- *----------------------------------------------------------------------
- *
- * XInternAtom --
- *
- *	This procedure simulates the XInternAtom function by calling Tk_Uid to
- *	get a unique id for every atom. This is only a partial implementation,
- *	since it doesn't work across applications.
- *
- * Results:
- *	A new Atom.
- *
- * Side effects:
- *	None.
- *
- *----------------------------------------------------------------------
- */
-
-Atom
-XInternAtom(
-    Display *display,
-    TCL_UNUSED(_Xconst char *),
-    TCL_UNUSED(Bool))
-{
-    static Atom atom = XA_LAST_PREDEFINED;
-
-    LastKnownRequestProcessed(display)++;
-    return ++atom;
-}
 
 /*
  *----------------------------------------------------------------------

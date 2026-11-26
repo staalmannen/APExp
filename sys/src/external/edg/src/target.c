@@ -7124,7 +7124,10 @@ _ZN3edg31targ_jmp_buf_element_float_kindE = _ZN3edg14fk_long_doubleE;
 
 _ZN3edg29targ_jmp_buf_element_int_kindE = _ZN3edg6ik_intE;
 
-_ZN3edg25targ_jmp_buf_num_elementsE = 39U;
+/* APExp: was 39U, win64's count.  See kencc_targ.h's TARG_JMP_BUF
+ * note -- APE's jmp_buf is int[20], and the EH stack entry's layout
+ * has to agree with the one lib_src/throw.c was translated with. */
+_ZN3edg25targ_jmp_buf_num_elementsE = 20U;
 
 _ZN3edg16targ_setjmp_funcE = ((const char *)"setjmp");
 
