@@ -1,13 +1,5 @@
 /* Definitions for the X window system likely to be used by applications */
 
-/*
- * With -DXSHIM the Xlib API comes from the thin shim: see
- * sys/include/ape/xshim.h.  Without it, this file is the full XdotOrg header.
- */
-#ifdef XSHIM
-#include <xshim.h>
-#else
-
 #ifndef X_H
 #define X_H
 
@@ -736,5 +728,3 @@ enum { None = 0, ControlMask = (1<<2) };
 #define MSBFirst		1
 
 #endif /* X_H */
-
-#endif /* XSHIM */

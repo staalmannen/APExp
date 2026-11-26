@@ -5,10 +5,10 @@
  * and the one top-level window are the only windows; subwindows are not
  * supported yet.  Colours are X TrueColor 0xRRGGBB pixels.
  *
- * This is the master header for the shim.  Programs reach it through the
- * X11 headers when built with -DXSHIM (sys/include/ape/X11/Xlib.h and X.h
- * include it instead of the full XdotOrg content).  Xlib's names and field
- * types are kept so that simple X programs compile against it unchanged.  The implementation lives in sys/src/ape/lib/xshim
+ * Programs include this header directly.  Xlib's names and field types are
+ * kept so that simple X programs compile against it unchanged.  The old X11
+ * headers stay in place for the Tk Plan 9 backend, which needs the full
+ * multi-window API that the single-window shim does not provide.  The implementation lives in sys/src/ape/lib/xshim
  * and does not include this file, because it uses libdraw's Display type.
  */
 #ifndef _XSHIM_H_

@@ -33,14 +33,6 @@ in this Software without prior written authorization from The Open Group.
  *	interface library (Xlib) to the X Window System Protocol (V11).
  *	Structures and symbols starting with "_" are private to the library.
  */
-/*
- * With -DXSHIM the Xlib API comes from the thin shim: see
- * sys/include/ape/xshim.h.  Without it, this file is the full XdotOrg header.
- */
-#ifdef XSHIM
-#include <xshim.h>
-#else
-
 #ifndef _XLIB_H_
 #define _XLIB_H_
 
@@ -4014,5 +4006,3 @@ extern int _Xwctomb(
 _XFUNCPROTOEND
 
 #endif /* _XLIB_H_ */
-
-#endif /* XSHIM */
