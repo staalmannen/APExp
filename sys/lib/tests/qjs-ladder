@@ -1,0 +1,129 @@
+#!/bin/rc
+# qjs-ladder -- where does the QuickTS port (qjs) stop working?
+#
+#	rc sys/lib/tests/qjs-ladder
+#	rc sys/lib/tests/qjs-ladder >/tmp/qjs-ladder.out >[2=1]
+#
+# ***A LADDER, NOT A TEST: IT DOES NOT GATE.*** Every probe prints what
+# it measured, beside what a WORKING qjs answers, and the run goes on.
+# Read it from the top; the first probe whose `got' differs from its
+# `want' is the finding.
+#
+# WHY THIS EXISTS.  The first qjs build printed its usage for `-h' and
+# NOTHING for anything else -- not `console.log', and not even the
+# error of a deliberate `throw', which goes to STDERR.  Measured so far
+# on the VM:
+#   - `qjs -d -e 1' prints the memory table, which the `fail:' path in
+#     qjs.c skips: so parsing, compiling and running `1' WORK.
+#   - `qjs -e "console.log(1)"' exits 1: `eval_buf' saw an exception.
+#     `js_print' always ends in `putchar(10)' and nothing appeared, so
+#     console.log never got that far -- and `js_std_dump_error' always
+#     ends in `fputc(10, stderr)', and nothing appeared there either.
+# Measured on the HOST and cleared: the QuickTS sources with every
+# non-GNU arm forced, built with gcc, answer every `want' below; so do
+# builds without `aligned(8)' and with 32-bit BigInt limbs; and all 99
+# comparable structs in quickjs.c have the same layout under host
+# `6c -J -a' as under gcc.  So the fault is kencc CODE or libap, at
+# run time.
+#
+# WHAT THE PROBES SEPARATE:
+#   A  stdout/stderr of qjs itself, with no JS involved (`-h', a
+#      missing file: perror is libap's, not QuickJS's).
+#   B  JS evaluation with no native call (`1', `1+1').
+#   C  the error PRINTER (`xyz', `throw 7'): if these print nothing,
+#      printing a JS value to stderr is broken, not throwing.
+#   D  `--std', the std/os module (MODULE evaluation, another path),
+#      and std.out/std.err, which do NOT go through JS_PrintValue.
+#   E  native calls, one at a time, each turned into an EXIT STATUS by
+#      a try/catch -- so the answer survives even if every kind of
+#      printing is broken.  The status NAMES the call that threw.
+#   F  if std.out works, the exception console.log throws, as text,
+#      and its message length as a status in case it does not.
+#   G  the original symptom, last.
+#
+# stdout and stderr go to FILES, never to the window, and each is
+# reported with its byte count -- so `printed nothing' and `printed
+# into a place you cannot see' are different answers.  rc and not bash
+# on purpose: a harness written in the shell under test dies with it,
+# and rc's $status carries the Plan 9 exit string (`sys: trap: ...')
+# where bash's $? is only a number.
+#
+# A `want' of `status=' means success: rc's $status is empty then.
+
+tmp=/tmp/qjs-ladder.$pid
+mkdir -p $tmp || exit mkdir
+
+fn probe {
+	name=$1
+	want=$2
+	shift 2
+	echo
+	echo '--- '^$name
+	echo '    run:  qjs' $*
+	echo '    want: '^$want
+	qjs $* >$tmp/out >[2]$tmp/err
+	st=$status
+	echo '    got:  status='^$"st^'  stdout='^`{wc -c <$tmp/out}^' bytes  stderr='^`{wc -c <$tmp/err}^' bytes'
+	if (test -s $tmp/out) {
+		echo '    [stdout]'
+		cat $tmp/out
+	}
+	if (test -s $tmp/err) {
+		echo '    [stderr]'
+		cat $tmp/err
+	}
+}
+
+echo 'qjs-ladder: starting (nothing here gates; compare got with want)'
+echo 'qjs-ladder: objtype='^$objtype^' cputype='^$cputype
+
+echo
+echo '=== A: qjs output with no JS'
+probe A1-help 'status=1 (non-empty), stdout = the usage text, starting QuickJS version' -h
+probe A2-nofile 'status=1, stderr 43 bytes: /nonexistent.js: No such file or directory' /nonexistent.js
+
+echo
+echo '=== B: JS evaluation, no native call'
+probe B1-quit 'status=, nothing printed' -q
+probe B2-one 'status=, nothing printed' -e '1'
+probe B3-add 'status=, nothing printed' -e 'var a = 1 + 1; a'
+probe B4-dump 'status=, stdout = the memory usage table' -d -e '1'
+
+echo
+echo '=== C: the error printer (stderr through JS_PrintValue)'
+probe C1-throw7 'status=1, stderr 2 bytes: 7' -e 'throw 7'
+probe C2-refer 'status=1, stderr 67 bytes: ReferenceError: xyz is not defined (in quotes) + a stack line' -e 'xyz'
+probe C3-error 'status=1, stderr: Error: boom + a stack line' -e 'throw new Error("boom")'
+
+echo
+echo '=== D: --std (module evaluation) and std.out / std.err'
+probe D1-std 'status=, nothing printed' --std -e '1'
+probe D2-stdout 'status=, stdout 14 bytes: std.out works' --std -e 'std.out.puts("std.out works\n")'
+probe D3-stderr 'status=, stderr 14 bytes: std.err works' --std -e 'std.err.puts("std.err works\n")'
+probe D4-types 'status=, stdout: object function function' --std -e 'std.out.puts(typeof console + " " + typeof console.log + " " + typeof print + "\n")'
+
+echo
+echo '=== E: native calls; a non-empty status NAMES the call that threw'
+probe E1-mathabs 'status=, nothing printed (11 = Math.abs threw)' --std -e 'try { Math.abs(-1) } catch (e) { std.exit(11) }'
+probe E2-mapfunc 'status=, nothing printed (12 = map with a function threw)' --std -e 'try { [1].map(function (x) { return x }) } catch (e) { std.exit(12) }'
+probe E3-maparrow 'status=, nothing printed (13 = map with an arrow threw)' --std -e 'try { [1].map(x => x) } catch (e) { std.exit(13) }'
+probe E4-json 'status=, nothing printed (14 = JSON.stringify threw)' --std -e 'try { JSON.stringify({a: 1}) } catch (e) { std.exit(14) }'
+probe E5-print 'status=, stdout 2 bytes: 1 (15 = print threw)' --std -e 'try { print(1) } catch (e) { std.exit(15) }'
+probe E6-conslog 'status=, stdout 2 bytes: 1 (16 = console.log threw)' --std -e 'try { console.log(1) } catch (e) { std.exit(16) }'
+probe E7-strout 'status=, stdout 2 bytes: x (17 = std.out.puts threw)' --std -e 'try { std.out.puts("x\n") } catch (e) { std.exit(17) }'
+
+echo
+echo '=== F: what console.log throws'
+probe F1-text 'status=, stdout 2 bytes: 1 (else: caught: <the error>)' --std -e 'try { console.log(1) } catch (e) { std.out.puts("caught: " + e + "\n") }'
+probe F2-name 'status=, stdout 2 bytes: 1 (else status = length of the error NAME)' --std -e 'try { console.log(1) } catch (e) { std.exit(String(e.name).length) }'
+probe F3-msglen 'status=, stdout 2 bytes: 1 (else status = length of the MESSAGE)' --std -e 'try { console.log(1) } catch (e) { std.exit(String(e.message).length) }'
+probe F4-char0 'status=, stdout 2 bytes: 1 (else status = char code of the first character of the message)' --std -e 'try { console.log(1) } catch (e) { std.exit(String(e.message).charCodeAt(0)) }'
+
+echo
+echo '=== G: the original symptom'
+probe G1-print 'status=, stdout 12 bytes: plain print' -e 'print("plain print")'
+probe G2-conslog 'status=, stdout 19 bytes: hello from QuickJS' -e 'console.log("hello from QuickJS")'
+
+echo
+echo 'qjs-ladder: done'
+rm -rf $tmp
