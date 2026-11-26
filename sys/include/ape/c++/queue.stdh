@@ -1,0 +1,6 @@
+#ifndef APEXP_STD_QUEUE_STDH
+#define APEXP_STD_QUEUE_STDH
+
+#include "containers/queue.h"
+
+#endif

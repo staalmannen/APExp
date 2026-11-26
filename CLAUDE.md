@@ -2473,7 +2473,11 @@ silent:
   libstdc++ disagreed, and C++11 zeroes it -- *the test was wrong and
   the library had the same bug*, which one arm cannot separate.
   **67 reference / 73 of 73 APExp**, `cxxlib-host.sh --iostream`,
-  two controls at 2 and 1 failures. `docs/notes/cxx-library.md` has
+  two controls at 2 and 1 failures. ***AND THE VM AGREES: `eccp -o
+  cxx-iostream-test` BUILT AND RAN 73 OF 73 ON THE FIRST ATTEMPT***,
+  so cpfe and g++ disagree about none of it -- *the host arm
+  predicted the VM exactly*, which is the whole case for writing the
+  test against an oracle before the VM sees it. `docs/notes/cxx-library.md` has
   the rest, including the second draft that was wrong the OTHER way.
   **What re2c still wants is `cassert`, `stack`, `queue`,
   `unordered_set`, `valarray` and a `deque`** -- none of them this
