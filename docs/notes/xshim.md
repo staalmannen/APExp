@@ -205,3 +205,16 @@ moves any failing test name is a regression even if the total is unchanged.
 - Build warnings to clear in a later step: `xs_gc.c:56` converts a pointer to a
   shorter integer (the clip-mask truncation above, now visible to the compiler),
   and `xs_region.c` has unused parameters in the three stubs.
+
+## Clip-mask pointer fix (applied, awaiting the 9front gate)
+
+- The clip record is no longer stored by pointer.  `xs_clip.c` keeps a table of
+  records; the GC's `clip_mask` field holds the slot index plus one (`None` is
+  no clip).  The record type and the handle functions are in `xs_clip.h`,
+  which depends only on the shared types, so the table is independent of
+  libdraw.
+- A host runtime test (9 checks: allocation, lookup, unknown and released
+  handles, slot reuse, growth past the first 16 slots, 32-bit handles) passes.
+- The pointer-to-integer warning at `xs_gc.c:56` is gone, since the cast is gone.
+- Not changed: `XSetRegion` still does not keep the region (its own fault), and
+  `draw.c` still ignores the clip mask.

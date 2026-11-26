@@ -19,3 +19,5 @@ extern int	XDestroyRegion(Region rgn);
 extern int	XUnionRectWithRegion(XRectangle *rect, Region src, Region dst);
 extern int	XCopyRegion(Region src, Region dst);
 extern int	XSetClipMask(Display *d, GC gc, Pixmap pixmap);
+
+#include "xs_clip.h"

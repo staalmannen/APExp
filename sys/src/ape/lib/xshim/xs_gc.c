@@ -17,15 +17,6 @@
  * #ifdef that never holds on Plan 9.
  */
 
-/* the clip mask a GC carries: a pixmap, or a region (Tk's TkpClipMask) */
-typedef struct xs_clip {
-	int type;
-	union {
-		Pixmap pixmap;
-		Region region;
-	} value;
-} xs_clip;
-
 #define XS_CLIP_PIXMAP	0
 #define XS_CLIP_REGION	1
 
@@ -47,13 +38,15 @@ xs_panic(char *msg)
 static xs_clip*
 AllocClipMask(GC gc)
 {
-	xs_clip *clip_mask = (xs_clip*)gc->clip_mask;
+	xs_clip *clip_mask = xs_clip_get(gc->clip_mask);
 
 	if(clip_mask == nil){
 		clip_mask = malloc(sizeof(xs_clip));
 		if(clip_mask == nil)
 			xs_panic("AllocClipMask: out of memory");
-		gc->clip_mask = (Pixmap)clip_mask;
+		gc->clip_mask = xs_clip_new(clip_mask);
+		if(gc->clip_mask == None)
+			xs_panic("AllocClipMask: out of memory");
 	} else if(clip_mask->type == XS_CLIP_REGION){
 		XDestroyRegion(clip_mask->value.region);
 	}
@@ -65,13 +58,14 @@ AllocClipMask(GC gc)
 static void
 FreeClipMask(GC gc)
 {
-	xs_clip *clip_mask = (xs_clip*)gc->clip_mask;
+	xs_clip *clip_mask = xs_clip_get(gc->clip_mask);
 
 	if(clip_mask == nil)
 		return;
 	if(clip_mask->type == XS_CLIP_REGION)
 		XDestroyRegion(clip_mask->value.region);
 	free(clip_mask);
+	xs_clip_release(gc->clip_mask);
 	gc->clip_mask = None;
 }
 
