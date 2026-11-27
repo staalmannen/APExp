@@ -14,7 +14,8 @@
 #include <time.h>
 #include <math.h>
 #include <unistd.h>
-#include <xshim.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 #define W	300
 #define H	300

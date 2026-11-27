@@ -4,7 +4,7 @@
 #	cd sys/src/ape/cmd/xshimclock
 #	mk install
 # The Xlib and libdraw link libraries come from the #pragma lib lines in
-# sys/include/ape/xshim.h, so this mkfile names none.
+# the standard X11 headers (sys/include/ape/X11), so this mkfile names none.
 
 APEXPROOT=../../../../../
 APE=$APEXPROOT/sys/src/ape

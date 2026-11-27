@@ -74,7 +74,9 @@ typedef int Status;
 #define MotionNotify		6
 #define Expose			12
 
-/* window attributes for XCreateWindow: the fields and masks this shim uses */
+/* the standard X11 definition, verbatim: clients and the library share its layout */
+typedef XID Colormap;
+typedef XID Cursor;
 #define CWBackPixel	(1L<<1)
 #define CWBorderPixel	(1L<<3)
 #define CWOverrideRedirect	(1L<<9)
@@ -82,10 +84,21 @@ typedef int Status;
 #define InputOutput	1
 #define PointerRoot	1
 typedef struct {
-	unsigned long background_pixel;
-	unsigned long border_pixel;
-	long event_mask;
-	int override_redirect;
+    XID background_pixmap;	/* background or None or ParentRelative */
+    unsigned long background_pixel;	/* background pixel */
+    XID border_pixmap;	/* border of the window */
+    unsigned long border_pixel;	/* border pixel value */
+    int bit_gravity;		/* one of bit gravity values */
+    int win_gravity;		/* one of the window gravity values */
+    int backing_store;		/* NotUseful, WhenMapped, Always */
+    unsigned long backing_planes;/* planes to be preserved if possible */
+    unsigned long backing_pixel;/* value to use in restoring planes */
+    Bool save_under;		/* should bits under be saved? (popups) */
+    long event_mask;		/* set of events that should be saved */
+    long do_not_propagate_mask;	/* set of events that should not propagate */
+    Bool override_redirect;	/* boolean value for override-redirect */
+    Colormap colormap;		/* color map to be associated with window */
+    Cursor cursor;		/* cursor to be displayed (or None) */
 } XSetWindowAttributes;
 
 typedef struct { short x, y; } XPoint;
@@ -93,12 +106,6 @@ typedef struct { short x, y; unsigned short width, height; } XRectangle;
 typedef struct { short x1, y1, x2, y2; } XSegment;
 typedef struct { short x, y; unsigned short width, height; short angle1, angle2; } XArc;
 
-/* a font: its resource id and metrics (the id names a libdraw Font) */
-typedef struct {
-	XID fid;
-	int ascent;
-	int descent;
-} XFontStruct;
 
 /* Tk's layout, copied verbatim: a GC is this record, and Tk reads its fields. */
 typedef struct {

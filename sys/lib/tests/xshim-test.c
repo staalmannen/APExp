@@ -6,7 +6,7 @@
  * the number of failures.  It never blocks waiting for input, so it cannot
  * hang; the event cases only check what is already queued.
  *
- * The contract each case asserts is the one in sys/include/ape/xshim.h:
+ * The contract each case asserts is the one in the standard headers under sys/include/ape/X11:
  * the root is rio's window, and every other window is a new id in its tree;
  a drawable
  * other than the window is refused (pixmaps are not supported yet); a
@@ -14,7 +14,8 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include <xshim.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 static int fails;
 
@@ -46,7 +47,7 @@ main(void)
 
 	check(XDisplayWidth(dpy, 0) > 0 && XDisplayHeight(dpy, 0) > 0,
 		"the screen has a positive size");
-	check(XDefaultRootWindow(dpy) == XSHIM_ROOT, "the root window id is XSHIM_ROOT");
+	check(XDefaultRootWindow(dpy) == 1UL, "the root window id is 1UL");
 
 	w = XCreateSimpleWindow(dpy, XDefaultRootWindow(dpy), 0, 0, 100, 100, 0, 0, 0);
 	check(w != None && w != XDefaultRootWindow(dpy), "XCreateSimpleWindow returns a new window, not the root");
