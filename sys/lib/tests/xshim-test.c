@@ -7,7 +7,8 @@
  * hang; the event cases only check what is already queued.
  *
  * The contract each case asserts is the one in sys/include/ape/xshim.h:
- * one window, rio's, with the root and the window ids fixed; a drawable
+ * the root is rio's window, and every other window is a new id in its tree;
+ a drawable
  * other than the window is refused (pixmaps are not supported yet); a
  * zero-size outline draws nothing and succeeds.
  */
@@ -48,7 +49,29 @@ main(void)
 	check(XDefaultRootWindow(dpy) == XSHIM_ROOT, "the root window id is XSHIM_ROOT");
 
 	w = XCreateSimpleWindow(dpy, XDefaultRootWindow(dpy), 0, 0, 100, 100, 0, 0, 0);
-	check(w == XSHIM_WINDOW, "XCreateSimpleWindow returns the one window");
+	check(w != None && w != XDefaultRootWindow(dpy), "XCreateSimpleWindow returns a new window, not the root");
+
+	{
+		Window child, root, rw, cw;
+		int rx, ry, wx, wy, gx, gy;
+		unsigned int gw, gh, bw, dep, mask;
+		Bool ok;
+
+		child = XCreateSimpleWindow(dpy, w, 5, 6, 20, 10, 0, 0, 0);
+		check(child != None && child != w, "a child window is created inside its parent");
+		check(XMapWindow(dpy, child), "the child maps");
+		check(XGetGeometry(dpy, child, &root, &gx, &gy, &gw, &gh, &bw, &dep)
+			&& gx == 5 && gy == 6 && gw == 20 && gh == 10,
+			"XGetGeometry reports the child's rectangle relative to its parent");
+		check(XMoveResizeWindow(dpy, child, 7, 8, 30, 12), "XMoveResizeWindow succeeds");
+		check(XRaiseWindow(dpy, child) && XLowerWindow(dpy, child), "XRaiseWindow and XLowerWindow succeed");
+		check(XFillRectangle(dpy, child, gc, 0, 0, 5, 5), "drawing into a child succeeds");
+		ok = XQueryPointer(dpy, w, &rw, &cw, &rx, &ry, &wx, &wy, &mask);
+		check(ok == True && rw == XDefaultRootWindow(dpy), "XQueryPointer reports the root");
+		check(XDestroyWindow(dpy, child) && !XDestroyWindow(dpy, child),
+			"XDestroyWindow removes the child, and a second destroy fails");
+		check(!XDestroyWindow(dpy, XDefaultRootWindow(dpy)), "the root cannot be destroyed");
+	}
 	check(XMapWindow(dpy, w) && XSelectInput(dpy, w, ExposureMask),
 		"map and select on the window succeed");
 

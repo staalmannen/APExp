@@ -74,6 +74,20 @@ typedef int Status;
 #define MotionNotify		6
 #define Expose			12
 
+/* window attributes for XCreateWindow: the fields and masks this shim uses */
+#define CWBackPixel	(1L<<1)
+#define CWBorderPixel	(1L<<3)
+#define CWOverrideRedirect	(1L<<9)
+#define CWEventMask	(1L<<11)
+#define InputOutput	1
+#define PointerRoot	1
+typedef struct {
+	unsigned long background_pixel;
+	unsigned long border_pixel;
+	long event_mask;
+	int override_redirect;
+} XSetWindowAttributes;
+
 typedef struct { short x, y; } XPoint;
 typedef struct { short x, y; unsigned short width, height; } XRectangle;
 typedef struct { short x1, y1, x2, y2; } XSegment;

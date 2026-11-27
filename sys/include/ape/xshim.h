@@ -93,6 +93,24 @@ extern int	XOffsetRegion(Region rgn, int dx, int dy);
 extern Region	XPolygonRegion(XPoint *pts, int n, int rule);
 extern int	XCopyRegion(Region src, Region dst);
 
+/* windows: a tree inside the rio window; the root is the rio window, and
+ * each other window is a rectangle in its parent.  See xs_win.c. */
+extern Window	XCreateWindow(Display *dpy, Window parent, int x, int y,
+			unsigned int width, unsigned int height, unsigned int border_width,
+			int depth, unsigned int c_class, void *visual,
+			unsigned long valuemask, XSetWindowAttributes *attributes);
+extern int	XMoveWindow(Display *dpy, Window w, int x, int y);
+extern int	XResizeWindow(Display *dpy, Window w, unsigned int width, unsigned int height);
+extern int	XMoveResizeWindow(Display *dpy, Window w, int x, int y,
+			unsigned int width, unsigned int height);
+extern int	XRaiseWindow(Display *dpy, Window w);
+extern int	XLowerWindow(Display *dpy, Window w);
+extern int	XSetWindowBackground(Display *dpy, Window w, unsigned long pixel);
+extern int	XSetInputFocus(Display *dpy, Window w, int revert_to, Time time);
+extern int	XGetGeometry(Display *dpy, Drawable d, Window *root, int *x, int *y,
+			unsigned int *width, unsigned int *height,
+			unsigned int *border_width, unsigned int *depth);
+
 /* arcs: angles in 1/64 degree, counter-clockwise from 3 o'clock */
 extern int	XDrawArc(Display *dpy, Drawable d, GC gc, int x, int y,
 			unsigned int width, unsigned int height, int angle1, int angle2);
