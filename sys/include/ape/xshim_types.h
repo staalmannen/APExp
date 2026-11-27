@@ -76,7 +76,6 @@ typedef int Status;
 
 /* the standard X11 definition, verbatim: clients and the library share its layout */
 typedef XID Colormap;
-typedef XID Cursor;
 #define CWBackPixel	(1L<<1)
 #define CWBorderPixel	(1L<<3)
 #define CWOverrideRedirect	(1L<<9)
@@ -98,7 +97,7 @@ typedef struct {
     long do_not_propagate_mask;	/* set of events that should not propagate */
     Bool override_redirect;	/* boolean value for override-redirect */
     Colormap colormap;		/* color map to be associated with window */
-    Cursor cursor;		/* cursor to be displayed (or None) */
+    XID cursor;		/* a Cursor; typed XID here because libdraw owns the name Cursor */
 } XSetWindowAttributes;
 
 typedef struct { short x, y; } XPoint;
