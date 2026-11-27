@@ -393,8 +393,18 @@ if(! ~ $#home 0){
 	xzsamples = ($xzsamples $home^/download/xz_sample_file_1MB.xz)
 	lz4samples = ($lz4samples $home^/download/sample.txt.lz4)
 }
+#
+# ***AND A SECTION THAT SAYS NOTHING WHEN IT FINDS NOTHING IS THE
+# FAULT THIS TREE KEEPS PAYING FOR.***  The first complete run printed
+# the heading, no body, and then the COMPLETE line -- which reads
+# exactly like "both samples decoded" to anyone not holding the
+# source.  *An absence has two explanations and only one of them is a
+# result.*  It names the paths it looked in now, so a reader can put
+# a file where it will be found.
+found = ()
 for(f in $xzsamples){
 	if(test -f $f){
+		found = ($found $f)
 		note '  trying '^$f
 		unxz -c <$f >/dev/null
 		if(~ $status '')
@@ -403,8 +413,15 @@ for(f in $xzsamples){
 			note '  sample xz: FAILS'
 	}
 }
+if(~ $#found 0){
+	note '  NOT FOUND: no xz sample in any of --'
+	for(f in $xzsamples)
+		note '    '^$f
+}
+found = ()
 for(f in $lz4samples){
 	if(test -f $f){
+		found = ($found $f)
 		note '  trying '^$f
 		unlz4 -c <$f >/dev/null
 		if(~ $status '')
@@ -413,6 +430,12 @@ for(f in $lz4samples){
 			note '  sample lz4: FAILS'
 	}
 }
+if(~ $#found 0){
+	note '  NOT FOUND: no lz4 sample in any of --'
+	for(f in $lz4samples)
+		note '    '^$f
+}
+note '  (a path can be given on the command line; it is added to both lists)'
 
 rm -rf $tmp
 note ''

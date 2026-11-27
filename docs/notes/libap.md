@@ -4407,3 +4407,48 @@ default (`lz4conf.h:45`, "Requires `<pthread>` support. Can't be
 reliably and portably tested at source code level"). *That default
 turns out to be right for a reason upstream states as uncertainty and
 this platform can state as a mechanism.*
+
+### Confirmed, in the order the two runs had to be read
+
+`pthread-stack-test` on the VM: sections 1 (bss) and 2 (heap) PASS,
+**3c FAILS**, section 4 PASSES — **1 failure**, against 0 on glibc. So
+a thread's store is visible through bss and through the heap and *not*
+through the creator's frame, and the creator's neighbouring locals are
+untouched, which rules out a store landing in the right frame at the
+wrong offset.
+
+Its disambiguator is the part worth keeping: it printed
+`worker ran=0, read back=0`. The worker's writes to `g.ran` and
+`g.saw` are subject to the same rule, `g` being a local too, so their
+not coming back says **the whole frame is private** rather than one
+store having gone astray. Had it printed `ran=1, read-back=42` the
+finding would have been a different one — a store that happened and
+landed somewhere the creator cannot see, i.e. a partially shared
+mapping — and the two are one observation without that read-back.
+
+Then `archive-roundtrip` with `LZ4IO_MULTITHREAD` undefined:
+**`COMPLETE, 0 failure(s)`**. Every lz4 section is `ok` — pipe and
+file, threaded and `-T1` compressors — and the file run reports
+`decoded 2527731 bytes` where the threaded decoder had reported
+`Decompressed : 0 MiB`. *The order mattered*: a stack that had turned
+out to be shared would have made the mkfile change mean something
+else entirely, so the test is read first and the package second.
+
+So one mechanism is confirmed directly by an instrument that isolates
+it and indirectly by the package that found it.
+
+### The instrument fault of the round, and it was silence
+
+Section 7 of `archive-roundtrip` runs the two shipped sample files, and
+it printed **a heading, no body, and then the COMPLETE line** — because
+it speaks only for a file it finds, and none of its candidate paths
+held one. *That reads exactly like "both samples decoded"* to anyone
+not holding the source. It prints `NOT FOUND` and lists every path it
+searched now, and says that a path on the command line is added to both
+lists.
+
+**The samples have not been re-tested since the fix**, and
+`unlz4 sample.txt.lz4` is now expected to decode: its two reported
+symptoms, `invalid frame` and `Decompressed : 0 MiB`, are exactly the
+pair this mechanism produces. One command retires half of that open
+item.
