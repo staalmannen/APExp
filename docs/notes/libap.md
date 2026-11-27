@@ -4452,3 +4452,52 @@ lists.
 symptoms, `invalid frame` and `Decompressed : 0 MiB`, are exactly the
 pair this mechanism produces. One command retires half of that open
 item.
+
+### The lz4 sample decodes, and the xz one is now the whole item
+
+`archive-roundtrip $home/download/sample.txt.lz4` answers **`sample
+lz4: decodes`** on a file downloaded fresh from the same server. So
+the lz4 sample was never corrupt and the download path was never at
+fault: it was the decoder pool, which is the stack finding confirmed
+from the one direction that was still open. *Two hypotheses collapse
+to none.*
+
+**Section 7 printed a false failure in both runs, and it was the
+instrument's.** A path given on the command line was appended to BOTH
+sample lists, so an `.lz4` argument was handed to `unxz` as well —
+`File format not recognized`, reported as `sample xz: FAILS` **in a
+run where no xz sample was present at all** — and an `.xz` argument
+to `unlz4`, `Error 44 : Unrecognized header`. A FAILS line naming a
+sample that was never tried is worse than the silence it replaced one
+round earlier. Arguments are routed by SUFFIX now, and a name ending
+in neither is announced and ignored.
+
+### What `Compressed data is corrupt` rules out
+
+`unxz sample.txt.xz` says `Compressed data is corrupt`, and **the
+same `unxz` in the same run said `File format not recognized`** for
+the lz4 file it was wrongly handed. The two messages are different
+states: the second is a bad magic number, the first is a magic number
+that parsed. So
+
+- the download did not fetch an error page or an HTML body,
+- the file is not some other format under an `.xz` name,
+- and `hget` is cleared for small binaries, since the 246-byte lz4
+  sample from the same host decoded byte-perfectly.
+
+Two readings remain: the sample is genuinely bad at the source, or
+there is a decode path only that stream reaches. **The build host
+cannot settle it** — its egress proxy refuses `testaroo.com`, so no
+reference copy can be fetched here.
+
+`xz -lvv` is the cheapest next command: it reads the stream footer
+and the index and nothing else, so it succeeds or fails independently
+of the compressed blocks. Success says the tail is intact (so not a
+truncated download) and prints the check type, the block count and
+the declared compressed and uncompressed sizes; failure says the
+damage reaches the index.
+
+**If that does not separate them, the file is 380 bytes** and
+`sha1sum` plus `od -An -tx1` is a transcribable amount — reconstructed
+on the host, the hash makes the transcription self-checking, and the
+host's own `xz` then answers the question outright.

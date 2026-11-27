@@ -2747,11 +2747,33 @@ silent:
   round***: it prints only for a sample file it FINDS, so finding none
   gave a heading, no body and then `COMPLETE` -- which reads exactly
   like "both samples decoded". It names the paths it searched now.
-  **WHAT IS LEFT IS THE TWO SHIPPED SAMPLE FILES, AND THEY HAVE NOT
-  BEEN RE-TESTED SINCE THE FIX** -- `unlz4 sample.txt.lz4` is now
-  expected to WORK, its reported symptoms having been the decoder
-  pool's, so the one command that would retire half this item is
-  running it again. The historical statement follows:
+  ***AND THE lz4 SAMPLE DECODES: `sample lz4: decodes`, ON A FRESHLY
+  DOWNLOADED FILE.*** So it was never corrupt and never a bad
+  download -- it was the decoder pool, which is the prediction
+  confirmed from the one direction left. **Half the open item is
+  retired and the hypothesis count on it goes from two to zero.**
+  ***AND SECTION 7 PRINTED A FALSE FAILURE IN BOTH RUNS, WHICH IS
+  MINE***: a path on the command line was added to BOTH lists, so an
+  `.lz4` argument was also handed to `unxz` (`File format not
+  recognized`, reported as **`sample xz: FAILS` in a run where no xz
+  sample existed**) and an `.xz` one to `unlz4` (`Error 44 :
+  Unrecognized header`). *A FAILS line naming a sample that was never
+  tried is worse than the silence it replaced.* Routed by SUFFIX now,
+  with anything else named and ignored.
+  **WHAT IS LEFT IS ONE FILE: `sample.txt.xz` says `Compressed data
+  is corrupt`** -- and **that message is not `File format not
+  recognized`**, which the same `unxz` prints for a file whose magic
+  is wrong, *measured in the very same run on the lz4 file*. So the
+  stream header PARSED and the failure is inside the stream, which
+  rules out a download that fetched an error page and rules out a
+  wrong-format mixup. **hget is cleared for small binaries too**, the
+  246-byte lz4 sample from the same server decoding perfectly.
+  *The two remaining readings are a genuinely bad sample and a decode
+  path only that stream reaches*, and the host cannot settle it: the
+  build host's proxy refuses `testaroo.com`. **`xz -lvv` is the next
+  command** -- it reads only the footer and index, so success says the
+  tail is intact and names the check type, the block count and the
+  declared sizes. The historical statement follows:
   `unxz xz_sample_file_1MB.xz` says `Compressed data is corrupt` and
   `unlz4 sample.txt.lz4` says `Error 26 : LZ4F frame decoding could
   not complete: invalid frame`, `Decompressed : 0 MiB`. **Both files

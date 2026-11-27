@@ -387,11 +387,32 @@ note 'section 7: the shipped sample files (reported, not counted)'
 # variable inside a concatenation is a null LIST in rc, which is an
 # error and not an empty string -- `null list in concatenation', the
 # same shape as `mkone''s unset `BIN' and as `eccp''s `$O'.
-xzsamples = (./xz_sample_file_1MB.xz /tmp/xz_sample_file_1MB.xz $*)
-lz4samples = (./sample.txt.lz4 /tmp/sample.txt.lz4 $*)
+xzsamples = (./xz_sample_file_1MB.xz /tmp/xz_sample_file_1MB.xz)
+lz4samples = (./sample.txt.lz4 /tmp/sample.txt.lz4)
 if(! ~ $#home 0){
-	xzsamples = ($xzsamples $home^/download/xz_sample_file_1MB.xz)
+	xzsamples = ($xzsamples $home^/download/xz_sample_file_1MB.xz \
+		$home^/download/sample.txt.xz)
 	lz4samples = ($lz4samples $home^/download/sample.txt.lz4)
+}
+#
+# ***A PATH ON THE COMMAND LINE GOES TO THE LIST ITS SUFFIX NAMES,
+# AND PUTTING IT IN BOTH PRINTED A FALSE FAILURE EVERY RUN.***  The
+# first version appended `$*' to both lists, so one `.lz4' argument
+# was also handed to `unxz' -- `File format not recognized', reported
+# as `sample xz: FAILS' in a run where NO xz sample was present.  The
+# reverse run reported `sample lz4: FAILS' for an `.xz' file, `Error
+# 44 : Unrecognized header'.
+#
+# *Both messages are the instrument feeding a decoder the other
+# format*, and the first of them is the dangerous one: a reader sees
+# a FAILS line naming a sample that was never tried.
+for(f){
+	if(~ $f *.xz)
+		xzsamples = ($xzsamples $f)
+	if not if(~ $f *.lz4)
+		lz4samples = ($lz4samples $f)
+	if not
+		note '  IGNORED: '^$f^' -- name ends in neither .xz nor .lz4'
 }
 #
 # ***AND A SECTION THAT SAYS NOTHING WHEN IT FINDS NOTHING IS THE
@@ -435,7 +456,7 @@ if(~ $#found 0){
 	for(f in $lz4samples)
 		note '    '^$f
 }
-note '  (a path can be given on the command line; it is added to both lists)'
+note '  (a path on the command line goes to the list its suffix names)'
 
 rm -rf $tmp
 note ''
