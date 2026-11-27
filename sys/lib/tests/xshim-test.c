@@ -65,7 +65,11 @@ main(void)
 			"XGetGeometry reports the child's rectangle relative to its parent");
 		check(XMoveResizeWindow(dpy, child, 7, 8, 30, 12), "XMoveResizeWindow succeeds");
 		check(XRaiseWindow(dpy, child) && XLowerWindow(dpy, child), "XRaiseWindow and XLowerWindow succeed");
-		check(XFillRectangle(dpy, child, gc, 0, 0, 5, 5), "drawing into a child succeeds");
+		{
+			GC cgc = XCreateGC(dpy, child, 0, NULL);
+			check(XFillRectangle(dpy, child, cgc, 0, 0, 5, 5), "drawing into a child succeeds");
+			XFreeGC(dpy, cgc);
+		}
 		ok = XQueryPointer(dpy, w, &rw, &cw, &rx, &ry, &wx, &wy, &mask);
 		check(ok == True && rw == XDefaultRootWindow(dpy), "XQueryPointer reports the root");
 		check(XDestroyWindow(dpy, child) && !XDestroyWindow(dpy, child),
