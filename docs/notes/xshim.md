@@ -246,3 +246,23 @@ moves any failing test name is a regression even if the total is unchanged.
 - Fix: drawing, clearing, the clip rectangle, the window origin and the expose size
   use `screen`.  `XDisplayWidth`/`XDisplayHeight` still read the display image,
   which is the whole screen.
+
+## Multi-window (window tree), confirmed on 9front
+
+- `xshim-test` passes all checks (0 failures): windows as a tree inside the rio
+  window, child windows, geometry, raise and lower, pointer query, destroy,
+  arcs, fonts, text, and the GC functions.
+- The tree is also tested on the host (20 checks).
+- Not yet covered: sibling clipping (overlapping children draw over each
+  other), Expose per damaged region, pixmaps, and an in-process multi-window
+  demo.
+- The Tk gate still needs a run on the current tree.  Tk does not call the
+  window functions, but it links the library, and the drawing target changed.
+
+## Gate: drawing-target change (`tmp/tk-runall-xshim4.out` on `main`)
+
+- Run 05:11 on 2026-11-27: Total 10027, Passed 8926, Skipped 924, Failed 177.
+  The 177 failing names are identical to the baseline.  The drawing change
+  (drawing to libdraw's window image) is gated.
+- The run was made on a build before the window-tree commit was rebuilt; the
+  window tree and the clip-handle table still need their own Tk gate run.
