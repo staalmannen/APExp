@@ -291,7 +291,16 @@ there because section 0 passes for an `fsync` that returns 0 to
 everything), `pthread-test` (**the one test here
 that can HANG, so the only one that arms a `SIGALRM`** — a thread must
 reach its start routine and `pthread_cond_timedwait` must actually
-wait; the two are different bugs and the sections are split so), `poll-test` (the count is
+wait; the two are different bugs and the sections are split so),
+`pthread-stack-test` (**EXPECTED TO FAIL ON APExp TODAY, 1 failure,
+and that is the point**: a thread's store through a pointer to the
+CREATOR'S STACK is invisible, because RFMEM shares data, bss and the
+heap and not the stack. *Sections 1 and 2 are bss and heap controls
+that must PASS*, since a lone section-3 failure reads equally as
+"threads do not share memory" or "the function never ran" — both of
+which this tree has had — and the worker reads its own store BACK, so
+"the write did not happen" and "the write went somewhere else" are
+different outputs. 0 on glibc), `poll-test` (the count is
 of pollfd ENTRIES, a negative fd is ignored, a closed one is POLLNVAL —
 the two rules whose absence makes a `while(poll())` caller SPIN),
 `ucontext-test` (**the one test here with a REAL REFERENCE
@@ -2511,8 +2520,9 @@ silent:
   that data.* Section 2b uses multiples of a large prime and it fires
   with 4. **A dense `0..N` run is the shape that makes a hash container
   look right**; it tests the chain and not the index.
-  ***AND `valarray` CLOSED THE LIST, 39 OF 39 ON THE HOST*** (reference
-  30), **sized by a measurement rather than by the synopsis**:
+  ***AND `valarray` CLOSED THE LIST, 39 OF 39 ON THE VM FIRST
+  ATTEMPT*** (reference 30), **sized by a measurement rather than by
+  the synopsis**:
   `<valarray>` is in five re2c files and the only name used from it in
   2,900 is `std::valarray<bool> loops(n)`, a DFS visited bitmap. So it
   is a contiguous array with IN-PLACE arithmetic; the binary operators
@@ -2681,6 +2691,40 @@ silent:
   this repo's `sys/src` over `/sys/src`**, so the VM's
   `/sys/src/ape/lib/ap` is **stock 9front's** -- *two trees with one
   path, compared as though they were one.*
+  ***AND THE SEVEN-SECTION RUN FOUND IT, AND MY OWN DIAGNOSIS WAS
+  WRONG: THE EndMark IS THERE.*** Section 6 dumps the tail and all
+  three locally produced streams end
+  `00 00 00 00 cf d7 f7 12` -- four zero bytes of EndMark then four
+  checksum bytes, exactly the shape asked for, then EOF. *So "the
+  EndMark never arrived" is dead*; the frame is structurally complete,
+  the payload is byte-identical, and the decoder errors anyway. **The
+  host reference's `ea 08 55 0a` differs only because it is a
+  different corpus** -- a checksum compared across two inputs says
+  nothing, and only the SHAPE was ever comparable.
+  **Sections 3, 4 and 5 vary the compressor three ways and fail
+  identically**, and the NOTE fired: the threaded and `-T1` streams
+  are byte-identical, so the compressor is cleared from two
+  directions and the DECODER pool is the one thing never varied --
+  `TPool_create(1,1)` being unconditional on that path.
+  ***AND IT IS THE STACK: `lz4io.c:2104-2106` DECLARES `filesize`,
+  `lastStatus` AND `storedSkips` AS LOCALS AND HANDS ALL THREE TO THE
+  WORKER BY ADDRESS.*** `pthread_create.c:85` rforks
+  `RFFDG|RFPROC|RFMEM`, and **its own comment eleven lines down says
+  `the STACK is not shared -- dupseg() gives SG_STACK a new segment
+  whatever RFMEM says`** -- *written there as a REASSURANCE*, to
+  explain why the parent returning through the child's frame is safe,
+  with the cost side of the identical fact never written down. So the
+  worker's `*lastStatus = 0` lands in its own frame and the parent
+  reads the initial 1 for ever. **One mechanism, three predictions,
+  two already on the screen**: error 26; `Decompressed : 0 MiB`, which
+  is `filesize` one field over and had been read as part of the frame
+  error; and a correct payload, because the worker does its own
+  `fwrite` through a SHARED fd. *So the shipped sample may never have
+  been corrupt.*
+  **`cmd/lz4/mkfile` no longer defines `LZ4IO_MULTITHREAD`**, which
+  restores upstream's own non-Windows default -- not caution now but a
+  named mechanism, and `-T1` cannot avoid it because the decode pool
+  is unconditional.
   **WHAT IS LEFT IS TWO DECODE FAILURES, AND ONE IS STILL UNSEPARATED**:
   `unxz xz_sample_file_1MB.xz` says `Compressed data is corrupt` and
   `unlz4 sample.txt.lz4` says `Error 26 : LZ4F frame decoding could
@@ -3497,6 +3541,20 @@ the index, so that nothing here is a surprise.
 - `RFCENVG`, `RFCNAMEG` and `RFCFDG` create **empty** groups; the `C` is
   *clear*. `RFENVG`, `RFNAMEG` and `RFFDG` are the ones that copy. So
   `execve` has no environment at all after its first line.
+- **A THREAD DOES NOT SHARE THE CREATOR'S STACK**, measured
+  (`pthread-stack-test`): `pthread_create` rforks `RFMEM`, which
+  shares data, bss and the heap, while `dupseg()` gives `SG_STACK` a
+  NEW segment whatever RFMEM says. POSIX requires the whole address
+  space, so **`&local` is the one kind of address that silently means
+  a different object in the two threads** -- and handing a worker
+  `&result` is the ordinary way to get an answer out of one. The
+  symptom is a value that keeps its initial contents with no error
+  from anywhere: lz4's `lastStatus` stayed 1 and its `filesize` stayed
+  0 while the decompressed bytes were perfect. *Nothing diagnoses
+  this; sections 1 and 2 of the test are the controls that make the
+  stack the finding rather than "threads are broken".* Fixing it means
+  every thread INCLUDING main running on a stack allocated from the
+  shared segment; in 0.6's inventory, not attempted.
 - **NATIVE kencc rounds EVERY struct's size up to 8, and aligns a
   nested struct member to 8 too** (`6c/swt.c`'s `align()`, cases
   `Asu2` and `Ael1`), so `sizeof(struct{char a[500];})` is **504**.

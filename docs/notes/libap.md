@@ -4316,3 +4316,94 @@ the invariants in section 1 are the test's and not the library's.
 **Its version marker earns its keep more than most**: the old
 library's ENOSYS is a legitimate output of the new one under `strict`,
 so a stale libap would look exactly like a working `strict` run.
+
+## A thread does not share the creator's stack
+
+**Found through lz4, and the diagnosis it replaced was mine.**
+`archive-roundtrip` had reported `LZ4F frame decoding could not
+complete: invalid frame` beside `bytes identical`, and the reading
+written down at the time was that the EndMark never arrived — the
+frame, not the data. **Section 6 of the same script refuted that on
+its first complete run**: all three locally produced streams end
+
+    011b840  00 00 00 00 cf d7 f7 12
+    011b848
+
+which is four zero bytes of EndMark, four bytes of content checksum,
+then EOF — exactly the shape the section says it wants. *The host
+reference ends `ea 08 55 0a` and that difference means nothing*: it
+was a different corpus, so only the SHAPE was ever comparable, and
+comparing the checksum values would have been comparing two answers to
+two different questions.
+
+### What the three sections eliminated
+
+Sections 3, 4 and 5 vary the compressor — threaded through a pipe,
+`-T1` through a pipe, file to file — and fail identically. The NOTE
+fired: **the threaded and `-T1` streams are byte-identical**, so the
+compressor is cleared from two directions at once. The decode path
+calls `TPool_create(1, 1)` unconditionally, so `-T1` is a
+compression-only switch and **the decoder pool is the one thing never
+varied**.
+
+### The mechanism, and it was in this tree's own source
+
+`lz4io.c:2104-2106` declares `filesize`, `lastStatus` and
+`storedSkips` as LOCALS of `LZ4IO_decompressLZ4F`, and the worker job
+is handed all three BY ADDRESS. `pthread_create.c:85` is
+`_RFORK(RFFDG|RFPROC|RFMEM)`, and its own comment eleven lines below
+says it outright:
+
+> RFMEM shares data and bss [...] The STACK is not shared — `dupseg()`
+> gives `SG_STACK` a new segment whatever RFMEM says
+
+***That comment is there as a REASSURANCE.*** It explains why the
+parent returning through the child's frame does not disturb the child
+sitting in it — which is true, and useful, and the cost side of the
+identical fact was never written down. POSIX requires every thread to
+share the whole address space; here data, bss and the heap are shared
+and stacks are not, which makes **`&local` the one kind of address
+that silently names a different object in the two threads**.
+
+### One mechanism, three predictions, two already observed
+
+- `lastStatus` keeps its initial `1` → `END_PROCESS(26, ...)`. Seen.
+- `filesize` keeps its `0` → `Decompressed : 0 MiB`, which is the
+  same bug one field over and had been read as part of the frame
+  error. Seen, in the earlier `unlz4 sample.txt.lz4` run.
+- The payload is still correct, because the worker does its own
+  `fwrite` through a **shared file descriptor**. Seen.
+
+*So the shipped sample may never have been corrupt*, and the two
+"produced elsewhere" files stop being two hypotheses.
+
+### The instrument, and why it has four sections
+
+`sys/lib/tests/pthread-stack-test.c`. Section 3 alone cannot be read:
+a failure there is equally consistent with "threads do not share
+memory", "the start routine never ran" and "join did not wait", **all
+three of which this tree has actually had**. Sections 1 and 2 store to
+bss and to the heap and must PASS, which is what makes the stack the
+finding rather than threading in general; the worker also reads its own
+store back, so "the write did not happen" and "the write went
+somewhere the creator cannot see" are different outputs rather than
+one. Section 4 checks the creator's neighbouring locals are undamaged,
+ruling out a store that landed in the right frame at the wrong offset.
+0 failures on glibc; 1 on APExp, which is the known gap and not a
+regression.
+
+### What a fix would take
+
+Every thread would have to run on a stack allocated from the shared
+segment — **including the main one**, since the creator's frame is the
+thing being pointed at, and `main`'s stack is the private `SG_STACK`
+the kernel gives it. The machinery exists (this tree's `makecontext`
+switches stacks), but it reaches `main9.s`, `longjmp`'s contract and
+every debugger stack walk. Recorded in 0.6's inventory, not attempted.
+
+**The immediate consequence is one line**: `cmd/lz4/mkfile` stops
+defining `LZ4IO_MULTITHREAD`, restoring upstream's own non-Windows
+default (`lz4conf.h:45`, "Requires `<pthread>` support. Can't be
+reliably and portably tested at source code level"). *That default
+turns out to be right for a reason upstream states as uncertainty and
+this platform can state as a mechanism.*

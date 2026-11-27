@@ -20,7 +20,25 @@ LZ4INC=-I$LZ4SRC -I$LZ4SRC/lib -I$LZ4SRC/programs
 
 CC=pcc
 LD=pcc
-CFLAGS= -c -DLZ4IO_MULTITHREAD $LZ4INC
+# LZ4IO_MULTITHREAD is DELIBERATELY NOT DEFINED, which restores
+# upstream's own non-Windows default (lz4conf.h:45, "Requires
+# <pthread> support.  Can't be reliably and portably tested at source
+# code level").
+#
+# It is not caution: the threaded DECODER cannot work on this platform
+# as written.  `lz4io.c:2104-2106' declares `filesize', `lastStatus'
+# and `storedSkips' as LOCALS and hands all three to the worker BY
+# ADDRESS, and `lib/ap/thread/pthread_create.c' rforks RFMEM, which
+# shares data, bss and the heap and NOT the stack -- so the worker's
+# `*lastStatus = 0' lands in its own frame and the parent reads the
+# initial 1 for ever.  That is `unlz4' answering `LZ4F frame decoding
+# could not complete: invalid frame' while writing byte-identical
+# output, and `Decompressed : 0 MiB' from the same cause one field
+# over.  `sys/lib/tests/pthread-stack-test.c' measures the rule.
+#
+# The decode path calls `TPool_create(1,1)' unconditionally, so `-T1'
+# does not avoid it -- only this does.
+CFLAGS= -c $LZ4INC
 
 %.$O: $LZ4SRC/programs/%.c
     $CC $CFLAGS $LZ4SRC/programs/$stem.c
