@@ -264,5 +264,6 @@ moves any failing test name is a regression even if the total is unchanged.
 - Run 05:11 on 2026-11-27: Total 10027, Passed 8926, Skipped 924, Failed 177.
   The 177 failing names are identical to the baseline.  The drawing change
   (drawing to libdraw's window image) is gated.
-- The run was made on a build before the window-tree commit was rebuilt; the
-  window tree and the clip-handle table still need their own Tk gate run.
+- Built from the synced branch with the window tree and the clip-handle table
+  (per the user).  That run therefore also gates the window tree and the clip
+  handles, which are not separately recorded.

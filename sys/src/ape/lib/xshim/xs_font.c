@@ -4,6 +4,10 @@
 #include <xshim_types.h>
 #include "xshim_p.h"
 
+/* xs_xdisplay.c: the standard font structure */
+extern void	*xs_newfont(XID fid, int ascent, int descent);
+extern XID	xs_fontfid(void *fs);
+
 /*
  * Fonts, backed by libdraw's font support.  An X font id is an index into a
  * table of libdraw Fonts, plus one, so None (0) means "the default font".
@@ -58,10 +62,10 @@ XLoadFont(Display *dpy, char *name)
 	return addfont(f);
 }
 
-XFontStruct*
+/* a font structure with the standard layout (xs_xdisplay.c) */
+void*
 XLoadQueryFont(Display *dpy, char *name)
 {
-	XFontStruct *fs;
 	Font *f;
 	XID id;
 
@@ -70,17 +74,11 @@ XLoadQueryFont(Display *dpy, char *name)
 	f = fontof(id);
 	if(f == nil)
 		return nil;
-	fs = malloc(sizeof *fs);
-	if(fs == nil)
-		return nil;
-	fs->fid = id;
-	fs->ascent = f->ascent;
-	fs->descent = f->height - f->ascent;
-	return fs;
+	return xs_newfont(id, f->ascent, f->height - f->ascent);
 }
 
 int
-XFreeFont(Display *dpy, XFontStruct *fs)
+XFreeFont(Display *dpy, void *fs)
 {
 	USED(dpy);
 	if(fs != nil)
@@ -115,13 +113,13 @@ XDrawString(Display *dpy, Drawable d, GC gc, int x, int y, char *s, int n)
 }
 
 int
-XTextWidth(XFontStruct *fs, char *s, int n)
+XTextWidth(void *fs, char *s, int n)
 {
 	Font *f;
 	char *buf;
 	int w;
 
-	f = fs != nil ? fontof(fs->fid) : xs_dpy->defaultfont;
+	f = fs != nil ? fontof(xs_fontfid(fs)) : xs_dpy->defaultfont;
 	if(f == nil || s == nil)
 		return 0;
 	buf = malloc(n + 1);

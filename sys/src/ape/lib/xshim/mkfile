@@ -9,6 +9,7 @@ OFILES=\
 	window.$O\
 	xs_gc.$O\
 	xs_win.$O\
+	xs_xdisplay.$O\
 	xs_clip.$O\
 	draw.$O\
 	event.$O\
@@ -17,11 +18,11 @@ OFILES=\
 	xs_arc.$O\
 	xs_font.$O\
 
-# the public header is sys/include/ape/xshim.h (with xshim_types.h); both are
-# installed by hand for now, like draw.h, until the X11 headers are cleaned up
+# the public API is the standard X11 headers in sys/include/ape/X11; the shared
+# types the library uses are xshim_types.h
 HFILES=\
-	$APEXPROOT/sys/include/ape/xshim.h\
 	$APEXPROOT/sys/include/ape/xshim_types.h\
+	$APEXPROOT/sys/include/ape/X11/Xlib.h\
 
 UPDATE=\
 	mkfile\
