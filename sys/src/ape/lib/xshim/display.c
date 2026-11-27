@@ -5,6 +5,17 @@
 #include "xshim_p.h"
 
 Display	*xs_dpy;
+
+/*
+ * Clip all drawing to the window's rectangle.  libdraw clips each draw to the
+ * destination's clip rectangle, and that rectangle is not guaranteed to be the
+ * window's, so it is set here; without it, drawing reached the whole screen.
+ */
+void
+xs_clipwindow(void)
+{
+	replclipr(xs_dpy->image, 0, xs_dpy->image->r);
+}
 int	xs_expose;
 
 Display*
@@ -15,6 +26,7 @@ XOpenDisplay(char *name)
 		return xs_dpy;
 	if(initdraw(nil, nil, "xshim") < 0)
 		return nil;
+	xs_clipwindow();
 	einit(Ekeyboard|Emouse);
 	xs_dpy = display;
 	return xs_dpy;
@@ -37,6 +49,7 @@ eresized(int new)
 {
 	if(new && getwindow(xs_dpy, Refnone) < 0)
 		sysfatal("xshim: getwindow: %r");
+	xs_clipwindow();
 	xs_expose = 1;
 }
 

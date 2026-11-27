@@ -7,6 +7,9 @@
 /* the one display, set by XOpenDisplay */
 extern Display	*xs_dpy;
 
+/* clip all drawing to the window (display.c); call after any change of window */
+extern void	xs_clipwindow(void);
+
 /* set by eresized when rio resizes the window; cleared when reported */
 extern int	xs_expose;
 
