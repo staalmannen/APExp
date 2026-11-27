@@ -17,7 +17,7 @@ extern int	xs_expose;
 extern Image	*xs_colour(unsigned long pixel);
 
 /* the window's rectangle on the screen, so X coordinates are relative to it */
-#define xs_origin()	(xs_dpy->image->r.min)
+#define xs_origin()	(screen->r.min)
 
 /* the region and clip functions the GC code calls (xs_region.c, xs_gc.c) */
 extern Region	XCreateRegion(void);

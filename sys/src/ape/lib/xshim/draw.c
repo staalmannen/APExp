@@ -45,7 +45,7 @@ XFillRectangle(Display *dpy, Drawable d, GC gc, int x, int y,
 	c = xs_colour(gc->foreground);
 	if(c == nil)
 		return 0;
-	draw(xs_dpy->image, xrect(x, y, width, height), c, nil, ZP);
+	draw(screen, xrect(x, y, width, height), c, nil, ZP);
 	freeimage(c);
 	return 1;
 }
@@ -94,7 +94,7 @@ XDrawLine(Display *dpy, Drawable d, GC gc, int x1, int y1, int x2, int y2)
 	radius = gc->line_width > 0 ? gc->line_width - 1 : 0;
 	p0 = addpt(xs_origin(), Pt(x1, y1));
 	p1 = addpt(xs_origin(), Pt(x2, y2));
-	line(xs_dpy->image, p0, p1, 0, 0, radius, c, ZP);
+	line(screen, p0, p1, 0, 0, radius, c, ZP);
 	freeimage(c);
 	return 1;
 }

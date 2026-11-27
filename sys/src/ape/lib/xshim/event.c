@@ -102,8 +102,8 @@ XNextEvent(Display *dpy, XEvent *e)
 			newevent(e, Expose);
 			e->xexpose.x = 0;
 			e->xexpose.y = 0;
-			e->xexpose.width = Dx(xs_dpy->image->r);
-			e->xexpose.height = Dy(xs_dpy->image->r);
+			e->xexpose.width = Dx(screen->r);
+			e->xexpose.height = Dy(screen->r);
 			e->xexpose.count = 0;
 			return 1;
 		}

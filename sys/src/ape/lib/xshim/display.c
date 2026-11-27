@@ -14,7 +14,7 @@ Display	*xs_dpy;
 void
 xs_clipwindow(void)
 {
-	replclipr(xs_dpy->image, 0, xs_dpy->image->r);
+	replclipr(screen, 0, screen->r);
 }
 int	xs_expose;
 
