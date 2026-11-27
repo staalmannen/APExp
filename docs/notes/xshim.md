@@ -258,3 +258,11 @@ moves any failing test name is a regression even if the total is unchanged.
   demo.
 - The Tk gate still needs a run on the current tree.  Tk does not call the
   window functions, but it links the library, and the drawing target changed.
+
+## Gate: drawing-target change (`tmp/tk-runall-xshim4.out` on `main`)
+
+- Run 05:11 on 2026-11-27: Total 10027, Passed 8926, Skipped 924, Failed 177.
+  The 177 failing names are identical to the baseline.  The drawing change
+  (drawing to libdraw's window image) is gated.
+- The run was made on a build before the window-tree commit was rebuilt; the
+  window tree and the clip-handle table still need their own Tk gate run.
