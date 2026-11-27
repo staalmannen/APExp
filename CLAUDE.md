@@ -2730,7 +2730,28 @@ silent:
   restores upstream's own non-Windows default -- not caution now but a
   named mechanism, and `-T1` cannot avoid it because the decode pool
   is unconditional.
-  **WHAT IS LEFT IS TWO DECODE FAILURES, AND ONE IS STILL UNSEPARATED**:
+  ***AND BOTH HALVES ARE CONFIRMED, IN THE ORDER THEY HAD TO BE READ.***
+  `pthread-stack-test` answers **1 failure**: bss and heap visible,
+  the creator's stack NOT, the creator's frame undamaged -- and its
+  disambiguator printed `ran=0, read back=0`, so the worker's writes
+  to the argument struct did not come back either and *the whole frame
+  is private* rather than one store having gone astray. Then
+  `archive-roundtrip` answers **COMPLETE, 0 failure(s)**: every lz4
+  section `ok`, pipe and file, threaded and `-T1`, and the file run
+  reports `decoded 2527731 bytes`. **So `lz4` is CLOSED locally** --
+  one mechanism confirmed directly by the test and indirectly by the
+  package, and *the test had to be read first*, since a stack that
+  turned out to be shared would have made the mkfile change mean
+  something else entirely.
+  ***And section 7 said NOTHING, which is the instrument fault of this
+  round***: it prints only for a sample file it FINDS, so finding none
+  gave a heading, no body and then `COMPLETE` -- which reads exactly
+  like "both samples decoded". It names the paths it searched now.
+  **WHAT IS LEFT IS THE TWO SHIPPED SAMPLE FILES, AND THEY HAVE NOT
+  BEEN RE-TESTED SINCE THE FIX** -- `unlz4 sample.txt.lz4` is now
+  expected to WORK, its reported symptoms having been the decoder
+  pool's, so the one command that would retire half this item is
+  running it again. The historical statement follows:
   `unxz xz_sample_file_1MB.xz` says `Compressed data is corrupt` and
   `unlz4 sample.txt.lz4` says `Error 26 : LZ4F frame decoding could
   not complete: invalid frame`, `Decompressed : 0 MiB`. **Both files
@@ -3698,8 +3719,12 @@ different files in SILENCE** (it believed its own stdout was
 identical; **16-bit `ino_t`/`dev_t`**, against a tree of 64799 files;
 **`pthread_create` never running the thread it created** — the child
 waited on a rendezvous the parent never answered, which was both
-archiver hangs; **`fsync` answering FAILURE, so `xz` deleted every file
-it wrote**; **a partial `munmap` destroying the whole segment, by two
+archiver hangs; **lz4's decoder returning `invalid frame` on a
+perfectly good stream, because a worker thread wrote its completion
+status into the CREATOR'S STACK** — `archive-roundtrip` is
+`COMPLETE, 0 failure(s)` with the threaded decoder off, and
+`pthread-stack-test` says why in its own right; **`fsync` answering
+FAILURE, so `xz` deleted every file it wrote**; **a partial `munmap` destroying the whole segment, by two
 different routes** — a head trim matched the table on its start address
 and detached the segment the caller was about to use, and a tail trim's
 interior address fell through to `_SEGDETACH(addr)`, which detaches the
