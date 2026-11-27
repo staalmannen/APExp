@@ -8,6 +8,7 @@ OFILES=\
 	display.$O\
 	window.$O\
 	xs_gc.$O\
+	xs_win.$O\
 	xs_clip.$O\
 	draw.$O\
 	event.$O\

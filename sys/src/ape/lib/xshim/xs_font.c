@@ -94,11 +94,11 @@ XDrawString(Display *dpy, Drawable d, GC gc, int x, int y, char *s, int n)
 {
 	Font *f;
 	Image *c;
-	Point p;
-	char *buf;
+	Point org, p;
+	Rectangle clip;
 
 	USED(dpy);
-	if(d != XSHIM_WINDOW && d != XSHIM_ROOT)
+	if(!xs_target(d, &org, &clip))
 		return 0;
 	f = fontof(gc->font);
 	if(f == nil)
@@ -106,9 +106,10 @@ XDrawString(Display *dpy, Drawable d, GC gc, int x, int y, char *s, int n)
 	c = xs_colour(gc->foreground);
 	if(c == nil)
 		return 0;
-	p = addpt(xs_origin(), Pt(x, y - f->ascent));
-	buf = s;
-	stringn(screen, p, c, ZP, f, buf, n);
+	p = Pt(org.x + x, org.y + y - f->ascent);
+	xs_clipbegin(clip);
+	stringn(screen, p, c, ZP, f, s, n);
+	xs_clipend();
 	freeimage(c);
 	return 1;
 }

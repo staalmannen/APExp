@@ -235,3 +235,14 @@ moves any failing test name is a regression even if the total is unchanged.
 - Demo: `sys/src/ape/cmd/xshimclock`, an analogue clock that uses only the Xlib
   API.  It is not in the default build; build it by hand after `libxshim.a`.
 - `xshim-test.c` gains checks for the arc, font and text calls.
+
+## Drawing target (fixed, confirmed on 9front with xshimclock)
+
+- Symptom: xshimclock drew over the whole screen and the drawing stayed after exit.
+- Cause: the library drew to `display->image`, which is the whole screen.  libdraw's
+  global `screen` is the window (set by `gengetwindow`), with `screen->r` the
+  window's rectangle on the display.  Clipping the display image did not help,
+  because the wrong image was the target.
+- Fix: drawing, clearing, the clip rectangle, the window origin and the expose size
+  use `screen`.  `XDisplayWidth`/`XDisplayHeight` still read the display image,
+  which is the whole screen.

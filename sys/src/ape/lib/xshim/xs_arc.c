@@ -7,14 +7,12 @@
 
 /*
  * Arcs.  An X arc is sampled into a polyline on its ellipse and drawn with
- * libdraw's poly (outline) or fillpoly (filled), so no new drawing primitive
- * is needed.  Angles are in 1/64 degree, counter-clockwise from 3 o'clock, as
- * X has them.
+ * libdraw's poly (outline) or fillpoly (filled).  Angles are in 1/64 degree,
+ * counter-clockwise from 3 o'clock, as X has them.
  */
 
 #define FULLCIRCLE	(360*64)
 
-/* the number of straight segments for an arc of extent a2 */
 static int
 nsegments(int a2)
 {
@@ -29,10 +27,8 @@ nsegments(int a2)
 	return n;
 }
 
-/*
- * The points of an arc, into pts, which must hold nsegments+3 points.
- * Returns the count.  With pie set, the centre is the first point.
- */
+/* the points of an arc with absolute top-left (x,y); pts holds nsegments+3.
+ * With pie set, the centre is the first point. */
 static int
 arcpoints(int x, int y, unsigned int w, unsigned int h, int a1, int a2,
 	int pie, Point *pts)
@@ -66,22 +62,24 @@ int
 XDrawArc(Display *dpy, Drawable d, GC gc, int x, int y, unsigned int width,
 	unsigned int height, int angle1, int angle2)
 {
-	Point pts[256];
+	Point org, pts[256];
+	Rectangle clip;
 	Image *c;
 	int n, radius;
 
 	USED(dpy);
-	if(d != XSHIM_WINDOW && d != XSHIM_ROOT)
+	if(!xs_target(d, &org, &clip))
 		return 0;
 	if(width == 0 || height == 0)
 		return 1;
-	n = arcpoints(x + xs_origin().x, y + xs_origin().y, width, height,
-		angle1, angle2, 0, pts);
+	n = arcpoints(org.x + x, org.y + y, width, height, angle1, angle2, 0, pts);
 	c = xs_colour(gc->foreground);
 	if(c == nil)
 		return 0;
 	radius = gc->line_width > 0 ? gc->line_width - 1 : 0;
+	xs_clipbegin(clip);
 	poly(screen, pts, n, 0, 0, radius, c, ZP);
+	xs_clipend();
 	freeimage(c);
 	return 1;
 }
@@ -90,22 +88,25 @@ int
 XFillArc(Display *dpy, Drawable d, GC gc, int x, int y, unsigned int width,
 	unsigned int height, int angle1, int angle2)
 {
-	Point pts[256];
+	Point org, pts[256];
+	Rectangle clip;
 	Image *c;
 	int n;
 
 	USED(dpy);
-	if(d != XSHIM_WINDOW && d != XSHIM_ROOT)
+	if(!xs_target(d, &org, &clip))
 		return 0;
 	if(width == 0 || height == 0)
 		return 1;
 	/* the pie includes the centre; a chord does not */
-	n = arcpoints(x + xs_origin().x, y + xs_origin().y, width, height,
-		angle1, angle2, gc->arc_mode == ArcPieSlice, pts);
+	n = arcpoints(org.x + x, org.y + y, width, height, angle1, angle2,
+		gc->arc_mode == ArcPieSlice, pts);
 	c = xs_colour(gc->foreground);
 	if(c == nil)
 		return 0;
+	xs_clipbegin(clip);
 	fillpoly(screen, pts, n, ~0, c, ZP);
+	xs_clipend();
 	freeimage(c);
 	return 1;
 }
