@@ -12,8 +12,8 @@
  * other than the window is refused (pixmaps are not supported yet); a
  * zero-size outline draws nothing and succeeds.
  */
-#include <u.h>
-#include <libc.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <xshim.h>
 
 static int fails;
@@ -21,12 +21,12 @@ static int fails;
 static void
 check(int ok, char *what)
 {
-	print("%s: %s\n", ok ? "PASS" : "FAIL", what);
+	printf("%s: %s\n", ok ? "PASS" : "FAIL", what);
 	if(!ok)
 		fails++;
 }
 
-void
+int
 main(void)
 {
 	Display *dpy;
@@ -36,12 +36,12 @@ main(void)
 	XEvent ev;
 	Window w;
 
-	dpy = XOpenDisplay(nil);
-	check(dpy != nil, "XOpenDisplay returns a display");
-	if(dpy == nil)
-		exits("no display");
+	dpy = XOpenDisplay(NULL);
+	check(dpy != NULL, "XOpenDisplay returns a display");
+	if(dpy == NULL)
+		exit(1);
 
-	again = XOpenDisplay(nil);
+	again = XOpenDisplay(NULL);
 	check(again == dpy, "a second XOpenDisplay returns the same display");
 
 	check(XDisplayWidth(dpy, 0) > 0 && XDisplayHeight(dpy, 0) > 0,
@@ -75,8 +75,8 @@ main(void)
 	check(XMapWindow(dpy, w) && XSelectInput(dpy, w, ExposureMask),
 		"map and select on the window succeed");
 
-	gc = XCreateGC(dpy, w, 0, nil);
-	check(gc != nil, "XCreateGC returns a context");
+	gc = XCreateGC(dpy, w, 0, NULL);
+	check(gc != NULL, "XCreateGC returns a context");
 	check(XSetForeground(dpy, gc, 0xFF0000), "XSetForeground succeeds");
 	check(XFillRectangle(dpy, w, gc, 10, 10, 40, 20), "XFillRectangle on the window succeeds");
 	check(XDrawRectangle(dpy, w, gc, 0, 0, 30, 30), "XDrawRectangle succeeds");
@@ -96,10 +96,10 @@ main(void)
 
 	{
 		XFontStruct *fs = XLoadQueryFont(dpy, "fixed");
-		check(fs != nil && fs->ascent > 0, "XLoadQueryFont gives a font with a positive ascent");
-		check(fs != nil && XTextWidth(fs, "clock", 5) > 0, "XTextWidth of a word is positive");
+		check(fs != NULL && fs->ascent > 0, "XLoadQueryFont gives a font with a positive ascent");
+		check(fs != NULL && XTextWidth(fs, "clock", 5) > 0, "XTextWidth of a word is positive");
 		check(XDrawString(dpy, w, gc, 10, 50, "12", 2), "XDrawString succeeds");
-		if(fs != nil)
+		if(fs != NULL)
 			XFreeFont(dpy, fs);
 	}
 
@@ -108,14 +108,14 @@ main(void)
 	/* nothing has been typed or moved yet, so nothing should be queued;
 	 * a nonzero count here only means the mouse moved, so it is reported */
 	if(XPending(dpy) != 0)
-		print("INFO: events were already queued (mouse moved?)\n");
+		printf("INFO: events were already queued (mouse moved?)\n");
 	else
 		check(1, "no events are queued at start");
 
 	check(XFreeGC(dpy, gc), "XFreeGC succeeds");
 	check(XCloseDisplay(dpy), "XCloseDisplay succeeds");
 
-	USED(ev);
-	print("%d failure(s)\n", fails);
-	exits(fails ? "fail" : nil);
+	(void)ev;
+	printf("%d failure(s)\n", fails);
+	return fails != 0;
 }

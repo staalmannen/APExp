@@ -94,7 +94,8 @@ main(void)
 		fprintf(stderr, "xshimclock: cannot open the display\n");
 		return 1;
 	}
-	win = XCreateSimpleWindow(dpy, XDefaultRootWindow(dpy), 0, 0, W, H, 0, 0, 0);
+	/* a white background: X's pixel 0 is black, which would hide the black face */
+	win = XCreateSimpleWindow(dpy, XDefaultRootWindow(dpy), 0, 0, W, H, 0, 0, 0xFFFFFF);
 	XSelectInput(dpy, win, ExposureMask | KeyPressMask);
 	XMapWindow(dpy, win);
 	gc = XCreateGC(dpy, win, 0, NULL);
