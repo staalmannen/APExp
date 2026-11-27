@@ -81,7 +81,7 @@ main(void)
 
 	gc = XCreateGC(dpy, w, 0, NULL);
 	check(gc != NULL, "XCreateGC returns a context");
-	check(XSetForeground(dpy, gc, 0xFF0000), "XSetForeground succeeds");
+	check(XSetForeground(dpy, gc, 0xFF0000) == Success, "XSetForeground succeeds");
 	check(XFillRectangle(dpy, w, gc, 10, 10, 40, 20), "XFillRectangle on the window succeeds");
 	check(XDrawRectangle(dpy, w, gc, 0, 0, 30, 30), "XDrawRectangle succeeds");
 	check(XDrawRectangle(dpy, w, gc, 5, 5, 0, 0), "a zero-size outline draws nothing and succeeds");
@@ -116,7 +116,7 @@ main(void)
 	else
 		check(1, "no events are queued at start");
 
-	check(XFreeGC(dpy, gc), "XFreeGC succeeds");
+	check(XFreeGC(dpy, gc) == Success, "XFreeGC succeeds");
 	check(XCloseDisplay(dpy), "XCloseDisplay succeeds");
 
 	(void)ev;
