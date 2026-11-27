@@ -81,7 +81,7 @@ XDrawArc(Display *dpy, Drawable d, GC gc, int x, int y, unsigned int width,
 	if(c == nil)
 		return 0;
 	radius = gc->line_width > 0 ? gc->line_width - 1 : 0;
-	poly(xs_dpy->image, pts, n, 0, 0, radius, c, ZP);
+	poly(screen, pts, n, 0, 0, radius, c, ZP);
 	freeimage(c);
 	return 1;
 }
@@ -105,7 +105,7 @@ XFillArc(Display *dpy, Drawable d, GC gc, int x, int y, unsigned int width,
 	c = xs_colour(gc->foreground);
 	if(c == nil)
 		return 0;
-	fillpoly(xs_dpy->image, pts, n, ~0, c, ZP);
+	fillpoly(screen, pts, n, ~0, c, ZP);
 	freeimage(c);
 	return 1;
 }

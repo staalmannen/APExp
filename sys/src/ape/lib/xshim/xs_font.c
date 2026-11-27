@@ -108,7 +108,7 @@ XDrawString(Display *dpy, Drawable d, GC gc, int x, int y, char *s, int n)
 		return 0;
 	p = addpt(xs_origin(), Pt(x, y - f->ascent));
 	buf = s;
-	stringn(xs_dpy->image, p, c, ZP, f, buf, n);
+	stringn(screen, p, c, ZP, f, buf, n);
 	freeimage(c);
 	return 1;
 }

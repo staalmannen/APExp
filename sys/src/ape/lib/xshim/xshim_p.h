@@ -7,6 +7,9 @@
 /* the one display, set by XOpenDisplay */
 extern Display	*xs_dpy;
 
+/* clip all drawing to the window (display.c); call after any change of window */
+extern void	xs_clipwindow(void);
+
 /* set by eresized when rio resizes the window; cleared when reported */
 extern int	xs_expose;
 
@@ -14,7 +17,7 @@ extern int	xs_expose;
 extern Image	*xs_colour(unsigned long pixel);
 
 /* the window's rectangle on the screen, so X coordinates are relative to it */
-#define xs_origin()	(xs_dpy->image->r.min)
+#define xs_origin()	(screen->r.min)
 
 /* the region and clip functions the GC code calls (xs_region.c, xs_gc.c) */
 extern Region	XCreateRegion(void);

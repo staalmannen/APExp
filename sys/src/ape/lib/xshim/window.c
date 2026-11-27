@@ -42,7 +42,7 @@ int
 XClearWindow(Display *dpy, Window w)
 {
 	USED(dpy); USED(w);
-	draw(xs_dpy->image, xs_dpy->image->r, xs_dpy->white, nil, ZP);
+	draw(screen, screen->r, xs_dpy->white, nil, ZP);
 	return 1;
 }
 
