@@ -81,3 +81,43 @@ xs_fontfid(void *fs)
 {
 	return fs != NULL ? ((XFontStruct*)fs)->fid : None;
 }
+
+/*
+ * The Xlib functions that the standard macros of the same stem stand beside.
+ * Each reads the standard display structure, as the macros do.
+ */
+int
+XDefaultScreen(Display *dpy)
+{
+	return ((_XPrivDisplay)dpy)->default_screen;
+}
+
+Window
+XDefaultRootWindow(Display *dpy)
+{
+	return ScreenOfDisplay(dpy, DefaultScreen(dpy))->root;
+}
+
+int
+XDisplayWidth(Display *dpy, int scr)
+{
+	return ScreenOfDisplay(dpy, scr)->width;
+}
+
+int
+XDisplayHeight(Display *dpy, int scr)
+{
+	return ScreenOfDisplay(dpy, scr)->height;
+}
+
+unsigned long
+XBlackPixel(Display *dpy, int scr)
+{
+	return ScreenOfDisplay(dpy, scr)->black_pixel;
+}
+
+unsigned long
+XWhitePixel(Display *dpy, int scr)
+{
+	return ScreenOfDisplay(dpy, scr)->white_pixel;
+}
